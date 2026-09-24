@@ -201,7 +201,6 @@ TrustNode TheoryBV::ppRewrite(TNode t,
   }
   // When int-blasting, it is better to handle most overflow operators
   // natively, rather than to eliminate them eagerly.
-  if (options().smt.solveBVAsInt == options::SolveBVAsIntMode::OFF)
   {
     res = d_rewriter.eliminateOverflows(res);
   }

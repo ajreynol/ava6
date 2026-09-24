@@ -103,12 +103,6 @@ Node RewriteDbNodeConverter::postConvert(Node n)
       return ret;
     }
   }
-  else if (k == Kind::APPLY_UF)
-  {
-    Node ret = theory::uf::TheoryUfRewriter::getHoApplyForApplyUf(n);
-    recordProofStep(n, ret, ProofRule::ENCODE_EQ_INTRO);
-    return ret;
-  }
   else if (k == Kind::APPLY_CONSTRUCTOR)
   {
     // We apply annotations to parametric datatype constructors, which is

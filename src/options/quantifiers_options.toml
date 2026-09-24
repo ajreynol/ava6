@@ -482,23 +482,6 @@ name   = "Quantifiers"
   default    = "true"
   help       = "infer alpha equivalence between quantified formulas"
 
-[[setting]]
-  name       = "macrosQuant"
-  type       = "bool"
-  default    = "false"
-
-[[setting]]
-  name       = "macrosQuantMode"
-  type       = "MacrosQuantMode"
-  default    = "GROUND_UF"
-  help_mode  = "Modes for quantifiers macro expansion."
-[[setting.mode.ALL]]
-  name = "all"
-[[setting.mode.GROUND]]
-  name = "ground"
-[[setting.mode.GROUND_UF]]
-  name = "ground-uf"
-
 [[option]]
   name       = "quantDynamicSplit"
   category   = "regular"
@@ -552,24 +535,9 @@ name = "on"
 name = "agg"
 
 [[setting]]
-name = "iteDtTesterSplitQuant"
-type = "bool"
-default = "false"
-
-[[setting]]
 name = "preSkolemQuantNested"
 type = "bool"
 default = "true"
-
-[[setting]]
-name = "globalNegate"
-type = "bool"
-default = "false"
-
-[[setting]]
-name = "purifyTriggers"
-type = "bool"
-default = "false"
 
 [[setting]]
 name = "triggerActiveSelMode"
@@ -622,34 +590,9 @@ name = "agg-predicate"
 name = "agg"
 
 [[setting]]
-name = "dtStcInduction"
-type = "bool"
-default = "false"
-
-[[setting]]
-name = "intWfInduction"
-type = "bool"
-default = "false"
-
-[[setting]]
 name = "cegqiFullEffort"
 type = "bool"
 default = "false"
-
-[[setting]]
-name = "cegqiUseInfInt"
-type = "bool"
-default = "false"
-
-[[setting]]
-name = "cegqiUseInfReal"
-type = "bool"
-default = "false"
-
-[[setting]]
-name = "cegqiMidpoint"
-type = "bool"
-default = "true"
 
 [[setting]]
 name = "cegqiBvIneqMode"
@@ -661,11 +604,6 @@ name = "eq-slack"
 name = "eq-boundary"
 [[setting.mode.KEEP]]
 name = "keep"
-
-[[setting]]
-name = "hoElimStoreAx"
-type = "bool"
-default = "true"
 
 [[option]]
   name       = "fmfOneInstPerRound"

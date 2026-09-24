@@ -41,7 +41,6 @@ const char* toString(ava6::SkolemId id)
     case ava6::SkolemId::ARITH_VTS_INFINITY: return "arith_vts_infinity";
     case ava6::SkolemId::ARITH_VTS_INFINITY_FREE:
       return "arith_vts_infinity_free";
-    case ava6::SkolemId::SHARED_SELECTOR: return "shared_selector";
     case ava6::SkolemId::HO_DEQ_DIFF: return "ho_deq_diff";
     case ava6::SkolemId::QUANTIFIERS_SKOLEMIZE: return "quantifiers_skolemize";
     case ava6::SkolemId::WITNESS_STRING_LENGTH: return "witness_string_length";

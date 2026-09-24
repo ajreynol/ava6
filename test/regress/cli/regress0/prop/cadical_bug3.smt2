@@ -1,4 +1,4 @@
-; COMMAND-LINE: -i --sat-solver=cadical
+; COMMAND-LINE: -i
 ; EXPECT: unknown
 ; EXPECT: unknown
 (set-logic UF)

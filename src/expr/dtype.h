@@ -465,17 +465,6 @@ class DType
   Node computeGroundTerm(TypeNode t,
                          std::vector<TypeNode>& processing,
                          bool isValue) const;
-  /** Get the shared selector
-   *
-   * This returns the index^th (constructor-agnostic)
-   * selector for type t. The type dtt is the datatype
-   * type whose datatype is this class, where this may
-   * be an instantiated parametric datatype.
-   *
-   * In the terminology of "DTypes with Shared Selectors",
-   * this returns the term sel_{dtt}^{t,index}.
-   */
-  Node getSharedSelector(TypeNode dtt, TypeNode t, size_t index) const;
   /**
    * Helper for mkGroundTerm and mkGroundValue above.
    */
@@ -584,9 +573,6 @@ class DType
   mutable std::map<TypeNode, Node> d_groundTerm;
   /** cache of ground values for this datatype */
   mutable std::map<TypeNode, Node> d_groundValue;
-  /** cache of shared selectors for this datatype */
-  mutable std::map<TypeNode, std::map<TypeNode, std::map<unsigned, Node> > >
-      d_sharedSel;
   /**  A cache for getCardinalityClass. */
   mutable std::map<TypeNode, CardinalityClass> d_cardClass;
 }; /* class DType */

@@ -28,13 +28,11 @@
 
 namespace ava6::internal {
 
-class ProofLogger;
 
 namespace prop {
 
 class CDCLTSatSolver;
 class CnfStream;
-class SatProofManager;
 
 /**
  * This class is responsible for managing the proof output of PropEngine, both
@@ -45,7 +43,6 @@ class SatProofManager;
  */
 class PropPfManager : protected EnvObj
 {
-  friend class SatProofManager;
 
  public:
   /**
@@ -59,12 +56,6 @@ class PropPfManager : protected EnvObj
                 CnfStream& cnfProof,
                 const context::CDList<Node>& assumptions);
 
-  /** Presolve, which initializes proof logging. */
-  void presolve();
-  /** Logs the preprocessing proof, if the proof logger is set. */
-  void logPreprocessing();
-  /** Postsolve, which finalizes proof logging. */
-  void postsolve(SatValue result);
   /**
    * Ensure that the given node will have a designated SAT literal that is
    * definitionally equal to it.  The result of this function is that the Node
@@ -170,16 +161,6 @@ class PropPfManager : protected EnvObj
    */
   void notifyExplainedPropagation(TrustNode ttn);
   /**
-   * Get the last explained propagation by the above method. This is required
-   * only for Minisat.
-   */
-  Node getLastExplainedPropagation() const;
-  /**
-   * Reset the tracker for the last explained propagation. This is required only
-   * for Minisat.
-   */
-  void resetLastExplainedPropagation();
-  /**
    * Get the clausification proof of all clauses that have been sent to the SAT
    * solver.
    */
@@ -215,7 +196,6 @@ class PropPfManager : protected EnvObj
   /** Proof-producing CNF converter */
   ProofCnfStream d_pfCnfStream;
   /** Pointer to the proof logger of the environment */
-  ProofLogger* d_plog;
   /**
    * The SAT solver of this prop engine, which should provide a refutation
    * proof when requested */
@@ -245,10 +225,6 @@ class PropPfManager : protected EnvObj
   context::CDHashMap<Node, uint64_t> d_lemmaClauseTimestamp;
   /** The current identifier */
   theory::InferenceId d_currLemmaId;
-  /** The current propagation being processed via this class. */
-  Node d_currPropagationProcessed;
-  /** Temporary, pointer to SAT proof manager */
-  SatProofManager* d_satPm;
   /**
    * Counts number of inference ids in requested unsat core lemmas. Note this is
    * tracked only if -o unsat-core-lemmas is on.

@@ -63,17 +63,3 @@ name   = "Printing"
 # Internal core policies; never accepted as command-line or SMT-LIB options.
 
 
-[[setting]]
-name = "flattenHOChains"
-type = "bool"
-default = "false"
-
-[[setting]]
-name = "printArithLitToken"
-type = "bool"
-default = "false"
-
-[[setting]]
-name = "printSkolemDefinitions"
-type = "bool"
-default = "false"

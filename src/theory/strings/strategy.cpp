@@ -52,15 +52,6 @@ std::ostream& operator<<(std::ostream& out, InferStep s)
       break;
     case InferStep::CHECK_MEMBERSHIP: out << "check_membership"; break;
     case InferStep::CHECK_CARDINALITY: out << "check_cardinality"; break;
-    case InferStep::CHECK_SEQUENCES_ARRAY_CONCAT:
-      out << "check_sequences_update_concat_terms";
-      break;
-    case InferStep::CHECK_SEQUENCES_ARRAY:
-      out << "check_sequences_array";
-      break;
-    case InferStep::CHECK_SEQUENCES_ARRAY_EAGER:
-      out << "check_sequences_array_eager";
-      break;
     case InferStep::UNKNOWN: out << "?"; break;
     default:
       Unreachable();
@@ -124,10 +115,7 @@ void Strategy::initializeStrategy()
     addStrategyStep(InferStep::CHECK_INIT);
     addStrategyStep(InferStep::CHECK_CONST_EQC);
     addStrategyStep(InferStep::CHECK_EXTF_EVAL, 0);
-    if (options().strings.seqArray == options::SeqArrayMode::EAGER)
-    {
-      addStrategyStep(InferStep::CHECK_SEQUENCES_ARRAY_EAGER);
-    }
+    
     // we must check cycles before using flat forms
     addStrategyStep(InferStep::CHECK_CYCLES);
     {
@@ -143,11 +131,7 @@ void Strategy::initializeStrategy()
     {
       addStrategyStep(InferStep::CHECK_LENGTH_EQC);
     }
-    if (options().strings.seqArray != options::SeqArrayMode::NONE)
-    {
-      addStrategyStep(InferStep::CHECK_SEQUENCES_ARRAY_CONCAT);
-      addStrategyStep(InferStep::CHECK_SEQUENCES_ARRAY);
-    }
+    
     if (options().strings.stringExp)
     {
       addStrategyStep(InferStep::CHECK_EXTF_REDUCTION);

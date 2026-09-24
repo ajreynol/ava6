@@ -11,4 +11,3 @@
 ##
 
 # Add unit tests.
-ava6_add_unit_test_white(pass_foreign_theory_rewrite_white preprocessing)

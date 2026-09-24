@@ -457,10 +457,7 @@ void FullModelChecker::initializeFunctions(TheoryModel* m)
     return;
   }
   // if higher-order, we must use the standard assignment method
-  if (logicInfo().isHigherOrder())
-  {
-    return;
-  }
+  
   FirstOrderModelFmc* fm = d_fm.get();
   Trace("fmc") << "---Full Model Check reset() " << std::endl;
   d_quant_models.clear();

@@ -49,18 +49,6 @@ name   = "Strings Theory"
   default    = "true"
   help       = "use models to avoid reductions for extended functions that introduce quantified formulas"
 
-[[setting]]
-  name       = "regExpElim"
-  type       = "RegExpElimMode"
-  default    = "OFF"
-  help_mode  = "Regular expression elimination modes."
-[[setting.mode.OFF]]
-  name = "off"
-[[setting.mode.ON]]
-  name = "on"
-[[setting.mode.AGG]]
-  name = "agg"
-
 [[option]]
   name       = "stringEagerEval"
   category   = "regular"
@@ -96,33 +84,9 @@ name   = "Strings Theory"
 
 # Internal core policies; never accepted as command-line or SMT-LIB options.
 [[setting]]
-name = "stringRegExpInterMode"
-type = "RegExpInterMode"
-default = "NONE"
-[[setting.mode.ALL]]
-name = "all"
-[[setting.mode.CONSTANT]]
-name = "constant"
-[[setting.mode.ONE_CONSTANT]]
-name = "one-constant"
-[[setting.mode.NONE]]
-name = "none"
-
-[[setting]]
 name = "stringsAlphaCard"
 type = "uint64_t"
 default = "196608"
-
-[[setting]]
-name = "seqArray"
-type = "SeqArrayMode"
-default = "NONE"
-[[setting.mode.LAZY]]
-name = "lazy"
-[[setting.mode.EAGER]]
-name = "eager"
-[[setting.mode.NONE]]
-name = "none"
 
 [[setting]]
 name = "stringsModelMaxLength"

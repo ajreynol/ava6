@@ -1589,7 +1589,7 @@ Node TheoryArrays::mkAnd(std::vector<TNode>& conjunctions,
 
 void TheoryArrays::setNonLinear(TNode a)
 {
-  if (false) return;
+  
   if (d_infoMap.isNonLinear(a)) return;
 
   Trace("arrays") << spaces(context()->getLevel()) << "Arrays::setNonLinear ("
@@ -1783,7 +1783,7 @@ void TheoryArrays::mergeArrays(TNode a, TNode b)
 
 void TheoryArrays::checkStore(TNode a)
 {
-  if (false) return;
+  
 
   Trace("arrays-cri") << "Arrays::checkStore " << a << "\n";
 
@@ -1818,7 +1818,7 @@ void TheoryArrays::checkStore(TNode a)
 
 void TheoryArrays::checkRowForIndex(TNode i, TNode a)
 {
-  if (false) return;
+  
 
   Trace("arrays-cri") << "Arrays::checkRowForIndex " << a << "\n";
   Trace("arrays-cri") << "                   index " << i << "\n";
@@ -1888,7 +1888,7 @@ void TheoryArrays::checkRowForIndex(TNode i, TNode a)
 // look for new ROW lemmas
 void TheoryArrays::checkRowLemmas(TNode a, TNode b)
 {
-  if (false) return;
+  
 
   Trace("arrays-crl") << "Arrays::checkLemmas begin \n" << a << "\n";
   if (TraceIsOn("arrays-crl")) d_infoMap.getInfo(a)->print();

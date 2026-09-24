@@ -78,44 +78,10 @@ class Skolemize : protected EnvObj
   static std::vector<Node> getSkolemConstants(const Node& q);
   /** get the i^th skolem constant for quantified formula q */
   static Node getSkolemConstant(const Node& q, size_t i);
-  /** make skolemized body
-   *
-   * This returns the skolemized body n of a
-   * quantified formula q with inductive strenghtening,
-   * where typically n is q[1].
-   *
-   * The skolem constants/functions we generate by this
-   * skolemization are added to sk.
-   *
-   * The argument fvs are used if we are
-   * performing skolemization within a nested quantified
-   * formula. In this case, skolem constants we introduce
-   * must be parameterized based on the types of fvs and must be
-   * applied to fvs.
-   *
-   * The last two arguments sub and sub_vars are used for
-   * to carry the body and indices of other induction
-   * variables if a quantified formula to skolemize
-   * has multiple induction variables. See page 5
-   * of Reynolds et al., VMCAI 2015.
-   */
-  static Node mkSkolemizedBodyInduction(const Options& opts,
-                                        Node q,
-                                        Node n,
-                                        std::vector<TNode>& fvs,
-                                        std::vector<Node>& sk,
-                                        Node& sub,
-                                        std::vector<unsigned>& sub_vars);
-  /** get skolem constants for quantified formula q */
-  bool getSkolemConstantsInduction(Node q, std::vector<Node>& skolems);
-  /** get the skolemized body for quantified formula q
-   *
-   * For example, if q is forall x. P( x ), this returns the formula P( k ) for
-   * a fresh Skolem constant k.
-   */
-  Node getSkolemizedBodyInduction(Node q);
-  /** is n a variable that we can apply inductive strenghtening to? */
-  static bool isInductionTerm(const Options& opts, Node n);
+  /** Substitute Skolem constants, or functions of the enclosing variables. */
+  static Node mkSkolemizedBody(Node q, Node body,
+                               const std::vector<TNode>& fvs,
+                               std::vector<Node>& skolems);
   /**
    * Get skolemization vectors, where for each quantified formula that was
    * skolemized, this is the list of skolems that were used to witness the
@@ -132,17 +98,6 @@ class Skolemize : protected EnvObj
  private:
   /** Are proofs enabled? */
   bool isProofEnabled() const;
-  /** get self selectors
-   * For datatype constructor dtc with type dt,
-   * this collects the set of datatype selector applications,
-   * applied to term n, whose return type in ntn, and stores
-   * them in the vector selfSel.
-   */
-  static void getSelfSel(const DType& dt,
-                         const DTypeConstructor& dc,
-                         Node n,
-                         TypeNode ntn,
-                         std::vector<Node>& selfSel);
   /** Reference to the quantifiers state */
   QuantifiersState& d_qstate;
   /** Reference to the term registry */
@@ -152,7 +107,6 @@ class Skolemize : protected EnvObj
   /** map from quantified formulas to the list of skolem constants */
   std::unordered_map<Node, std::vector<Node>> d_skolem_constants;
   /** map from quantified formulas to their skolemized body */
-  std::unordered_map<Node, Node> d_skolem_body;
   /** Eager proof generator for skolemization lemmas */
   std::unique_ptr<EagerProofGenerator> d_epg;
 };

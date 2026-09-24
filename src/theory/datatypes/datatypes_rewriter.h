@@ -52,18 +52,6 @@ class DatatypesRewriter : public TheoryRewriter
   Node rewriteViaRule(ProofRewriteRule id, const Node& n) override;
 
   /**
-   * Expand an APPLY_SELECTOR term n, return its expanded form. If n is
-   *   (APPLY_SELECTOR selC x)
-   * its expanded form is
-   *   (APPLY_SELECTOR selC' x)
-   * where selC' is the internal selector function for selC (a shared selector
-   * if sharedSel is true).
-   * Note that we do not introduce an uninterpreted function here, e.g. to
-   * handle when the selector is misapplied. This is because it suffices to
-   * reason about the original selector term e.g. via congruence.
-   */
-  static Node expandApplySelector(Node n, bool sharedSel);
-  /**
    * Expand updater term. Given n = (APPLY_UPDATER{SELECTOR_k} t s), this method
    * returns (ITE (APPLY_TESTER{C} t) (C (APPLY_SELECTOR SELECTOR_1
    * t)...s...(APPLY_SELECTOR SELECTOR_m t)) t). where 1 <= k <= m.

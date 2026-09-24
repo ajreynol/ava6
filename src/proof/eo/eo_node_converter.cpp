@@ -156,11 +156,6 @@ Node EoNodeConverter::postConvert(Node n)
       return mkInternalApp("_", args, tn);
     }
   }
-  else if (k == Kind::HO_APPLY)
-  {
-    TypeNode tn = n.getType();
-    return mkInternalApp("_", {n[0], n[1]}, tn);
-  }
   else if (n.isClosure())
   {
     TypeNode tn = n.getType();
@@ -518,17 +513,6 @@ Node EoNodeConverter::getOperatorOfTerm(Node n)
     else if (k == Kind::APPLY_SELECTOR)
     {
       // maybe a shared selector
-      if (op.getSkolemId() == SkolemId::SHARED_SELECTOR)
-      {
-        std::vector<Node> kindices = op.getSkolemIndices();
-        opName << "@shared_selector";
-        indices.push_back(
-            typeAsNode(kindices[0].getConst<SortToTerm>().getType()));
-        indices.push_back(
-            typeAsNode(kindices[1].getConst<SortToTerm>().getType()));
-        indices.push_back(kindices[2]);
-      }
-      else
       {
         unsigned index = DType::indexOf(op);
         const DType& dt = DType::datatypeOf(op);

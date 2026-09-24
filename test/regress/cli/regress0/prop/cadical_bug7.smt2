@@ -1,4 +1,4 @@
-; COMMAND-LINE: -i --sat-solver=cadical
+; COMMAND-LINE: -i
 ; EXPECT: sat
 (set-logic QF_LIA)
 (declare-fun v () Int)

@@ -45,26 +45,6 @@ class TheoryUfRewriter : public TheoryRewriter
    */
   Node rewriteViaRule(ProofRewriteRule id, const Node& n) override;
   // conversion between HO_APPLY AND APPLY_UF
-  /**
-   * converts an APPLY_UF to a curried HO_APPLY e.g.
-   * (f a b) becomes (@ (@ f a) b).
-   */
-  static Node getHoApplyForApplyUf(TNode n);
-  /**
-   * Converts a curried HO_APPLY into an APPLY_UF e.g.
-   * (@ (@ f a) b) becomes (f a b).
-   * Returns null if f cannot be used as an operator for APPLY_UF (see
-   * canUseAsApplyUfOperator).
-   */
-  static Node getApplyUfForHoApply(TNode n);
-  /**
-   * Given a curried HO_APPLY term n, this method adds its arguments into args
-   * and returns its operator. If the argument opInArgs is true, then we add
-   * its operator to args.
-   */
-  static Node decomposeHoApply(TNode n,
-                               std::vector<TNode>& args,
-                               bool opInArgs = false);
   /** returns true if this node can be used as an operator of an APPLY_UF node.
    * In higher-order logic, terms can have function types and not just
    * variables. Currently, we want only free variables to be used as operators

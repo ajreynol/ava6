@@ -36,6 +36,10 @@
  */
 namespace ava6::internal::options::ioutils {
 
+/** Use CPC syntax for arithmetic literals and Skolem definitions. */
+void applyCpcFormat(std::ios_base& ios, bool enabled) AVA6_EXPORT;
+bool getCpcFormat(std::ios_base& ios);
+
 // clang-format off
 ${iodecls}$
     // clang-format on
@@ -56,6 +60,7 @@ ${iodecls}$
  private:
   /** The ios object */
   std::ios_base& d_ios;
+  bool d_cpcFormat;
 
   // clang-format off
 ${ioscope_members}$

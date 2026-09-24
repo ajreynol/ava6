@@ -58,7 +58,6 @@ class AVA6_EXPORT LogicInfo
   bool d_differenceLogic;
   /** cardinality constraints in this logic? */
   /** higher-order constraints in this logic? */
-  bool d_higherOrder;
 
   bool d_locked; /**< is this LogicInfo instance locked (and thus immutable)? */
 
@@ -151,9 +150,6 @@ class AVA6_EXPORT LogicInfo
   /** Does this logic only permit difference reasoning? (implies linear) */
   bool isDifferenceLogic() const;
 
-  /** Is this a higher order logic? */
-  bool isHigherOrder() const;
-
   // MUTATORS
 
   /**
@@ -170,7 +166,7 @@ class AVA6_EXPORT LogicInfo
    * @param enableHigherOrder Whether HOL should be enable together with the
    * above.
    */
-  void enableEverything(bool enableHigherOrder = false);
+  void enableEverything();
 
   /**
    * Disable all functionality.  The result will be a LogicInfo with
@@ -232,11 +228,6 @@ class AVA6_EXPORT LogicInfo
   // for cardinality constraints
 
   // for higher-order
-
-  /** Enable the use of higher-order in this logic. */
-  void enableHigherOrder();
-  /** Disable the use of higher-order in this logic. */
-  void disableHigherOrder();
 
   // LOCKING FUNCTIONALITY
 

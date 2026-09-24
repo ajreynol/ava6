@@ -121,16 +121,6 @@ type = "bool"
 default = "false"
 
 [[setting]]
-name = "checkProofSteps"
-type = "bool"
-default = "false"
-
-[[setting]]
-name = "proofLog"
-type = "bool"
-default = "false"
-
-[[setting]]
 name = "proofPreSimpLookahead"
 type = "uint64_t"
 default = "2"

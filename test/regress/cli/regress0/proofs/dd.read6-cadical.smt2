@@ -1,4 +1,4 @@
-; COMMAND-LINE: --sat-solver=cadical
+; COMMAND-LINE:
 ; EXPECT: unsat
 (set-logic QF_AUFLIA)
 (declare-const x Bool)

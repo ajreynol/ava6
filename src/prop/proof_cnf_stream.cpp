@@ -11,9 +11,10 @@
  */
 
 #include "prop/proof_cnf_stream.h"
+#include "prop/prop_proof_manager.h"
+#include "smt/env.h"
 
 #include "options/smt_options.h"
-#include "prop/minisat/minisat.h"
 #include "theory/builtin/proof_checker.h"
 #include "util/rational.h"
 

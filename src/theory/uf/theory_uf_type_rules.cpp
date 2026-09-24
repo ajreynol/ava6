@@ -109,7 +109,7 @@ TypeNode HoApplyTypeRule::computeType(NodeManager* nodeManager,
                                       bool check,
                                       std::ostream* errOut)
 {
-  Assert(n.getKind() == Kind::HO_APPLY);
+  Assert(false);
   TypeNode fType = n[0].getTypeOrNull();
   if (!fType.isFunction())
   {

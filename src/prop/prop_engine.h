@@ -349,12 +349,6 @@ class PropEngine : protected EnvObj
    */
   std::vector<Node> getUnsatCoreLemmas();
 
-  /** Get the zero-level assertions that should be used on deep restart */
-  std::vector<Node> getLearnedZeroLevelLiteralsForRestart() const;
-
-  /** Get the literal type through the ZLL utilities */
-  LearnedLitType getLiteralType(const Node& lit) const;
-
  private:
   /** Dump out the satisfying assignment (after SAT result) */
   void printSatisfyingAssignment();
@@ -406,7 +400,6 @@ class PropEngine : protected EnvObj
                             TrustNode trn,
                             const std::vector<theory::SkolemLemma>& ppLemmas,
                             bool removable,
-                            bool inprocess,
                             bool local);
 
   /**

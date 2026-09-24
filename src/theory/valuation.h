@@ -31,7 +31,6 @@ namespace theory {
 
 struct Assertion;
 class TheoryModel;
-class SortInference;
 
 /**
  * The status of an equality in the current context.
@@ -119,12 +118,6 @@ class Valuation
    * check.
    */
   TheoryModel* getModel();
-  /**
-   * Returns a pointer to the sort inference module, which lives in TheoryEngine
-   * and is non-null when options::sortInference is true.
-   */
-  SortInference* getSortInference();
-
   //-------------------------------------- static configuration of the model
   /**
    * Set that k is an unevaluated kind in the TheoryModel, if it exists.

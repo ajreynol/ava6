@@ -12,7 +12,6 @@
 
 #include "theory/quantifiers/ematching/trigger_database.h"
 
-#include "theory/quantifiers/ematching/ho_trigger.h"
 #include "theory/quantifiers/ematching/trigger.h"
 #include "theory/quantifiers/term_util.h"
 

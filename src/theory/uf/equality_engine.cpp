@@ -105,7 +105,6 @@ EqualityEngine::EqualityEngine(Env& env,
                                bool anyTermTriggers)
     : ContextNotifyObj(c),
       EnvObj(env),
-      d_masterEqualityEngine(nullptr),
       d_context(c),
       d_done(c, false),
       d_notify(&s_notifyNone),
@@ -136,7 +135,6 @@ EqualityEngine::EqualityEngine(Env& env,
                                bool anyTermTriggers)
     : ContextNotifyObj(c),
       EnvObj(env),
-      d_masterEqualityEngine(nullptr),
       d_proofEqualityEngine(nullptr),
       d_context(c),
       d_done(c, false),
@@ -162,12 +160,6 @@ EqualityEngine::EqualityEngine(Env& env,
   // since the notify class may not be fully constructed yet, we
   // don't set up the provided notification class until after initialization.
   d_notify = &notify;
-}
-
-void EqualityEngine::setMasterEqualityEngine(EqualityEngine* master)
-{
-  Assert(d_masterEqualityEngine == nullptr);
-  d_masterEqualityEngine = master;
 }
 
 void EqualityEngine::setProofEqualityEngine(ProofEqEngine* pfee)
@@ -458,10 +450,7 @@ void EqualityEngine::addTermInternal(TNode t, bool isOperator)
   }
 
   // If this is not an internal node, add it to the master
-  if (d_masterEqualityEngine && !d_isInternal[result])
-  {
-    d_masterEqualityEngine->addTermInternal(t);
-  }
+  
 
   // Empty the queue
   propagate();
@@ -2329,13 +2318,7 @@ void EqualityEngine::propagate()
     }
 
     // If not merging internal nodes, notify the master
-    if (d_masterEqualityEngine && !d_isInternal[t1classId]
-        && !d_isInternal[t2classId])
-    {
-      d_masterEqualityEngine->assertEqualityInternal(
-          d_nodes[t1classId], d_nodes[t2classId], TNode::null());
-      d_masterEqualityEngine->propagate();
-    }
+    
 
     // Notify the triggers
     if (!d_done)

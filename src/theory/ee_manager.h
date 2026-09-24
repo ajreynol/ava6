@@ -7,7 +7,7 @@
  * directory for licensing information.
  * ****************************************************************************
  *
- * Utilities for management of equality engines.
+ * Equality engine manager for central equality engine architecture
  */
 
 #include "ava6_private.h"
@@ -21,76 +21,115 @@
 #include "smt/env_obj.h"
 #include "theory/ee_setup_info.h"
 #include "theory/theory.h"
+#include "theory/quantifiers/master_eq_notify.h"
 #include "theory/uf/equality_engine.h"
 
 namespace ava6::internal {
-
 class TheoryEngine;
 
 namespace theory {
 
 class SharedSolver;
 
-/**
- * This is (theory-agnostic) information associated with the management of
- * an equality engine for a single theory. This information is maintained
- * by the manager class below.
- *
- * Currently, this simply is the equality engine itself, for memory
- * management purposes.
- */
 struct EeTheoryInfo
 {
   EeTheoryInfo() : d_usedEe(nullptr) {}
   /** Equality engine that is used (if it exists) */
   eq::EqualityEngine* d_usedEe;
-  /** Equality engine allocated specifically for this theory (if it exists) */
-  std::unique_ptr<eq::EqualityEngine> d_allocEe;
 };
 
-/** Virtual base class for equality engine managers */
+
+
+/**
+ * The (central) equality engine manager. This encapsulates an architecture
+ * in which all applicable theories use a single central equality engine.
+ *
+ * This class is not responsible for actually initializing equality engines in
+ * theories (since this class does not have access to the internals of Theory).
+ * Instead, it is only responsible for the construction of the equality
+ * engine objects themselves. TheoryEngine is responsible for querying this
+ * class during finishInit() to determine the equality engines to pass to each
+ * theories based on getEeTheoryInfo.
+ *
+ * It also may allocate a "master" equality engine, which is intuitively the
+ * equality engine of the theory of quantifiers. If all theories use the
+ * central equality engine, then the master equality engine is the same as the
+ * central equality engine.
+ *
+ * The theories that use central equality engine are determined by
+ * Theory::usesCentralEqualityEngine.
+ *
+ * The main idea behind this class is to use a notification class on the
+ * central equality engine which dispatches *multiple* notifications to the
+ * theories that use the central equality engine.
+ */
 class EqEngineManager : protected EnvObj
 {
  public:
-  /**
-   * @param te Reference to the theory engine
-   * @param sharedSolver The shared solver that is being used in combination
-   * with this equality engine manager
-   */
   EqEngineManager(Env& env, TheoryEngine& te, SharedSolver& shs);
-  virtual ~EqEngineManager() {}
+  ~EqEngineManager();
   /**
-   * Initialize theories, called during TheoryEngine::finishInit after theory
-   * objects have been created but prior to their final initialization. This
-   * sets up equality engines for all theories.
-   *
-   * This method is context-independent, and is applied once during
-   * the lifetime of TheoryEngine (during finishInit).
+   * Initialize theories. This method allocates unique equality engines
+   * per theories and connects them to a master equality engine.
    */
-  virtual void initializeTheories() = 0;
+  void initializeTheories();
+
   /**
-   * Get the equality engine theory information for theory with the given id.
+   * Return true if the theory with the given id uses central equality engine
+   * with the given options.
    */
+  static bool usesCentralEqualityEngine(TheoryId id);
   const EeTheoryInfo* getEeTheoryInfo(TheoryId tid) const;
-
-  /** Allocate equality engine that is context-dependent on c with info esi */
   eq::EqualityEngine* allocateEqualityEngine(EeSetupInfo& esi,
-                                             context::Context* c);
-  /**
-   * Notify this class that we are about to terminate with a model. This method
-   * is for debugging only.
-   *
-   * @param incomplete Whether we are answering "unknown" instead of "sat".
-   */
-  virtual void notifyModel(AVA6_UNUSED bool incomplete) {}
+                                           context::Context* c);
 
- protected:
-  /** Reference to the theory engine */
+ private:
   TheoryEngine& d_te;
-  /** Reference to the shared solver */
   SharedSolver& d_sharedSolver;
-  /** Information related to the equality engine, per theory. */
   std::map<TheoryId, EeTheoryInfo> d_einfo;
+  /**
+   * Notify class for central equality engine. This class dispatches
+   * notifications from the central equality engine to the appropriate
+   * theory(s).
+   */
+  class CentralNotifyClass : public theory::eq::EqualityEngineNotify
+  {
+   public:
+    CentralNotifyClass(EqEngineManager& eemc);
+    bool eqNotifyTriggerPredicate(TNode predicate, bool value) override;
+    bool eqNotifyTriggerTermEquality(TheoryId tag,
+                                     TNode t1,
+                                     TNode t2,
+                                     bool value) override;
+    void eqNotifyConstantTermMerge(TNode t1, TNode t2) override;
+    void eqNotifyNewClass(TNode t) override;
+    void eqNotifyMerge(TNode t1, TNode t2) override;
+    void eqNotifyDisequal(TNode t1, TNode t2, TNode reason) override;
+    /** Parent */
+    EqEngineManager& d_eemc;
+    /** List of notify classes that need new class notification */
+    std::vector<eq::EqualityEngineNotify*> d_newClassNotify;
+    /** List of notify classes that need merge notification */
+    std::vector<eq::EqualityEngineNotify*> d_mergeNotify;
+    /** List of notify classes that need disequality notification */
+    std::vector<eq::EqualityEngineNotify*> d_disequalNotify;
+  };
+  /** Notification when predicate gets value in central equality engine */
+  bool eqNotifyTriggerPredicate(TNode predicate, bool value);
+  bool eqNotifyTriggerTermEquality(TheoryId tag,
+                                   TNode t1,
+                                   TNode t2,
+                                   bool value);
+  /** Notification when constants are merged in central equality engine */
+  void eqNotifyConstantTermMerge(TNode t1, TNode t2);
+  /** The master equality engine notify class */
+  std::unique_ptr<quantifiers::MasterNotifyClass> d_masterEENotify;
+  /** The central equality engine notify class */
+  CentralNotifyClass d_centralEENotify;
+  /** The central equality engine. */
+  eq::EqualityEngine d_centralEqualityEngine;
+  /** The proof equality engine for the central equality engine */
+  std::unique_ptr<eq::ProofEqEngine> d_centralPfee;
 };
 
 }  // namespace theory

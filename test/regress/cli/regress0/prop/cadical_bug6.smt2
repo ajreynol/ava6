@@ -1,4 +1,4 @@
-; COMMAND-LINE: -i --sat-solver=cadical
+; COMMAND-LINE: -i
 ; DISABLE-TESTER: proof
 ; EXPECT: unsat
 ; EXPECT: unsat

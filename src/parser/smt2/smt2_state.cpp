@@ -308,8 +308,6 @@ bool Smt2State::isTheoryEnabled(internal::theory::TheoryId theory) const
   return d_logic.isTheoryEnabled(theory);
 }
 
-bool Smt2State::isHoEnabled() const { return d_logic.isHigherOrder(); }
-
 bool Smt2State::logicIsSet() { return d_logicSet; }
 
 bool Smt2State::getTesterName(Term cons, std::string& name)
@@ -527,12 +525,7 @@ void Smt2State::setLogic(std::string name)
     ParserState::addOperator(Kind::APPLY_UF);
   }
 
-  if (d_logic.isHigherOrder())
-  {
-    addOperator(Kind::HO_APPLY, "@");
-    // lambda is a closure kind
-    addClosureKind(Kind::LAMBDA, "lambda");
-  }
+  
 
   if (d_logic.isTheoryEnabled(internal::theory::THEORY_ARITH))
   {
@@ -746,7 +739,7 @@ void Smt2State::checkLogicAllowsFreeSorts()
 
 void Smt2State::checkLogicAllowsFunctions()
 {
-  if (!d_logic.isTheoryEnabled(internal::theory::THEORY_UF) && !isHoEnabled())
+  if (!d_logic.isTheoryEnabled(internal::theory::THEORY_UF) && !false)
   {
     parseError(
         "Functions (of non-zero arity) cannot "
@@ -1182,7 +1175,6 @@ Term Smt2State::applyParseOp(const ParseOp& p, std::vector<Term>& args)
       for (const Term& i : args)
       {
         Sort s = i.getSort();
-        if (!isHoEnabled())
         {
           if (s.isFunction())
           {
@@ -1334,7 +1326,6 @@ Term Smt2State::applyParseOp(const ParseOp& p, std::vector<Term>& args)
       unsigned arity = argt.getFunctionArity();
       if (args.size() - 1 < arity)
       {
-        if (!isHoEnabled())
         {
           parseError(
               "Cannot partially apply functions unless logic is prefixed by "
@@ -1413,19 +1404,7 @@ Sort Smt2State::getParametricSort(const std::string& name,
     Sort tupleSort = d_tm.mkTupleSort(args);
     t = d_tm.mkBagSort(tupleSort);
   }
-  else if (name == "->" && isHoEnabled())
-  {
-    if (args.size() < 2)
-    {
-      parseError("Arrow types must have at least 2 arguments");
-    }
-    // flatten the type
-    Sort rangeType = args.back();
-    std::vector<Sort> dargs(args.begin(), args.end() - 1);
-    t = mkFlatFunctionType(dargs, rangeType);
-  }
-  else
-  {
+  else {
     t = ParserState::getParametricSort(name, args);
   }
   return t;

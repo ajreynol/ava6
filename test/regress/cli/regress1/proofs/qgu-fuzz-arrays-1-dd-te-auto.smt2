@@ -1,5 +1,5 @@
 ; COMMAND-LINE:
-; COMMAND-LINE: --sat-solver=cadical
+; COMMAND-LINE:
 (set-logic ALL)
 (set-info :status unsat)
 (declare-const x Int)

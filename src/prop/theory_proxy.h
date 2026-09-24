@@ -24,7 +24,6 @@
 #include "expr/node.h"
 #include "proof/trust_node.h"
 #include "prop/learned_db.h"
-#include "prop/lemma_inprocess.h"
 #include "prop/registrar.h"
 #include "prop/sat_solver_types.h"
 #include "prop/theory_preregistrar.h"
@@ -195,14 +194,6 @@ class TheoryProxy : protected EnvObj, public Registrar
    */
   void notifyBacktrack();
 
-  /** Get the zero-level assertions that should be used on deep restart */
-  std::vector<Node> getLearnedZeroLevelLiteralsForRestart() const;
-  /** Get literal type using ZLL utility */
-  LearnedLitType getLiteralType(const Node& lit) const;
-
-  /** Inprocess lemma */
-  TrustNode inprocessLemma(TrustNode& trn);
-
  private:
   /** The prop engine we are using. */
   PropEngine* d_propEngine;
@@ -246,7 +237,6 @@ class TheoryProxy : protected EnvObj, public Registrar
   std::unique_ptr<ZeroLevelLearner> d_zll;
 
   /** The inprocess utility */
-  std::unique_ptr<LemmaInprocess> d_lemip;
 
   /** Preregister policy */
   std::unique_ptr<TheoryPreregistrar> d_prr;

@@ -18,7 +18,6 @@
 #include "options/bv_options.h"
 #include "printer/printer.h"
 #include "proof/clause_id.h"
-#include "prop/minisat/minisat.h"
 #include "prop/prop_engine.h"
 #include "prop/theory_proxy.h"
 #include "smt/env.h"

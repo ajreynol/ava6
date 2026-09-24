@@ -620,12 +620,7 @@ void SolverEngine::defineFunctionRec(Node func,
 
 void SolverEngine::checkModelAvailable(const char* c) const
 {
-  if (!d_env->getOptions().theory.assignFunctionValues)
-  {
-    std::stringstream ss;
-    ss << "Cannot " << c << " when --assign-function-values is false.";
-    throw RecoverableModalException(ss.str().c_str());
-  }
+  
 
   if (d_state->getMode() != SmtMode::SAT
       && d_state->getMode() != SmtMode::SAT_UNKNOWN)

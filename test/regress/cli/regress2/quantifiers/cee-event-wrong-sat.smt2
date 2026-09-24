@@ -1,5 +1,4 @@
-; COMMAND-LINE: -q --full-saturate-quant --ee-mode=distributed
-; COMMAND-LINE: -q --full-saturate-quant --ee-mode=central
+; COMMAND-LINE: -q --full-saturate-quant
 ; EXPECT: unsat
 ; DISABLE-TESTER: unsat-core
 (set-logic ALL)

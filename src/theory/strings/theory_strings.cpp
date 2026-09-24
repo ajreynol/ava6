@@ -74,20 +74,8 @@ TheoryStrings::TheoryStrings(Env& env, OutputChannel& out, Valuation valuation)
                 d_extTheory,
                 d_statistics),
       d_psolver(env, d_state, d_im, d_termReg, d_bsolver, d_csolver),
-      d_asolver(env,
-                d_state,
-                d_im,
-                d_termReg,
-                d_bsolver,
-                d_csolver,
-                d_esolver,
-                d_extTheory),
       d_rsolver(
           env, d_state, d_im, d_termReg, d_csolver, d_esolver, d_statistics),
-      d_regexp_elim(
-          env,
-          options().strings.regExpElim == options::RegExpElimMode::AGG,
-          userContext()),
       d_mcd(env, d_state, d_csolver),
       d_strat(d_env),
       d_absModelCounter(0),
@@ -365,12 +353,7 @@ bool TheoryStrings::collectModelInfoType(
   Trace("strings-model") << "Assign to equivalence classes..." << std::endl;
   std::map<Node, Node> pure_eq_assign;
   // if we are using the sequences array solver, get the connected sequences
-  const std::map<Node, Node>* conSeq = nullptr;
-  std::map<Node, Node>::const_iterator itcs;
-  if (options().strings.seqArray != options::SeqArrayMode::NONE)
-  {
-    conSeq = &d_asolver.getConnectedSequences();
-  }
+  
   // step 3 : assign values to equivalence classes that are pure variables
   for (size_t i = 0, csize = col.size(); i < csize; i++)
   {
@@ -515,94 +498,7 @@ bool TheoryStrings::collectModelInfoType(
               << "-> assign via str.code: " << assignedValue << std::endl;
         }
       }
-      else if (options().strings.seqArray != options::SeqArrayMode::NONE)
-      {
-        TypeNode eqcType = eqc.getType();
-        // determine skeleton based on the write model, if it exists
-        const std::map<Node, Node>& writeModel = d_asolver.getWriteModel(eqc);
-        if (!writeModel.empty())
-        {
-          Trace("strings-model") << "Write model for " << eqc << " (type " << tn
-                                 << ") is:" << std::endl;
-          std::vector<std::pair<Node, Node>> writes;
-          std::unordered_set<Node> usedWrites;
-          for (const std::pair<const Node, Node>& w : writeModel)
-          {
-            Trace("strings-model") << "  " << w.first << " -> " << w.second;
-            Node ivalue = d_valuation.getCandidateModelValue(w.first);
-            Assert(ivalue.isConst() && ivalue.getType().isInteger());
-            // ignore if out of bounds
-            Rational irat = ivalue.getConst<Rational>();
-            if (irat.sgn() == -1 || irat >= lenValue.getConst<Rational>())
-            {
-              Trace("strings-model")
-                  << " (index " << irat << " out of bounds)" << std::endl;
-              continue;
-            }
-            if (usedWrites.find(ivalue) != usedWrites.end())
-            {
-              Trace("strings-model")
-                  << " (index " << irat << " already written)" << std::endl;
-              continue;
-            }
-            Trace("strings-model") << " (index " << irat << ")" << std::endl;
-            usedWrites.insert(ivalue);
-            Node wsunit = utils::mkUnit(eqcType, w.second);
-            writes.emplace_back(ivalue, wsunit);
-          }
-          // sort based on index value
-          SortSeqIndex ssi;
-          std::sort(writes.begin(), writes.end(), ssi);
-          std::vector<Node> cc;
-          uint32_t currIndex = 0;
-          for (size_t w = 0, wsize = writes.size(); w <= wsize; w++)
-          {
-            uint32_t nextIndex;
-            if (w == writes.size())
-            {
-              nextIndex =
-                  lenValue.getConst<Rational>().getNumerator().toUnsignedInt();
-            }
-            else
-            {
-              Node windex = writes[w].first;
-              Assert(windex.getConst<Rational>()
-                     <= Rational(String::maxSize()));
-              nextIndex =
-                  windex.getConst<Rational>().getNumerator().toUnsignedInt();
-              Assert(nextIndex >= currIndex);
-            }
-            if (nextIndex > currIndex)
-            {
-              Trace("strings-model") << "Make skeleton from " << currIndex
-                                     << " ... " << nextIndex << std::endl;
-              // allocate arbitrary value to fill gap
-              Assert(conSeq != nullptr);
-              Node base = eqc;
-              itcs = conSeq->find(eqc);
-              if (itcs != conSeq->end())
-              {
-                base = itcs->second;
-              }
-              // use a skeleton for the gap and not a concrete value, as we
-              // do not know how which values from the element type are
-              // allowable (i.e. unconstrained) to assign to the gap
-              Node cgap = mkSkeletonFromBase(base, currIndex, nextIndex);
-              cc.push_back(cgap);
-            }
-            // then take read
-            if (w < wsize)
-            {
-              cc.push_back(writes[w].second);
-            }
-            currIndex = nextIndex + 1;
-          }
-          assignedValue = utils::mkConcat(cc, tn);
-          Trace("strings-model")
-              << "-> assign via seq.update/nth eqc: " << assignedValue
-              << std::endl;
-        }
-      }
+      
       if (!assignedValue.isNull())
       {
         pure_eq_assign[eqc] = assignedValue;
@@ -1163,20 +1059,7 @@ TrustNode TheoryStrings::ppRewrite(TNode atom, std::vector<SkolemLemma>& lems)
   }
 
   TrustNode ret;
-  Node atomRet = atom;
-  if (options().strings.regExpElim != options::RegExpElimMode::OFF
-      && ak == Kind::STRING_IN_REGEXP)
-  {
-    // aggressive elimination of regular expression membership
-    ret = d_regexp_elim.eliminateTrusted(atomRet);
-    if (!ret.isNull())
-    {
-      Trace("strings-ppr") << "  rewrote " << atom << " -> " << ret.getNode()
-                           << " via regular expression elimination."
-                           << std::endl;
-      atomRet = ret.getNode();
-    }
-  }
+  
 
 
   // all characters of constants should fall in the alphabet
@@ -1265,13 +1148,6 @@ void TheoryStrings::runInferStep(InferStep s, Theory::Effort e, int effort)
       break;
     case InferStep::CHECK_CODES: d_psolver.checkCodes(); break;
     case InferStep::CHECK_LENGTH_EQC: d_csolver.checkLengthsEqc(); break;
-    case InferStep::CHECK_SEQUENCES_ARRAY_CONCAT:
-      d_asolver.checkArrayConcat();
-      break;
-    case InferStep::CHECK_SEQUENCES_ARRAY: d_asolver.checkArray(); break;
-    case InferStep::CHECK_SEQUENCES_ARRAY_EAGER:
-      d_asolver.checkArrayEager();
-      break;
     case InferStep::CHECK_REGISTER_TERMS_NF:
       d_csolver.checkRegisterTermsNormalForms();
       break;

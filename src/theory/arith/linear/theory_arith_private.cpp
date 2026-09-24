@@ -137,7 +137,7 @@ TheoryArithPrivate::TheoryArithPrivate(Env& env,
                           SetupLiteralCallBack(*this),
                           d_partialModel,
                           RaiseEqualityEngineConflict(*this)),
-      d_cmEnabled(context(), !options().arith.arithEqSolver),
+      d_cmEnabled(context(), !true),
 
       d_dualSimplex(
           env, d_linEq, d_errorSet, RaiseConflict(*this), TempVarMalloc(*this)),

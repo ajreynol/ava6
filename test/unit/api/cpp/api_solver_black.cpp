@@ -1191,7 +1191,6 @@ class PluginUnsat : public Plugin
 
 TEST_F(TestApiBlackSolver, pluginUnsat)
 {
-  d_solver->setOption("sat-solver", "minisat");
   PluginUnsat pu(d_tm);
   d_solver->addPlugin(pu);
   ASSERT_TRUE(pu.getName() == "PluginUnsat");

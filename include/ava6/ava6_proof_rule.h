@@ -1189,7 +1189,7 @@ enum ENUM(ProofRule)
    * It is not used for kinds with variadic arity, or for kind
    * ``ava6::Kind::HO_APPLY``, which respectively use the rules
    * :cpp:enumerator:`NARY_CONG <ava6::ProofRule::NARY_CONG>` and
-   * :cpp:enumerator:`HO_CONG <ava6::ProofRule::HO_CONG>` below.
+   * :cpp:enumerator:`APPLY_CONG <ava6::ProofRule::APPLY_CONG>` below.
    * \endverbatim
    */
   EVALUE(CONG),
@@ -1268,27 +1268,6 @@ enum ENUM(ProofRule)
   EVALUE(FALSE_ELIM),
   /**
    * \verbatim embed:rst:leading-asterisk
-   * **Equality -- Higher-order application encoding**
-   *
-   * .. math::
-   *
-   *   \inferrule{-\mid t}{t=t'}
-   *
-   * where `t'` is the higher-order application that is equivalent to `t`,
-   * as implemented by ``uf::TheoryUfRewriter::getHoApplyForApplyUf``.
-   * For details see :ava6src:`theory/uf/theory_uf_rewriter.h`
-   *
-   * For example, this rule concludes :math:`f(x,y) = @( @(f,x), y)`, where
-   * :math:`@` is the ``HO_APPLY`` kind.
-   *
-   * Note this rule can be treated as a
-   * :cpp:enumerator:`REFL <ava6::ProofRule::REFL>` when appropriate in
-   * external proof formats.
-   * \endverbatim
-   */
-  EVALUE(HO_APP_ENCODE),
-  /**
-   * \verbatim embed:rst:leading-asterisk
    * **Equality -- Higher-order congruence**
    *
    * .. math::
@@ -1302,7 +1281,7 @@ enum ENUM(ProofRule)
    * ``ava6::Kind::HO_APPLY``.
    * \endverbatim
    */
-  EVALUE(HO_CONG),
+  EVALUE(APPLY_CONG),
   /**
    * \verbatim embed:rst:leading-asterisk
    * **Arrays -- Read over write**

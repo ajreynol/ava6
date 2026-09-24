@@ -2,19 +2,6 @@ id     = "PROP"
 name   = "SAT Layer"
 
 [[option]]
-  name       = "satSolver"
-  category   = "common"
-  long       = "sat-solver=MODE"
-  type       = "SatSolverMode"
-  default    = "CADICAL"
-  help       = "choose which sat solver to use, see --sat-solver=help"
-  help_mode  = "CDCL(T) SAT solver backend."
-[[option.mode.MINISAT]]
-  name = "minisat"
-[[option.mode.CADICAL]]
-  name = "cadical"
-
-[[option]]
   name       = "satRandomSeed"
   category   = "regular"
   long       = "sat-random-seed=N"
@@ -38,39 +25,3 @@ name   = "SAT Layer"
   help = "Preregister literals when they are asserted by the SAT solver."
 
 # Internal core policies; never accepted as command-line or SMT-LIB options.
-[[setting]]
-name = "satRandomFreq"
-type = "double"
-default = "0.0"
-
-[[setting]]
-name = "satVarDecay"
-type = "double"
-default = "0.95"
-
-[[setting]]
-name = "satClauseDecay"
-type = "double"
-default = "0.999"
-
-[[setting]]
-name = "satRestartFirst"
-type = "uint64_t"
-default = "25"
-
-[[setting]]
-name = "satRestartInc"
-type = "double"
-default = "3.0"
-
-[[setting]]
-name = "minisatSimpMode"
-type = "MinisatSimpMode"
-default = "ALL"
-[[setting.mode.ALL]]
-name = "all"
-[[setting.mode.CLAUSE_ELIM]]
-name = "clause-elim"
-[[setting.mode.NONE]]
-name = "none"
-

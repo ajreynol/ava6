@@ -180,16 +180,6 @@ type = "bool"
 default = "true"
 
 [[setting]]
-name = "arithMLTrick"
-type = "bool"
-default = "false"
-
-[[setting]]
-name = "arithMLTrickSubstitutions"
-type = "uint64_t"
-default = "1"
-
-[[setting]]
 name = "maxCutsInContext"
 type = "uint64_t"
 default = "65535"
@@ -240,11 +230,6 @@ type = "uint64_t"
 default = "2"
 
 [[setting]]
-name = "pbRewrites"
-type = "bool"
-default = "false"
-
-[[setting]]
 name = "nlRlvAssertBounds"
 type = "bool"
 default = "false"
@@ -254,18 +239,3 @@ name = "nlExtInitialSignLemmas"
 type = "bool"
 default = "false"
 
-[[setting]]
-name = "nlRlvMode"
-type = "NlRlvMode"
-default = "NONE"
-[[setting.mode.NONE]]
-name = "none"
-[[setting.mode.INTERLEAVE]]
-name = "interleave"
-[[setting.mode.ALWAYS]]
-name = "always"
-
-[[setting]]
-name = "arithEqSolver"
-type = "bool"
-default = "false"

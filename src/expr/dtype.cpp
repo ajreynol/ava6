@@ -757,41 +757,6 @@ const DTypeConstructor& DType::operator[](size_t index) const
   return *d_constructors[index];
 }
 
-Node DType::getSharedSelector(TypeNode dtt, TypeNode t, size_t index) const
-{
-  Assert(isResolved());
-  std::map<TypeNode, std::map<TypeNode, std::map<unsigned, Node> > >::iterator
-      itd = d_sharedSel.find(dtt);
-  if (itd != d_sharedSel.end())
-  {
-    std::map<TypeNode, std::map<unsigned, Node> >::iterator its =
-        itd->second.find(t);
-    if (its != itd->second.end())
-    {
-      std::map<unsigned, Node>::iterator it = its->second.find(index);
-      if (it != its->second.end())
-      {
-        return it->second;
-      }
-    }
-  }
-  // make the shared selector
-  Node s;
-  NodeManager* nm = dtt.getNodeManager();
-  std::stringstream ss;
-  ss << "sel_" << index;
-  SkolemManager* sm = nm->getSkolemManager();
-  std::vector<Node> cacheVals;
-  cacheVals.push_back(nm->mkConst(SortToTerm(dtt)));
-  cacheVals.push_back(nm->mkConst(SortToTerm(t)));
-  cacheVals.push_back(nm->mkConstInt(Rational(index)));
-  s = sm->mkSkolemFunction(SkolemId::SHARED_SELECTOR, cacheVals);
-  d_sharedSel[dtt][t][index] = s;
-  Trace("dt-shared-sel") << "Made " << s << " of type " << dtt << " -> " << t
-                         << std::endl;
-  return s;
-}
-
 TypeNode DType::getSygusType() const { return d_sygusType; }
 
 Node DType::getSygusVarList() const { return d_sygusBvl; }

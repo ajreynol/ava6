@@ -34,7 +34,7 @@ struct EeSetupInfo;
 class TheoryInferenceManager;
 
 /**
- * A base class for shared solver. The shared solver is the component of theory
+ * A shared solver. The shared solver is the component of theory
  * engine that behaves like a theory solver, and whose purpose is to ensure the
  * main theory combination method can be performed in CombinationEngine.
  * Its role is to:
@@ -46,18 +46,18 @@ class SharedSolver : protected EnvObj
 {
  public:
   SharedSolver(Env& env, TheoryEngine& te);
-  virtual ~SharedSolver() {}
+  ~SharedSolver() {}
   //------------------------------------- initialization
   /**
    * Returns true if we need an equality engine, this has the same contract
    * as Theory::needsEqualityEngine.
    */
-  virtual bool needsEqualityEngine(theory::EeSetupInfo& esi);
+  bool needsEqualityEngine(theory::EeSetupInfo& esi);
   /**
    * Set the equality engine. This should be called by equality engine manager
    * during EqEngineManager::initializeTheories.
    */
-  virtual void setEqualityEngine(eq::EqualityEngine* ee) = 0;
+  void setEqualityEngine(eq::EqualityEngine* ee);
   //------------------------------------- end initialization
   /**
    * Called when the given atom is pre-registered in TheoryEngine.
@@ -86,24 +86,23 @@ class SharedSolver : protected EnvObj
    * This method is used by theories via Valuation mostly for determining their
    * care graph.
    */
-  virtual EqualityStatus getEqualityStatus(TNode a, TNode b);
+  EqualityStatus getEqualityStatus(TNode a, TNode b);
   /**
    * Explain literal, which returns a conjunction of literals that entail
    * the given one.
    */
-  virtual TrustNode explain(TNode literal, TheoryId id) = 0;
+  TrustNode explain(TNode literal, TheoryId id);
   /**
    * Assert n to the shared terms database.
    *
    * This method is called by TheoryEngine when a fact has been marked to
    * send to THEORY_BUILTIN, meaning that shared terms database should
-   * maintain this fact. In the distributed equality engine architecture,
-   * this is the case when either an equality is asserted from the SAT solver
+   * maintain this fact. This is the case when either an equality is asserted from the SAT solver
    * or a theory propagates an equality between shared terms.
    */
-  virtual void assertShared(TNode n, bool polarity, TNode reason) = 0;
+  void assertShared(TNode n, bool polarity, TNode reason);
   /** Is term t a shared term? */
-  virtual bool isShared(TNode t) const;
+  bool isShared(TNode t) const;
 
   /**
    * Propagate the predicate with polarity value on the output channel of this
@@ -126,7 +125,7 @@ class SharedSolver : protected EnvObj
 
  protected:
   /** Solver-specific pre-register shared */
-  virtual void preRegisterSharedInternal(TNode t) = 0;
+  void preRegisterSharedInternal(TNode t);
   /** Reference to the theory engine */
   TheoryEngine& d_te;
   /** Logic info of theory engine (cached) */

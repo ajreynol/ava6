@@ -66,30 +66,18 @@ bool TheoryEngineModelBuilder::isAssignable(TNode n)
   {
     // selectors are always assignable (where we guarantee that they are not
     // evaluatable here)
-    if (!logicInfo().isHigherOrder())
     {
       Assert(!n.getType().isFunction());
       return true;
     }
-    else
-    {
-      // might be a function field
-      return !n.getType().isFunction();
-    }
   }
   else {
     // non-function variables, and fully applied functions
-    if (!logicInfo().isHigherOrder())
     {
       // no functions exist, all functions are fully applied
-      Assert(k != Kind::HO_APPLY);
+      Assert(true);
       Assert(!n.getType().isFunction());
       return n.isVar() || k == Kind::APPLY_UF;
-    }
-    else
-    {
-      return (n.isVar() && !n.getType().isFunction()) || k == Kind::APPLY_UF
-             || (k == Kind::HO_APPLY && n[0].getType().getNumChildren() == 2);
     }
   }
 }

@@ -60,20 +60,8 @@ class ZeroLevelLearner : protected EnvObj
    */
   bool notifyAsserted(TNode assertion, int32_t alevel);
 
-  /** Get the zero-level assertions */
-  std::vector<Node> getLearnedZeroLevelLiterals(
-      LearnedLitType ltype) const;
-  /** Get the zero-level assertions that should be used on deep restart */
-  std::vector<Node> getLearnedZeroLevelLiteralsForRestart() const;
   /** compute type for learned literal */
   LearnedLitType computeLearnedLiteralType(const Node& lit);
-
-  /**
-   * Get inferred simplifications. This is a (term) substitution that can be
-   * applied to construct simpler terms that are equivalent based on
-   * literals learned at decision level zero.
-   */
-  theory::TrustSubstitutionMap& getSimplifications();
 
  private:
   static void getAtoms(TNode a,
@@ -81,12 +69,8 @@ class ZeroLevelLearner : protected EnvObj
                        std::unordered_set<Node>& atoms);
   /** Process learned literal */
   void processLearnedLiteral(const Node& lit, LearnedLitType ltype);
-  /** is learnable based on the value of options */
-  bool isLearnable(LearnedLitType ltype) const;
   /** get solved */
   bool getSolved(const Node& lit, Subs& subs);
-  /** has learned literal */
-  bool hasLearnedLiteralForRestart() const;
   /**
    * Adds a substitution to d_tsmap. This occurs when we learn a literal at
    * decision level zero that is equivalent to (= t s)
@@ -117,11 +101,8 @@ class ZeroLevelLearner : protected EnvObj
   /** Symbols in the above atoms. */
   NodeSet d_ppnSyms;
   /** Current counter of assertions */
-  size_t d_assertNoLearnCount;
   /** The threshold */
-  size_t d_deepRestartThreshold;
   /** learnable learned literal types (for deep restart), based on option */
-  std::unordered_set<LearnedLitType> d_learnedTypes;
   /** Should we track the simplification map? */
   bool d_trackSimplifications;
   /**

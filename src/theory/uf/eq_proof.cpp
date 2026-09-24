@@ -1476,7 +1476,7 @@ Node EqProof::addToProof(CDProof* p,
                           << conclusion << " with children " << children
                           << "\n";
     p->addStep(conclusion,
-               ProofRule::HO_CONG,
+               ProofRule::APPLY_CONG,
                children,
                {ProofRuleChecker::mkKindNode(nm, Kind::APPLY_UF)},
                true);

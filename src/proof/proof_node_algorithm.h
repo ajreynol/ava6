@@ -132,7 +132,7 @@ bool containsSubproof(ProofNode* pn,
  * @param n The term, i.e. the lhs or rhs of the conclusion of the cong step.
  * @param args The arguments to the application of cong for the given term
  * @return the proof rule for congruence over the given term, which is one
- * of CONG, NARY_CONG or HO_CONG.
+ * of CONG, NARY_CONG or APPLY_CONG.
  */
 ProofRule getCongRule(const Node& n, std::vector<Node>& args);
 

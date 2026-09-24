@@ -25,30 +25,14 @@
 #include "preprocessing/passes/apply_substs.h"
 #include "preprocessing/passes/bool_to_bv.h"
 #include "preprocessing/passes/bv_eager_atoms.h"
-#include "preprocessing/passes/bv_intro_pow2.h"
 #include "preprocessing/passes/bv_to_bool.h"
-#include "preprocessing/passes/bv_to_int.h"
-#include "preprocessing/passes/distinct_elim.h"
-#include "preprocessing/passes/extended_rewriter_pass.h"
-#include "preprocessing/passes/foreign_theory_rewrite.h"
-#include "preprocessing/passes/global_negate.h"
-#include "preprocessing/passes/ho_elim.h"
-#include "preprocessing/passes/int_to_bv.h"
-#include "preprocessing/passes/ite_removal.h"
-#include "preprocessing/passes/ite_simp.h"
-#include "preprocessing/passes/learned_rewrite.h"
-#include "preprocessing/passes/miplib_trick.h"
-#include "preprocessing/passes/nl_ext_purify.h"
 #include "preprocessing/passes/non_clausal_simp.h"
 #include "preprocessing/passes/normalize.h"
-#include "preprocessing/passes/pseudo_boolean_processor.h"
 #include "preprocessing/passes/quantifiers_preprocess.h"
 #include "preprocessing/passes/real_to_int.h"
 #include "preprocessing/passes/rewrite.h"
-#include "preprocessing/passes/sort_infer.h"
 #include "preprocessing/passes/static_learning.h"
 #include "preprocessing/passes/static_rewrite.h"
-#include "preprocessing/passes/strings_eager_pp.h"
 #include "preprocessing/passes/theory_preprocess.h"
 #include "preprocessing/passes/unconstrained_simplifier.h"
 #include "preprocessing/preprocessing_pass.h"
@@ -118,35 +102,18 @@ PreprocessingPassRegistry::PreprocessingPassRegistry()
   registerPassInfo("apply-substs", callCtor<ApplySubsts>);
 
   registerPassInfo("static-learning", callCtor<StaticLearning>);
-  registerPassInfo("ite-simp", callCtor<ITESimp>);
-  registerPassInfo("global-negate", callCtor<GlobalNegate>);
-  registerPassInfo("int-to-bv", callCtor<IntToBV>);
-  registerPassInfo("bv-to-int", callCtor<BVToInt>);
-  registerPassInfo("learned-rewrite", callCtor<LearnedRewrite>);
-  registerPassInfo("foreign-theory-rewrite", callCtor<ForeignTheoryRewrite>);
-  registerPassInfo("distinct-elim", callCtor<DistinctElim>);
   registerPassInfo("real-to-int", callCtor<RealToInt>);
   registerPassInfo("bv-to-bool", callCtor<BVToBool>);
-  registerPassInfo("bv-intro-pow2", callCtor<BvIntroPow2>);
-  registerPassInfo("sort-inference", callCtor<SortInferencePass>);
   registerPassInfo("rewrite", callCtor<Rewrite>);
   registerPassInfo("bv-eager-atoms", callCtor<BvEagerAtoms>);
-  registerPassInfo("pseudo-boolean-processor",
-                   callCtor<PseudoBooleanProcessor>);
   registerPassInfo("unconstrained-simplifier",
                    callCtor<UnconstrainedSimplifier>);
   registerPassInfo("quantifiers-preprocess", callCtor<QuantifiersPreprocess>);
-  registerPassInfo("ite-removal", callCtor<IteRemoval>);
-  registerPassInfo("miplib-trick", callCtor<MipLibTrick>);
   registerPassInfo("non-clausal-simp", callCtor<NonClausalSimp>);
   registerPassInfo("ackermann", callCtor<Ackermann>);
-  registerPassInfo("ext-rew-pre", callCtor<ExtRewPre>);
   registerPassInfo("theory-preprocess", callCtor<TheoryPreprocess>);
-  registerPassInfo("nl-ext-purify", callCtor<NlExtPurify>);
   registerPassInfo("bool-to-bv", callCtor<BoolToBV>);
-  registerPassInfo("ho-elim", callCtor<HoElim>);
   registerPassInfo("static-rewrite", callCtor<StaticRewrite>);
-  registerPassInfo("strings-eager-pp", callCtor<StringsEagerPp>);
   registerPassInfo("normalize", callCtor<Normalize>);
 }
 

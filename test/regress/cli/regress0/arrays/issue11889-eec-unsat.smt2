@@ -1,4 +1,4 @@
-; COMMAND-LINE: --ee-mode=central
+; COMMAND-LINE:
 ; EXPECT: unsat
 (set-logic QF_AUFLIA)
 (declare-fun a () (Array Int Int))

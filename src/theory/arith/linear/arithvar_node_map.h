@@ -34,61 +34,6 @@ namespace arith::linear {
 typedef std::unordered_map<Node, ArithVar> NodeToArithVarMap;
 typedef DenseMap<Node> ArithVarToNodeMap;
 
-class ArithVarNodeMap
-{
- private:
-  /**
-   * Bidirectional map between Nodes and ArithVars.
-   */
-  NodeToArithVarMap d_nodeToArithVarMap;
-  ArithVarToNodeMap d_arithVarToNodeMap;
-
- public:
-  typedef ArithVarToNodeMap::const_iterator var_iterator;
-
-  ArithVarNodeMap() {}
-
-  inline bool hasArithVar(TNode x) const
-  {
-    return d_nodeToArithVarMap.find(x) != d_nodeToArithVarMap.end();
-  }
-
-  inline bool hasNode(ArithVar a) const { return d_arithVarToNodeMap.isKey(a); }
-
-  inline ArithVar asArithVar(TNode x) const
-  {
-    Assert(hasArithVar(x));
-    Assert((d_nodeToArithVarMap.find(x))->second <= ARITHVAR_SENTINEL);
-    return (d_nodeToArithVarMap.find(x))->second;
-  }
-
-  inline Node asNode(ArithVar a) const
-  {
-    Assert(hasNode(a));
-    return d_arithVarToNodeMap[a];
-  }
-
-  inline void setArithVar(TNode x, ArithVar a)
-  {
-    Assert(!hasArithVar(x));
-    Assert(!d_arithVarToNodeMap.isKey(a));
-    d_arithVarToNodeMap.set(a, x);
-    d_nodeToArithVarMap[x] = a;
-  }
-
-  inline void remove(ArithVar x)
-  {
-    Assert(hasNode(x));
-    Node node = asNode(x);
-
-    d_nodeToArithVarMap.erase(d_nodeToArithVarMap.find(node));
-    d_arithVarToNodeMap.remove(x);
-  }
-
-  var_iterator var_begin() const { return d_arithVarToNodeMap.begin(); }
-  var_iterator var_end() const { return d_arithVarToNodeMap.end(); }
-
-}; /* class ArithVarNodeMap */
 
 }  // namespace arith::linear
 }  // namespace theory

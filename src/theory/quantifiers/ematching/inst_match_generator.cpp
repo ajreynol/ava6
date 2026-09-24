@@ -715,18 +715,7 @@ InstMatchGenerator* InstMatchGenerator::getInstMatchGenerator(Env& env,
     Trace("var-trigger-debug")
         << "Is " << n << " a variable trigger?" << std::endl;
     Node x;
-    if (env.getOptions().quantifiers.purifyTriggers)
-    {
-      Node xi = PatternTermSelector::getInversionVariable(n);
-      if (!xi.isNull())
-      {
-        Node qa = quantifiers::TermUtil::getInstConstAttr(xi);
-        if (qa == q)
-        {
-          x = xi;
-        }
-      }
-    }
+    
     if (!x.isNull())
     {
       Node s = PatternTermSelector::getInversion(n, x);

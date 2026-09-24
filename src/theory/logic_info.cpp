@@ -35,7 +35,6 @@ LogicInfo::LogicInfo()
       d_transcendentals(true),
       d_linear(false),
       d_differenceLogic(false),
-      d_higherOrder(false),
       d_locked(false)
 {
   for (TheoryId id = THEORY_FIRST; id < THEORY_LAST; ++id)
@@ -53,7 +52,6 @@ LogicInfo::LogicInfo(std::string logicString)
       d_transcendentals(false),
       d_linear(false),
       d_differenceLogic(false),
-      d_higherOrder(false),
       d_locked(false)
 {
   setLogicString(logicString);
@@ -69,7 +67,6 @@ LogicInfo::LogicInfo(const char* logicString)
       d_transcendentals(false),
       d_linear(false),
       d_differenceLogic(false),
-      d_higherOrder(false),
       d_locked(false)
 {
   setLogicString(logicString);
@@ -104,21 +101,13 @@ bool LogicInfo::isQuantified() const
 }
 
 /** Is this a higher-order logic? */
-bool LogicInfo::isHigherOrder() const
-{
-  PrettyCheckArgument(d_locked,
-                      *this,
-                      "This LogicInfo isn't locked yet, and cannot be queried");
-  return d_higherOrder;
-}
-
 bool LogicInfo::hasEverything() const
 {
   PrettyCheckArgument(d_locked,
                       *this,
                       "This LogicInfo isn't locked yet, and cannot be queried");
   LogicInfo everything;
-  everything.enableEverything(isHigherOrder());
+  everything.enableEverything();
   everything.lock();
   return (*this == everything);
 }
@@ -223,10 +212,7 @@ bool LogicInfo::operator==(const LogicInfo& other) const
   PrettyCheckArgument(d_sharingTheories == other.d_sharingTheories,
                       *this,
                       "LogicInfo internal inconsistency");
-  if (d_higherOrder != other.d_higherOrder)
-  {
-    return false;
-  }
+  
   if (isTheoryEnabled(theory::THEORY_ARITH))
   {
     return d_integers == other.d_integers && d_reals == other.d_reals
@@ -253,7 +239,7 @@ bool LogicInfo::operator<=(const LogicInfo& other) const
   PrettyCheckArgument(d_sharingTheories <= other.d_sharingTheories,
                       *this,
                       "LogicInfo internal inconsistency");
-  bool res = (!d_higherOrder || other.d_higherOrder);
+  bool res = true;
   if (isTheoryEnabled(theory::THEORY_ARITH)
       && other.isTheoryEnabled(theory::THEORY_ARITH))
   {
@@ -284,7 +270,7 @@ bool LogicInfo::operator>=(const LogicInfo& other) const
   PrettyCheckArgument(d_sharingTheories >= other.d_sharingTheories,
                       *this,
                       "LogicInfo internal inconsistency");
-  bool res = (d_higherOrder || !other.d_higherOrder);
+  bool res = true;
   if (isTheoryEnabled(theory::THEORY_ARITH)
       && other.isTheoryEnabled(theory::THEORY_ARITH))
   {
@@ -310,10 +296,7 @@ std::string LogicInfo::getLogicString() const
     qf_all_supported.disableQuantifiers();
     qf_all_supported.lock();
     stringstream ss;
-    if (isHigherOrder())
-    {
-      ss << "HO_";
-    }
+    
     if (!isQuantified())
     {
       ss << "QF_";
@@ -442,8 +425,7 @@ void LogicInfo::setLogicString(std::string logicString)
   const char* p = logicString.c_str();
   if (!strncmp(p, "HO_", 3))
   {
-    enableHigherOrder();
-    p += 3;
+    throw IllegalArgumentException("Higher-order logics are not supported");
   }
   if (*p == '\0')
   {
@@ -463,7 +445,7 @@ void LogicInfo::setLogicString(std::string logicString)
   else if (!strcmp(p, "QF_ALL"))
   {
     // the "all theories included" logic, no quantifiers.
-    enableEverything(d_higherOrder);
+    enableEverything();
     disableQuantifiers();
     arithNonLinear();
     p += 6;
@@ -471,7 +453,7 @@ void LogicInfo::setLogicString(std::string logicString)
   else if (!strcmp(p, "ALL"))
   {
     // the "all theories included" logic, with quantifiers.
-    enableEverything(d_higherOrder);
+    enableEverything();
     enableQuantifiers();
     arithNonLinear();
     p += 3;
@@ -479,7 +461,7 @@ void LogicInfo::setLogicString(std::string logicString)
   else if (!strcmp(p, "HORN"))
   {
     // the HORN logic
-    enableEverything(d_higherOrder);
+    enableEverything();
     enableQuantifiers();
     arithNonLinear();
     p += 4;
@@ -687,12 +669,11 @@ void LogicInfo::setLogicString(std::string logicString)
   d_logicString = logicString;
 }
 
-void LogicInfo::enableEverything(bool enableHigherOrder)
+void LogicInfo::enableEverything()
 {
   PrettyCheckArgument(
       !d_locked, *this, "This LogicInfo is locked, and cannot be modified");
   *this = LogicInfo();
-  this->d_higherOrder = enableHigherOrder;
 }
 
 void LogicInfo::disableEverything()
@@ -837,22 +818,6 @@ void LogicInfo::arithNonLinear()
   d_logicString = "";
   d_linear = false;
   d_differenceLogic = false;
-}
-
-void LogicInfo::enableHigherOrder()
-{
-  PrettyCheckArgument(
-      !d_locked, *this, "This LogicInfo is locked, and cannot be modified");
-  d_logicString = "";
-  d_higherOrder = true;
-}
-
-void LogicInfo::disableHigherOrder()
-{
-  PrettyCheckArgument(
-      !d_locked, *this, "This LogicInfo is locked, and cannot be modified");
-  d_logicString = "";
-  d_higherOrder = false;
 }
 
 LogicInfo LogicInfo::getUnlockedCopy() const

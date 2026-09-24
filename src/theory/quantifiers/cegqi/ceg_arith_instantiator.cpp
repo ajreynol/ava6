@@ -301,8 +301,8 @@ bool ArithInstantiator::processAssertions(CegInstantiator* ci,
                                           AVA6_UNUSED CegInstEffort effort)
 {
   NodeManager* nm = nodeManager();
-  bool use_inf = d_type.isInteger() ? options().quantifiers.cegqiUseInfInt
-                                    : options().quantifiers.cegqiUseInfReal;
+  bool use_inf = d_type.isInteger() ? false
+                                    : false;
   bool upper_first = Random::getRandom().pickWithProb(0.5);
   
   int best_used[2];
@@ -476,7 +476,7 @@ bool ArithInstantiator::processAssertions(CegInstantiator* ci,
         best_used[rr] = best;
         // if using cbqiMidpoint, only add the instance based on one bound if
         // the bound is non-strict
-        if (!options().quantifiers.cegqiMidpoint || d_type.isInteger()
+        if (!true || d_type.isInteger()
             || d_mbp_vts_coeff[rr][1][best].isNull())
         {
           Node val = d_mbp_bounds[rr][best];
@@ -534,7 +534,7 @@ bool ArithInstantiator::processAssertions(CegInstantiator* ci,
       }
     }
   }
-  if (options().quantifiers.cegqiMidpoint && !d_type.isInteger())
+  if (true && !d_type.isInteger())
   {
     Node vals[2];
     bool bothBounds = true;
@@ -616,7 +616,7 @@ bool ArithInstantiator::processAssertions(CegInstantiator* ci,
     for (unsigned j = 0, nbounds = d_mbp_bounds[rr].size(); j < nbounds; j++)
     {
       if ((int)j != best_used[rr]
-          && (!options().quantifiers.cegqiMidpoint
+          && (!true
               || d_mbp_vts_coeff[rr][1][j].isNull()))
       {
         Node val = getModelBasedProjectionValue(ci,

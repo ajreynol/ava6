@@ -941,16 +941,7 @@ Node QuantifiersRewriter::computeProcessTerms2(
       ret = nm->mkNode(Kind::ITE, iconds[i], elements[i], ret);
     }
   }
-  else if (ret.getKind() == Kind::HO_APPLY && !ret.getType().isFunction())
-  {
-    // fully applied functions are converted to APPLY_UF here.
-    Node fullApp = uf::TheoryUfRewriter::getApplyUfForHoApply(ret);
-    // it may not be possible to convert e.g. if the head is not a variable
-    if (!fullApp.isNull())
-    {
-      ret = fullApp;
-    }
-  }
+  
   if (pg != nullptr)
   {
     if (retOrig != ret)
@@ -997,27 +988,7 @@ Node QuantifiersRewriter::computeCondSplit(Node body,
 {
   NodeManager* nm = nodeManager();
   Kind bk = body.getKind();
-  if (d_opts.quantifiers.iteDtTesterSplitQuant && bk == Kind::ITE
-      && body[0].getKind() == Kind::APPLY_TESTER)
-  {
-    Trace("quantifiers-rewrite-ite-debug")
-        << "DTT split : " << body << std::endl;
-    std::map<Node, Node> pcons;
-    std::map<Node, std::map<int, Node>> ncons;
-    std::vector<Node> conj;
-    computeDtTesterIteSplit(body, pcons, ncons, conj);
-    Assert(!conj.empty());
-    if (conj.size() > 1)
-    {
-      Trace("quantifiers-rewrite-ite") << "*** Split ITE (datatype tester) "
-                                       << body << " into : " << std::endl;
-      for (unsigned i = 0; i < conj.size(); i++)
-      {
-        Trace("quantifiers-rewrite-ite") << "   " << conj[i] << std::endl;
-      }
-      return nm->mkNode(Kind::AND, conj);
-    }
-  }
+  
   if (d_opts.quantifiers.condVarSplitQuant
       == options::CondVarSplitQuantMode::OFF)
   {
@@ -2424,7 +2395,7 @@ bool QuantifiersRewriter::doOperation(Node q,
   }
   else if (computeOption == COMPUTE_COND_SPLIT)
   {
-    return (d_opts.quantifiers.iteDtTesterSplitQuant
+    return (false
             || d_opts.quantifiers.condVarSplitQuant
                    != options::CondVarSplitQuantMode::OFF)
            && !is_strict_trigger;

@@ -33,8 +33,7 @@ void UfProofRuleChecker::registerTo(ProofChecker* pc)
   pc->registerChecker(ProofRule::TRUE_ELIM, this);
   pc->registerChecker(ProofRule::FALSE_INTRO, this);
   pc->registerChecker(ProofRule::FALSE_ELIM, this);
-  pc->registerChecker(ProofRule::HO_CONG, this);
-  pc->registerChecker(ProofRule::HO_APP_ENCODE, this);
+  pc->registerChecker(ProofRule::APPLY_CONG, this);
 }
 
 Node UfProofRuleChecker::checkInternal(ProofRule id,
@@ -169,17 +168,9 @@ Node UfProofRuleChecker::checkInternal(ProofRule id,
     }
     return children[0][0].notNode();
   }
-  if (id == ProofRule::HO_CONG)
+  if (id == ProofRule::APPLY_CONG)
   {
-    Kind k = Kind::HO_APPLY;
-    // kind argument is optional, defaults to HO_APPLY
-    if (args.size() == 1)
-    {
-      if (!getKind(args[0], k))
-      {
-        return Node::null();
-      }
-    }
+    Kind k = Kind::APPLY_UF;
     std::vector<Node> lchildren;
     std::vector<Node> rchildren;
     for (size_t i = 0, nchild = children.size(); i < nchild; ++i)
@@ -197,12 +188,7 @@ Node UfProofRuleChecker::checkInternal(ProofRule id,
     Node r = nm->mkNode(k, rchildren);
     return l.eqNode(r);
   }
-  else if (id == ProofRule::HO_APP_ENCODE)
-  {
-    Assert(args.size() == 1);
-    Node ret = TheoryUfRewriter::getHoApplyForApplyUf(args[0]);
-    return args[0].eqNode(ret);
-  }
+  
   // no rule
   return Node::null();
 }

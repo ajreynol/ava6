@@ -195,18 +195,6 @@ class DTypeConstructor
    * of this constructor.
    */
   Node getSelector(size_t index) const;
-  /**
-   * This returns a shared (constructor-agnotic) selector, which
-   * in the terminology of "DTypes with Shared Selectors", is:
-   *   sel_{dtt}^{T,atos(T,C,index)}
-   * where C is this constructor, and T is the type
-   * of the index^th field of this constructor.
-   * The semantics of sel_{dtt}^{T,n}( t ) is the n^th field of
-   * type T of constructor term t if one exists, or is
-   * unconstrained otherwise.
-   */
-  Node getSharedSelector(TypeNode dtt, size_t index) const;
-
   /** get selector index internal
    *
    * This gets the argument number of this constructor
@@ -307,10 +295,6 @@ class DTypeConstructor
    * that have finite external type.
    */
   std::pair<CardinalityClass, bool> computeCardinalityInfo(TypeNode t) const;
-  /** compute shared selectors
-   * This computes the maps d_sharedSelectors and d_sharedSelectorIndex.
-   */
-  void computeSharedSelectors(TypeNode domainType) const;
   /** the name of the constructor */
   std::string d_name;
   /** the name of the tester */
@@ -325,26 +309,6 @@ class DTypeConstructor
   Node d_sygusOp;
   /** weight */
   unsigned d_weight;
-  /** shared selectors for each type
-   *
-   * This stores the shared (constructor-agnotic)
-   * selectors that access the fields of this datatype.
-   * In the terminology of "DTypes with Shared Selectors",
-   * this stores:
-   *   sel_{dtt}^{T1,atos(T1,C,1)}, ...,
-   *   sel_{dtt}^{Tn,atos(Tn,C,n)}
-   * where C is this constructor, which has type
-   * T1 x ... x Tn -> dtt above.
-   * We store this information for (possibly multiple)
-   * datatype types dtt, since this constructor may be
-   * for a parametric datatype, where dtt is an instantiated
-   * parametric datatype.
-   */
-  mutable std::map<TypeNode, std::vector<Node> > d_sharedSelectors;
-  /** for each type, a cache mapping from shared selectors to
-   * its argument index for this constructor.
-   */
-  mutable std::map<TypeNode, std::map<Node, unsigned> > d_sharedSelectorIndex;
   /**  A cache for computeCardinalityInfo. */
   mutable std::map<TypeNode, std::pair<CardinalityClass, bool> > d_cardInfo;
 }; /* class DTypeConstructor */

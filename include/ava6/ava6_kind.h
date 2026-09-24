@@ -423,25 +423,6 @@ enum ENUM(Kind)
    *   - TermManager::mkOp(Kind, const std::vector<uint32_t>&)
    */
   EVALUE(APPLY_UF),
-  /**
-   * Higher-order applicative encoding of function application, left
-   * associative.
-   *
-   * - Arity: ``n = 2``
-   *
-   *   - ``1:`` Function Term
-   *   - ``2:`` Argument Term of the domain Sort of the function
-   *
-   * - Create Term of this Kind with:
-   *
-   *   - TermManager::mkTerm(Kind, const std::vector<Term>&)
-   *   - TermManager::mkTerm(const Op&, const std::vector<Term>&)
-   *
-   * - Create Op of this kind with:
-   *
-   *   - TermManager::mkOp(Kind, const std::vector<uint32_t>&)
-   */
-  EVALUE(HO_APPLY),
 
   /* Arithmetic ------------------------------------------------------------ */
 

@@ -85,15 +85,7 @@ void SmtSolver::finishInit()
   d_propEngine->finishInit();
   finishInitPreprocessor();
 
-  if (options().proof.proofLog)
-  {
-    smt::PfManager* pm = d_env.getProofManager();
-    if (pm != nullptr)
-    {
-      // Logs proofs on the base output stream of the solver
-      pm->startProofLogging(options().base.out, d_asserts);
-    }
-  }
+  
 }
 
 void SmtSolver::resetAssertions()
@@ -172,7 +164,7 @@ void SmtSolver::assertToInternal(preprocessing::AssertionPipeline& ap)
   if (trackPreprocessedAssertions())
   {
     // incompatible with global negation
-    Assert(!options().quantifiers.globalNegate);
+    Assert(!false);
     theory::SubstitutionMap& sm = d_env.getTopLevelSubstitutions().get();
     size_t startIndex = d_ppAssertions.size();
     // remember the assertions and Skolem mapping
@@ -206,8 +198,7 @@ const context::CDHashMap<size_t, Node>& SmtSolver::getPreprocessedSkolemMap()
 
 bool SmtSolver::trackPreprocessedAssertions() const
 {
-  return options::DeepRestartMode::NONE != options::DeepRestartMode::NONE
-         || options().smt.produceProofs;
+  return options().smt.produceProofs;
 }
 
 TheoryEngine* SmtSolver::getTheoryEngine() { return d_theoryEngine.get(); }

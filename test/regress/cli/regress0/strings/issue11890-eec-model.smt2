@@ -1,4 +1,4 @@
-; COMMAND-LINE: --ee-mode=central
+; COMMAND-LINE:
 ; EXPECT: sat
 (set-logic QF_SLIA)
 (declare-fun x () String)

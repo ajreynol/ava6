@@ -29,9 +29,7 @@ namespace ava6::internal {
 namespace theory {
 namespace uf {
 
-class HoExtension;
 class ConversionsSolver;
-class LambdaLift;
 
 class TheoryUF : public Theory
 {
@@ -61,9 +59,7 @@ class TheoryUF : public Theory
  private:
   /** The associated cardinality extension (or nullptr if it does not exist) */
   /** the lambda lifting utility */
-  std::unique_ptr<LambdaLift> d_lambdaLift;
   /** the higher-order solver extension (or nullptr if it does not exist) */
-  std::unique_ptr<HoExtension> d_ho;
   /** the conversions solver */
   std::unique_ptr<ConversionsSolver> d_csolver;
   /** Diamonds proof generator */
@@ -113,10 +109,6 @@ class TheoryUF : public Theory
   void notifyFact(TNode atom, bool pol, TNode fact, bool isInternal) override;
   //--------------------------------- end standard check
 
-  /** Collect model values in m based on the relevant terms given by termSet */
-  bool collectModelValues(TheoryModel* m,
-                          const std::set<Node>& termSet) override;
-
   TrustNode ppRewrite(TNode node, std::vector<SkolemLemma>& lems) override;
   void preRegisterTerm(TNode term) override;
   TrustNode explain(TNode n) override;
@@ -144,10 +136,6 @@ class TheoryUF : public Theory
    * considered.
    */
   void processCarePairArgs(TNode a, TNode b) override;
-  /**
-   * Compute relevant terms. Used in higher-order.
-   */
-  void computeRelevantTerms(std::set<Node>& termSet) override;
   /**
    * Is t a higher order type? A higher-order type is a function type having
    * an argument type that is also a function type. This is used for checking

@@ -78,8 +78,7 @@ PropEngine::PropEngine(Env& env, TheoryEngine* te)
   // make the theory proxy first
   d_theoryProxy = new TheoryProxy(d_env, this, d_theoryEngine, d_skdm.get());
 
-  const auto factory = SatSolverFactory::getFactory(options().prop.satSolver);
-  d_satSolver = factory(
+  d_satSolver = SatSolverFactory::createCDCLTSatSolver(
       env, statisticsRegistry(), env.getResourceManager(), d_theoryProxy, "");
 
   // create CnfStream with new SAT solver
@@ -165,7 +164,6 @@ void PropEngine::assertInputFormulas(
   // to the theory engine lemmas may already be generated.
   if (d_ppm != nullptr)
   {
-    d_ppm->presolve();
   }
   d_theoryProxy->notifyInputFormulas(assertions, skolemMap);
   int64_t natomsPre = d_cnfStream->d_stats.d_numAtoms.get();
@@ -185,7 +183,6 @@ void PropEngine::assertLemma(theory::InferenceId id,
 {
   bool removable = isLemmaPropertyRemovable(p);
   bool local = isLemmaPropertyLocal(p);
-  bool inprocess = isLemmaPropertyInprocess(p);
 
   // call preprocessor
   std::vector<theory::SkolemLemma> ppLemmas;
@@ -219,7 +216,7 @@ void PropEngine::assertLemma(theory::InferenceId id,
   }
 
   // now, assert the lemmas
-  assertLemmasInternal(id, tplemma, ppLemmas, removable, inprocess, local);
+  assertLemmasInternal(id, tplemma, ppLemmas, removable, local);
 }
 
 void PropEngine::assertTrustedLemmaInternal(theory::InferenceId id,
@@ -313,7 +310,6 @@ void PropEngine::assertLemmasInternal(
     TrustNode trn,
     const std::vector<theory::SkolemLemma>& ppLemmas,
     bool removable,
-    bool inprocess,
     bool local)
 {
   // notify skolem definitions first to ensure that the computation of
@@ -328,11 +324,7 @@ void PropEngine::assertLemmasInternal(
   if (!trn.isNull())
   {
     // inprocess
-    if (inprocess
-        && options().theory.lemmaInprocess != options::LemmaInprocessMode::NONE)
-    {
-      trn = d_theoryProxy->inprocessLemma(trn);
-    }
+    
     assertTrustedLemmaInternal(id, trn, removable, local);
   }
   for (const theory::SkolemLemma& lem : ppLemmas)
@@ -477,7 +469,6 @@ Result PropEngine::checkSat()
   // now log preprocessing
   if (d_ppm != nullptr)
   {
-    d_ppm->logPreprocessing();
   }
 
   // Reset the interrupted flag
@@ -546,7 +537,6 @@ Result PropEngine::checkSat()
 
   if (d_ppm != nullptr)
   {
-    d_ppm->postsolve(result);
   }
 
   return Result(result == SAT_VALUE_TRUE ? Result::SAT : Result::UNSAT);
@@ -637,7 +627,6 @@ Node PropEngine::getPreprocessedTerm(TNode n)
   assertLemmasInternal(theory::InferenceId::THEORY_PP_SKOLEM_LEM,
                        trnNull,
                        newLemmas,
-                       false,
                        false,
                        false);
   return tpn.isNull() ? Node(n) : tpn.getNode();
@@ -850,16 +839,6 @@ std::vector<Node> PropEngine::getUnsatCoreLemmas()
     Trace("ocl-timestamp") << ss.str() << std::endl;
   }
   return lems;
-}
-
-std::vector<Node> PropEngine::getLearnedZeroLevelLiteralsForRestart() const
-{
-  return d_theoryProxy->getLearnedZeroLevelLiteralsForRestart();
-}
-
-LearnedLitType PropEngine::getLiteralType(const Node& lit) const
-{
-  return d_theoryProxy->getLiteralType(lit);
 }
 
 PropEngine::Statistics::Statistics(StatisticsRegistry& sr)

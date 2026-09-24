@@ -23,7 +23,7 @@ namespace arith {
 InferenceManager::InferenceManager(Env& env, TheoryArith& ta, TheoryState& s)
     : InferenceManagerBuffered(env, ta, s, "theory::arith::"),
       // currently must track propagated literals if using the equality solver
-      d_trackPropLits(options().arith.arithEqSolver),
+      d_trackPropLits(true),
       d_propLits(context())
 {
 }

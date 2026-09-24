@@ -14,8 +14,6 @@ libava6_add_sources(
   aci_norm.cpp
   aci_norm.h
   algorithm/flatten.h
-  annotation_elim_node_converter.cpp
-  annotation_elim_node_converter.h
   array_store_all.cpp
   array_store_all.h
   ascription_type.cpp
@@ -36,8 +34,6 @@ libava6_add_sources(
   elim_witness_converter.h
   emptyset.cpp
   emptyset.h
-  free_var_cache.cpp
-  free_var_cache.h
   function_array_const.cpp
   function_array_const.h
   internal_skolem_id.cpp
@@ -63,13 +59,9 @@ libava6_add_sources(
   node_trie.h
   node_trie_algorithm.cpp
   node_trie_algorithm.h
-  node_traversal.cpp
-  node_traversal.h
   node_value.cpp
   node_value.h
   oracle.h
-  oracle_caller.cpp
-  oracle_caller.h
   plugin.cpp
   plugin.h
   sequence.cpp
@@ -108,8 +100,6 @@ libava6_add_sources(
   subs.h
   sygus_datatype.cpp
   sygus_datatype.h
-  variadic_trie.cpp
-  variadic_trie.h
   non_closed_node_converter.cpp
   non_closed_node_converter.h
   normalize_sort_converter.cpp

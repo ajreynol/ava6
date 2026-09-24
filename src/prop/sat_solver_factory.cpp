@@ -13,44 +13,14 @@
 #include "prop/sat_solver_factory.h"
 
 #include "prop/cadical/cadical.h"
-#include "prop/minisat/minisat.h"
 
 namespace ava6::internal {
 namespace prop {
 
 
 
-SatSolverFactory::CDCLTFactory SatSolverFactory::getFactory(
-    const options::SatSolverMode mode)
-{
-  using options::SatSolverMode;
-  switch (mode)
-  {
-    case SatSolverMode::CADICAL:
-      return createCDCLTSatSolver<SatSolverMode::CADICAL>;
-    case SatSolverMode::MINISAT:
-      return createCDCLTSatSolver<SatSolverMode::MINISAT>;
-    default: Unreachable(); return nullptr;
-  }
-}
-
-template <>
 CDCLTSatSolver*
-SatSolverFactory::createCDCLTSatSolver<options::SatSolverMode::MINISAT>(
-    Env& env,
-    StatisticsRegistry& registry,
-    AVA6_UNUSED ResourceManager* resmgr,
-    TheoryProxy* theory_proxy,
-    AVA6_UNUSED const std::string& name)
-{
-  MinisatSatSolver* res = new MinisatSatSolver(env, registry);
-  res->initialize(theory_proxy);
-  return res;
-}
-
-template <>
-CDCLTSatSolver*
-SatSolverFactory::createCDCLTSatSolver<options::SatSolverMode::CADICAL>(
+SatSolverFactory::createCDCLTSatSolver(
     Env& env,
     StatisticsRegistry& registry,
     ResourceManager* resmgr,

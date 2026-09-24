@@ -27,23 +27,6 @@ name   = "Theory Layer"
   name = "hole"
   help = "The default value is equal to a distinguished variable."
 
-[[option]]
-  name       = "eeMode"
-  category   = "regular"
-  long       = "ee-mode=MODE"
-  type       = "EqEngineMode"
-  default    = "DISTRIBUTED"
-  help       = "mode for managing equalities across theory solvers"
-  help_mode  = "Defines mode for managing equalities across theory solvers."
-[[option.mode.DISTRIBUTED]]
-  name = "distributed"
-  help = "Each theory maintains its own equality engine."
-[[option.mode.CENTRAL]]
-  name = "central"
-  help = "All applicable theories use the central equality engine."
-
-
-# Internal core policies; never accepted as command-line or SMT-LIB options.
 [[setting]]
 name = "theoryOfMode"
 type = "TheoryOfMode"
@@ -54,43 +37,11 @@ name = "type"
 name = "term"
 
 [[setting]]
-name = "assignFunctionValues"
-type = "bool"
-default = "true"
-
-[[setting]]
-name = "relevanceFilter"
-type = "bool"
-default = "false"
-
-[[setting]]
 name = "tcMode"
 type = "TcMode"
 default = "CARE_GRAPH"
 [[setting.mode.CARE_GRAPH]]
 name = "care-graph"
-
-[[setting]]
-name = "conflictProcessMode"
-type = "ConflictProcessMode"
-default = "NONE"
-[[setting.mode.NONE]]
-name = "none"
-[[setting.mode.MINIMIZE]]
-name = "min"
-[[setting.mode.MINIMIZE_EXT]]
-name = "min-ext"
-
-[[setting]]
-name = "lemmaInprocess"
-type = "LemmaInprocessMode"
-default = "NONE"
-[[setting.mode.FULL]]
-name = "full"
-[[setting.mode.LIGHT]]
-name = "light"
-[[setting.mode.NONE]]
-name = "none"
 
 [[setting]]
 name = "lemmaInprocessSubsMode"

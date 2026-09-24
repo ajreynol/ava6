@@ -250,7 +250,7 @@ Node TermDb::getMatchOperator(TNode n)
   if (k == Kind::SELECT || k == Kind::STORE || k == Kind::SET_UNION
       || k == Kind::SET_INTER || k == Kind::SET_SUBSET || k == Kind::SET_MINUS
       || k == Kind::SET_MEMBER || k == Kind::SET_SINGLETON
-      || k == Kind::APPLY_SELECTOR || k == Kind::APPLY_TESTER || k == Kind::HO_APPLY || k == Kind::SEQ_NTH
+      || k == Kind::APPLY_SELECTOR || k == Kind::APPLY_TESTER || false || k == Kind::SEQ_NTH
       || k == Kind::STRING_LENGTH || k == Kind::BITVECTOR_UBV_TO_INT
       || k == Kind::INT_TO_BITVECTOR)
   {
@@ -319,7 +319,6 @@ void TermDb::addTerm(Node n)
       DbList* dlo = getOrMkDbListForOp(op);
       dlo->d_list.push_back(n);
       // If we are higher-order, we may need to register more terms.
-      addTermInternal(n);
     }
   }
   else
@@ -377,7 +376,6 @@ void TermDb::computeArgReps(TNode n)
 
 void TermDb::computeUfEqcTerms(TNode f)
 {
-  Assert(f == getOperatorRepresentative(f));
   if (d_func_map_eqc_trie.find(f) != d_func_map_eqc_trie.end())
   {
     return;
@@ -414,7 +412,6 @@ void TermDb::computeUfTerms(TNode f)
     // already computed
     return;
   }
-  Assert(f == getOperatorRepresentative(f));
   d_op_nonred_count[f] = 0;
   // get the matchable operators in the equivalence class of f
   std::vector<TNode> ops;
@@ -532,8 +529,6 @@ void TermDb::computeUfTerms(TNode f)
   }
 }
 
-Node TermDb::getOperatorRepresentative(TNode op) const { return op; }
-
 bool TermDb::checkCongruentDisequal(TNode a,
                                     TNode b,
                                     AVA6_UNUSED std::vector<Node>& exp)
@@ -548,7 +543,6 @@ bool TermDb::checkCongruentDisequal(TNode a,
 bool TermDb::inRelevantDomain(TNode f, size_t i, TNode r)
 {
   // notice if we are not higher-order, getOperatorRepresentative is a no-op
-  f = getOperatorRepresentative(f);
   computeUfTerms(f);
   Assert(!d_qstate.getEqualityEngine()->hasTerm(r)
          || d_qstate.getEqualityEngine()->getRepresentative(r) == r);
@@ -659,17 +653,6 @@ Node TermDb::getEligibleTermInEqc(TNode r)
   }
 }
 
-bool TermDb::finishResetInternal(AVA6_UNUSED Theory::Effort e)
-{
-  // do nothing
-  return true;
-}
-
-void TermDb::addTermInternal(AVA6_UNUSED Node n)
-{
-  // do nothing
-}
-
 void TermDb::getOperatorsFor(TNode f, std::vector<TNode>& ops)
 {
   ops.push_back(f);
@@ -732,12 +715,11 @@ bool TermDb::reset(Theory::Effort effort)
     }
   }
   // finish reset
-  return finishResetInternal(effort);
+  return true;
 }
 
 TNodeTrie* TermDb::getTermArgTrie(Node f)
 {
-  f = getOperatorRepresentative(f);
   computeUfTerms(f);
   std::map<Node, TNodeTrie>::iterator itut = d_func_map_trie.find(f);
   if (itut != d_func_map_trie.end())
@@ -752,7 +734,6 @@ TNodeTrie* TermDb::getTermArgTrie(Node f)
 
 TNodeTrie* TermDb::getTermArgTrie(Node eqc, Node f)
 {
-  f = getOperatorRepresentative(f);
   computeUfEqcTerms(f);
   std::map<Node, TNodeTrie>::iterator itut = d_func_map_eqc_trie.find(f);
   if (itut == d_func_map_eqc_trie.end())
@@ -783,7 +764,6 @@ TNodeTrie* TermDb::getTermArgTrie(Node eqc, Node f)
 
 TNode TermDb::getCongruentTerm(Node f, Node n)
 {
-  f = getOperatorRepresentative(f);
   computeUfTerms(f);
   std::map<Node, TNodeTrie>::iterator itut = d_func_map_trie.find(f);
   if (itut != d_func_map_trie.end())
@@ -796,7 +776,6 @@ TNode TermDb::getCongruentTerm(Node f, Node n)
 
 TNode TermDb::getCongruentTerm(Node f, const std::vector<TNode>& args)
 {
-  f = getOperatorRepresentative(f);
   computeUfTerms(f);
   return d_func_map_trie[f].existsTerm(args);
 }

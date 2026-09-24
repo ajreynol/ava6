@@ -142,7 +142,6 @@ TrustNode TheorySets::ppRewrite(TNode n, std::vector<SkolemLemma>& lems)
   if (nk == Kind::SET_MAP || nk == Kind::SET_FOLD)
   {
     // requires higher order
-    if (!logicInfo().isHigherOrder())
     {
       std::stringstream ss;
       ss << "Term of kind " << nk

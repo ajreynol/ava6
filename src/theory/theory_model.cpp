@@ -42,7 +42,7 @@ TheoryModel::TheoryModel(Env& env, std::string name, bool enableFuncModels)
       d_enableFuncModels(enableFuncModels)
 {
   // must use function models when ufHo is enabled
-  Assert(d_enableFuncModels || !logicInfo().isHigherOrder());
+  Assert(d_enableFuncModels || !false);
   d_true = nodeManager()->mkConst(true);
   d_false = nodeManager()->mkConst(false);
 }
@@ -55,7 +55,6 @@ void TheoryModel::finishInit(eq::EqualityEngine* ee)
   d_equalityEngine = ee;
   // we do not do congruence on any kind in the model equality engine, with
   // the exception of HO_APPLY for the sake of higher-order.
-  d_equalityEngine->addFunctionKind(Kind::HO_APPLY);
   // do not interpret APPLY_UF if we are not assigning function values
   if (!d_enableFuncModels)
   {
@@ -79,7 +78,6 @@ void TheoryModel::reset()
   d_reps.clear();
   d_rep_set.clear();
   d_uf_terms.clear();
-  d_ho_uf_terms.clear();
   d_uf_models.clear();
   d_using_model_core = false;
   d_model_core.clear();
@@ -294,7 +292,7 @@ Node TheoryModel::getModelValue(TNode n) const
       << "Look up " << ret << " in equality engine" << std::endl;
   // return the representative of the term in the equality engine, if it exists
   TypeNode t = ret.getType();
-  if (!logicInfo().isHigherOrder() && t.isFunction())
+  if (!false && t.isFunction())
   {
     // functions are in the equality engine, but *not* as first-class members
     // when higher-order is disabled. In this case, we cannot query
@@ -410,16 +408,7 @@ void TheoryModel::addTermInternal(TNode n)
       Trace("model-builder-fun") << "Add apply term " << n << std::endl;
     }
   }
-  else if (n.getKind() == Kind::HO_APPLY)
-  {
-    Node op = n[0];
-    if (std::find(d_ho_uf_terms[op].begin(), d_ho_uf_terms[op].end(), n)
-        == d_ho_uf_terms[op].end())
-    {
-      d_ho_uf_terms[op].push_back(n);
-      Trace("model-builder-fun") << "Add ho apply term " << n << std::endl;
-    }
-  }
+  
   // all functions must be included, marked as higher-order
   if (n.getType().isFunction())
   {
@@ -588,11 +577,6 @@ void TheoryModel::assignRepresentative(const Node& r,
   Trace("model-builder-reps") << "Assign rep : " << r << " " << n << std::endl;
   AssertEqual(r.getType(), n.getType());
   TypeNode tn = r.getType();
-  if (isFinal && logicInfo().isHigherOrder() && tn.isFunction())
-  {
-    assignFunctionDefinition(r, n);
-  }
-  else
   {
     d_reps[r] = n;
   }
@@ -642,13 +626,7 @@ Node TheoryModel::getRepresentative(TNode a) const
     }
     // special case: functions are constructed lazily so if we are higher-order
     // and are looking for the representative of a function eqc, compute it now
-    if (logicInfo().isHigherOrder() && a.getType().isFunction())
-    {
-      assignFunctionDefault(r);
-      itr = d_reps.find(r);
-      Assert(itr != d_reps.end());
-      return itr->second;
-    }
+    
     return r;
   }
   return a;
@@ -705,13 +683,7 @@ void TheoryModel::assignFunctionDefault(Node f) const
   {
     return;
   }
-  if (logicInfo().isHigherOrder())
-  {
-    Trace("model-builder") << "  Assign function value for " << f
-                           << " based on curried HO_APPLY" << std::endl;
-    assignFunctionDefaultHo(f);
-    return;
-  }
+  
   Trace("model-builder") << "  Assign function value for " << f
                          << " based on APPLY_UF" << std::endl;
   uf::UfModelTree ufmt(f);
@@ -774,185 +746,17 @@ void TheoryModel::assignFunctionDefault(Node f) const
   assignFunctionDefinition(f, val);
 }
 
-void TheoryModel::assignFunctionDefaultHo(Node f) const
-{
-  Assert(logicInfo().isHigherOrder());
-  // collect all HO_APPLY terms, modulo equality of the function, which will
-  // determine the relevant points of the function value we construct below.
-  std::vector<Node> hoTerms;
-  std::map<Node, std::vector<Node>>::const_iterator itht;
-  if (d_equalityEngine->hasTerm(f))
-  {
-    // if we are in the equality, look up each function in the equivalence class
-    Node r = d_equalityEngine->getRepresentative(f);
-    eq::EqClassIterator eqc_i = eq::EqClassIterator(r, d_equalityEngine);
-    while (!eqc_i.isFinished())
-    {
-      Node n = *eqc_i;
-      ++eqc_i;
-      itht = d_ho_uf_terms.find(n);
-      if (itht != d_ho_uf_terms.end())
-      {
-        hoTerms.insert(hoTerms.end(), itht->second.begin(), itht->second.end());
-      }
-    }
-  }
-  else
-  {
-    // otherwise just take the function itself
-    itht = d_ho_uf_terms.find(f);
-    if (itht != d_ho_uf_terms.end())
-    {
-      hoTerms.insert(hoTerms.end(), itht->second.begin(), itht->second.end());
-    }
-  }
-  Trace("model-builder-debug") << "Assign HO function " << f << std::endl;
-  TypeNode type = f.getType();
-  std::vector<TypeNode> argTypes = type.getArgTypes();
-  std::vector<Node> args;
-  std::vector<TNode> apply_args;
-  options::DefaultFunctionValueMode dfvm =
-      options().theory.defaultFunctionValueMode;
-  for (size_t i = 0; i < argTypes.size(); i++)
-  {
-    Node v = nodeManager()->mkBoundVar(argTypes[i]);
-    args.push_back(v);
-    if (i > 0)
-    {
-      apply_args.push_back(v);
-    }
-  }
-  // Depending on the default value mode, maybe set the current value (curr).
-  // We also remember a default value (currPre) in case there are no terms
-  // to assign below.
-  TypeNode rangeType = type.getRangeType();
-  Node curr, currPre;
-  if (dfvm == options::DefaultFunctionValueMode::HOLE)
-  {
-    NodeManager* nm = nodeManager();
-    SkolemManager* sm = nm->getSkolemManager();
-    std::vector<Node> cacheVals;
-    cacheVals.push_back(nm->mkConst(SortToTerm(rangeType)));
-    currPre = sm->mkSkolemFunction(SkolemId::GROUND_TERM, cacheVals);
-    curr = currPre;
-  }
-  else
-  {
-    TypeEnumerator te(rangeType);
-    currPre = (*te);
-    if (dfvm == options::DefaultFunctionValueMode::FIRST_ENUM)
-    {
-      curr = currPre;
-    }
-  }
-  curr = currPre;
-  for (const Node& hn : hoTerms)
-  {
-    Trace("model-builder-debug") << "    process : " << hn << std::endl;
-    Assert(hn.getKind() == Kind::HO_APPLY);
-    Assert(areEqual(hn[0], f));
-    // get representative of the argument, which note may recursively compute
-    // more function values.
-    Node hni = getRepresentative(hn[1]);
-    Trace("model-builder-debug2")
-        << "      get rep : " << hn[1] << " returned " << hni << std::endl;
-    AssertEqual(hni.getType(), args[0].getType());
-    // rewrite to ensure the equality is properly oriented, as required by
-    // function constants
-    hni = rewrite(args[0].eqNode(hni));
-    // get representative of the returned term, which note may recursively
-    // compute more function values.
-    Node hnv = getRepresentative(hn);
-    Trace("model-builder-debug2")
-        << "      get rep val : " << hn << " returned " << hnv << std::endl;
-    // hnv is expected to be constant but may not be the case if e.g. a
-    // non-trivial lambda is given as argument to this function.
-    if (!apply_args.empty())
-    {
-      // Convert to lambda, which is necessary if hnv is a function array
-      // constant.
-      hnv = uf::FunctionConst::toLambda(hnv);
-      Assert(!hnv.isNull() && hnv.getKind() == Kind::LAMBDA
-             && hnv[0].getNumChildren() + 1 == args.size());
-      std::vector<TNode> largs(hnv[0].begin(), hnv[0].end());
-      Assert(largs.size() == apply_args.size());
-      hnv = hnv[1].substitute(
-          largs.begin(), largs.end(), apply_args.begin(), apply_args.end());
-      hnv = rewrite(hnv);
-    }
-    AssertEqual(hnv.getType(), curr.getType());
-    if (curr.isNull())
-    {
-      curr = hnv;
-    }
-    else
-    {
-      curr = nodeManager()->mkNode(Kind::ITE, hni, hnv, curr);
-    }
-  }
-  // if curr was not set, we set it to currPre.
-  if (curr.isNull())
-  {
-    curr = currPre;
-  }
-  Node val = nodeManager()->mkNode(
-      Kind::LAMBDA, nodeManager()->mkNode(Kind::BOUND_VAR_LIST, args), curr);
-  Trace("model-builder-debug")
-      << "...assign via ho function to " << val << std::endl;
-  assignFunctionDefinition(f, val);
-}
-
 void TheoryModel::assignFunctionDefinition(Node f, Node f_def) const
 {
   Trace("model-builder") << "  Assigning function (" << f << ") to (" << f_def
                          << ")" << endl;
   Assert(d_uf_models.find(f) == d_uf_models.end());
 
-  if (logicInfo().isHigherOrder())
-  {
-    // we must rewrite the function value since the definition needs to be a
-    // constant value. This does not need to be the case if we are assigning a
-    // lambda to the equivalence class in isolation, so we do not assert that
-    // f_def is constant here.
-    f_def = rewrite(f_def);
-    Trace("model-builder-debug")
-        << "Model value (post-rewrite) : " << f_def << std::endl;
-  }
+  
 
   d_uf_models[f] = f_def;
 
-  if (logicInfo().isHigherOrder() && d_equalityEngine->hasTerm(f))
-  {
-    Trace("model-builder-debug")
-        << "  ...function is first-class member of equality engine"
-        << std::endl;
-    // assign to representative if higher-order
-    Node r = d_equalityEngine->getRepresentative(f);
-    // always replace the representative, since it is initially assigned to
-    // itself
-    Trace("model-builder") << "    Assign: Setting function rep " << r << " to "
-                           << f_def << endl;
-    // should not have assigned it yet, unless it was set to itself
-    Assert(d_reps.find(r) == d_reps.end() || d_reps[r] == r)
-        << "Function already assigned " << d_reps[r];
-    d_reps[r] = f_def;
-    // also assign to other assignable functions in the same equivalence class
-    eq::EqClassIterator eqc_i = eq::EqClassIterator(r, d_equalityEngine);
-    while (!eqc_i.isFinished())
-    {
-      Node n = *eqc_i;
-      // if an unassigned variable function
-      if (isAssignableUf(n) && !hasAssignedFunctionDefinition(n))
-      {
-        d_uf_models[n] = f_def;
-        Trace("model-builder")
-            << "  Assigning function (" << n << ") to function definition of "
-            << f << std::endl;
-      }
-      ++eqc_i;
-    }
-    Trace("model-builder-debug") << "  ...finished." << std::endl;
-  }
+  
 }
 
 bool TheoryModel::hasAssignedFunctionDefinition(Node f) const

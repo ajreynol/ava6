@@ -106,8 +106,7 @@ const char* toString(ProofRule rule)
     case ProofRule::TRUE_ELIM: return "TRUE_ELIM";
     case ProofRule::FALSE_INTRO: return "FALSE_INTRO";
     case ProofRule::FALSE_ELIM: return "FALSE_ELIM";
-    case ProofRule::HO_APP_ENCODE: return "HO_APP_ENCODE";
-    case ProofRule::HO_CONG: return "HO_CONG";
+    case ProofRule::APPLY_CONG: return "APPLY_CONG";
     //================================================= Array rules
     case ProofRule::ARRAYS_READ_OVER_WRITE: return "ARRAYS_READ_OVER_WRITE";
     case ProofRule::ARRAYS_READ_OVER_WRITE_CONTRA:

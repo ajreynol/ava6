@@ -121,11 +121,6 @@ void RegExpSolver::checkInclusions(Theory::Effort e)
       // conflict discovered, return
       return;
     }
-    if (e == Theory::EFFORT_FULL && !checkEqcIntersect(mems2))
-    {
-      // conflict discovered, return
-      return;
-    }
   }
   Trace("regexp-debug") << "... No Intersect Conflict in Memberships"
                         << std::endl;
@@ -426,117 +421,6 @@ bool RegExpSolver::checkEqcInclusion(Theory::Effort e, std::vector<Node>& mems)
                  [&remove](Node& n) { return remove.find(n) != remove.end(); }),
              mems.end());
 
-  return true;
-}
-
-bool RegExpSolver::checkEqcIntersect(const std::vector<Node>& mems)
-{
-  // do not compute intersections if the re intersection mode is none
-  if (options().strings.stringRegExpInterMode == options::RegExpInterMode::NONE)
-  {
-    return true;
-  }
-  if (mems.empty())
-  {
-    // nothing to do
-    return true;
-  }
-  // the initial regular expression membership and its constant type
-  Node mi;
-  RegExpConstType rcti = RE_C_UNKNOWN;
-  NodeManager* nm = nodeManager();
-  for (const Node& m : mems)
-  {
-    if (m.getKind() != Kind::STRING_IN_REGEXP)
-    {
-      // do not do negative
-      Assert(m.getKind() == Kind::NOT
-             && m[0].getKind() == Kind::STRING_IN_REGEXP);
-      continue;
-    }
-    RegExpConstType rct = d_regexp_opr.getRegExpConstType(m[1]);
-    if (rct == RE_C_VARIABLE
-        || (options().strings.stringRegExpInterMode
-                == options::RegExpInterMode::CONSTANT
-            && rct != RE_C_CONCRETE_CONSTANT))
-    {
-      // cannot do intersection on RE with variables, or with re.allchar based
-      // on option.
-      continue;
-    }
-    if (options().strings.stringRegExpInterMode
-        == options::RegExpInterMode::ONE_CONSTANT)
-    {
-      if (!mi.isNull() && rcti >= RE_C_CONSTANT && rct >= RE_C_CONSTANT)
-      {
-        // if both have re.allchar, do not do intersection if the
-        // options::RegExpInterMode::ONE_CONSTANT option is set.
-        continue;
-      }
-    }
-    if (mi.isNull())
-    {
-      // first regular expression seen
-      mi = m;
-      rcti = rct;
-      continue;
-    }
-    Node resR = d_regexp_opr.intersect(mi[1], m[1]);
-    if (resR.isNull())
-    {
-      // failed to compute intersection, e.g. if there was a complement
-      continue;
-    }
-    if (resR == d_emptyRegexp)
-    {
-      // conflict, explain
-      std::vector<Node> vec_nodes;
-      vec_nodes.push_back(mi);
-      vec_nodes.push_back(m);
-      if (mi[0] != m[0])
-      {
-        vec_nodes.push_back(mi[0].eqNode(m[0]));
-      }
-      Node conc;
-      d_im.sendInference(
-          vec_nodes, conc, InferenceId::STRINGS_RE_INTER_CONF, false, true);
-      // conflict, return
-      return false;
-    }
-    // rewrite to ensure the equality checks below are precise
-    Node mres = nm->mkNode(Kind::STRING_IN_REGEXP, mi[0], resR);
-    Node mresr = rewrite(mres);
-    if (mresr == mi)
-    {
-      // if R1 = intersect( R1, R2 ), then x in R1 ^ x in R2 is equivalent
-      // to x in R1, hence x in R2 can be marked redundant.
-      d_im.markInactive(m, ExtReducedId::STRINGS_REGEXP_INTER_SUBSUME);
-    }
-    else if (mresr == m)
-    {
-      // same as above, opposite direction
-      d_im.markInactive(mi, ExtReducedId::STRINGS_REGEXP_INTER_SUBSUME);
-    }
-    else
-    {
-      // new conclusion
-      // (x in R1 ^ y in R2 ^ x = y) => (x in intersect(R1,R2))
-      std::vector<Node> vec_nodes;
-      vec_nodes.push_back(mi);
-      vec_nodes.push_back(m);
-      if (mi[0] != m[0])
-      {
-        vec_nodes.push_back(mi[0].eqNode(m[0]));
-      }
-      d_im.sendInference(
-          vec_nodes, mres, InferenceId::STRINGS_RE_INTER_INFER, false, true);
-      // both are inactive
-      d_im.markInactive(m, ExtReducedId::STRINGS_REGEXP_INTER);
-      d_im.markInactive(mi, ExtReducedId::STRINGS_REGEXP_INTER);
-      // do not send more than one lemma for this class
-      return true;
-    }
-  }
   return true;
 }
 

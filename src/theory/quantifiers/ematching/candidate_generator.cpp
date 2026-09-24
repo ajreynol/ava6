@@ -323,7 +323,7 @@ Node CandidateGeneratorConsExpand::getNextCandidate()
   const DType& dt = d_mpat_type.getDType();
   Assert(dt.getNumConstructors() == 1);
   return datatypes::utils::getInstCons(
-      curr, dt, 0, options().datatypes.dtSharedSelectors);
+      curr, dt, 0);
 }
 
 bool CandidateGeneratorConsExpand::isLegalOpCandidate(const Node& n)
@@ -339,13 +339,7 @@ CandidateGeneratorSelector::CandidateGeneratorSelector(Env& env,
 {
   Trace("sel-trigger") << "Selector trigger: " << mpat << std::endl;
   Assert(mpat.getKind() == Kind::APPLY_SELECTOR);
-  // Get the expanded form of the selector, meaning that we will match on
-  // the shared selector if shared selectors are enabled.
-  Node mpatExp = datatypes::DatatypesRewriter::expandApplySelector(
-      mpat, options().datatypes.dtSharedSelectors);
-  Trace("sel-trigger") << "Expands to: " << mpatExp << std::endl;
-  Assert(mpatExp.getKind() == Kind::APPLY_SELECTOR);
-  d_selOp = d_treg.getTermDatabase()->getMatchOperator(mpatExp);
+  d_selOp = d_treg.getTermDatabase()->getMatchOperator(mpat);
 }
 
 void CandidateGeneratorSelector::reset(Node eqc)

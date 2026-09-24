@@ -271,16 +271,6 @@ Node DTypeConstructor::getSelector(size_t index) const
   return d_args[index]->getSelector();
 }
 
-Node DTypeConstructor::getSharedSelector(TypeNode domainType,
-                                         size_t index) const
-{
-  Assert(isResolved());
-  Assert(index < getNumArgs());
-  computeSharedSelectors(domainType);
-  Assert(d_sharedSelectors[domainType].size() == getNumArgs());
-  return d_sharedSelectors[domainType][index];
-}
-
 int DTypeConstructor::getSelectorIndexInternal(Node sel) const
 {
   Assert(isResolved());
@@ -293,15 +283,6 @@ int DTypeConstructor::getSelectorIndexInternal(Node sel) const
     {
       return static_cast<int>(sindex);
     }
-  }
-  // otherwise, check shared selector
-  TypeNode domainType = sel.getType().getDatatypeSelectorDomainType();
-  computeSharedSelectors(domainType);
-  std::map<Node, unsigned>::iterator its =
-      d_sharedSelectorIndex[domainType].find(sel);
-  if (its != d_sharedSelectorIndex[domainType].end())
-  {
-    return (int)its->second;
   }
   return -1;
 }
@@ -488,37 +469,6 @@ Node DTypeConstructor::computeGroundTerm(TypeNode t,
   Assert(!isValue || groundTerm.isConst()) << "Non-constant term " << groundTerm
                                            << " returned for computeGroundTerm";
   return groundTerm;
-}
-
-void DTypeConstructor::computeSharedSelectors(TypeNode domainType) const
-{
-  if (d_sharedSelectors[domainType].size() < getNumArgs())
-  {
-    TypeNode ctype;
-    if (domainType.isParametricDatatype())
-    {
-      ctype = getInstantiatedConstructorType(domainType);
-    }
-    else
-    {
-      ctype = d_constructor.getType();
-    }
-    Assert(ctype.isDatatypeConstructor());
-    Assert(ctype.getNumChildren() - 1 == getNumArgs());
-    // compute the shared selectors
-    const DType& dt = DType::datatypeOf(d_constructor);
-    std::map<TypeNode, unsigned> counter;
-    for (size_t j = 0, jend = ctype.getNumChildren() - 1; j < jend; j++)
-    {
-      TypeNode t = ctype[j];
-      Node ss = dt.getSharedSelector(domainType, t, counter[t]);
-      d_sharedSelectors[domainType].push_back(ss);
-      Assert(d_sharedSelectorIndex[domainType].find(ss)
-             == d_sharedSelectorIndex[domainType].end());
-      d_sharedSelectorIndex[domainType][ss] = j;
-      counter[t]++;
-    }
-  }
 }
 
 bool DTypeConstructor::resolve(

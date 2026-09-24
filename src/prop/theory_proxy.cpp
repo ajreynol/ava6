@@ -58,10 +58,9 @@ TheoryProxy::TheoryProxy(Env& env,
       d_activatedSkDefs(false)
 {
   bool trackZeroLevel =
-      options::DeepRestartMode::NONE != options::DeepRestartMode::NONE
-      || isOutputOn(OutputTag::LEARNED_LITS)
+      isOutputOn(OutputTag::LEARNED_LITS)
       || false
-      || options().theory.lemmaInprocess != options::LemmaInprocessMode::NONE;
+      || false;
   if (trackZeroLevel)
   {
     d_zll = std::make_unique<ZeroLevelLearner>(env, theoryEngine);
@@ -97,10 +96,7 @@ void TheoryProxy::finishInit(CDCLTSatSolver* ss, CnfStream* cs)
   {
     d_trackActiveSkDefs = true;
   }
-  if (options().theory.lemmaInprocess != options::LemmaInprocessMode::NONE)
-  {
-    d_lemip.reset(new LemmaInprocess(d_env, cs, *d_zll.get()));
-  }
+  
   d_cnfStream = cs;
 }
 
@@ -521,30 +517,6 @@ void TheoryProxy::notifyBacktrack()
 {
   // notify the preregistrar, which may trigger reregistrations
   d_prr->notifyBacktrack();
-}
-
-LearnedLitType TheoryProxy::getLiteralType(const Node& lit) const
-{
-  if (d_zll != nullptr)
-  {
-    return d_zll->computeLearnedLiteralType(lit);
-  }
-  return LearnedLitType::UNKNOWN;
-}
-
-std::vector<Node> TheoryProxy::getLearnedZeroLevelLiteralsForRestart() const
-{
-  if (d_zll != nullptr)
-  {
-    return d_zll->getLearnedZeroLevelLiteralsForRestart();
-  }
-  return {};
-}
-
-TrustNode TheoryProxy::inprocessLemma(TrustNode& trn)
-{
-  Assert(d_lemip != nullptr);
-  return d_lemip->inprocessLemma(trn);
 }
 
 }  // namespace prop

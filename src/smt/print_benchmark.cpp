@@ -247,7 +247,7 @@ void PrintBenchmark::printDeclaredFuns(std::ostream& out,
                                        const std::vector<Node>& funs,
                                        std::unordered_set<Node>& alreadyPrinted)
 {
-  bool printSkolemDefs = options::ioutils::getPrintSkolemDefinitions(out);
+  bool printSkolemDefs = options::ioutils::getCpcFormat(out);
   SkolemManager* sm = d_nm->getSkolemManager();
   BenchmarkNoPrintAttribute bnpa;
   for (const Node& f : funs)

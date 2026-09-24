@@ -75,7 +75,6 @@ TheoryDatatypes::TheoryDatatypes(Env& env,
   // Thus, we should always check at STANDARD effort. We set d_checkEarlyExit
   // to false to disable an optimization in the base Theory class which would
   // otherwise skip these checks.
-  if (options().theory.eeMode == options::EqEngineMode::CENTRAL)
   {
     d_checkEarlyExit = false;
   }
@@ -1119,7 +1118,6 @@ bool TheoryDatatypes::collectModelValues(TheoryModel* m,
   std::map<TypeNode, int> typ_enum_map;
   std::vector<TypeEnumerator> typ_enum;
   size_t index = 0;
-  bool shareSel = options().datatypes.dtSharedSelectors;
   while (index < nodes.size())
   {
     Node eqc = nodes[index];
@@ -1154,7 +1152,7 @@ bool TheoryDatatypes::collectModelValues(TheoryModel* m,
               d_env.isFiniteType(dt[i].getInstantiatedConstructorType(tt));
           if (pcons[i] && (r == 1) == cfinite)
           {
-            neqc = utils::getInstCons(eqc, dt, i, shareSel);
+            neqc = utils::getInstCons(eqc, dt, i);
             break;
           }
         }
@@ -1232,7 +1230,7 @@ Node TheoryDatatypes::getInstantiateCons(Node n, const DType& dt, int index)
   // add constructor to equivalence class
   Node k = getTermSkolemFor(n);
   Node n_ic =
-      utils::getInstCons(k, dt, index, options().datatypes.dtSharedSelectors);
+      utils::getInstCons(k, dt, index);
   // generally n_ic is in rewritten form but this is not the case if
   // n is not in rewritten form, e.g. if another theory added an unrewritten
   // term to the equality engine.

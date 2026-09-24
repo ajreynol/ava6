@@ -20,13 +20,11 @@
 #include "proof/proof_node_algorithm.h"
 #include "proof/theory_proof_step_buffer.h"
 #include "prop/cnf_stream.h"
-#include "prop/minisat/sat_proof_manager.h"
 #include "prop/prop_proof_manager.h"
 #include "prop/sat_solver.h"
 #include "prop/sat_solver_factory.h"
 #include "smt/env.h"
 #include "smt/logic_exception.h"
-#include "smt/proof_logger.h"
 #include "util/resource_manager.h"
 #include "util/string.h"
 
@@ -58,7 +56,6 @@ PropPfManager::PropPfManager(Env& env,
           env, nullptr, userContext(), "ProofCnfStream::LazyCDProof", false),
       d_pfpp(new ProofPostprocess(env, &d_proof)),
       d_pfCnfStream(env, cnf, this),
-      d_plog(nullptr),
       d_satSolver(satSolver),
       d_assertions(userContext()),
       d_cnfStream(cnf),
@@ -69,7 +66,6 @@ PropPfManager::PropPfManager(Env& env,
       d_lemmaClauseIds(userContext()),
       d_lemmaClauseTimestamp(userContext()),
       d_currLemmaId(theory::InferenceId::NONE),
-      d_satPm(nullptr),
       d_uclIds(statisticsRegistry().registerHistogram<theory::InferenceId>(
           "ppm::unsatCoreLemmaIds")),
       d_uclSize(statisticsRegistry().registerInt("ppm::unsatCoreLemmaSize")),
@@ -334,76 +330,9 @@ Node PropPfManager::normalizeAndRegister(TNode clauseNode,
       d_lemmaClauseTimestamp[normClauseNode] = currTimestamp;
     }
   }
-  if (d_satPm)
-  {
-    d_satPm->registerSatAssumptions({normClauseNode});
-  }
   // if proof logging, make the call now
-  if (d_plog != nullptr)
-  {
-    if (!input)
-    {
-      if (d_env.isTheoryProofProducing())
-      {
-        // if theory proof producing, we get the proof to log
-        std::shared_ptr<ProofNode> pfn = d_proof.getProofFor(normClauseNode);
-        d_plog->logTheoryLemmaProof(pfn);
-      }
-      else
-      {
-        // otherwise we just notify the clause
-        d_plog->logTheoryLemma(normClauseNode);
-      }
-    }
-  }
+  
   return normClauseNode;
-}
-
-void PropPfManager::presolve()
-{
-  // get the proof logger now
-  d_plog = d_env.getProofLogger();
-  Trace("pf-log-debug") << "PropPfManager::presolve, plog="
-                        << (d_plog != nullptr) << std::endl;
-}
-
-void PropPfManager::logPreprocessing()
-{
-  if (d_plog != nullptr)
-  {
-    // TODO (wishues #157): in incremental mode, only get the new assertions
-    std::vector<std::shared_ptr<ProofNode>> icp = getInputClausesProofs();
-    for (const Node& a : d_assumptions)
-    {
-      icp.emplace_back(d_proof.getProofFor(a));
-    }
-    Trace("pf-log-debug") << "PropPfManager::presolve, we have "
-                          << d_inputClauses.size() << " inputs and "
-                          << d_assumptions.size() << " assumptions"
-                          << std::endl;
-    d_plog->logCnfPreprocessInputProofs(icp);
-  }
-}
-
-void PropPfManager::postsolve(SatValue result)
-{
-  if (d_plog != nullptr)
-  {
-    if (result == SAT_VALUE_FALSE)
-    {
-      if (d_env.isSatProofProducing())
-      {
-        // if SAT proof producing, log the proof
-        std::shared_ptr<ProofNode> satPf = getProof(true);
-        d_plog->logSatRefutationProof(satPf);
-      }
-      else
-      {
-        // otherwise just mark the refutation
-        d_plog->logSatRefutation();
-      }
-    }
-  }
 }
 
 LazyCDProof* PropPfManager::getCnfProof() { return &d_proof; }
@@ -509,7 +438,7 @@ void PropPfManager::notifyExplainedPropagation(TrustNode trn)
   {
     clauseExp = nm->mkNode(Kind::OR, proven[0].notNode(), proven[1]);
   }
-  d_currPropagationProcessed = normalizeAndRegister(clauseExp, false);
+  normalizeAndRegister(clauseExp, false);
   // If we are not logging the clausification, we need to add the clause, as *it
   // will be saved in the SAT solver* (i.e., as clauseExp), as closed step in
   // the d_proof, so that there are no non-input assumptions.
@@ -517,16 +446,6 @@ void PropPfManager::notifyExplainedPropagation(TrustNode trn)
   {
     d_proof.addTrustedStep(clauseExp, TrustId::THEORY_LEMMA, {}, {});
   }
-}
-
-Node PropPfManager::getLastExplainedPropagation() const
-{
-  return d_currPropagationProcessed;
-}
-
-void PropPfManager::resetLastExplainedPropagation()
-{
-  d_currPropagationProcessed = Node::null();
 }
 
 }  // namespace prop

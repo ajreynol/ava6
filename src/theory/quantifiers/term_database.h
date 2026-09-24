@@ -275,21 +275,11 @@ class TermDb : public QuantifiersUtil
    * Dummy predicate that states terms should be considered first-class members
    * of equality engine (for higher-order).
    */
-  std::map<TypeNode, Node> d_ho_type_match_pred;
   /** A proof generator for disequal congruent terms */
   std::shared_ptr<DeqCongProofGenerator> d_dcproof;
   //----------------------------- implementation-specific
-  /**
-   * Finish reset internal, called at the end of reset(e). Returning false will
-   * cause the overall reset to return false.
-   */
-  virtual bool finishResetInternal(Theory::Effort e);
-  /** Add term internal, called when addTerm(n) is called */
-  virtual void addTermInternal(Node n);
   /** Get operators that we know are equivalent to f, typically only f itself */
-  virtual void getOperatorsFor(TNode f, std::vector<TNode>& ops);
-  /** get the chosen representative for operator op */
-  virtual Node getOperatorRepresentative(TNode op) const;
+  void getOperatorsFor(TNode f, std::vector<TNode>& ops);
   /**
    * This method is called when terms a and b are indexed by the same operator,
    * and have equivalent arguments. This method checks if we are in conflict,
@@ -297,7 +287,7 @@ class TermDb : public QuantifiersUtil
    * If so, it adds any additional arguments that explain why a = b, e.g. the
    * equivalence of their operators if their operators are different.
    */
-  virtual bool checkCongruentDisequal(TNode a, TNode b, std::vector<Node>& exp);
+  bool checkCongruentDisequal(TNode a, TNode b, std::vector<Node>& exp);
   //----------------------------- end implementation-specific
   /** compute uf eqc terms :
    * Ensure entries for f are in d_func_map_eqc_trie for all equivalence classes

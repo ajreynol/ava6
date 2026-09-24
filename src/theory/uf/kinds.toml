@@ -47,13 +47,6 @@ comment  = "a lambda expression; first parameter is a BOUND_VAR_LIST, second is 
 typerule = "::ava6::internal::theory::uf::LambdaTypeRule"
 
 [[kinds]]
-type     = "operator"
-name     = "HO_APPLY"
-children = 2
-comment  = "higher-order (partial) function application"
-typerule = "::ava6::internal::theory::uf::HoApplyTypeRule"
-
-[[kinds]]
 type      = "constant"
 name      = "FUNCTION_ARRAY_CONST"
 class_key = "class"

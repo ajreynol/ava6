@@ -23,24 +23,15 @@ namespace theory {
 namespace datatypes {
 namespace utils {
 
-Node getSelector(TypeNode dtt,
-                 const DTypeConstructor& dc,
-                 size_t index,
-                 bool shareSel)
-{
-  return shareSel ? dc.getSharedSelector(dtt, index) : dc.getSelector(index);
-}
-
 Node applySelector(const DTypeConstructor& dc,
                    size_t index,
-                   bool shareSel,
                    const Node& n)
 {
-  Node s = getSelector(n.getType(), dc, index, shareSel);
+  Node s = dc.getSelector(index);
   return NodeManager::mkNode(Kind::APPLY_SELECTOR, s, n);
 }
 
-Node getInstCons(Node n, const DType& dt, size_t index, bool shareSel)
+Node getInstCons(Node n, const DType& dt, size_t index)
 {
   Assert(index < dt.getNumConstructors());
   std::vector<Node> children;
@@ -49,7 +40,7 @@ Node getInstCons(Node n, const DType& dt, size_t index, bool shareSel)
   for (size_t i = 0, nargs = dt[index].getNumArgs(); i < nargs; i++)
   {
     Node nc = nm->mkNode(
-        Kind::APPLY_SELECTOR, getSelector(tn, dt[index], i, shareSel), n);
+        Kind::APPLY_SELECTOR, dt[index].getSelector(i), n);
     children.push_back(nc);
   }
   Node n_ic = mkApplyCons(tn, dt, index, children);

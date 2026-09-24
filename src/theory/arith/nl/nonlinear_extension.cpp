@@ -123,14 +123,8 @@ void NonlinearExtension::getAssertions(std::vector<Node>& assertions)
 {
   Trace("nl-ext-assert-debug") << "Getting assertions..." << std::endl;
   bool useRelevance = false;
-  if (options().arith.nlRlvMode == options::NlRlvMode::INTERLEAVE)
-  {
-    useRelevance = (d_checkCounter % 2);
-  }
-  else if (options().arith.nlRlvMode == options::NlRlvMode::ALWAYS)
-  {
-    useRelevance = true;
-  }
+  
+  
   Valuation v = d_containing.getValuation();
 
   BoundInference bounds(d_env);

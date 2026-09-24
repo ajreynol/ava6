@@ -459,11 +459,7 @@ void RelevanceManager::notifyLemma(TNode n,
                                    AVA6_UNUSED const std::vector<Node>& sks)
 {
   // add to assertions
-  if (options().theory.relevanceFilter && isLemmaPropertyNeedsJustify(p))
-  {
-    notifyPreprocessedAssertion(n, false);
-    notifyPreprocessedAssertions(skAsserts, false);
-  }
+  
   // notice that we may be in FULL or STANDARD effort here.
 
 }

@@ -62,7 +62,6 @@ class EqualityEngine : public context::ContextNotifyObj, protected EnvObj
    * Master equality engine that gets all the equality information from
    * this one, or null if none.
    */
-  EqualityEngine* d_masterEqualityEngine;
 
   /** Proof equality engine */
   ProofEqEngine* d_proofEqualityEngine;
@@ -100,11 +99,6 @@ class EqualityEngine : public context::ContextNotifyObj, protected EnvObj
   virtual ~EqualityEngine();
 
   //--------------------initialization
-  /**
-   * Set the master equality engine for this one. Master engine will get copies
-   * of all the terms and equalities from this engine.
-   */
-  void setMasterEqualityEngine(EqualityEngine* master);
   /** Set the proof equality engine for this one. */
   void setProofEqualityEngine(ProofEqEngine* pfee);
   /**

@@ -25,11 +25,6 @@ name   = "SMT Layer"
   default    = "true"
   help       = "use static learning (on by default)"
 
-[[setting]]
-  name       = "learnedRewrite"
-  type       = "bool"
-  default    = "false"
-
 [[option]]
   name       = "produceModels"
   category   = "common"
@@ -154,22 +149,6 @@ name   = "SMT Layer"
   default    = "true"
   help       = "keep an assertions list. Note this option is always enabled."
 
-[[setting]]
-  name       = "solveBVAsInt"
-  type       = "SolveBVAsIntMode"
-  default    = "OFF"
-  help_mode  = "solve-bv-as-int modes."
-[[setting.mode.OFF]]
-  name = "off"
-[[setting.mode.SUM]]
-  name = "sum"
-[[setting.mode.IAND]]
-  name = "iand"
-[[setting.mode.BV]]
-  name = "bv"
-[[setting.mode.BITWISE]]
-  name = "bitwise"
-
 [[option]]
   name       = "solveRealAsInt"
   category   = "regular"
@@ -180,11 +159,6 @@ name   = "SMT Layer"
 
 [[setting]]
 name = "ackermann"
-type = "bool"
-default = "false"
-
-[[setting]]
-name = "simplificationBoolConstProp"
 type = "bool"
 default = "false"
 
@@ -220,27 +194,6 @@ name = "sat-proof"
 name = "assumptions"
 
 [[setting]]
-name = "extRewPrep"
-type = "ExtRewPrepMode"
-default = "OFF"
-[[setting.mode.OFF]]
-name = "off"
-[[setting.mode.USE]]
-name = "use"
-[[setting.mode.AGG]]
-name = "agg"
-
-[[setting]]
-name = "simplifyWithCareEnabled"
-type = "bool"
-default = "false"
-
-[[setting]]
-name = "earlyIteRemoval"
-type = "bool"
-default = "false"
-
-[[setting]]
 name = "unconstrainedSimp"
 type = "bool"
 default = "false"
@@ -249,44 +202,4 @@ default = "false"
 name = "repeatSimp"
 type = "bool"
 default = "false"
-
-[[setting]]
-name = "sortInference"
-type = "bool"
-default = "false"
-
-[[setting]]
-name = "distinctElimThreshold"
-type = "uint64_t"
-default = "0"
-
-[[setting]]
-name = "BVAndIntegerGranularity"
-type = "uint64_t"
-default = "1"
-
-[[setting]]
-name = "solveIntAsBV"
-type = "uint64_t"
-default = "0"
-
-[[setting]]
-name = "deepRestartMode"
-type = "DeepRestartMode"
-default = "NONE"
-[[setting.mode.NONE]]
-name = "none"
-[[setting.mode.INPUT]]
-name = "input"
-[[setting.mode.INPUT_AND_SOLVABLE]]
-name = "input-and-solvable"
-[[setting.mode.INPUT_AND_PROP]]
-name = "input-and-prop"
-[[setting.mode.ALL]]
-name = "all"
-
-[[setting]]
-name = "deepRestartFactor"
-type = "double"
-default = "3.0"
 

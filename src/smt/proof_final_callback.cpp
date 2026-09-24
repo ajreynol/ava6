@@ -204,7 +204,7 @@ void ProofFinalCallback::finalize(std::shared_ptr<ProofNode> pn)
     }
   }
 
-  if (options().proof.checkProofSteps
+  if (false
       || isOutputOn(OutputTag::TRUSTED_PROOF_STEPS))
   {
     Node conc = pn->getResult();
@@ -261,31 +261,7 @@ void ProofFinalCallback::finalize(std::shared_ptr<ProofNode> pn)
         }
         output(OutputTag::TRUSTED_PROOF_STEPS) << ")" << std::endl;
       }
-      if (options().proof.checkProofSteps)
-      {
-        // trust the rewriter here, since the subsolver will rewrite anyways
-        query = rewrite(query);
-        // We use the original form of the query, which is a logically
-        // stronger formula. This may make it possible or easier to prove.
-        query = SkolemManager::getOriginalForm(query);
-        // set up the subsolver
-        Options subOptions;
-        subOptions.copyValues(d_env.getOptions());
-        smt::SetDefaults::disableChecking(subOptions);
-        SubsolverSetupInfo ssi(d_env, subOptions);
-        Trace("check-proof-steps")
-            << "Check: " << r << " : " << query << std::endl;
-        Result res = checkWithSubsolver(query.notNode(), ssi, true, 5000);
-        Trace("check-proof-steps") << "...got " << res << std::endl;
-        if (res != Result::UNSAT)
-        {
-          Warning() << "A proof step may not hold: " << r << " proving "
-                    << query;
-          Warning() << ", result from check-sat was: " << res << std::endl;
-          Trace("check-proof-steps")
-              << "Original conclusion: " << conc << std::endl;
-        }
-      }
+      
     }
   }
 }

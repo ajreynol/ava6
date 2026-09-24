@@ -175,11 +175,8 @@ Node QuantifiersPreprocess::preSkolemizeQuantifiers(
       // will skolemize current, process body
       Node nn = preSkolemizeQuantifiers(n[1], polarity, fvs, visited);
       std::vector<Node> sk;
-      Node sub;
-      std::vector<unsigned> sub_vars;
       // return skolemized body
-      ret = Skolemize::mkSkolemizedBodyInduction(
-          options(), n, nn, fvs, sk, sub, sub_vars);
+      ret = Skolemize::mkSkolemizedBody(n, nn, fvs, sk);
     }
     visited[key] = ret;
     return ret;

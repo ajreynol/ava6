@@ -27,8 +27,6 @@
 #include "theory/theory_model.h"
 #include "theory/type_enumerator.h"
 #include "theory/uf/conversions_solver.h"
-#include "theory/uf/ho_extension.h"
-#include "theory/uf/lambda_lift.h"
 #include "theory/uf/theory_uf_rewriter.h"
 
 using namespace std;
@@ -43,8 +41,6 @@ TheoryUF::TheoryUF(Env& env,
                    Valuation valuation,
                    std::string instanceName)
     : Theory(THEORY_UF, env, out, valuation, instanceName),
-      d_lambdaLift(new LambdaLift(env)),
-      d_ho(nullptr),
       d_dpfgen(env),
       d_functionsTerms(context()),
       d_rewriter(nodeManager()),
@@ -87,18 +83,9 @@ void TheoryUF::finishInit()
   // the ufssMode option.
 
   // The kinds we are treating as function application in congruence
-  bool isHo = logicInfo().isHigherOrder();
-  d_equalityEngine->addFunctionKind(Kind::APPLY_UF, false, isHo);
-  if (isHo)
-  {
-    {
-      std::stringstream ss;
-      ss << "Higher-order logic not available in this core solver.";
-      throw LogicException(ss.str());
-    }
-    d_equalityEngine->addFunctionKind(Kind::HO_APPLY);
-    d_ho.reset(new HoExtension(d_env, d_state, d_im, *d_lambdaLift.get()));
-  }
+
+  d_equalityEngine->addFunctionKind(Kind::APPLY_UF, false, false);
+  
   // conversion kinds
   d_equalityEngine->addFunctionKind(Kind::INT_TO_BITVECTOR, true);
   d_equalityEngine->addFunctionKind(Kind::BITVECTOR_UBV_TO_INT, true);
@@ -110,7 +97,7 @@ bool TheoryUF::needsCheckLastEffort()
 {
   // last call effort needed if using finite model finding,
   // arithmetic/bit-vector conversions, or higher-order extension
-  return d_csolver != nullptr || d_ho != nullptr
+  return d_csolver != nullptr || false
          || d_distinct.needsCheckLastEffort();
 }
 
@@ -134,10 +121,7 @@ void TheoryUF::postCheck(Effort level)
     }
     d_distinct.check(level);
     // check with the higher-order extension at full effort
-    if (fullEffort(level) && logicInfo().isHigherOrder())
-    {
-      d_ho->check();
-    }
+    
   }
 }
 
@@ -155,14 +139,7 @@ void TheoryUF::notifyFact(TNode atom,
   {
     case Kind::EQUAL:
     {
-      if (logicInfo().isHigherOrder())
-      {
-        if (!pol && !d_state.isInConflict() && atom[0].getType().isFunction())
-        {
-          // apply extensionality eagerly using the ho extension
-          d_ho->applyExtensionality(fact);
-        }
-      }
+      
     }
     break;
     case Kind::DISTINCT:
@@ -181,23 +158,17 @@ TrustNode TheoryUF::ppRewrite(TNode node, std::vector<SkolemLemma>& lems)
   Trace("uf-exp-def") << "TheoryUF::ppRewrite: expanding definition : " << node
                       << std::endl;
   Kind k = node.getKind();
-  bool isHol = logicInfo().isHigherOrder();
+
   if (node.getType().isAbstract())
   {
     std::stringstream ss;
     ss << "Cannot process term of abstract type " << node;
     throw LogicException(ss.str());
   }
-  if (k == Kind::HO_APPLY || node.getType().isFunction())
+  if (false || node.getType().isFunction())
   {
-    if (!isHol)
     {
       std::stringstream ss;
-      if (k == Kind::HO_APPLY)
-      {
-        ss << "Higher-order function applications";
-      }
-      else
       {
         ss << "Function terms";
       }
@@ -208,7 +179,7 @@ TrustNode TheoryUF::ppRewrite(TNode node, std::vector<SkolemLemma>& lems)
   }
   else if (k == Kind::APPLY_UF)
   {
-    if (!isHol && isHigherOrderType(node.getOperator().getType()))
+    if (!false && isHigherOrderType(node.getOperator().getType()))
     {
       // check for higher-order
       // logic exception if higher-order is not enabled
@@ -228,16 +199,7 @@ TrustNode TheoryUF::ppRewrite(TNode node, std::vector<SkolemLemma>& lems)
                                                : arith::eliminateInt2Bv(node);
     return TrustNode::mkTrustRewrite(node, ret);
   }
-  if (isHol)
-  {
-    TrustNode ret = d_ho->ppRewrite(node, lems);
-    if (!ret.isNull())
-    {
-      Trace("uf-exp-def") << "TheoryUF::ppRewrite: higher-order: " << node
-                          << " to " << ret.getNode() << std::endl;
-      return ret;
-    }
-  }
+  
   return TrustNode::null();
 }
 
@@ -254,18 +216,6 @@ void TheoryUF::preRegisterTerm(TNode node)
       d_state.addEqualityEngineTriggerPredicate(node);
       break;
     case Kind::APPLY_UF: preRegisterFunctionTerm(node); break;
-    case Kind::HO_APPLY:
-    {
-      if (!logicInfo().isHigherOrder())
-      {
-        std::stringstream ss;
-        ss << "Partial function applications are only supported with "
-              "higher-order logic. Try adding the logic prefix HO_.";
-        throw LogicException(ss.str());
-      }
-      preRegisterFunctionTerm(node);
-    }
-    break;
     case Kind::INT_TO_BITVECTOR:
     case Kind::BITVECTOR_UBV_TO_INT:
     {
@@ -299,18 +249,7 @@ void TheoryUF::preRegisterTerm(TNode node)
     default:
       // Variables etc
       d_equalityEngine->addTerm(node);
-      if (logicInfo().isHigherOrder())
-      {
-        // When using lazy lambda handling, if node is a lambda function, it
-        // must be marked as a shared term. This is to ensure we split on the
-        // equality of lambda functions with other functions when doing care
-        // graph based theory combination.
-        if (d_lambdaLift->isLambdaFunction(node))
-        {
-          addSharedTerm(node);
-        }
-      }
-      else if (node.getType().isFunction())
+      if (node.getType().isFunction())
       {
         std::stringstream ss;
         ss << "Function terms are only supported with higher-order logic. Try "
@@ -357,23 +296,6 @@ void TheoryUF::explain(TNode literal, Node& exp)
 }
 
 TrustNode TheoryUF::explain(TNode literal) { return d_im.explainLit(literal); }
-
-bool TheoryUF::collectModelValues(TheoryModel* m, const std::set<Node>& termSet)
-{
-  if (logicInfo().isHigherOrder())
-  {
-    // must add extensionality disequalities for all pairs of (non-disequal)
-    // function equivalence classes.
-    if (!d_ho->collectModelInfoHo(m, termSet))
-    {
-      Trace("uf") << "Collect model info fail HO" << std::endl;
-      return false;
-    }
-  }
-
-  Trace("uf") << "UF : finish collectModelInfo " << std::endl;
-  return true;
-}
 
 void TheoryUF::presolve()
 {
@@ -440,11 +362,7 @@ bool TheoryUF::areCareDisequal(TNode x, TNode y)
       // if x or y is a lambda function, and they are neither entailed to
       // be equal or disequal, then we return false. This ensures the pair
       // (x,y) may be considered for the care graph.
-      if (d_lambdaLift->isLambdaFunction(x)
-          || d_lambdaLift->isLambdaFunction(y))
-      {
-        return false;
-      }
+      
       return true;
     }
   }
@@ -462,48 +380,15 @@ void TheoryUF::processCarePairArgs(TNode a, TNode b)
   addCarePairArgs(a, b);
 
   // also split on functions
-  if (logicInfo().isHigherOrder())
-  {
-    NodeManager* nm = nodeManager();
-    for (size_t k = 0, nchild = a.getNumChildren(); k < nchild; ++k)
-    {
-      TNode x = a[k];
-      TNode y = b[k];
-      if (d_state.areEqual(x, y))
-      {
-        continue;
-      }
-      // Splitting on functions. This is required since conceptually the HO
-      // extension should be considered a separate entity with regards to
-      // theory combination (in particular, with the core UF solver). This is
-      // similar to how we handle sets of sets, where each set type is
-      // considered a separate entity. The types below must be equal to handle
-      // polymorphic operators taking higher-order arguments, e.g. set.map.
-      TypeNode xt = x.getType();
-      if (xt.isFunction() && xt == y.getType())
-      {
-        Node lemma = x.eqNode(y);
-        lemma = nm->mkNode(Kind::OR, lemma, lemma.notNode());
-        d_im.lemma(lemma, InferenceId::UF_HO_CG_SPLIT);
-      }
-    }
-  }
-}
-
-void TheoryUF::computeRelevantTerms(std::set<Node>& termSet)
-{
-  if (d_ho != nullptr)
-  {
-    d_ho->computeRelevantTerms(termSet);
-  }
+  
 }
 
 void TheoryUF::computeCareGraph()
 {
-  bool isHigherOrder = logicInfo().isHigherOrder();
+
   // note that if we are higher-order, we may still generate splits for
   // function arguments
-  if (d_state.getSharedTerms().empty() && !isHigherOrder)
+  if (d_state.getSharedTerms().empty() && !false)
   {
     return;
   }
@@ -528,7 +413,7 @@ void TheoryUF::computeCareGraph()
       // if doing higher-order, higher-order arguments must all be considered as
       // well
       if (d_equalityEngine->isTriggerTerm(j, THEORY_UF)
-          || (isHigherOrder && j.getType().isFunction()))
+          || (false && j.getType().isFunction()))
       {
         has_trigger_arg = true;
       }
@@ -543,28 +428,9 @@ void TheoryUF::computeCareGraph()
         Node op = app.getOperator();
         index[op].addTerm(app, reps);
         arity[op] = reps.size();
-        if (isHigherOrder && d_equalityEngine->hasTerm(op))
-        {
-          // Since we use a lazy app-completion scheme for equating fully
-          // and partially applied versions of terms, we must add all
-          // sub-chains to the HO index if the operator of this term occurs
-          // in a higher-order context in the equality engine.  In other words,
-          // for (f a b c), this will add the terms:
-          // (HO_APPLY f a), (HO_APPLY (HO_APPLY f a) b),
-          // (HO_APPLY (HO_APPLY (HO_APPLY f a) b) c) to the higher-order
-          // term index for consideration when computing care pairs.
-          Node curr = op;
-          for (const Node& c : app)
-          {
-            Node happ = nm->mkNode(Kind::HO_APPLY, curr, c);
-            Assert(curr.getType().isFunction());
-            typeIndex[curr.getType()].addTerm(happ, {curr, c});
-            curr = happ;
-            keep.push_back(happ);
-          }
-        }
+        
       }
-      else if (k == Kind::HO_APPLY || k == Kind::BITVECTOR_UBV_TO_INT)
+      else if (false || k == Kind::BITVECTOR_UBV_TO_INT)
       {
         // add it to the typeIndex for the function type if HO_APPLY, or the
         // bitvector type if bv2nat. The latter ensures that we compute

@@ -33,30 +33,8 @@ ZeroLevelLearner::ZeroLevelLearner(Env& env, TheoryEngine* theoryEngine)
       d_ppnAtoms(userContext()),
       d_ppnTerms(userContext()),
       d_ppnSyms(userContext()),
-      d_assertNoLearnCount(0),
       d_tsmap(env, userContext(), "ZllSimplificationMap")
 {
-  // get the learned types
-  options::DeepRestartMode lmode = options::DeepRestartMode::NONE;
-  if (lmode != options::DeepRestartMode::NONE)
-  {
-    d_learnedTypes.insert(LearnedLitType::INPUT);
-    if (lmode == options::DeepRestartMode::ALL)
-    {
-      d_learnedTypes.insert(LearnedLitType::INTERNAL);
-      d_learnedTypes.insert(LearnedLitType::SOLVABLE);
-      d_learnedTypes.insert(LearnedLitType::CONSTANT_PROP);
-    }
-    else if (lmode == options::DeepRestartMode::INPUT_AND_SOLVABLE)
-    {
-      d_learnedTypes.insert(LearnedLitType::SOLVABLE);
-    }
-    else if (lmode == options::DeepRestartMode::INPUT_AND_PROP)
-    {
-      d_learnedTypes.insert(LearnedLitType::SOLVABLE);
-      d_learnedTypes.insert(LearnedLitType::CONSTANT_PROP);
-    }
-  }
   d_trackSimplifications = true;
 }
 
@@ -174,10 +152,7 @@ void ZeroLevelLearner::notifyInputFormulas(const std::vector<Node>& assertions)
   // last learned literal is equal to the total number of literals in the
   // input problem times 3, i.e. each literal has been asserted on average 3
   // times.
-  d_deepRestartThreshold = static_cast<size_t>(
-      static_cast<double>(d_ppnAtoms.size()) * options().smt.deepRestartFactor);
-  Trace("level-zero") << "Restart threshold is " << d_deepRestartThreshold
-                      << std::endl;
+
 }
 
 bool ZeroLevelLearner::notifyAsserted(TNode assertion, int32_t alevel)
@@ -186,13 +161,11 @@ bool ZeroLevelLearner::notifyAsserted(TNode assertion, int32_t alevel)
   if (d_nonZeroAssert.get())
   {
     // already not at level zero, skip
-    d_assertNoLearnCount++;
   }
   else if (alevel != 0)
   {
     Trace("level-zero-dec") << "First non-zero: " << assertion << std::endl;
     d_nonZeroAssert = true;
-    d_assertNoLearnCount++;
   }
   else if (d_levelZeroAsserts.find(assertion) == d_levelZeroAsserts.end())
   {
@@ -202,19 +175,6 @@ bool ZeroLevelLearner::notifyAsserted(TNode assertion, int32_t alevel)
     LearnedLitType ltype = computeLearnedLiteralType(assertion);
     processLearnedLiteral(assertion, ltype);
     return true;
-  }
-  // request a deep restart?
-
-  if (TraceIsOn("level-zero-debug"))
-  {
-    if (d_assertNoLearnCount > 0 && d_deepRestartThreshold > 0
-        && d_assertNoLearnCount % d_deepRestartThreshold == 0)
-    {
-      Trace("level-zero-debug")
-          << "#asserts without learning = " << d_assertNoLearnCount << " ("
-          << (d_assertNoLearnCount / d_deepRestartThreshold) << "x)"
-          << std::endl;
-    }
   }
   return true;
 }
@@ -318,12 +278,6 @@ LearnedLitType ZeroLevelLearner::computeLearnedLiteralType(
   return ltype;
 }
 
-theory::TrustSubstitutionMap& ZeroLevelLearner::getSimplifications()
-{
-  Assert(d_trackSimplifications);
-  return d_tsmap;
-}
-
 void ZeroLevelLearner::addSimplification(const Node& t, const Node& s)
 {
   // in rare cases we may already have a substitution for v, e.g.
@@ -343,11 +297,6 @@ void ZeroLevelLearner::processLearnedLiteral(const Node& lit,
 {
   // add to the database
   d_ldb.addLearnedLiteral(lit, ltype);
-  // reset the counter for deep restart if the literal was learnable
-  if (isLearnable(ltype))
-  {
-    d_assertNoLearnCount = 0;
-  }
   // print to stream
   if (isOutputOn(OutputTag::LEARNED_LITS))
   {
@@ -365,50 +314,6 @@ void ZeroLevelLearner::processLearnedLiteral(const Node& lit,
     output(OutputTag::LEARNED_LITS) << " :" << ltstr;
     output(OutputTag::LEARNED_LITS) << ")" << std::endl;
   }
-}
-
-std::vector<Node> ZeroLevelLearner::getLearnedZeroLevelLiterals(
-    LearnedLitType ltype) const
-{
-  std::vector<Node> ret = d_ldb.getLearnedLiterals(ltype);
-  if (TraceIsOn("level-zero"))
-  {
-    if (!ret.empty())
-    {
-      Trace("level-zero") << "...learned #literals (" << ltype
-                          << ") = " << ret.size() << std::endl;
-    }
-  }
-  return ret;
-}
-
-std::vector<Node> ZeroLevelLearner::getLearnedZeroLevelLiteralsForRestart()
-    const
-{
-  std::vector<Node> ret;
-  for (LearnedLitType ltype : d_learnedTypes)
-  {
-    std::vector<Node> rett = getLearnedZeroLevelLiterals(ltype);
-    ret.insert(ret.end(), rett.begin(), rett.end());
-  }
-  return ret;
-}
-
-bool ZeroLevelLearner::hasLearnedLiteralForRestart() const
-{
-  for (LearnedLitType ltype : d_learnedTypes)
-  {
-    if (d_ldb.getNumLearnedLiterals(ltype) > 0)
-    {
-      return true;
-    }
-  }
-  return false;
-}
-
-bool ZeroLevelLearner::isLearnable(LearnedLitType ltype) const
-{
-  return d_learnedTypes.find(ltype) != d_learnedTypes.end();
 }
 
 bool ZeroLevelLearner::getSolved(const Node& lit, Subs& subs)

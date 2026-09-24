@@ -188,11 +188,6 @@ bool TheoryState::isSatLiteral(TNode lit) const
 
 TheoryModel* TheoryState::getModel() { return d_valuation.getModel(); }
 
-SortInference* TheoryState::getSortInference()
-{
-  return d_valuation.getSortInference();
-}
-
 bool TheoryState::hasSatValue(TNode n, bool& value) const
 {
   return d_valuation.hasSatValue(n, value);

@@ -68,7 +68,7 @@ Node TupleUtils::nthElementOfTuple(Node tuple, int n_th)
   // note that shared selectors are irrelevant for datatypes with one
   // constructor, hence we pass false here
   return tuple.getNodeManager()->mkNode(
-      Kind::APPLY_SELECTOR, utils::getSelector(tn, dt[0], n_th, false), tuple);
+      Kind::APPLY_SELECTOR, dt[0].getSelector(n_th), tuple);
 }
 
 Node TupleUtils::getTupleProjection(const std::vector<uint32_t>& indices,

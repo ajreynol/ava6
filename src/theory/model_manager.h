@@ -42,11 +42,11 @@ class ModelManager : protected EnvObj
 {
  public:
   ModelManager(Env& env, TheoryEngine& te, EqEngineManager& eem);
-  virtual ~ModelManager();
+  ~ModelManager();
   /**
    * Finish initializing this class, which allocates the model, the model
    * builder as well as the equality engine of the model. The equality engine
-   * to use is determined by the virtual method initializeModelEqEngine.
+   * to use is determined by the method initializeModelEqEngine.
    *
    * @param notify The object that wants to be notified for callbacks occurring
    */
@@ -82,14 +82,14 @@ class ModelManager : protected EnvObj
    * @return true if we are in conflict (i.e. the equality engine of the model
    * equality engine is inconsistent).
    */
-  virtual bool prepareModel() = 0;
+  bool prepareModel();
   /**
    * Finish build model, which calls the theory model builder to assign values
    * to all equivalence classes. This should be run after prepareModel.
    *
    * @return true if model building was successful.
    */
-  virtual bool finishBuildModel() const = 0;
+  bool finishBuildModel() const;
   //------------------------ end finer grained control over model building
  protected:
   /**
@@ -97,7 +97,7 @@ class ModelManager : protected EnvObj
    * init, after we have created a model object but before we have assigned it
    * an equality engine.
    */
-  virtual void initializeModelEqEngine(eq::EqualityEngineNotify* notify) = 0;
+  void initializeModelEqEngine(eq::EqualityEngineNotify* notify);
   /**
    * Collect model Boolean variables.
    * This asserts the values of all boolean variables to the equality engine of

@@ -26,20 +26,10 @@ namespace datatypes {
 namespace utils {
 
 /**
- * Get the index^th selector of datatype constructor dc whose type is dtt. If
- * shareSel is true, this returns the shared selector of dc.
- */
-Node getSelector(TypeNode dtt,
-                 const DTypeConstructor& dc,
-                 size_t index,
-                 bool shareSel);
-/**
- * Apply the indext^th selector of datatype constructor dc to term n. If
- * shareSel is true, we use the shared selector of dc.
+ * Apply the indext^th selector of datatype constructor dc to term n. 
  */
 Node applySelector(const DTypeConstructor& dc,
                    size_t index,
-                   bool shareSel,
                    const Node& n);
 
 /** get instantiate cons
@@ -47,7 +37,7 @@ Node applySelector(const DTypeConstructor& dc,
  * This returns the term C( sel^{C,1}( n ), ..., sel^{C,m}( n ) ),
  * where C is the index^{th} constructor of datatype dt.
  */
-Node getInstCons(Node n, const DType& dt, size_t index, bool shareSel);
+Node getInstCons(Node n, const DType& dt, size_t index);
 /**
  * Apply constructor, taking into account whether the datatype is parametric.
  *

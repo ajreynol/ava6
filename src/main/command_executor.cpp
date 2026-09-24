@@ -191,10 +191,7 @@ bool CommandExecutor::doCommandSingleton(Cmd* cmd)
     if (!getterCommands.empty())
     {
       // set no time limit during dumping if applicable
-      if (false)
-      {
-        setNoLimitCPU();
-      }
+      
       for (const auto& getterCommand : getterCommands)
       {
         status = doCommandSingleton(getterCommand.get());

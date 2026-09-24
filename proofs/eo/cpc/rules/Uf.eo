@@ -210,9 +210,9 @@
     :conclusion (not F)
 )
 
-;;;;; ProofRule::HO_CONG
+;;;;; ProofRule::APPLY_CONG
 
-; program: $mk_ho_cong
+; program: $mk_apply_cong
 ; args:
 ; - t1 U: The current left hand side of the equality we have proven.
 ; - t2 U: The current right hand side of the equality we have proven.
@@ -220,16 +220,16 @@
 ; return: >
 ;   An equality where the original terms are applied to the left and
 ;   right hand sides of the equalities given by E.
-(program $mk_ho_cong ((T Type) (U Type) (f1 (-> T U)) (f2 (-> T U)) (t1 U) (t2 U) (tail Bool :list))
+(program $mk_apply_cong ((T Type) (U Type) (f1 (-> T U)) (f2 (-> T U)) (t1 U) (t2 U) (tail Bool :list))
     :signature (U U Bool) Bool
     (
-        (($mk_ho_cong f1 f2 (and (= t1 t2) tail)) ($mk_ho_cong (f1 t1) (f2 t2) tail))
-        (($mk_ho_cong t1 t2 true)                 (= t1 t2))
+        (($mk_apply_cong f1 f2 (and (= t1 t2) tail)) ($mk_apply_cong (f1 t1) (f2 t2) tail))
+        (($mk_apply_cong t1 t2 true)                 (= t1 t2))
     )
 )
 
-; rule: ho_cong
-; implements: ProofRule::HO_CONG
+; rule: apply_cong
+; implements: ProofRule::APPLY_CONG
 ; premises:
 ; - E [:list]: A conjunction of equalities to apply congruence to.
 ; conclusion: >
@@ -237,10 +237,10 @@
 ;   the premises E. Note that the first equality in E should be an equality
 ;   between the functions that are respectively applied to the arguments given by
 ;   the remaining equalities.
-(declare-rule ho_cong ((T Type) (t1 T) (t2 T) (tail Bool :list))
+(declare-rule apply_cong ((T Type) (t1 T) (t2 T) (tail Bool :list))
     :premise-list (and (= t1 t2) tail) and
     :args ()
-    :conclusion ($mk_ho_cong t1 t2 tail)
+    :conclusion ($mk_apply_cong t1 t2 tail)
 )
 
 ;;-------------------- Instances of THEORY_REWRITE

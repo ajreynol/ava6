@@ -316,32 +316,6 @@ class TheoryModel : protected EnvObj
    * @param f The function to assign.
    */
   void assignFunctionDefault(Node f) const;
-  /**
-   * Assign function f when the logic is higher-order. This is called on demand
-   * when the model for f is required by his class.
-   * This construction is based on "dag form". For example:
-   * (f 0 1) = 1
-   * (f 0 2) = 2
-   * (f 1 1) = 3
-   * ...
-   * becomes:
-   * f = (lambda xy. (ite (= x 0) (ite (= y 1) 1
-   *                              (ite (= y 2) 2 ...))
-   *                 (ite (= x 1) (ite (= y 1) 3 ...)
-   *                              ...))
-   *
-   * where the above is represented as a directed acyclic graph (dag).
-   * This construction is accomplished by assigning values to (f c)
-   * terms before f, e.g.
-   * (f 0) = (lambda y. (ite (= y 1) 1
-   *                    (ite (= y 2) 2 ...))
-   * (f 1) = (lambda y. (ite (= y 1) 3 ...))
-   * where
-   * f = (lambda xy. (ite (= x 0) ((f 0) y)
-   *                 (ite (= x 1) ((f 1) y) ...))
-   * @param f The function to assign.
-   */
-  void assignFunctionDefaultHo(Node f) const;
   /** Unique name of this model */
   std::string d_name;
   /** equality engine containing all known equalities/disequalities */
@@ -420,7 +394,6 @@ class TheoryModel : protected EnvObj
   std::map<Node, std::vector<Node> > d_uf_terms;
   /** a map from functions f to a list of all HO_APPLY terms with first argument
    * f */
-  std::map<Node, std::vector<Node> > d_ho_uf_terms;
   /** whether function models are enabled */
   bool d_enableFuncModels;
   /**

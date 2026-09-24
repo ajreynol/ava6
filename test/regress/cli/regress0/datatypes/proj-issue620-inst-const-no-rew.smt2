@@ -1,6 +1,5 @@
 ; EXPECT: sat
 (set-logic ALL)
-(set-option :ee-mode central)
 (declare-datatypes ((d 0)) (((c (s Int)))))
 (declare-const _x Int)
 (declare-const x (Array Int d))

@@ -1,4 +1,4 @@
-; COMMAND-LINE: -i --sat-solver=cadical
+; COMMAND-LINE: -i
 ; DISABLE-TESTER: proof
 (set-logic QF_BV)
 (declare-const x Bool)

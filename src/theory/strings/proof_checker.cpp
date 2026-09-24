@@ -15,7 +15,6 @@
 #include "expr/sequence.h"
 #include "options/strings_options.h"
 #include "theory/rewriter.h"
-#include "theory/strings/regexp_elim.h"
 #include "theory/strings/regexp_entail.h"
 #include "theory/strings/regexp_operation.h"
 #include "theory/strings/skolem_cache.h"

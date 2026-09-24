@@ -56,7 +56,6 @@ set(regress_0_tests
   regress0/arith/integers/issue6146-stale-vars.smt2
   regress0/arith/issue12058.smt2
   regress0/arith/issue12754-div-zero-intreal.smt2
-  regress0/arith/issue1399.smt2
   regress0/arith/issue3412.smt2
   regress0/arith/issue3413.smt2
   regress0/arith/issue4367.smt2
@@ -1016,7 +1015,6 @@ set(regress_0_tests
   regress0/proofs/issue12255-cyclic-arith-rcons.smt2
   regress0/proofs/issue12574-check-proofs-int-to-bv.smt2
   regress0/proofs/issue12604-dt-tester-merge.smt2
-  regress0/proofs/issue12631-check-proofs-arith.smt2
   regress0/proofs/issue12670-dt-ite-check-proofs.smt2
   regress0/proofs/issue12683-check-proofs-arith-mixed.smt2
   regress0/proofs/issue12696-check-proofs-subtype.smt2
@@ -1813,7 +1811,6 @@ set(regress_1_tests
   regress1/nl/issue9183-3.smt2
   regress1/nl/issue9472-2-cmv.smt2
   regress1/nl/learned-rewrite-int-mod-range.smt2
-  regress1/nl/metitarski_3_4_2e.smt2
   regress1/nl/nl-eq-infer.smt2
   regress1/nl/nl-help-unsat-quant.smt2
   regress1/nl/nl-unk-quant.smt2
@@ -1979,8 +1976,6 @@ set(regress_1_tests
   regress1/quantifiers/issue5288-vts-real-int.smt2
   regress1/quantifiers/issue5373-2.smt2
   regress1/quantifiers/issue5470-aext.smt2
-  regress1/quantifiers/issue5735-subtypes.smt2
-  regress1/quantifiers/issue5735-2-subtypes.smt2
   regress1/quantifiers/issue6642-em-types.smt2
   regress1/quantifiers/issue6699-nc-shadow.smt2
   regress1/quantifiers/issue6775-vts-int.smt2

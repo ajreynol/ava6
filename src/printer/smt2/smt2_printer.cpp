@@ -62,7 +62,7 @@ namespace smt2 {
 static void toStreamRational(std::ostream& out, const Rational& r, bool isReal)
 {
   bool neg = r.sgn() < 0;
-  bool arithTokens = options::ioutils::getPrintArithLitToken(out);
+  bool arithTokens = options::ioutils::getCpcFormat(out);
   // Print the rational, possibly as a real.
   // Notice that we print (/ (- 5) 3) instead of (- (/ 5 3)),
   // the former is compliant with real values in the smt lib standard.
@@ -482,7 +482,7 @@ bool Smt2Printer::toStreamBase(std::ostream& out,
             printed = true;
           }
         }
-        else if (options::ioutils::getPrintSkolemDefinitions(out))
+        else if (options::ioutils::getCpcFormat(out))
         {
           toStreamSkolem(
               out, cacheVal, id, /*isApplied=*/false, toDepth, lbind);
@@ -523,22 +523,14 @@ bool Smt2Printer::toStreamBase(std::ostream& out,
   }
   else if (k == Kind::APPLY_UF)
   {
-    if (!n.getOperator().isVar())
-    {
-      // Must print as HO apply instead. This ensures un-beta-reduced function
-      // applications can be reparsed.
-      Node hoa = theory::uf::TheoryUfRewriter::getHoApplyForApplyUf(n);
-      toStream(out, hoa, lbind, toDepth);
-      return true;
-    }
-    else if (n.getOperator().getKind() == Kind::SKOLEM)
+    if (n.getOperator().getKind() == Kind::SKOLEM)
     {
       SkolemManager* sm = nm->getSkolemManager();
       SkolemId id;
       Node cacheVal;
       if (sm->isSkolemFunction(n.getOperator(), id, cacheVal))
       {
-        if (options::ioutils::getPrintSkolemDefinitions(out))
+        if (options::ioutils::getCpcFormat(out))
         {
           if (n.getNumChildren() != 0)
           {
@@ -554,32 +546,6 @@ bool Smt2Printer::toStreamBase(std::ostream& out,
   {
     Node range = n[n.getNumChildren() - 1];
     toStream(out, range, lbind, toDepth);
-    return true;
-  }
-  else if (k == Kind::HO_APPLY && options::ioutils::getFlattenHOChains(out))
-  {
-    out << "(";
-    // collapse "@" chains, i.e.
-    //
-    // ((a b) c) --> (a b c)
-    //
-    // (((a b) ((c d) e)) f) --> (a b (c d e) f)
-    {
-      Node head = n;
-      std::vector<Node> args;
-      while (head.getKind() == Kind::HO_APPLY)
-      {
-        args.insert(args.begin(), head[1]);
-        head = head[0];
-      }
-      toStream(out, head, lbind, toDepth);
-      for (unsigned i = 0, size = args.size(); i < size; ++i)
-      {
-        out << " ";
-        toStream(out, args[i], lbind, toDepth);
-      }
-      out << ")";
-    }
     return true;
   }
   else if (k == Kind::MATCH)
@@ -1192,8 +1158,6 @@ std::string Smt2Printer::smtKindString(Kind k)
     case Kind::EXISTS: return "exists";
 
     // HO
-    case Kind::HO_APPLY: return "@";
-
     default:; /* fall through */
   }
 

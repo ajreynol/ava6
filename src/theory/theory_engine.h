@@ -30,7 +30,6 @@
 #include "theory/interrupted.h"
 #include "theory/output_channel.h"
 #include "theory/rewriter.h"
-#include "theory/sort_inference.h"
 #include "theory/theory.h"
 #include "theory/theory_engine_module.h"
 #include "theory/theory_engine_statistics.h"
@@ -91,7 +90,6 @@ class RelevanceManager;
 class Rewriter;
 class SharedSolver;
 class TheoryModel;
-class ConflictProcessor;
 
 }  // namespace theory
 
@@ -428,7 +426,6 @@ class TheoryEngine : protected EnvObj
    */
   std::pair<bool, Node> entailmentCheck(options::TheoryOfMode mode, TNode lit);
 
-  theory::SortInference* getSortInference() { return d_sortInfer.get(); }
 
   /** Prints the assertions to the debug stream */
   void printAssertions(const char* tag);
@@ -645,7 +642,6 @@ class TheoryEngine : protected EnvObj
   AtomRequests d_atomRequests;
 
   /** sort inference module */
-  std::unique_ptr<theory::SortInference> d_sortInfer;
 
   /** Statistics */
   theory::TheoryEngineStatistics d_stats;
@@ -679,7 +675,6 @@ class TheoryEngine : protected EnvObj
   /** The list of modules */
   std::vector<theory::TheoryEngineModule*> d_modules;
   /** Conflict processor */
-  std::unique_ptr<theory::ConflictProcessor> d_cp;
   /** User plugin modules */
   std::vector<std::unique_ptr<theory::PluginModule>> d_userPlugins;
 

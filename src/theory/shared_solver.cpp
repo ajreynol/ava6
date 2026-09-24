@@ -24,9 +24,7 @@ namespace theory {
 // Always creates shared terms database. In all cases, shared terms
 // database is used as a way of tracking which calls to Theory::addSharedTerm
 // we need to make in preNotifySharedFact.
-// In distributed equality engine management, shared terms database also
-// maintains an equality engine. In central equality engine management,
-// it does not.
+// The database uses the central equality engine for shared equalities.
 SharedSolver::SharedSolver(Env& env, TheoryEngine& te)
     : EnvObj(env),
       d_te(te),
@@ -36,11 +34,6 @@ SharedSolver::SharedSolver(Env& env, TheoryEngine& te)
       d_sharedTermsVisitor(env, &te, d_sharedTerms),
       d_im(te.theoryOf(THEORY_BUILTIN)->getInferenceManager())
 {
-}
-
-bool SharedSolver::needsEqualityEngine(AVA6_UNUSED theory::EeSetupInfo& esi)
-{
-  return false;
 }
 
 void SharedSolver::preRegister(TNode atom)
@@ -103,12 +96,6 @@ void SharedSolver::preNotifySharedFact(TNode atom)
   }
 }
 
-EqualityStatus SharedSolver::getEqualityStatus(AVA6_UNUSED TNode a,
-                                               AVA6_UNUSED TNode b)
-{
-  return EQUALITY_UNKNOWN;
-}
-
 bool SharedSolver::propagateLit(TNode predicate, bool value)
 {
   if (value)
@@ -156,6 +143,73 @@ void SharedSolver::sendLemma(TrustNode trn, TheoryId atomsTo, InferenceId id)
 void SharedSolver::sendConflict(TrustNode trn, InferenceId id)
 {
   d_im->trustedConflict(trn, id);
+}
+
+bool SharedSolver::needsEqualityEngine(theory::EeSetupInfo& esi)
+{
+  return d_sharedTerms.needsEqualityEngine(esi);
+}
+
+void SharedSolver::setEqualityEngine(eq::EqualityEngine* ee)
+{
+  d_sharedTerms.setEqualityEngine(ee);
+}
+
+void SharedSolver::preRegisterSharedInternal(TNode t)
+{
+  if (t.getKind() == Kind::EQUAL)
+  {
+    // When sharing is enabled, we propagate from the shared terms manager also
+    d_sharedTerms.addEqualityToPropagate(t);
+  }
+}
+
+EqualityStatus SharedSolver::getEqualityStatus(TNode a, TNode b)
+{
+  // if we're using a shared terms database, ask its status if a and b are
+  // shared.
+  if (d_sharedTerms.isShared(a) && d_sharedTerms.isShared(b))
+  {
+    if (d_sharedTerms.areEqual(a, b))
+    {
+      return EQUALITY_TRUE_AND_PROPAGATED;
+    }
+    else if (d_sharedTerms.areDisequal(a, b))
+    {
+      return EQUALITY_FALSE_AND_PROPAGATED;
+    }
+  }
+  // otherwise, ask the theory, which may depend on the uninterpreted sort owner
+  TheoryId tid =
+      Theory::theoryOf(a.getType(), d_env.getUninterpretedSortOwner());
+  return d_te.theoryOf(tid)->getEqualityStatus(a, b);
+}
+
+TrustNode SharedSolver::explain(TNode literal, TheoryId id)
+{
+  TrustNode texp;
+  if (id == THEORY_BUILTIN)
+  {
+    // explanation using the shared terms database
+    texp = d_sharedTerms.explain(literal);
+    Trace("shared-solver")
+        << "\tTerm was propagated by THEORY_BUILTIN. Explanation: "
+        << texp.getNode() << std::endl;
+  }
+  else
+  {
+    // By default, we ask the individual theory for the explanation.
+    // It is possible that a centralized approach could preempt this.
+    texp = d_te.theoryOf(id)->explain(literal);
+    Trace("shared-solver") << "\tTerm was propagated by owner theory: " << id
+                           << ". Explanation: " << texp.getNode() << std::endl;
+  }
+  return texp;
+}
+
+void SharedSolver::assertShared(TNode n, bool polarity, TNode reason)
+{
+  d_sharedTerms.assertShared(n, polarity, reason);
 }
 
 }  // namespace theory

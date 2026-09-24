@@ -217,20 +217,6 @@ enum ENUM(SkolemId)
    * - Sort: The sort given by the index.
    */
   EVALUE(ARITH_VTS_INFINITY_FREE),
-  /** 
-   * A shared datatype selector, see Reynolds et al. "Datatypes with Shared
-   * Selectors", IJCAR 2018. Represents a selector that can extract fields
-   * of multiple constructors.
-   *
-   * - Number of skolem indices: ``3``
-   *   - ``1:`` A term that represents the datatype we are extracting from.
-   *   - ``2:`` A term that represents the sort of field we are extracting.
-   *   - ``3:`` An integer n such that this shared selector returns the n^th
-   *            subfield term of the given sort.
-   * - Sort: A selector sort whose domain is given by first index,
-   *         and whose codomain is the given by the second index.
-   */
-  EVALUE(SHARED_SELECTOR),
   /**
    * The higher-order diff skolem, which is the witness k for the inference
    * ``(=> (not (= A B)) (not (= (A k1 ... kn) (B k1 ... kn))))``.

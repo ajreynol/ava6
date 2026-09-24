@@ -1,4 +1,4 @@
-; COMMAND-LINE: --ee-mode=central
+; COMMAND-LINE:
 ; EXPECT: sat
 (set-logic ALIA)
 (declare-const x (Array Int Int))

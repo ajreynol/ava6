@@ -13,7 +13,6 @@
 #include "theory/strings/extf_solver.h"
 
 #include "options/strings_options.h"
-#include "theory/strings/array_solver.h"
 #include "theory/strings/sequences_rewriter.h"
 #include "theory/strings/theory_strings_preprocess.h"
 #include "theory/strings/theory_strings_utils.h"
@@ -118,21 +117,7 @@ bool ExtfSolver::shouldDoReduction(int effort, Node n, int pol)
     // asserted (pol=0).
     return false;
   }
-  else if (options().strings.seqArray != options::SeqArrayMode::NONE)
-  {
-    if (k == Kind::SEQ_NTH)
-    {
-      // don't need to reduce seq.nth when sequence update solver is used
-      return false;
-    }
-    else if ((k == Kind::STRING_UPDATE || k == Kind::STRING_SUBSTR)
-             && d_termReg.isHandledUpdateOrSubstr(n))
-    {
-      // don't need to reduce certain seq.update
-      // don't need to reduce certain seq.extract with length 1
-      return false;
-    }
-  }
+  
   // all other operators reduce at level 2
   return (effort == 2);
 }

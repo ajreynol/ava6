@@ -1,4 +1,4 @@
-; COMMAND-LINE: --sat-solver=cadical
+; COMMAND-LINE:
 ; EXPECT: unsat
 ; Tests proof reconstruction of a datatypes tester merge conflict where the
 ; explanation lists the negated tester first, e.g. ~is-C(a) ^ is-C(b) ^ a=b.

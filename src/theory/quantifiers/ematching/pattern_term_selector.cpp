@@ -35,7 +35,7 @@ PatternTermSelector::PatternTermSelector(const Options& opts,
       d_tstrt(tstrt),
       d_excluded(exc),
       d_filterInst(filterInst),
-      d_purifyTriggers(opts.quantifiers.purifyTriggers),
+      d_purifyTriggers(false),
       d_relTriggers(false)
 {
 }

@@ -114,19 +114,6 @@ class RegExpSolver : protected EnvObj
   bool checkEqcInclusion(Theory::Effort e, std::vector<Node>& mems);
 
   /**
-   * Check memberships for equivalence class.
-   * The vector mems is a vector of memberships of the form:
-   *   (~) (x1 in R1 ) ... (~) (xn in Rn)
-   * where x1 = ... = xn in the current context.
-   *
-   * This method may add lemmas or conflicts via the inference manager.
-   *
-   * This method returns false if it discovered a conflict for this set of
-   * assertions, and true otherwise. It discovers a conflict e.g. if mems
-   * contains (xi in Ri) and (xj in Rj) and intersect(xi,xj) is empty.
-   */
-  bool checkEqcIntersect(const std::vector<Node>& mems);
-  /**
    * Return true if we should process regular expression unfoldings with
    * the given polarity at the given effort.
    */

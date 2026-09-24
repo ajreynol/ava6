@@ -53,7 +53,7 @@ bool TriggerTermInfo::isAtomicTriggerKind(Kind k)
          || k == Kind::SET_MINUS || k == Kind::SET_MEMBER
          || k == Kind::SET_SINGLETON
          || k == Kind::BITVECTOR_UBV_TO_INT || k == Kind::INT_TO_BITVECTOR
-         || k == Kind::HO_APPLY || k == Kind::STRING_LENGTH
+         || false || k == Kind::STRING_LENGTH
          || k == Kind::SEQ_NTH;
 }
 
@@ -129,10 +129,7 @@ bool TriggerTermInfo::isSimpleTrigger(Node n)
       return false;
     }
   }
-  if (t.getKind() == Kind::HO_APPLY && t[0].getKind() == Kind::INST_CONSTANT)
-  {
-    return false;
-  }
+  
   return true;
 }
 

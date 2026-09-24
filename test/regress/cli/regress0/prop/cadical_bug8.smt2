@@ -1,4 +1,4 @@
-; COMMAND-LINE: --sat-solver=cadical
+; COMMAND-LINE:
 ; EXPECT: sat
 (set-logic QF_AUFLIA)
 (set-info :status sat)

@@ -294,7 +294,6 @@ bool TheoryArith::preNotifyFact(
   // We do not assert to the equality engine of arithmetic in the standard way,
   // hence we return "true" to indicate we are finished with this fact.
   bool ret = true;
-  if (options().arith.arithEqSolver)
   {
     // the equality solver may indicate ret = false, after which the assertion
     // will be asserted to the equality engine in the default way.

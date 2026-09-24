@@ -17,7 +17,6 @@
 #include "options/smt_options.h"
 #include "theory/quantifiers/entailment_check.h"
 #include "theory/quantifiers/first_order_model.h"
-#include "theory/quantifiers/ho_term_database.h"
 #include "theory/quantifiers/quantifiers_attributes.h"
 #include "theory/quantifiers/quantifiers_state.h"
 #include "theory/quantifiers/term_util.h"
@@ -31,8 +30,7 @@ TermRegistry::TermRegistry(Env& env,
                            QuantifiersRegistry& qr)
     : EnvObj(env),
       d_termEnum(new TermEnumeration),
-      d_termDb(logicInfo().isHigherOrder() ? new HoTermDb(env, qs, qr)
-                                           : new TermDb(env, qs, qr)),
+      d_termDb(new TermDb(env, qs, qr)),
       d_echeck(new EntailmentCheck(env, qs, *d_termDb.get())),
       d_vtsCache(new VtsTermCache(env)),
       d_ievalMan(new ieval::InstEvaluatorManager(env, qs, *d_termDb.get())),

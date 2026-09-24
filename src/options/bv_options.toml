@@ -67,8 +67,3 @@ name = "bitvectorPropagate"
 type = "bool"
 default = "true"
 
-[[setting]]
-name = "bvAssertInput"
-type = "bool"
-default = "false"
-

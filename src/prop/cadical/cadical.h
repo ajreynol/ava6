@@ -90,7 +90,7 @@ class CadicalSolver : public CDCLTSatSolver, protected EnvObj
 
   std::vector<Node> getOrderHeap() const override;
 
-  /** Get proof, unimplemented by this solver. */
+  /** Get the refutation reconstructed from CaDiCaL proof tracing. */
   std::shared_ptr<ProofNode> getProof() override;
 
  private:

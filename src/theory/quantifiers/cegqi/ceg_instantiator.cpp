@@ -12,7 +12,6 @@
 
 #include "theory/quantifiers/cegqi/ceg_instantiator.h"
 
-#include "expr/annotation_elim_node_converter.h"
 #include "expr/dtype.h"
 #include "expr/dtype_cons.h"
 #include "expr/elim_witness_converter.h"

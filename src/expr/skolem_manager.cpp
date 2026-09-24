@@ -540,15 +540,6 @@ TypeNode SkolemManager::getTypeFor(SkolemId id,
       Assert(cacheVals[0].getType().isFunction());
       return cacheVals[0].getType().getArgTypes()[0];
     }
-    case SkolemId::SHARED_SELECTOR:
-    {
-      Assert(cacheVals.size() == 3);
-      Assert(cacheVals[0].getKind() == Kind::SORT_TO_TERM);
-      Assert(cacheVals[1].getKind() == Kind::SORT_TO_TERM);
-      TypeNode dtt = cacheVals[0].getConst<SortToTerm>().getType();
-      TypeNode t = cacheVals[1].getConst<SortToTerm>().getType();
-      return d_nm->mkSelectorType(dtt, t);
-    }
     case SkolemId::HO_DEQ_DIFF:
     {
       const Rational& r = cacheVals[2].getConst<Rational>();
@@ -678,7 +669,7 @@ size_t SkolemManager::getNumIndicesForSkolemId(SkolemId id) const
     case SkolemId::FP_TO_UBV: return 2;
 
     // Number of skolem indices: 3
-    case SkolemId::SHARED_SELECTOR:
+
     case SkolemId::HO_DEQ_DIFF:
     case SkolemId::WITNESS_STRING_LENGTH:
     case SkolemId::STRINGS_REPLACE_ALL_RESULT:

@@ -128,7 +128,6 @@ const static std::unordered_map<Kind, std::pair<internal::Kind, std::string>>
         KIND_ENUM(Kind::ITE, internal::Kind::ITE),
         /* UF --------------------------------------------------------------- */
         KIND_ENUM(Kind::APPLY_UF, internal::Kind::APPLY_UF),
-        KIND_ENUM(Kind::HO_APPLY, internal::Kind::HO_APPLY),
         /* Arithmetic ------------------------------------------------------- */
         KIND_ENUM(Kind::ADD, internal::Kind::ADD),
         KIND_ENUM(Kind::MULT, internal::Kind::MULT),
@@ -400,7 +399,6 @@ const static std::unordered_map<internal::Kind,
         {internal::Kind::ITE, Kind::ITE},
         /* UF -------------------------------------------------------------- */
         {internal::Kind::APPLY_UF, Kind::APPLY_UF},
-        {internal::Kind::HO_APPLY, Kind::HO_APPLY},
         /* Arithmetic ------------------------------------------------------ */
         {internal::Kind::ADD, Kind::ADD},
         {internal::Kind::MULT, Kind::MULT},
@@ -4753,7 +4751,7 @@ Term TermManager::mkTermHelper(Kind kind, const std::vector<Term>& children)
   if (echildren.size() > 2)
   {
     if (kind == Kind::INTS_DIVISION || kind == Kind::XOR || kind == Kind::SUB
-        || kind == Kind::DIVISION || kind == Kind::HO_APPLY
+        || kind == Kind::DIVISION || false
         || kind == Kind::REGEXP_DIFF || kind == Kind::SET_UNION
         || kind == Kind::SET_INTER || kind == Kind::SET_MINUS
         || kind == Kind::BAG_INTER_MIN || kind == Kind::BAG_UNION_MAX
@@ -6860,7 +6858,6 @@ std::string to_string(ava6::Kind k)
     case ava6::Kind::XOR: return "XOR";
     case ava6::Kind::ITE: return "ITE";
     case ava6::Kind::APPLY_UF: return "APPLY_UF";
-    case ava6::Kind::HO_APPLY: return "HO_APPLY";
     case ava6::Kind::ADD: return "ADD";
     case ava6::Kind::MULT: return "MULT";
     case ava6::Kind::IAND: return "IAND";

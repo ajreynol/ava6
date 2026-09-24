@@ -16,7 +16,6 @@
 
 #include "options/quantifiers_options.h"
 #include "proof/proof_node_manager.h"
-#include "theory/quantifiers/quantifiers_macros.h"
 #include "theory/quantifiers/quantifiers_modules.h"
 #include "theory/quantifiers/quantifiers_rewriter.h"
 #include "theory/trust_substitutions.h"
@@ -54,10 +53,7 @@ TheoryQuantifiers::TheoryQuantifiers(Env& env,
   // post-construction.
   d_quantEngine = d_qengine.get();
 
-  if (options().quantifiers.macrosQuant)
-  {
-    d_qmacros.reset(new QuantifiersMacros(env, d_qreg));
-  }
+  
 }
 
 TheoryQuantifiers::~TheoryQuantifiers() {}
@@ -104,29 +100,6 @@ void TheoryQuantifiers::presolve()
   {
     getQuantifiersEngine()->presolve();
   }
-}
-
-bool TheoryQuantifiers::ppAssert(TrustNode tin,
-                                 TrustSubstitutionMap& outSubstitutions)
-{
-  if (d_qmacros != nullptr)
-  {
-    bool reqGround =
-        options().quantifiers.macrosQuantMode != options::MacrosQuantMode::ALL;
-    Node eq = d_qmacros->solve(tin.getProven(), reqGround);
-    if (!eq.isNull())
-    {
-      // must be legal
-      if (d_valuation.isLegalElimination(eq[0], eq[1]))
-      {
-        // add substitution solved, which ensures we track that eq depends on
-        // tin, which can impact unsat cores.
-        outSubstitutions.addSubstitutionSolved(eq[0], eq[1], tin);
-        return true;
-      }
-    }
-  }
-  return false;
 }
 
 void TheoryQuantifiers::ppNotifyAssertions(const std::vector<Node>& assertions)

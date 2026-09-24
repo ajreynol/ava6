@@ -77,7 +77,7 @@ Node DatatypesRewriter::rewriteViaRule(ProofRewriteRule id, const Node& n)
       // Note that we set shared selectors to false. This proof rule will
       // be (unintentionally) unsuccessful when reconstructing proofs of the
       // rewriter when using shared selectors.
-      Node ticons = utils::getInstCons(t, dt, i, false);
+      Node ticons = utils::getInstCons(t, dt, i);
       return t.eqNode(ticons);
     }
     case ProofRewriteRule::DT_COLLAPSE_SELECTOR:
@@ -89,10 +89,7 @@ Node DatatypesRewriter::rewriteViaRule(ProofRewriteRule id, const Node& n)
       }
       Node selector = n.getOperator();
       // shared selectors are not supported
-      if (selector.getSkolemId() == SkolemId::SHARED_SELECTOR)
-      {
-        return Node::null();
-      }
+      
       size_t constructorIndex = utils::indexOf(n[0].getOperator());
       const DType& dt = utils::datatypeOf(selector);
       const DTypeConstructor& c = dt[constructorIndex];
@@ -709,39 +706,11 @@ RewriteResponse DatatypesRewriter::rewriteNullableLift(TNode n)
   return RewriteResponse(REWRITE_DONE, n);
 }
 
-Node DatatypesRewriter::expandApplySelector(Node n, bool sharedSel)
-{
-  Assert(n.getKind() == Kind::APPLY_SELECTOR);
-  Node selector = n.getOperator();
-  if (!sharedSel || !selector.hasAttribute(DTypeConsIndexAttr()))
-  {
-    return n;
-  }
-  // APPLY_SELECTOR always applies to an external selector, cindexOf is
-  // legal here
-  size_t cindex = utils::cindexOf(selector);
-  const DType& dt = utils::datatypeOf(selector);
-  const DTypeConstructor& c = dt[cindex];
-  TypeNode ndt = n[0].getType();
-  size_t selectorIndex = utils::indexOf(selector);
-  Trace("dt-expand") << "...selector index = " << selectorIndex << std::endl;
-  Assert(selectorIndex < c.getNumArgs());
-  return utils::applySelector(c, selectorIndex, true, n[0]);
-}
-
 Node DatatypesRewriter::expandDefinition(Node n)
 {
   Node ret;
   switch (n.getKind())
   {
-    case Kind::APPLY_SELECTOR:
-    {
-      Trace("dt-expand") << "expand selector, share sel = "
-                         << d_opts.datatypes.dtSharedSelectors << std::endl;
-      ret = expandApplySelector(n, d_opts.datatypes.dtSharedSelectors);
-      Trace("dt-expand") << "...returns " << ret << std::endl;
-    }
-    break;
     case Kind::APPLY_UPDATER:
     {
       ret = expandUpdater(n);
@@ -794,7 +763,7 @@ Node DatatypesRewriter::expandUpdater(const Node& n)
     }
     else
     {
-      b << utils::applySelector(dc, i, false, n[0]);
+      b << utils::applySelector(dc, i, n[0]);
     }
   }
   ret = b;

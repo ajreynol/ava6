@@ -297,11 +297,6 @@ ProofRule getCongRule(const Node& n, std::vector<Node>& args)
     case Kind::APPLY_INDEXED_SYMBOLIC:
       // takes arbitrary but we use CONG
       break;
-    case Kind::HO_APPLY:
-      // Use HO_CONG, since HO_APPLY is encoded as native function application.
-      // This requires no arguments so we return.
-      r = ProofRule::HO_CONG;
-      break;
     case Kind::APPLY_CONSTRUCTOR:
       // tuples are n-ary, others are fixed
       r = n.getType().isTuple() ? ProofRule::NARY_CONG : ProofRule::CONG;
@@ -315,7 +310,7 @@ ProofRule getCongRule(const Node& n, std::vector<Node>& args)
       }
       break;
   }
-  if (r != ProofRule::HO_CONG)
+  if (r != ProofRule::APPLY_CONG)
   {
     args.push_back(n);
   }

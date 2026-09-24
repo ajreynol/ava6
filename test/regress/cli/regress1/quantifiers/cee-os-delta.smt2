@@ -1,5 +1,4 @@
-; COMMAND-LINE: --full-saturate-quant --ee-mode=distributed
-; COMMAND-LINE: --full-saturate-quant --ee-mode=central
+; COMMAND-LINE: --full-saturate-quant
 ; EXPECT: unsat
 (set-logic ALL)
 (declare-fun o (Int) Int)

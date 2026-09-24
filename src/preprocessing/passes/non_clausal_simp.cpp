@@ -204,15 +204,7 @@ PreprocessingPassResult NonClausalSimp::applyInternal(
           c = learnedLiteral[1];
         }
       }
-      else if (options().smt.simplificationBoolConstProp)
-      {
-        // From non-equalities, learn the Boolean equality. Notice that
-        // the equality case above is strictly more powerful that this, since
-        // e.g. (= t c) * { t -> c } also simplifies to true.
-        bool pol = learnedLiteral.getKind() != Kind::NOT;
-        c = nm->mkConst(pol);
-        t = pol ? learnedLiteral : learnedLiteral[0];
-      }
+      
       if (!t.isNull())
       {
         Assert(!t.isConst());

@@ -2528,7 +2528,7 @@ void CoreSolver::checkNormalFormsDeq()
     // investigate determining cases where the disequality is already
     // satisfied (for optimization).
     if (eq[0].getType().isSequence() || options().strings.stringsDeqExt
-        || options().strings.seqArray != options::SeqArrayMode::NONE)
+        || false)
     {
       processDeqExtensionality(eq[0], eq[1]);
       continue;

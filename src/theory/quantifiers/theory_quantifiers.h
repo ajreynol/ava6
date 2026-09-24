@@ -30,7 +30,6 @@ namespace ava6::internal {
 namespace theory {
 namespace quantifiers {
 
-class QuantifiersMacros;
 
 class TheoryQuantifiers : public Theory
 {
@@ -51,10 +50,6 @@ class TheoryQuantifiers : public Theory
 
   void preRegisterTerm(TNode n) override;
   void presolve() override;
-  /**
-   * Preprocess assert, which solves for quantifier macros when enabled.
-   */
-  bool ppAssert(TrustNode tin, TrustSubstitutionMap& outSubstitutions) override;
   void ppNotifyAssertions(const std::vector<Node>& assertions) override;
   //--------------------------------- standard check
   /** Post-check, called after the fact queue of the theory is processed. */
@@ -90,7 +85,6 @@ class TheoryQuantifiers : public Theory
   /** The quantifiers engine, which lives here */
   std::unique_ptr<QuantifiersEngine> d_qengine;
   /** The quantifiers macro module, used for ppAssert. */
-  std::unique_ptr<QuantifiersMacros> d_qmacros;
 }; /* class TheoryQuantifiers */
 
 }  // namespace quantifiers

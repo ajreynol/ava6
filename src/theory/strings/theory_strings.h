@@ -24,7 +24,6 @@
 #include "proof/trust_proof_generator.h"
 #include "theory/care_pair_argument_callback.h"
 #include "theory/ext_theory.h"
-#include "theory/strings/array_solver.h"
 #include "theory/strings/base_solver.h"
 #include "theory/strings/code_point_solver.h"
 #include "theory/strings/core_solver.h"
@@ -35,7 +34,6 @@
 #include "theory/strings/model_cons_default.h"
 #include "theory/strings/normal_form.h"
 #include "theory/strings/proof_checker.h"
-#include "theory/strings/regexp_elim.h"
 #include "theory/strings/regexp_operation.h"
 #include "theory/strings/regexp_solver.h"
 #include "theory/strings/sequences_stats.h"
@@ -291,11 +289,9 @@ class TheoryStrings : public Theory
    * The array solver, which implements specialized approaches for
    * seq.nth/seq.update.
    */
-  ArraySolver d_asolver;
   /** regular expression solver module */
   RegExpSolver d_rsolver;
   /** regular expression elimination module */
-  RegExpElimination d_regexp_elim;
   /** Strings finite model finding decision strategy */
   /** Model constructor (default) */
   ModelConsDefault d_mcd;

@@ -42,12 +42,23 @@ T getData(std::ios_base& ios, int iosIndex, T defaultValue)
 
 }  // namespace
 
+static const int s_cpcFormat = std::ios_base::xalloc();
+void applyCpcFormat(std::ios_base& ios, bool enabled)
+{
+  setData(ios, s_cpcFormat, enabled);
+}
+bool getCpcFormat(std::ios_base& ios)
+{
+  return getData(ios, s_cpcFormat, false);
+}
+
 // clang-format off
 ${ioimpls}$
     // clang-format on
 
     Scope::Scope(std::ios_base& ios)
     : d_ios(ios),
+      d_cpcFormat(getCpcFormat(ios)),
       // clang-format off
 ${ioscope_memberinit}$
 // clang-format on
@@ -56,6 +67,7 @@ ${ioscope_memberinit}$
 
 Scope::~Scope()
 {
+  applyCpcFormat(d_ios, d_cpcFormat);
   // clang-format off
 ${ioscope_restore}$
   // clang-format on

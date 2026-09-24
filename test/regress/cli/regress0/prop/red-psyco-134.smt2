@@ -1,4 +1,4 @@
-; COMMAND-LINE: --sat-solver=cadical
+; COMMAND-LINE:
 ; DISABLE-TESTER: proof
 ; EXPECT: sat
 (set-logic LIA)

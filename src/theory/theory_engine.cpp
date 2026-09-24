@@ -31,9 +31,8 @@
 #include "smt/logic_exception.h"
 #include "smt/solver_engine_state.h"
 #include "theory/combination_care_graph.h"
-#include "theory/conflict_processor.h"
 #include "theory/decision_manager.h"
-#include "theory/ee_manager_central.h"
+#include "theory/ee_manager.h"
 #include "theory/plugin_module.h"
 #include "theory/quantifiers/first_order_model.h"
 #include "theory/quantifiers_engine.h"
@@ -133,11 +132,7 @@ void TheoryEngine::finishInit()
                     << options().theory.tcMode << " not supported";
   }
   // create the relevance filter if any option requires it
-  if (options().theory.relevanceFilter || false)
-  {
-    d_relManager.reset(new RelevanceManager(d_env, this));
-    d_modules.push_back(d_relManager.get());
-  }
+  
 
   // initialize the quantifiers engine
   if (logicInfo().isQuantified())
@@ -230,8 +225,7 @@ TheoryEngine::TheoryEngine(Env& env)
       d_false(),
       d_interrupted(false),
       d_inPreregister(false),
-      d_factsAsserted(context(), false),
-      d_cp(nullptr)
+      d_factsAsserted(context(), false)
 {
   for (TheoryId theoryId = theory::THEORY_FIRST;
        theoryId != theory::THEORY_LAST;
@@ -241,17 +235,8 @@ TheoryEngine::TheoryEngine(Env& env)
     d_theoryOut[theoryId] = nullptr;
   }
 
-  if (options().smt.sortInference)
-  {
-    d_sortInfer.reset(new SortInference(env));
-  }
-  if (options().theory.conflictProcessMode
-      != options::ConflictProcessMode::NONE)
-  {
-    bool useExtRewriter = (options().theory.conflictProcessMode
-                           == options::ConflictProcessMode::MINIMIZE_EXT);
-    d_cp.reset(new ConflictProcessor(env, useExtRewriter));
-  }
+  
+  
 
   d_true = nodeManager()->mkConst<bool>(true);
   d_false = nodeManager()->mkConst<bool>(false);
@@ -724,9 +709,8 @@ bool TheoryEngine::isTheoryEnabled(theory::TheoryId theoryId) const
 
 theory::TheoryId TheoryEngine::theoryExpPropagation(theory::TheoryId tid) const
 {
-  if (options().theory.eeMode == options::EqEngineMode::CENTRAL)
   {
-    if (EqEngineManagerCentral::usesCentralEqualityEngine(options(), tid)
+    if (EqEngineManager::usesCentralEqualityEngine(tid)
         && Theory::expUsingCentralEqualityEngine(tid))
     {
       return THEORY_BUILTIN;
@@ -1265,7 +1249,6 @@ void TheoryEngine::assertFact(TNode literal)
                                << "): sending requested " << toAssert << endl;
         assertToTheory(
             toAssert, literal, request.d_toTheory, THEORY_SAT_SOLVER);
-        if (options().theory.eeMode == options::EqEngineMode::CENTRAL)
         {
           // Also send to THEORY_BUILTIN, similar to above
           assertToTheory(toAssert,
@@ -1597,16 +1580,6 @@ void TheoryEngine::lemma(TrustNode tlemma,
   // spendResource();
   Assert(tlemma.getKind() == TrustNodeKind::LEMMA
          || tlemma.getKind() == TrustNodeKind::CONFLICT);
-
-  // minimize or generalize conflict
-  if (d_cp)
-  {
-    TrustNode tproc = d_cp->processLemma(tlemma);
-    if (!tproc.isNull())
-    {
-      tlemma = tproc;
-    }
-  }
 
   // get the node
   Node node = tlemma.getNode();

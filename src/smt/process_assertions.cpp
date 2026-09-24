@@ -157,11 +157,7 @@ bool ProcessAssertions::apply(AssertionPipeline& ap)
 
   Trace("smt") << " assertions     : " << ap.size() << endl;
 
-  if (options().quantifiers.globalNegate)
-  {
-    // global negation of the formula
-    applyPass("global-negate", ap);
-  }
+  
 
 
   if (options().smt.solveRealAsInt)
@@ -174,19 +170,13 @@ bool ProcessAssertions::apply(AssertionPipeline& ap)
     applyPass("ackermann", ap);
   }
 
-  if (options().smt.solveIntAsBV > 0)
-  {
-    applyPass("int-to-bv", ap);
-  }
+  
 
   Trace("smt") << " assertions     : " << ap.size() << endl;
 
   bool noConflict = true;
 
-  if (options().smt.extRewPrep != options::ExtRewPrepMode::OFF)
-  {
-    applyPass("ext-rew-pre", ap);
-  }
+  
 
   // Unconstrained simplification
   if (options().smt.unconstrainedSimp)
@@ -201,18 +191,12 @@ bool ProcessAssertions::apply(AssertionPipeline& ap)
   {
     applyPass("bv-to-bool", ap);
   }
-  if (options().smt.solveBVAsInt != options::SolveBVAsIntMode::OFF)
-  {
-    applyPass("bv-to-int", ap);
-  }
+  
 
   // Eagerly eliminate distinct terms up to the configured threshold. Only run
   // if the threshold option was explicitly set by the user (a value of 0 means
   // no limit, i.e. eliminate all distinct terms).
-  if (options().smt.distinctElimThresholdWasSetByUser)
-  {
-    applyPass("distinct-elim", ap);
-  }
+  
 
   // Assertions MUST BE guaranteed to be rewritten by this point
   applyPass("rewrite", ap);
@@ -241,15 +225,9 @@ bool ProcessAssertions::apply(AssertionPipeline& ap)
     }
   }
 
-  if (options().smt.sortInference)
-  {
-    applyPass("sort-inference", ap);
-  }
+  
 
-  if (options().arith.pbRewrites)
-  {
-    applyPass("pseudo-boolean-processor", ap);
-  }
+  
 
   // rephrasing normal inputs as sygus problems
 
@@ -275,21 +253,9 @@ bool ProcessAssertions::apply(AssertionPipeline& ap)
   }
   Trace("smt") << " assertions     : " << ap.size() << endl;
 
-  if (options().smt.learnedRewrite)
-  {
-    applyPass("learned-rewrite", ap);
-  }
+  
 
-  if (options().smt.earlyIteRemoval)
-  {
-    d_slvStats.d_numAssertionsPre += ap.size();
-    applyPass("ite-removal", ap);
-    // This is needed because when solving incrementally, removeITEs may
-    // introduce skolems that were solved for earlier and thus appear in the
-    // substitution map.
-    applyPass("apply-substs", ap);
-    d_slvStats.d_numAssertionsPost += ap.size();
-  }
+  
 
   if (options().smt.repeatSimp)
   {
@@ -308,10 +274,7 @@ bool ProcessAssertions::apply(AssertionPipeline& ap)
     Trace("assertions::post-repeat-simplify") << std::endl;
   }
 
-  if (logicInfo().isHigherOrder())
-  {
-    applyPass("ho-elim", ap);
-  }
+  
 
   // begin: INVARIANT to maintain: no reordering of assertions or
   // introducing new ones
@@ -382,17 +345,6 @@ bool ProcessAssertions::simplifyAssertions(AssertionPipeline& ap)
 
       // We piggy-back off of the BackEdgesMap in the CircuitPropagator to
       // do the miplib trick.
-      if (  // check that option is on
-          options().arith.arithMLTrick &&
-          // only useful in arith
-          logicInfo().isTheoryEnabled(THEORY_ARITH) &&
-          // disables miplib processing during re-simplification, which we don't
-          // expect to be useful
-          d_simplifyAssertionsDepth <= 1)
-      {
-        applyPass("miplib-trick", ap);
-      }
-      else
       {
         Trace("simplify") << "ProcessAssertions::simplify(): "
                           << "skipping miplib pseudobooleans pass..." << endl;

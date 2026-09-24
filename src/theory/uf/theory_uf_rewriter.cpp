@@ -92,51 +92,7 @@ RewriteResponse TheoryUfRewriter::postRewrite(TNode node)
           vars.begin(), vars.end(), subs.begin(), subs.end());
       return RewriteResponse(REWRITE_AGAIN_FULL, ret);
     }
-    // note that for sanity we ensure that partially applied APPLY_UF (those
-    // with function return type) are rewritten here, although these should
-    // in general be avoided e.g. during parsing.
-    if (!canUseAsApplyUfOperator(node.getOperator())
-        || node.getType().isFunction())
-    {
-      return RewriteResponse(REWRITE_AGAIN_FULL, getHoApplyForApplyUf(node));
-    }
-  }
-  else if (k == Kind::HO_APPLY)
-  {
-    Node lambda = FunctionConst::toLambda(node[0]);
-    if (!lambda.isNull())
-    {
-      // resolve one argument of the lambda
-      Trace("uf-ho-beta") << "uf-ho-beta : beta-reducing one argument of : "
-                          << lambda << " with " << node[1] << "\n";
 
-      // see if we need to eliminate shadowing
-      Node nes =
-          rewriteViaRule(ProofRewriteRule::MACRO_LAMBDA_CAPTURE_AVOID, node);
-      if (!nes.isNull())
-      {
-        return RewriteResponse(REWRITE_AGAIN_FULL, nes);
-      }
-
-      // reconstruct the lambda first to avoid variable shadowing
-      Node new_body = lambda[1];
-      if (lambda[0].getNumChildren() > 1)
-      {
-        std::vector<Node> new_vars(lambda[0].begin() + 1, lambda[0].end());
-        std::vector<Node> largs;
-        largs.push_back(nodeManager()->mkNode(Kind::BOUND_VAR_LIST, new_vars));
-        largs.push_back(new_body);
-        new_body = nodeManager()->mkNode(Kind::LAMBDA, largs);
-        Trace("uf-ho-beta")
-            << "uf-ho-beta : ....new lambda : " << new_body << "\n";
-      }
-
-      TNode arg = node[1];
-      TNode var = lambda[0][0];
-      new_body = new_body.substitute(var, arg);
-      Trace("uf-ho-beta") << "uf-ho-beta : ..new body : " << new_body << "\n";
-      return RewriteResponse(REWRITE_AGAIN_FULL, new_body);
-    }
   }
   else if (k == Kind::LAMBDA)
   {
@@ -206,38 +162,15 @@ Node TheoryUfRewriter::rewriteViaRule(ProofRewriteRule id, const Node& n)
       {
         lambda = uf::FunctionConst::toLambda(n.getOperator());
       }
-      else if (k == Kind::HO_APPLY)
-      {
-        lambda = uf::FunctionConst::toLambda(n[0]);
-      }
+      
       if (lambda.isNull())
       {
         return Node::null();
       }
-      std::vector<Node> vars;
-      std::vector<Node> subs;
+      std::vector<Node> vars(lambda[0].begin(), lambda[0].end());
+      std::vector<Node> subs(n.begin(), n.end());
+      if (vars.size() != subs.size()) { return Node::null(); }
       Node body = lambda[1];
-      if (k == Kind::APPLY_UF)
-      {
-        vars.insert(vars.end(), lambda[0].begin(), lambda[0].end());
-        subs.insert(subs.end(), n.begin(), n.end());
-        if (vars.size() != subs.size())
-        {
-          return Node::null();
-        }
-      }
-      else
-      {
-        Assert(k == Kind::HO_APPLY);
-        vars.push_back(lambda[0][0]);
-        subs.push_back(n[1]);
-        if (lambda[0].getNumChildren() > 1)
-        {
-          std::vector<Node> newVars(lambda[0].begin() + 1, lambda[0].end());
-          Node bvl = d_nm->mkNode(Kind::BOUND_VAR_LIST, newVars);
-          body = d_nm->mkNode(Kind::LAMBDA, bvl, body);
-        }
-      }
       // Note that we do not check for variable shadowing in the lambda here.
       // This rule will only be used to express valid instances of beta
       // reduction. If a beta reduction had to eliminate shadowing, then it
@@ -318,27 +251,13 @@ Node TheoryUfRewriter::rewriteViaRule(ProofRewriteRule id, const Node& n)
           }
         }
       }
-      else if (k == Kind::HO_APPLY)
-      {
-        lambda = uf::FunctionConst::toLambda(n[0]);
-        args.push_back(n[1]);
-        // We assume lambda is rewritten, and thus a similar check is not
-        // necessary.
-      }
+      
       if (lambda.isNull())
       {
         return Node::null();
       }
       Node body = lambda[1];
-      if (k == Kind::HO_APPLY && lambda[0].getNumChildren() > 1)
-      {
-        // compute the partial beta reduction
-        std::vector<Node> nvars(lambda[0].begin() + 1, lambda[0].end());
-        std::vector<Node> largs;
-        largs.push_back(nm->mkNode(Kind::BOUND_VAR_LIST, nvars));
-        largs.push_back(body);
-        body = nm->mkNode(Kind::LAMBDA, largs);
-      }
+      
       // get the free variables of the arguments
       std::unordered_set<Node> fvs;
       for (TNode a : args)
@@ -355,20 +274,6 @@ Node TheoryUfRewriter::rewriteViaRule(ProofRewriteRule id, const Node& n)
         if (bodyc != body)
         {
           Node lambdac;
-          if (k == Kind::HO_APPLY && lambda[0].getNumChildren() > 1)
-          {
-            // body was a partial beta reduction computed above, reconstruct
-            // the original lambda.
-            Assert(bodyc.getKind() == Kind::LAMBDA);
-            std::vector<Node> nvars;
-            nvars.push_back(lambda[0][0]);
-            nvars.insert(nvars.end(), bodyc[0].begin(), bodyc[0].end());
-            std::vector<Node> largs;
-            largs.push_back(nm->mkNode(Kind::BOUND_VAR_LIST, nvars));
-            largs.push_back(bodyc[1]);
-            lambdac = nm->mkNode(Kind::LAMBDA, largs);
-          }
-          else
           {
             lambdac = nm->mkNode(Kind::LAMBDA, lambda[0], bodyc);
           }
@@ -443,46 +348,6 @@ Node TheoryUfRewriter::rewriteViaRule(ProofRewriteRule id, const Node& n)
   return Node::null();
 }
 
-Node TheoryUfRewriter::getHoApplyForApplyUf(TNode n)
-{
-  Assert(n.getKind() == Kind::APPLY_UF);
-  Node curr = n.getOperator();
-  for (unsigned i = 0; i < n.getNumChildren(); i++)
-  {
-    curr = NodeManager::mkNode(Kind::HO_APPLY, curr, n[i]);
-  }
-  return curr;
-}
-Node TheoryUfRewriter::getApplyUfForHoApply(TNode n)
-{
-  std::vector<TNode> children;
-  TNode curr = decomposeHoApply(n, children, true);
-  // if operator is standard
-  if (canUseAsApplyUfOperator(curr))
-  {
-    return n.getNodeManager()->mkNode(Kind::APPLY_UF, children);
-  }
-  // cannot construct APPLY_UF if operator is partially applied or is not
-  // standard
-  return Node::null();
-}
-Node TheoryUfRewriter::decomposeHoApply(TNode n,
-                                        std::vector<TNode>& args,
-                                        bool opInArgs)
-{
-  TNode curr = n;
-  while (curr.getKind() == Kind::HO_APPLY)
-  {
-    args.push_back(curr[1]);
-    curr = curr[0];
-  }
-  if (opInArgs)
-  {
-    args.push_back(curr);
-  }
-  std::reverse(args.begin(), args.end());
-  return curr;
-}
 bool TheoryUfRewriter::canUseAsApplyUfOperator(TNode n) { return n.isVar(); }
 
 Node TheoryUfRewriter::rewriteLambda(Node node)
@@ -594,14 +459,14 @@ RewriteResponse TheoryUfRewriter::rewriteIntToBV(TNode node)
   return RewriteResponse(REWRITE_DONE, node);
 }
 
-Node TheoryUfRewriter::canEliminateLambda(NodeManager* nm, const Node& node)
+Node TheoryUfRewriter::canEliminateLambda(AVA6_UNUSED NodeManager* nm, const Node& node)
 {
   Assert(node.getKind() == Kind::LAMBDA);
   if (node[1].getKind() == Kind::APPLY_UF)
   {
     size_t nvar = node[0].getNumChildren();
     size_t nargs = node[1].getNumChildren();
-    if (nargs >= nvar)
+    if (nargs == nvar)
     {
       bool matchesList = true;
       for (size_t i = 0; i < nvar; i++)
@@ -615,21 +480,7 @@ Node TheoryUfRewriter::canEliminateLambda(NodeManager* nm, const Node& node)
       if (matchesList)
       {
         Node ret = node[1].getOperator();
-        if (nargs > nvar)
-        {
-          size_t diff = nargs - nvar;
-          for (size_t i = 0; i < diff; i++)
-          {
-            ret = nm->mkNode(Kind::HO_APPLY, ret, node[1][i]);
-          }
-          // For instance we cannot eliminate (lambda ((x Int)) (f x x)) to
-          // (f x).
-          std::vector<Node> vars(node[0].begin(), node[0].end());
-          if (expr::hasSubterm(ret, vars))
-          {
-            return Node::null();
-          }
-        }
+        
         return ret;
       }
     }

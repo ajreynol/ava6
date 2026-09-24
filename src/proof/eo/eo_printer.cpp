@@ -81,7 +81,7 @@ bool EoPrinter::isHandled(const Options& opts, const ProofNode* pfn)
     case ProofRule::CONG:
     case ProofRule::NARY_CONG:
     case ProofRule::PAIRWISE_CONG:
-    case ProofRule::HO_CONG:
+    case ProofRule::APPLY_CONG:
     case ProofRule::TRUE_INTRO:
     case ProofRule::TRUE_ELIM:
     case ProofRule::FALSE_INTRO:
@@ -176,7 +176,7 @@ bool EoPrinter::isHandled(const Options& opts, const ProofNode* pfn)
     case ProofRule::ALPHA_EQUIV:
     case ProofRule::QUANT_VAR_REORDERING:
     case ProofRule::ENCODE_EQ_INTRO:
-    case ProofRule::HO_APP_ENCODE:
+
     case ProofRule::BV_EAGER_ATOM:
     case ProofRule::ACI_NORM:
     case ProofRule::ABSORB:
@@ -651,7 +651,7 @@ std::string EoPrinter::getRuleName(const ProofNode* pfn) const
     ss << id;
     return ss.str();
   }
-  else if (r == ProofRule::ENCODE_EQ_INTRO || r == ProofRule::HO_APP_ENCODE
+  else if (r == ProofRule::ENCODE_EQ_INTRO
            || r == ProofRule::BV_EAGER_ATOM)
   {
     // ENCODE_EQ_INTRO proves (= t (convert t)) from argument t,
@@ -694,8 +694,7 @@ std::string EoPrinter::getRuleName(const ProofNode* pfn) const
 
 void EoPrinter::printDslRule(std::ostream& out, ProofRewriteRule r)
 {
-  options::ioutils::applyPrintArithLitToken(out, true);
-  options::ioutils::applyPrintSkolemDefinitions(out, true);
+  options::ioutils::applyCpcFormat(out, true);
   const rewriter::RewriteProofRule& rpr = d_rdb->getRule(r);
   const std::vector<Node>& varList = rpr.getVarList();
   const std::vector<Node>& uvarList = rpr.getUserVarList();
@@ -843,8 +842,7 @@ void EoPrinter::print(std::ostream& out,
 {
   // ensures options are set once and for all
   options::ioutils::applyOutputLanguage(out, Language::LANG_SMTLIB_V2_6);
-  options::ioutils::applyPrintArithLitToken(out, true);
-  options::ioutils::applyPrintSkolemDefinitions(out, true);
+  options::ioutils::applyCpcFormat(out, true);
   // allocate a print channel
   EoPrintChannelOut aprint(out, d_lbindUse, d_termLetPrefix, true);
   print(aprint, pfn, psm);
@@ -909,7 +907,7 @@ void EoPrinter::print(EoPrintChannelOut& aout,
         smt::PrintBenchmark pb(nodeManager(), &eprinter, false, &d_tproc);
         std::stringstream outDecl;
         std::stringstream outDef;
-        options::ioutils::applyPrintArithLitToken(outDef, true);
+        options::ioutils::applyCpcFormat(outDef, true);
         pb.printDeclarationsFrom(outDecl, outDef, definitions, assertions);
         out << outDecl.str();
         // [2] print the definitions
@@ -1138,7 +1136,7 @@ void EoPrinter::getArgsFromProofRule(const ProofNode* pn,
   ProofRule r = pn->getRule();
   switch (r)
   {
-    case ProofRule::HO_CONG:
+    case ProofRule::APPLY_CONG:
     {
       // argument is ignored
       return;

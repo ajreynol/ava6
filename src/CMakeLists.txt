@@ -59,52 +59,20 @@ libava6_add_sources(
   preprocessing/passes/bool_to_bv.h
   preprocessing/passes/bv_eager_atoms.cpp
   preprocessing/passes/bv_eager_atoms.h
-  preprocessing/passes/bv_intro_pow2.cpp
-  preprocessing/passes/bv_intro_pow2.h
   preprocessing/passes/bv_to_bool.cpp
   preprocessing/passes/bv_to_bool.h
-  preprocessing/passes/bv_to_int.cpp
-  preprocessing/passes/bv_to_int.h
-  preprocessing/passes/distinct_elim.cpp
-  preprocessing/passes/distinct_elim.h
-  preprocessing/passes/extended_rewriter_pass.cpp
-  preprocessing/passes/extended_rewriter_pass.h
-  preprocessing/passes/foreign_theory_rewrite.cpp
-  preprocessing/passes/foreign_theory_rewrite.h
-  preprocessing/passes/global_negate.cpp
-  preprocessing/passes/global_negate.h
-  preprocessing/passes/ho_elim.cpp
-  preprocessing/passes/ho_elim.h
-  preprocessing/passes/int_to_bv.cpp
-  preprocessing/passes/int_to_bv.h
-  preprocessing/passes/ite_removal.cpp
-  preprocessing/passes/ite_removal.h
-  preprocessing/passes/ite_simp.cpp
-  preprocessing/passes/ite_simp.h
-  preprocessing/passes/learned_rewrite.cpp
-  preprocessing/passes/learned_rewrite.h
-  preprocessing/passes/miplib_trick.cpp
-  preprocessing/passes/miplib_trick.h
-  preprocessing/passes/nl_ext_purify.cpp
-  preprocessing/passes/nl_ext_purify.h
   preprocessing/passes/non_clausal_simp.cpp
   preprocessing/passes/non_clausal_simp.h
-  preprocessing/passes/pseudo_boolean_processor.cpp
-  preprocessing/passes/pseudo_boolean_processor.h
   preprocessing/passes/quantifiers_preprocess.cpp
   preprocessing/passes/quantifiers_preprocess.h
   preprocessing/passes/real_to_int.cpp
   preprocessing/passes/real_to_int.h
   preprocessing/passes/rewrite.cpp
   preprocessing/passes/rewrite.h
-  preprocessing/passes/sort_infer.cpp
-  preprocessing/passes/sort_infer.h
   preprocessing/passes/static_learning.cpp
   preprocessing/passes/static_learning.h
   preprocessing/passes/static_rewrite.cpp
   preprocessing/passes/static_rewrite.h
-  preprocessing/passes/strings_eager_pp.cpp
-  preprocessing/passes/strings_eager_pp.h
   preprocessing/passes/theory_preprocess.cpp
   preprocessing/passes/theory_preprocess.h
   preprocessing/passes/unconstrained_simplifier.cpp
@@ -117,8 +85,6 @@ libava6_add_sources(
   preprocessing/preprocessing_pass_context.h
   preprocessing/preprocessing_pass_registry.cpp
   preprocessing/preprocessing_pass_registry.h
-  preprocessing/util/boolean_simplification.cpp
-  preprocessing/util/boolean_simplification.h
   preprocessing/util/ite_utilities.cpp
   preprocessing/util/ite_utilities.h
   printer/ast/ast_printer.cpp
@@ -156,12 +122,8 @@ libava6_add_sources(
   proof/lazy_proof.h
   proof/lazy_proof_chain.cpp
   proof/lazy_proof_chain.h
-  proof/lazy_tree_proof_generator.cpp
-  proof/lazy_tree_proof_generator.h
   proof/method_id.cpp
   proof/method_id.h
-  proof/print_expr.cpp
-  proof/print_expr.h
   proof/proof.cpp
   proof/proof.h
   proof/proof_checker.cpp
@@ -170,8 +132,6 @@ libava6_add_sources(
   proof/proof_ensure_closed.h
   proof/proof_generator.cpp
   proof/proof_generator.h
-  proof/proof_letify.cpp
-  proof/proof_letify.h
   proof/proof_node.cpp
   proof/proof_node.h
   proof/proof_node_algorithm.cpp
@@ -220,30 +180,6 @@ libava6_add_sources(
   prop/learned_db.cpp
   prop/learned_db.h
   prop/learned_literal_type.h
-  prop/lemma_inprocess.cpp
-  prop/lemma_inprocess.h
-  prop/minisat/core/Dimacs.h
-  prop/minisat/core/Solver.cc
-  prop/minisat/core/Solver.h
-  prop/minisat/core/SolverTypes.h
-  prop/minisat/minisat.cpp
-  prop/minisat/minisat.h
-  prop/minisat/mtl/Alg.h
-  prop/minisat/mtl/Alloc.h
-  prop/minisat/mtl/Heap.h
-  prop/minisat/mtl/IntTypes.h
-  prop/minisat/mtl/Map.h
-  prop/minisat/mtl/Queue.h
-  prop/minisat/mtl/Sort.h
-  prop/minisat/mtl/Vec.h
-  prop/minisat/mtl/XAlloc.h
-  prop/minisat/opt_clauses_manager.cpp
-  prop/minisat/opt_clauses_manager.h
-  prop/minisat/sat_proof_manager.cpp
-  prop/minisat/sat_proof_manager.h
-  prop/minisat/simp/SimpSolver.cc
-  prop/minisat/simp/SimpSolver.h
-  prop/minisat/utils/Options.h
   prop/proof_cnf_stream.cpp
   prop/proof_cnf_stream.h
   prop/proof_post_processor.cpp
@@ -297,8 +233,6 @@ libava6_add_sources(
   smt/proof_manager.h
   smt/proof_final_callback.cpp
   smt/proof_final_callback.h
-  smt/proof_logger.cpp
-  smt/proof_logger.h
   smt/proof_post_processor.cpp
   smt/proof_post_processor.h
   smt/proof_post_processor_dsl.cpp
@@ -325,8 +259,6 @@ libava6_add_sources(
   smt/witness_form.h
   theory/arith/arith_evaluator.cpp
   theory/arith/arith_evaluator.h
-  theory/arith/arith_ite_utils.cpp
-  theory/arith/arith_ite_utils.h
   theory/arith/arith_msum.cpp
   theory/arith/arith_msum.h
   theory/arith/arith_poly_norm.cpp
@@ -403,8 +335,6 @@ libava6_add_sources(
   theory/arith/linear/tableau_sizes.h
   theory/arith/linear/theory_arith_private.cpp
   theory/arith/linear/theory_arith_private.h
-  theory/arith/nl/equality_substitution.cpp
-  theory/arith/nl/equality_substitution.h
   theory/arith/nl/ext/arith_nl_compare_proof_gen.cpp
   theory/arith/nl/ext/arith_nl_compare_proof_gen.h
   theory/arith/nl/ext/constraint.cpp
@@ -522,8 +452,6 @@ libava6_add_sources(
   theory/bv/bv_solver.h
   theory/bv/bv_solver_bitblast_internal.cpp
   theory/bv/bv_solver_bitblast_internal.h
-  theory/bv/int_blaster.cpp
-  theory/bv/int_blaster.h
   theory/bv/macro_rewrite_elaborator.cpp
   theory/bv/macro_rewrite_elaborator.h
   theory/bv/proof_checker.cpp
@@ -550,8 +478,6 @@ libava6_add_sources(
   theory/combination_care_graph.h
   theory/combination_engine.cpp
   theory/combination_engine.h
-  theory/conflict_processor.cpp
-  theory/conflict_processor.h
   theory/datatypes/datatypes_rewriter.cpp
   theory/datatypes/datatypes_rewriter.h
   theory/datatypes/inference.cpp
@@ -582,10 +508,6 @@ libava6_add_sources(
   theory/decision_strategy.h
   theory/ee_manager.cpp
   theory/ee_manager.h
-  theory/ee_manager_central.cpp
-  theory/ee_manager_central.h
-  theory/ee_manager_distributed.cpp
-  theory/ee_manager_distributed.h
   theory/ee_setup_info.h
   theory/evaluator.cpp
   theory/evaluator.h
@@ -604,8 +526,6 @@ libava6_add_sources(
   theory/logic_info.h
   theory/model_manager.cpp
   theory/model_manager.h
-  theory/model_manager_distributed.cpp
-  theory/model_manager_distributed.h
   theory/output_channel.cpp
   theory/output_channel.h
   theory/quantifiers/alpha_equivalence.cpp
@@ -632,12 +552,8 @@ libava6_add_sources(
   theory/quantifiers/cegqi/instantiator.h
   theory/quantifiers/cegqi/vts_term_cache.cpp
   theory/quantifiers/cegqi/vts_term_cache.h
-  theory/quantifiers/dynamic_rewrite.cpp
-  theory/quantifiers/dynamic_rewrite.h
   theory/quantifiers/ematching/candidate_generator.cpp
   theory/quantifiers/ematching/candidate_generator.h
-  theory/quantifiers/ematching/ho_trigger.cpp
-  theory/quantifiers/ematching/ho_trigger.h
   theory/quantifiers/ematching/im_generator.cpp
   theory/quantifiers/ematching/im_generator.h
   theory/quantifiers/ematching/inst_match_generator.cpp
@@ -690,10 +606,6 @@ libava6_add_sources(
   theory/quantifiers/quant_rep_bound_ext.h
   theory/quantifiers/first_order_model.cpp
   theory/quantifiers/first_order_model.h
-  theory/quantifiers/fun_def_evaluator.cpp
-  theory/quantifiers/fun_def_evaluator.h
-  theory/quantifiers/ho_term_database.cpp
-  theory/quantifiers/ho_term_database.h
   theory/quantifiers/ieval/free_var_info.cpp
   theory/quantifiers/ieval/free_var_info.h
   theory/quantifiers/ieval/inst_evaluator.cpp
@@ -722,8 +634,6 @@ libava6_add_sources(
   theory/quantifiers/instantiate.h
   theory/quantifiers/instantiation_list.cpp
   theory/quantifiers/instantiation_list.h
-  theory/quantifiers/lazy_trie.cpp
-  theory/quantifiers/lazy_trie.h
   theory/quantifiers/master_eq_notify.cpp
   theory/quantifiers/master_eq_notify.h
   theory/quantifiers/proof_checker.cpp
@@ -744,8 +654,6 @@ libava6_add_sources(
   theory/quantifiers/quantifiers_attributes.h
   theory/quantifiers/quantifiers_inference_manager.cpp
   theory/quantifiers/quantifiers_inference_manager.h
-  theory/quantifiers/quantifiers_macros.cpp
-  theory/quantifiers/quantifiers_macros.h
   theory/quantifiers/quantifiers_modules.cpp
   theory/quantifiers/quantifiers_modules.h
   theory/quantifiers/quantifiers_preprocess.cpp
@@ -760,8 +668,6 @@ libava6_add_sources(
   theory/quantifiers/quantifiers_statistics.h
   theory/quantifiers/relevant_domain.cpp
   theory/quantifiers/relevant_domain.h
-  theory/quantifiers/single_inv_partition.cpp
-  theory/quantifiers/single_inv_partition.h
   theory/quantifiers/skolemize.cpp
   theory/quantifiers/skolemize.h
   theory/quantifiers/term_tuple_enumerator.cpp
@@ -818,26 +724,18 @@ libava6_add_sources(
   theory/sets/theory_sets_type_rules.h
   theory/shared_solver.cpp
   theory/shared_solver.h
-  theory/shared_solver_distributed.cpp
-  theory/shared_solver_distributed.h
   theory/shared_terms_database.cpp
   theory/shared_terms_database.h
   theory/skolem_lemma.cpp
   theory/skolem_lemma.h
   theory/smt_engine_subsolver.cpp
   theory/smt_engine_subsolver.h
-  theory/sort_inference.cpp
-  theory/sort_inference.h
   theory/plugin_module.cpp
   theory/plugin_module.h
   theory/step.cpp
   theory/step.h
   theory/strategy.cpp
   theory/strategy.h
-  theory/strings/array_solver.cpp
-  theory/strings/array_solver.h
-  theory/strings/array_core_solver.cpp
-  theory/strings/array_core_solver.h
   theory/strings/arith_entail.cpp
   theory/strings/arith_entail.h
   theory/strings/base_solver.cpp
@@ -869,8 +767,6 @@ libava6_add_sources(
   theory/strings/proof_checker.h
   theory/strings/regexp_enumerator.cpp
   theory/strings/regexp_enumerator.h
-  theory/strings/regexp_elim.cpp
-  theory/strings/regexp_elim.h
   theory/strings/regexp_entail.cpp
   theory/strings/regexp_entail.h
   theory/strings/regexp_eval.cpp
@@ -963,16 +859,10 @@ libava6_add_sources(
   theory/uf/eq_proof.h
   theory/uf/function_const.cpp
   theory/uf/function_const.h
-  theory/uf/lambda_lift.cpp
-  theory/uf/lambda_lift.h
   theory/uf/proof_checker.cpp
   theory/uf/proof_checker.h
   theory/uf/proof_equality_engine.cpp
   theory/uf/proof_equality_engine.h
-  theory/uf/ho_extension.cpp
-  theory/uf/ho_extension.h
-  theory/uf/lambda_lift.cpp
-  theory/uf/lambda_lift.h
   theory/uf/theory_uf.cpp
   theory/uf/theory_uf.h
   theory/uf/theory_uf_model.cpp
