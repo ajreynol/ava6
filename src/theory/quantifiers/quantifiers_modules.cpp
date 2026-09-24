@@ -29,7 +29,6 @@ QuantifiersModules::QuantifiersModules()
       d_bint(nullptr),
       d_qcf(nullptr),
       d_fs(nullptr),
-      d_ipool(nullptr),
       d_i_cbqi(nullptr),
       d_qsplit(nullptr)
 {
@@ -72,7 +71,7 @@ void QuantifiersModules::initialize(Env& env,
     modules.push_back(d_bint.get());
   }
 
-  if (options.quantifiers.finiteModelFind || options.quantifiers.fmfBound
+  if (options.quantifiers.fmfBound
       || options.strings.stringExp)
   {
     d_model_engine.reset(new ModelEngine(env, qs, qim, qr, tr, builder));
@@ -93,10 +92,6 @@ void QuantifiersModules::initialize(Env& env,
     d_rel_dom.reset(new RelevantDomain(env, qs, qr, tr));
     d_fs.reset(new InstStrategyEnum(env, qs, qim, qr, tr, d_rel_dom.get()));
     modules.push_back(d_fs.get());
-  }
-  {
-    d_ipool.reset(new InstStrategyPool(env, qs, qim, qr, tr));
-    modules.push_back(d_ipool.get());
   }
   
   if (options.quantifiers.mbqi)

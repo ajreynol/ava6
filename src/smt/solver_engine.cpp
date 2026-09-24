@@ -47,7 +47,6 @@
 #include "smt/listeners.h"
 #include "smt/logic_exception.h"
 #include "smt/model.h"
-#include "smt/model_blocker.h"
 #include "smt/model_core_builder.h"
 #include "smt/preprocessor.h"
 #include "smt/proof_manager.h"
@@ -56,7 +55,6 @@
 #include "smt/smt_solver.h"
 #include "smt/solver_engine_state.h"
 #include "smt/solver_engine_stats.h"
-#include "smt/timeout_core_manager.h"
 #include "smt/unsat_core_manager.h"
 #include "theory/quantifiers/instantiation_list.h"
 #include "theory/quantifiers/quantifiers_attributes.h"
@@ -194,8 +192,8 @@ void SolverEngine::finishInit()
   d_ctxManager->setup(d_smtDriver.get());
 
   // subsolvers
-  
-  
+
+
   // check models utility
   if (d_env->getOptions().smt.checkModels)
   {
@@ -234,7 +232,6 @@ SolverEngine::~SolverEngine()
 
     d_pfManager.reset(nullptr);
     d_ucManager.reset(nullptr);
-    d_tcm.reset(nullptr);
 
     d_smtDriver.reset(nullptr);
     d_smtSolver.reset(nullptr);
@@ -828,55 +825,6 @@ Result SolverEngine::checkSatInternal(const std::vector<Node>& assumptions)
   return Result(r, filename);
 }
 
-std::pair<Result, std::vector<Node>> SolverEngine::getTimeoutCore(
-    const std::vector<Node>& assumptions)
-{
-  Trace("smt") << "SolverEngine::getTimeoutCore()" << std::endl;
-  beginCall(true);
-  if (d_tcm == nullptr)
-  {
-    d_tcm.reset(new TimeoutCoreManager(*d_env.get()));
-  }
-  // refresh the assertions, to ensure we have applied preprocessing to
-  // all current assertions
-  d_smtDriver->refreshAssertions();
-  // get the preprocessed assertions
-  const context::CDList<Node>& assertions =
-      d_smtSolver->getPreprocessedAssertions();
-  std::vector<Node> passerts(assertions.begin(), assertions.end());
-  const context::CDHashMap<size_t, Node>& ppsm =
-      d_smtSolver->getPreprocessedSkolemMap();
-  std::map<size_t, Node> ppSkolemMap;
-  for (auto& pk : ppsm)
-  {
-    ppSkolemMap[pk.first] = pk.second;
-  }
-  std::pair<Result, std::vector<Node>> ret =
-      d_tcm->getTimeoutCore(passerts, ppSkolemMap, assumptions);
-  // convert the preprocessed assertions to input assertions
-  std::vector<Node> core;
-  if (assumptions.empty())
-  {
-    if (!ret.second.empty())
-    {
-      core = d_ucManager->convertPreprocessedToInput(ret.second, true);
-    }
-  }
-  else
-  {
-    // not necessary to convert, since we computed the assumptions already
-    core = ret.second;
-  }
-  // A call to get-timeout-core is the same as a check-sat, except that the
-  // solver that has the model/proof is the SMT solver owned by the timeout
-  // core manager.
-  SolverEngine* solver = d_tcm->getSubSolver();
-  Assert(solver != nullptr);
-  d_state->notifyCheckSatResult(ret.first, solver);
-  endCall();
-  return std::pair<Result, std::vector<Node>>(ret.first, core);
-}
-
 std::vector<Node> SolverEngine::getUnsatAssumptions(void)
 {
   // see if another solver engine was responsible for the last status
@@ -945,15 +893,6 @@ void SolverEngine::assertFormulaInternal(const Node& formula)
   // but currently don't.
   Node f = eliminateSubtypesForProof(formula);
   d_smtSolver->getAssertions().assertFormula(f);
-}
-
-void SolverEngine::declarePool(const Node& p,
-                               const std::vector<Node>& initValue)
-{
-  Assert(p.isVar() && p.getType().isSet());
-  beginCall();
-  QuantifiersEngine* qe = getAvailableQuantifiersEngine("declareTermPool");
-  qe->declarePool(p, initValue);
 }
 
 void SolverEngine::addPlugin(Plugin* p)
@@ -1145,7 +1084,7 @@ Node SolverEngine::getValue(const Node& t, bool fromUser)
     }
   }
 
-  
+
   return resultNode;
 }
 
@@ -1228,42 +1167,6 @@ std::string SolverEngine::getModel(const std::vector<TypeNode>& declaredSorts,
   std::stringstream ssm;
   ssm << m;
   return ssm.str();
-}
-
-void SolverEngine::blockModel(modes::BlockModelsMode mode)
-{
-  Trace("smt") << "SMT blockModel()" << endl;
-  TheoryModel* m = getAvailableModel("block model");
-
-  // get expanded assertions
-  std::vector<Node> eassertsProc = getSubstitutedAssertions();
-  ModelBlocker mb(*d_env.get());
-  Node eblocker = mb.getModelBlocker(eassertsProc, m, mode);
-  Trace("smt") << "Block formula: " << eblocker << std::endl;
-
-  // Must begin call now to ensure pops are processed. We cannot call this
-  // above since we are accessing the model.
-  beginCall();
-  assertFormulaInternal(eblocker);
-}
-
-void SolverEngine::blockModelValues(const std::vector<Node>& exprs)
-{
-  Trace("smt") << "SMT blockModelValues()" << endl;
-  ensureWellFormedTerms(exprs, "block model values");
-
-  TheoryModel* m = getAvailableModel("block model values");
-
-  // get expanded assertions
-  std::vector<Node> eassertsProc = getSubstitutedAssertions();
-  // we always do block model values mode here
-  ModelBlocker mb(*d_env.get());
-  Node eblocker = mb.getModelBlocker(
-      eassertsProc, m, modes::BlockModelsMode::VALUES, exprs);
-
-  // Call begin call here, for same reasons as above.
-  beginCall();
-  assertFormulaInternal(eblocker);
 }
 
 std::pair<Node, Node> SolverEngine::getSepHeapAndNilExpr(void)
@@ -1411,16 +1314,6 @@ bool SolverEngine::getSepHeapTypes(TypeNode& locT, TypeNode& dataT)
 Node SolverEngine::getSepHeapExpr() { return getSepHeapAndNilExpr().first; }
 
 Node SolverEngine::getSepNilExpr() { return getSepHeapAndNilExpr().second; }
-
-std::vector<Node> SolverEngine::getLearnedLiterals(modes::LearnedLitType t)
-{
-  Trace("smt") << "SMT getLearnedLiterals()" << std::endl;
-  // note that the default mode for learned literals is via the prop engine,
-  // although other modes could use the preprocessor
-  PropEngine* pe = d_smtSolver->getPropEngine();
-  Assert(pe != nullptr);
-  return pe->getLearnedZeroLevelLiterals(t);
-}
 
 void SolverEngine::checkProof()
 {
@@ -1879,26 +1772,6 @@ std::vector<Node> SolverEngine::getAssertions()
   Trace("smt") << "SMT getAssertions()" << endl;
   // note we always enable assertions, so it is available here
   return getAssertionsInternal();
-}
-
-void SolverEngine::getDifficultyMap(std::map<Node, Node>& dmap)
-{
-  Trace("smt") << "SMT getDifficultyMap()\n";
-  // ensure this solver engine has been initialized
-  finishInit();
-  if (!d_env->getOptions().smt.produceDifficulty)
-  {
-    throw ModalException(
-        "Cannot get difficulty when difficulty option is off.");
-  }
-  // the prop engine has the proof of false
-  Assert(d_pfManager);
-  // get difficulty map from theory engine first
-  TheoryEngine* te = d_smtSolver->getTheoryEngine();
-  // do not include lemmas
-  te->getDifficultyMap(dmap, false);
-  // then ask proof manager to translate dmap in terms of the input
-  d_pfManager->translateDifficultyMap(dmap, d_smtSolver->getAssertions());
 }
 
 void SolverEngine::push()

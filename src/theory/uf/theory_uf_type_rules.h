@@ -43,32 +43,12 @@ class UfTypeRule
  * type and an integer. Ensures that type is an uninterpreted sort and the
  * integer is positive, and returns the builtin type.
  */
-class CardinalityConstraintOpTypeRule
-{
- public:
-  static TypeNode preComputeType(NodeManager* nm, TNode n);
-
-  static TypeNode computeType(NodeManager* nodeManager,
-                              TNode n,
-                              bool check,
-                              std::ostream* errOut);
-};
 
 /**
  * The type rule for combined cardinality constraint operators, which is indexed
  * by an integer. Ensures that the integer is positive, and returns the builtin
  * type.
  */
-class CombinedCardinalityConstraintOpTypeRule
-{
- public:
-  static TypeNode preComputeType(NodeManager* nm, TNode n);
-
-  static TypeNode computeType(NodeManager* nodeManager,
-                              TNode n,
-                              bool check,
-                              std::ostream* errOut);
-};
 
 /**
  * Type rule for HO_APPLY terms. Ensures the first argument is a function type

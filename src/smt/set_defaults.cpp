@@ -154,10 +154,7 @@ void SetDefaults::setDefaultsPre(Options& opts)
     SET_AND_NOTIFY(smt, produceAssignments, true, "checkModels");
   }
   // unsat cores and proofs shenanigans
-  if (opts.driver.dumpDifficulty)
-  {
-    SET_AND_NOTIFY(smt, produceDifficulty, true, "dumpDifficulty");
-  }
+
   if (opts.smt.checkUnsatCores || opts.driver.dumpUnsatCores
       || opts.driver.dumpUnsatCoresLemmas || opts.smt.unsatAssumptions
       || false
@@ -243,7 +240,7 @@ void SetDefaults::setDefaultsPre(Options& opts)
     // note that this test assumes that granularity modes are ordered and
     // THEORY_REWRITE is gonna be, in the enum, after the lower granularity
     // levels
-    
+
   }
   if (!opts.smt.produceProofs)
   {
@@ -254,16 +251,7 @@ void SetDefaults::setDefaultsPre(Options& opts)
       SET_AND_NOTIFY(smt, produceProofs, true, "proof mode");
     }
     // if proofs weren't enabled by user, and we are producing difficulty
-    if (opts.smt.produceDifficulty)
-    {
-      SET_AND_NOTIFY(smt, produceProofs, true, "produce difficulty");
-      // ensure at least preprocessing proofs are enabled
-      if (opts.smt.proofMode == options::ProofMode::OFF)
-      {
-        SET_AND_NOTIFY_VAL_SYM(
-            smt, proofMode, options::ProofMode::PP_ONLY, "produce difficulty");
-      }
-    }
+
     if (opts.proof.proofLog)
     {
       SET_AND_NOTIFY(smt, produceProofs, true, "proof logging");
@@ -305,7 +293,7 @@ void SetDefaults::setDefaultsPre(Options& opts)
   if (opts.proof.proofLog)
   {
     // incompatible with sygus-inst
-    
+
   }
 
   // if unsat cores are disabled, then unsat cores mode should be OFF. Similarly
@@ -330,7 +318,7 @@ void SetDefaults::setDefaultsPre(Options& opts)
   {
     // these options must be disabled on internal subsolvers, as they are
     // used by the user to rephrase the input.
-    
+
     // deep restart does not work with internal subsolvers?
     SET_AND_NOTIFY_VAL_SYM(smt,
                            deepRestartMode,
@@ -353,7 +341,7 @@ void SetDefaults::finalizeLogic(LogicInfo& logic, Options& opts) const
                    && logic.areIntegersUsed()))
            && !opts.base.incrementalSolving)
   {
-    
+
   }
 
   if (opts.bv.bitblastMode == options::BitblastMode::EAGER)
@@ -475,11 +463,10 @@ void SetDefaults::finalizeLogic(LogicInfo& logic, Options& opts) const
     // quantifiers (those marked with InternalQuantAttribute).
   }
 
-  
 
   // We now know whether the input uses sygus. Update the logic to incorporate
   // the theories we need internally for handling sygus problems.
-  
+
 
   // widen the logic
   widenLogic(logic, opts);
@@ -593,7 +580,6 @@ void SetDefaults::setDefaultsPost(const LogicInfo& logic, Options& opts) const
     }
   }
 
-  
 
   // cases where we need produce models
   if (opts.smt.produceAssignments || false)
@@ -605,7 +591,7 @@ void SetDefaults::setDefaultsPost(const LogicInfo& logic, Options& opts) const
   // technique is experimental. This benchmark set also requires removing ITEs
   // during preprocessing, before repeating simplification. Hence, we enable
   // this by default.
-  
+
 
   // Set the options for the theoryOf
   if (!opts.theory.theoryOfModeWasSetByUser)
@@ -627,11 +613,11 @@ void SetDefaults::setDefaultsPost(const LogicInfo& logic, Options& opts) const
   // By default, symmetry breaker is on only for non-incremental QF_UF.
   // Note that if ufSymmetryBreaker is already set to false, we do not reenable
   // it.
-  
+
 
   // If in arrays, set the UF handler to arrays
   if (logic.isTheoryEnabled(THEORY_ARRAYS) && !logic.isHigherOrder()
-      && !opts.quantifiers.finiteModelFind
+      && !false
       && (!logic.isQuantified()
           || (logic.isQuantified() && !logic.isTheoryEnabled(THEORY_UF))))
   {
@@ -778,7 +764,7 @@ void SetDefaults::setDefaultsPost(const LogicInfo& logic, Options& opts) const
   // Shared selectors are generally not good to combine with standard
   // quantifier techniques e.g. E-matching.
   // We only enable them if SyGuS is enabled.
-  
+
 
   if (opts.prop.minisatSimpMode == options::MinisatSimpMode::ALL)
   {
@@ -815,13 +801,6 @@ void SetDefaults::setDefaultsPost(const LogicInfo& logic, Options& opts) const
     SET_AND_NOTIFY(arrays, arraysOptimizeLinear, false, "models");
   }
 
-  if (opts.strings.stringFMF)
-  {
-    SET_AND_NOTIFY_IF_NOT_USER_VAL_SYM(strings,
-                                       stringProcessLoopMode,
-                                       options::ProcessLoopMode::SIMPLE,
-                                       "strings-fmf");
-  }
 
   // !!! All options that require disabling models go here
   std::stringstream reasonNoModel;
@@ -871,7 +850,7 @@ void SetDefaults::setDefaultsPost(const LogicInfo& logic, Options& opts) const
   }
 
   // Note that if nlCov is already set to false, we do not reenable it.
-  
+
   if (logic.isTheoryEnabled(theory::THEORY_ARITH)
       && logic.areTranscendentalsUsed())
   {
@@ -892,9 +871,6 @@ void SetDefaults::setDefaultsPost(const LogicInfo& logic, Options& opts) const
         "when the logic has quantifiers");
   }
 }
-
-
-
 
 
 bool SetDefaults::usesInputConversion(const Options& opts,
@@ -921,7 +897,7 @@ bool SetDefaults::usesInputConversion(const Options& opts,
 bool SetDefaults::incompatibleWithProofs(Options& opts,
                                          std::ostream& reason) const
 {
-  
+
   if (opts.quantifiers.globalNegate)
   {
     // When global negate answers "unsat", it is not due to showing a set of
@@ -931,7 +907,7 @@ bool SetDefaults::incompatibleWithProofs(Options& opts,
   }
   bool isFullPf = (opts.smt.proofMode == options::ProofMode::FULL
                    || opts.smt.proofMode == options::ProofMode::FULL_STRICT);
-  
+
   // options that are automatically set to support proofs
   if (opts.bv.bvAssertInput)
   {
@@ -946,8 +922,8 @@ bool SetDefaults::incompatibleWithProofs(Options& opts,
     SET_AND_NOTIFY_IF_NOT_USER_VAL_SYM(
         bv, bvSolver, options::BVSolver::BITBLAST_INTERNAL, "proofs");
   }
-  
-  
+
+
   // specific to SAT solver
   if (opts.prop.satSolver == options::SatSolverMode::MINISAT)
   {
@@ -965,7 +941,7 @@ bool SetDefaults::incompatibleWithProofs(Options& opts,
   {
     // these are always disabled by safe options, ok to silently change
     // symmetry breaking does not have proof support
-    
+
     // CEGQI with deltas and infinities is not supported
     SET_AND_NOTIFY(quantifiers, cegqiMidpoint, true, "full strict proofs");
     SET_AND_NOTIFY(quantifiers, cegqiUseInfInt, false, "full strict proofs");
@@ -1000,7 +976,7 @@ bool SetDefaults::incompatibleWithModels(const Options& opts,
     reason << "global-negate";
     return true;
   }
-  
+
   return false;
 }
 
@@ -1036,15 +1012,15 @@ bool SetDefaults::incompatibleWithIncremental(const LogicInfo& logic,
             << options::BitblastMode::LAZY << ".";
     return true;
   }
-  
-  
+
+
   if (opts.smt.solveIntAsBV > 0)
   {
     reason << "solveIntAsBV";
     return true;
   }
-  
-  
+
+
   // proof logging not yet supported in incremental mode, which requires
   // managing how new assertions are printed.
   if (opts.proof.proofLog)
@@ -1069,7 +1045,7 @@ bool SetDefaults::incompatibleWithUnsatCores(Options& opts,
   // where A does not imply A', or if it adds new assertions B that are not
   // tautologies, AND
   // (B) it does not track proofs.
-  
+
   if (opts.smt.learnedRewrite)
   {
     if (opts.smt.learnedRewriteWasSetByUser)
@@ -1100,7 +1076,7 @@ bool SetDefaults::incompatibleWithUnsatCores(Options& opts,
     SET_AND_NOTIFY(quantifiers, globalNegate, false, "unsat cores");
   }
 
-  
+
   return false;
 }
 
@@ -1120,7 +1096,7 @@ bool SetDefaults::incompatibleWithSygus(const Options& opts,
   {
     return true;
   }
-  
+
   if (opts.quantifiers.globalNegate)
   {
     reason << "global negate";
@@ -1260,32 +1236,24 @@ void SetDefaults::setDefaultsQuantifiers(const LogicInfo& logic,
   {
     SET_AND_NOTIFY(quantifiers, enumInst, true, "full-saturate-quant");
   }
-  
-  if (logic.hasCardinalityConstraints())
-  {
-    // must have finite model finding on
-    SET_AND_NOTIFY(quantifiers,
-                   finiteModelFind,
-                   true,
-                   "logic with cardinality constraints");
-  }
+
+
   if (opts.quantifiers.instMaxLevel != -1)
   {
     SET_AND_NOTIFY(quantifiers, cegqi, false, "instMaxLevel");
   }
-  
+
   // enable MBQI if --mbqi-enum is provided
-  
+
   if (opts.quantifiers.mbqi)
   {
     // MBQI is an alternative to CEGQI/SyQI
     SET_AND_NOTIFY_IF_NOT_USER(quantifiers, cegqi, false, "mbqi");
-    
+
   }
 
-  
-  // now have determined whether fmfBound is on/off
-  // apply fmfBound options
+
+  // Configure bounded quantifier enumeration.
   if (opts.quantifiers.fmfBound)
   {
     // if bounded integers are set, use no MBQI by default
@@ -1294,14 +1262,12 @@ void SetDefaults::setDefaultsQuantifiers(const LogicInfo& logic,
     SET_AND_NOTIFY_IF_NOT_USER_VAL_SYM(
         quantifiers, prenexQuant, options::PrenexQuantMode::NONE, "fmfBound");
   }
+
   if (logic.isHigherOrder())
   {
     // if higher-order, then current variants of model-based instantiation
     // cannot be used
-    SET_AND_NOTIFY_VAL_SYM(quantifiers,
-                           fmfMbqiMode,
-                           options::FmfMbqiMode::NONE,
-                           "higher-order logic");
+
     // by default, use store axioms only if --ho-elim is set
     SET_AND_NOTIFY_IF_NOT_USER_VAL_SYM(quantifiers,
                                        hoElimStoreAx,
@@ -1311,39 +1277,15 @@ void SetDefaults::setDefaultsQuantifiers(const LogicInfo& logic,
     // operations.
     SET_AND_NOTIFY(quantifiers, macrosQuant, false, "higher-order logic");
   }
-  
-  if (opts.quantifiers.fmfFunWellDefined)
-  {
-    SET_AND_NOTIFY_IF_NOT_USER(
-        quantifiers, finiteModelFind, true, "fmfFunWellDefined");
-  }
+
 
   // now, have determined whether finite model find is on/off
   // apply finite model finding options
-  if (opts.quantifiers.finiteModelFind)
-  {
-    // apply conservative quantifiers splitting
-    SET_AND_NOTIFY_IF_NOT_USER_VAL_SYM(quantifiers,
-                                       quantDynamicSplit,
-                                       options::QuantDSplitMode::DEFAULT,
-                                       "finiteModelFind");
-    // do not use E-matching by default. For E-matching + FMF, the user should
-    // specify --finite-model-find --e-matching.
-    SET_AND_NOTIFY_IF_NOT_USER(
-        quantifiers, eMatching, false, "finiteModelFind");
-    // instantiate only on last call
-    if (opts.quantifiers.eMatching)
-    {
-      SET_AND_NOTIFY_IF_NOT_USER_VAL_SYM(quantifiers,
-                                         instWhenMode,
-                                         options::InstWhenMode::LAST_CALL,
-                                         "finiteModelFind");
-    }
-  }
+
 
   // apply sygus options
   // if we are attempting to rewrite everything to SyGuS, use sygus()
-  
+
   // counterexample-guided instantiation for non-sygus
   // enable if any possible quantifiers with arithmetic, datatypes or bitvectors
   if ((logic.isQuantified()
@@ -1389,7 +1331,7 @@ void SetDefaults::setDefaultsQuantifiers(const LogicInfo& logic,
     SET_AND_NOTIFY(quantifiers, conflictBasedInst, true, "cbqi option");
   }
   // for induction techniques
-  
+
   if (opts.quantifiers.dtStcInduction)
   {
     // try to remove ITEs from quantified formulas
@@ -1405,7 +1347,7 @@ void SetDefaults::setDefaultsQuantifiers(const LogicInfo& logic,
     SET_AND_NOTIFY_IF_NOT_USER(
         quantifiers, purifyTriggers, true, "intWfInduction");
   }
-  
+
   // can't pre-skolemize nested quantifiers without UF theory
   if (!logic.isTheoryEnabled(THEORY_UF)
       && opts.quantifiers.preSkolemQuant != options::PreSkolemQuantMode::OFF)
@@ -1438,7 +1380,7 @@ void SetDefaults::setDefaultDecisionMode(const LogicInfo& logic,
   }
   options::DecisionMode decMode =
       // anything that uses sygus uses internal
-      
+
                       // ALL or its supersets
           logic.hasEverything()
           ? options::DecisionMode::JUSTIFICATION

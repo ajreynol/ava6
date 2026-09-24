@@ -18,6 +18,8 @@ CASES = {
       (assert (distinct (select (store a 0 1) 0) 1))''',
     'datatypes': '''(declare-datatype D ((a) (b))) (declare-const x D)
       (assert (distinct x a)) (assert (distinct x b))''',
+    'recursive-datatypes': '''(declare-datatype L ((nil) (cons (head Int) (tail L))))
+      (declare-const x L) (assert (= x (cons 0 x)))''',
     'sets': '''(declare-const x Int) (declare-const s (Set Int))
       (assert (set.member x s)) (assert (not (set.member x s)))''',
     'strings': '''(declare-const s String) (assert (= s "abc"))
@@ -63,19 +65,39 @@ def main():
     assert result.returncode == 0, result.stderr
     assert result.stdout.splitlines() == ['sat', '((x 7))', 'unsat', 'sat'], result.stdout
     print('PASS models and incremental solving')
+    result = run(args.binary, '''(set-logic ALL)
+      (set-option :produce-models true) (set-option :incremental true)
+      (declare-datatype L ((nil) (cons (head Int) (tail L))))
+      (declare-sort U 0) (declare-const a U) (declare-const b U)
+      (declare-const x L) (declare-const s (Set L))
+      (assert (distinct a b)) (assert (= x (cons 7 nil)))
+      (assert (set.member x s)) (assert (not (set.member nil s)))
+      (check-sat) (get-value (x))
+      (push 1) (assert (= (tail x) x)) (check-sat) (pop 1) (check-sat)''',
+      '--check-models', '--debug-check-models')
+    assert result.returncode == 0, (result.stdout, result.stderr)
+    assert result.stdout.splitlines() == [
+        'sat', '((x (cons 7 nil)))', 'unsat', 'sat'], result.stdout
+    print('PASS datatype, set and UF models without exclusion sets')
     for option in ['--safe-mode=unrestricted', '--nl-cov', '--sygus',
                    '--produce-abducts', '--produce-interpolants',
                    '--proof-format-mode=alethe', '--proof-format-mode=dot',
-                   '--fp', '--ff', '--bags', '--sep', '--arith-exp']:
+                   '--fp', '--ff', '--bags', '--sep', '--arith-exp',
+                   '--finite-model-find', '--strings-fmf',
+                   '--produce-difficulty', '--dump-difficulty',
+                   '--produce-learned-literals', '--timeout-core-timeout=100']:
         result = run(args.binary, '(check-sat)', option)
         assert result.returncode != 0, (option, result.stdout)
-    for text in ['(set-logic QF_FP)', '(set-logic QF_FF)',
+    for text in ['(set-logic QF_FP)', '(set-logic QF_FF)', '(set-logic QF_UFC)',
                  '(set-logic ALL) (declare-const x (_ FloatingPoint 8 24))',
                  '(set-logic ALL) (declare-const x (Bag Int))',
                  '(set-option :nl-cov true)', '(set-option :sygus true)',
                  '(set-logic ALL) (assert (= (^ 2 3) 8))',
                  '(set-logic ALL) (assert (= (sin 0.0) 0.0))',
                  '(set-logic ALL) (assert (= (set.card (set.singleton 0)) 1))',
+                 '(set-logic ALL) (declare-const s (Set Int)) (assert (= s (as set.universe (Set Int))))',
+                 '(set-logic ALL) (declare-const s (Set Int)) (assert (= s (set.complement s)))',
+                 '(set-logic ALL) (declare-const r (Set (Tuple Int Int))) (assert (= r (rel.transpose r)))',
                  '(set-logic ALL) (declare-const x (Nullable Int))',
                  '(set-logic ALL) (assert (= (select ((as const (Array Int Int)) 0) 1) 0))']:
         result = run(args.binary, text + '\n(check-sat)')
@@ -89,7 +111,13 @@ def main():
             '(get-qe (exists ((x Int)) (= x 0)))',
             '(get-qe-disjunct (exists ((x Int)) (= x 0)))',
             '(get-abduct A true)', '(get-abduct-next)',
-            '(get-interpolant I true)', '(get-interpolant-next)']:
+            '(get-interpolant I true)', '(get-interpolant-next)',
+            '(declare-pool p Int (0))', '(get-difficulty)',
+            '(get-timeout-core)', '(get-timeout-core-assuming (true))',
+            '(get-learned-literals)', '(block-model :values)',
+            '(block-model-values (true))',
+            '(declare-codatatype S ((cons (head Int) (tail S))))',
+            '(declare-codatatypes ((S 0)) (((cons (head Int) (tail S)))))']:
         result = run(args.binary, '(set-logic ALL)\n' + command)
         assert result.returncode != 0, (command, result.stdout, result.stderr)
         assert 'command' in (result.stdout + result.stderr).lower(), (

@@ -28,7 +28,6 @@ namespace quantifiers {
  * argument (if it exists) is an instantiation pattern list. Returns the
  * Boolean type.
  *
- * Furthermore ensures that certain annotations (e.g., for INST_POOL) are well
  * formed. In particular, instantiation pool annotations specify how to
  * instantiate this quantified formula. These must specify n sets, where n
  * is the number of variables of this quantified formula.

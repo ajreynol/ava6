@@ -94,10 +94,6 @@ class Smt2State : public ParserState
 
   bool isOperatorEnabled(const std::string& name) const;
 
-  /** Parse block models mode */
-  modes::BlockModelsMode getBlockModelsMode(const std::string& mode);
-  /** Parse learned literal type */
-  modes::LearnedLitType getLearnedLitType(const std::string& mode);
   /** Parse proof component */
   modes::ProofComponent getProofComponent(const std::string& pc);
 
@@ -110,11 +106,6 @@ class Smt2State : public ParserState
    * @return true if higher-order support is enabled, false otherwise
    */
   bool isHoEnabled() const;
-  /**
-   * @return true if cardinality constraints are enabled, false otherwise
-   */
-  bool hasCardinalityConstraints() const;
-
   bool logicIsSet() override;
 
   /**
@@ -428,7 +419,6 @@ class Smt2State : public ParserState
   void addDatatypesOperators();
 
   void addStringOperators();
-
 
 
   /**

@@ -14,9 +14,9 @@
 
 #include "expr/bound_var_manager.h"
 #include "expr/emptyset.h"
+#include "theory/quantifiers/fmf/bounded_integers.h"
 #include "expr/skolem_manager.h"
 #include "theory/datatypes//project_op.h"
-#include "theory/quantifiers/fmf/bounded_integers.h"
 #include "util/rational.h"
 
 using namespace ava6::internal;
@@ -75,8 +75,7 @@ Node SetReduction::reduceFoldOperator(Node node, std::vector<Node>& asserts)
       nm->mkNode(Kind::IMPLIES,
                  interval_i,
                  nm->mkNode(Kind::AND, combine_i_equal, union_i_equal));
-  Node forAll_i =
-      quantifiers::BoundedIntegers::mkBoundedForall(nm, iList, body_i);
+  Node forAll_i = quantifiers::BoundedIntegers::mkBoundedForall(nm, iList, body_i);
   Node nonNegative = nm->mkNode(Kind::GEQ, n, zero);
   Node union_n_equal = A.eqNode(union_n);
   asserts.push_back(forAll_i);
@@ -85,46 +84,6 @@ Node SetReduction::reduceFoldOperator(Node node, std::vector<Node>& asserts)
   asserts.push_back(union_n_equal);
   asserts.push_back(nonNegative);
   return combine_n;
-}
-
-Node SetReduction::reduceAggregateOperator(Node node)
-{
-  Assert(node.getKind() == Kind::RELATION_AGGREGATE);
-  NodeManager* nm = node.getNodeManager();
-  BoundVarManager* bvm = nm->getBoundVarManager();
-  Node function = node[0];
-  TypeNode elementType = function.getType().getArgTypes()[0];
-  Node initialValue = node[1];
-  Node A = node[2];
-
-  ProjectOp op = node.getOperator().getConst<ProjectOp>();
-  Node groupOp = nm->mkConst(Kind::RELATION_GROUP_OP, op);
-  Node group = nm->mkNode(Kind::RELATION_GROUP, {groupOp, A});
-
-  Node set = bvm->mkBoundVar(
-      BoundVarId::SETS_FIRST_INDEX, group, "set", nm->mkSetType(elementType));
-  Node foldList = nm->mkNode(Kind::BOUND_VAR_LIST, set);
-  Node foldBody = nm->mkNode(Kind::SET_FOLD, function, initialValue, set);
-
-  Node fold = nm->mkNode(Kind::LAMBDA, foldList, foldBody);
-  Node map = nm->mkNode(Kind::SET_MAP, fold, group);
-  return map;
-}
-
-Node SetReduction::reduceProjectOperator(Node n)
-{
-  Assert(n.getKind() == Kind::RELATION_PROJECT);
-  NodeManager* nm = n.getNodeManager();
-  Node A = n[0];
-  TypeNode elementType = A.getType().getSetElementType();
-  ProjectOp projectOp = n.getOperator().getConst<ProjectOp>();
-  Node op = nm->mkConst(Kind::TUPLE_PROJECT_OP, projectOp);
-  Node t = NodeManager::mkBoundVar("t", elementType);
-  Node projection = nm->mkNode(Kind::TUPLE_PROJECT, op, t);
-  Node lambda =
-      nm->mkNode(Kind::LAMBDA, nm->mkNode(Kind::BOUND_VAR_LIST, t), projection);
-  Node setMap = nm->mkNode(Kind::SET_MAP, lambda, A);
-  return setMap;
 }
 
 }  // namespace sets

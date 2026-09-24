@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# Install the CPC checker used by Ava6's regress-cpc target.
+set -euo pipefail
+
+if [[ ${1:-} == --help ]]; then
+  cat <<'EOF'
+Usage: contrib/get-ethos-checker [CMake options...]
+
+Build a pinned Ethos revision and install it to deps/bin/ethos.
+Requires CMake, a C++17 compiler, GMP, Python 3, and curl or wget.
+Set JOBS to control build parallelism (default: 4).
+Set ETHOS_ARCHIVE to use a previously downloaded archive offline.
+Additional arguments are passed to CMake (e.g. -DCMAKE_PREFIX_PATH=...).
+EOF
+  exit 0
+fi
+
+ava_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+ethos_revision=c95a259e15b5cc4216663e2e415c4526a51ef9f0
+ethos_sha256=d461458d0a905ccc2573624be2ed6a298e0f1726e34b8fe1baecb6850a841006
+ethos_archive=${ETHOS_ARCHIVE:-"$ava_root/deps/ethos-$ethos_revision.tar.gz"}
+ethos_source="$ava_root/deps/ethos-$ethos_revision"
+
+mkdir -p "$ava_root/deps"
+if [[ ! -f $ethos_archive ]]; then
+  if [[ -n ${ETHOS_ARCHIVE:-} ]]; then
+    echo "ETHOS_ARCHIVE does not exist: $ethos_archive" >&2
+    exit 1
+  fi
+  ethos_url="https://codeload.github.com/cvc5/ethos/tar.gz/$ethos_revision"
+  if command -v curl >/dev/null; then
+    curl --fail --location --retry 3 "$ethos_url" -o "$ethos_archive.part"
+  elif command -v wget >/dev/null; then
+    wget -O "$ethos_archive.part" "$ethos_url"
+  else
+    echo 'Install curl or wget, or set ETHOS_ARCHIVE to a local archive.' >&2
+    exit 1
+  fi
+  mv "$ethos_archive.part" "$ethos_archive"
+fi
+
+python3 - "$ethos_archive" "$ethos_sha256" <<'PY'
+import hashlib
+import sys
+from pathlib import Path
+
+archive, expected = sys.argv[1:]
+actual = hashlib.sha256(Path(archive).read_bytes()).hexdigest()
+if actual != expected:
+    sys.exit(f"Ethos archive checksum mismatch: {archive}\n"
+             f"Expected {expected}, got {actual}")
+PY
+
+mkdir -p "$ethos_source"
+tar -xzf "$ethos_archive" --strip-components=1 -C "$ethos_source"
+cmake -S "$ethos_source" -B "$ethos_source/build" \
+  -DCMAKE_BUILD_TYPE=Release "$@"
+cmake --build "$ethos_source/build" --target ethos --parallel "${JOBS:-4}"
+mkdir -p "$ava_root/deps/bin"
+cp "$ethos_source/build/src/ethos" "$ava_root/deps/bin/ethos"
+echo "Installed $ava_root/deps/bin/ethos"
+echo 'Run: cmake --build <ava6-build-dir> --target regress-cpc'

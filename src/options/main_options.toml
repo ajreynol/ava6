@@ -136,14 +136,6 @@ name   = "Driver"
   help       = "output lemmas in unsat cores after every UNSAT/VALID response"
 
 [[option]]
-  name       = "dumpDifficulty"
-  category   = "regular"
-  long       = "dump-difficulty"
-  type       = "bool"
-  default    = "false"
-  help       = "dump the difficulty measure after every response to check-sat"
-
-[[option]]
   name       = "printSuccess"
   category   = "common"
   long       = "print-success"

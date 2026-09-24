@@ -282,11 +282,8 @@ enum class InferenceId
   // ((_ is Ci) t) ^ ((_ is Cj) s) ^ (= t s) => false
   DATATYPES_TESTER_MERGE_CONFLICT,
   // bisimilarity for codatatypes
-  DATATYPES_BISIMILAR,
   // corecursive singleton equality
-  DATATYPES_REC_SINGLETON_EQ,
   // corecursive singleton equality (not (= k1 k2)) for fresh k1, k2
-  DATATYPES_REC_SINGLETON_FORCE_DEQ,
   // cycle conflict for datatypes
   DATATYPES_CYCLE,
   //-------------------- datatypes height
@@ -360,14 +357,14 @@ enum class InferenceId
   // unsat core from sub conflict-based instantiation
   QUANTIFIERS_SUB_UC,
   // instantiation from naive exhaustive instantiation in finite model finding
-  QUANTIFIERS_INST_FMF_EXH,
   // instantiation from finite model finding based on its model-based algorithm
-  QUANTIFIERS_INST_FMF_FMC,
   // instantiation from running exhaustive instantiation on a subdomain of
   // the quantified formula in finite model finding based on its model-based
   // algorithm
-  QUANTIFIERS_INST_FMF_FMC_EXH,
   // instantiations from counterexample-guided instantiation
+  QUANTIFIERS_INST_FMF_EXH,
+  QUANTIFIERS_INST_FMF_FMC,
+  QUANTIFIERS_INST_FMF_FMC_EXH,
   QUANTIFIERS_INST_CEGQI,
   // instantiations from syntax-guided instantiation
   QUANTIFIERS_INST_SYQI,
@@ -378,9 +375,7 @@ enum class InferenceId
   // instantiations from enumerative instantiation
   QUANTIFIERS_INST_ENUM,
   // instantiations from pool instantiation
-  QUANTIFIERS_INST_POOL,
   // instantiations from pool instantiation (tuple semantics)
-  QUANTIFIERS_INST_POOL_TUPLE,
   //-------------------- bounded integers
   // a proxy lemma from bounded integers, used to control bounds on ground terms
   QUANTIFIERS_BINT_PROXY,

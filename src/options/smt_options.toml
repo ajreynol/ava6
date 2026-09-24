@@ -82,14 +82,6 @@ name   = "SMT Layer"
   help = "Only include a subset of variables whose values, in addition to the values of variables whose values are implied, are sufficient to show the input formula is satisfied by the given model."
 
 [[option]]
-  name       = "produceLearnedLiterals"
-  category   = "regular"
-  long       = "produce-learned-literals"
-  type       = "bool"
-  default    = "false"
-  help       = "produce learned literals, support get-learned-literals"
-
-[[option]]
   name       = "produceProofs"
   category   = "common"
   long       = "produce-proofs"
@@ -136,14 +128,6 @@ name   = "SMT Layer"
   type       = "bool"
   default    = "false"
   help       = "turn on unsat assumptions generation"
-
-[[option]]
-  name       = "produceDifficulty"
-  category   = "regular"
-  long       = "produce-difficulty"
-  type       = "bool"
-  default    = "false"
-  help       = "enable tracking of difficulty."
 
 [[option]]
   name       = "checkSynthSol"
@@ -194,16 +178,6 @@ name   = "SMT Layer"
   default    = "false"
   help       = "attempt to solve a pure real satisfiable problem as an integer problem (for non-linear)"
 
-[[option]]
-  name       = "toCoreTimeout"
-  category   = "common"
-  long       = "timeout-core-timeout=N"
-  type       = "uint64_t"
-  default    = "10000"
-  help       = "timeout (in milliseconds) for satisfiability checks for timeout cores"
-
-
-# Internal core policies; never accepted as command-line or SMT-LIB options.
 [[setting]]
 name = "ackermann"
 type = "bool"
@@ -244,17 +218,6 @@ name = "off"
 name = "sat-proof"
 [[setting.mode.ASSUMPTIONS]]
 name = "assumptions"
-
-[[setting]]
-name = "difficultyMode"
-type = "DifficultyMode"
-default = "LEMMA_LITERAL_ALL"
-[[setting.mode.LEMMA_LITERAL]]
-name = "lemma-literal"
-[[setting.mode.LEMMA_LITERAL_ALL]]
-name = "lemma-literal-all"
-[[setting.mode.MODEL_CHECK]]
-name = "model-check"
 
 [[setting]]
 name = "extRewPrep"

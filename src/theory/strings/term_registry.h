@@ -42,7 +42,6 @@ class InferenceManager;
  * (1) Sending out preregistration lemmas for terms,
  * (2) Add terms to the equality engine,
  * (3) Maintaining a list of terms d_functionsTerms (for theory combination),
- * (4) Maintaining a list of input variables d_inputVars (for fmf).
  * (5) Maintaining a skolem cache. Notice that this skolem cache is the
  * official skolem cache that should be used by all modules in TheoryStrings.
  */
@@ -80,8 +79,6 @@ class TermRegistry : protected EnvObj
    * memberships).
    */
   void preRegisterTerm(TNode n);
-  /** Preregister input variable */
-  void preRegisterInputVar(TNode n);
   /** Register term
    *
    * This performs user-context-dependent registration for a term n, which
@@ -128,11 +125,6 @@ class TermRegistry : protected EnvObj
   SkolemCache* getSkolemCache();
   /** Get all function terms that have been preregistered to this object */
   const context::CDList<TNode>& getFunctionTerms() const;
-  /**
-   * Get the "input variables", corresponding to the set of leaf nodes of
-   * string-like type that have been preregistered as terms to this object.
-   */
-  const context::CDHashSet<Node>& getInputVars() const;
   /** Returns true if any str.code terms have been preregistered */
   bool hasStringCode() const;
   /**
@@ -254,7 +246,6 @@ class TermRegistry : protected EnvObj
   /**
    * The set of terms of type string that are abstracted as leaf nodes.
    */
-  NodeSet d_inputVars;
   /** The user-context dependent cache of terms that have been preregistered */
   NodeSet d_preregisteredTerms;
   /** The user-context dependent cache of terms that have been registered */

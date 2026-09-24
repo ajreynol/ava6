@@ -152,12 +152,6 @@ void QuantDSplit::checkOwnership(Node q)
     {
       bool isFinite = d_env.isFiniteType(tn);
       const DType& dt = tn.getDType();
-      if (dt.isRecursiveSingleton(tn))
-      {
-        Trace("quant-dsplit-debug") << "Datatype " << dt.getName()
-                                    << " is recursive singleton." << std::endl;
-      }
-      else
       {
         if (options().quantifiers.quantDynamicSplit
             == options::QuantDSplitMode::AGG)
@@ -180,7 +174,7 @@ void QuantDSplit::checkOwnership(Node q)
               // we mark it reduced.
               takeOwnership = true;
             }
-            else if (dt.getNumConstructors() == 1 && !dt.isCodatatype())
+            else if (dt.getNumConstructors() == 1 && !false)
             {
               // split if only one constructor
               doSplit = true;

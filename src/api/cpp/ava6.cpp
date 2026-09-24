@@ -37,7 +37,6 @@
 #include "base/configuration.h"
 #include "expr/array_store_all.h"
 #include "expr/ascription_type.h"
-#include "expr/cardinality_constraint.h"
 #include "expr/dtype.h"
 #include "expr/dtype_cons.h"
 #include "expr/dtype_selector.h"
@@ -218,47 +217,11 @@ const static std::unordered_map<Kind, std::pair<internal::Kind, std::string>>
                   internal::Kind::BITVECTOR_FROM_BOOLS),
         KIND_ENUM(Kind::BITVECTOR_BIT, internal::Kind::BITVECTOR_BIT),
         /* Finite Fields --------------------------------------------------- */
-        
-        
-        
-        
-        
+
+
         /* FP --------------------------------------------------------------- */
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
+
         /* Arrays ----------------------------------------------------------- */
         KIND_ENUM(Kind::SELECT, internal::Kind::SELECT),
         KIND_ENUM(Kind::STORE, internal::Kind::STORE),
@@ -270,11 +233,8 @@ const static std::unordered_map<Kind, std::pair<internal::Kind, std::string>>
         KIND_ENUM(Kind::APPLY_UPDATER, internal::Kind::APPLY_UPDATER),
         KIND_ENUM(Kind::TUPLE_PROJECT, internal::Kind::TUPLE_PROJECT),
         /* Separation Logic ------------------------------------------------- */
-        
-        
-        
-        
-        
+
+
         /* Sets ------------------------------------------------------------- */
         KIND_ENUM(Kind::SET_EMPTY, internal::Kind::SET_EMPTY),
         KIND_ENUM(Kind::SET_UNION, internal::Kind::SET_UNION),
@@ -284,8 +244,6 @@ const static std::unordered_map<Kind, std::pair<internal::Kind, std::string>>
         KIND_ENUM(Kind::SET_MEMBER, internal::Kind::SET_MEMBER),
         KIND_ENUM(Kind::SET_SINGLETON, internal::Kind::SET_SINGLETON),
         KIND_ENUM(Kind::SET_INSERT, internal::Kind::SET_INSERT),
-        KIND_ENUM(Kind::SET_COMPLEMENT, internal::Kind::SET_COMPLEMENT),
-        KIND_ENUM(Kind::SET_UNIVERSE, internal::Kind::SET_UNIVERSE),
         KIND_ENUM(Kind::SET_COMPREHENSION, internal::Kind::SET_COMPREHENSION),
         KIND_ENUM(Kind::SET_CHOOSE, internal::Kind::SET_CHOOSE),
         KIND_ENUM(Kind::SET_IS_EMPTY, internal::Kind::SET_IS_EMPTY),
@@ -297,30 +255,8 @@ const static std::unordered_map<Kind, std::pair<internal::Kind, std::string>>
         KIND_ENUM(Kind::SET_FOLD, internal::Kind::SET_FOLD),
         /* Relations -------------------------------------------------------- */
         /* Bags ------------------------------------------------------------- */
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
+
         /* Strings ---------------------------------------------------------- */
         KIND_ENUM(Kind::STRING_CONCAT, internal::Kind::STRING_CONCAT),
         KIND_ENUM(Kind::STRING_IN_REGEXP, internal::Kind::STRING_IN_REGEXP),
@@ -386,9 +322,6 @@ const static std::unordered_map<Kind, std::pair<internal::Kind, std::string>>
         KIND_ENUM(Kind::VARIABLE_LIST, internal::Kind::BOUND_VAR_LIST),
         KIND_ENUM(Kind::INST_PATTERN, internal::Kind::INST_PATTERN),
         KIND_ENUM(Kind::INST_NO_PATTERN, internal::Kind::INST_NO_PATTERN),
-        KIND_ENUM(Kind::INST_POOL, internal::Kind::INST_POOL),
-        KIND_ENUM(Kind::INST_ADD_TO_POOL, internal::Kind::INST_ADD_TO_POOL),
-        KIND_ENUM(Kind::SKOLEM_ADD_TO_POOL, internal::Kind::SKOLEM_ADD_TO_POOL),
         KIND_ENUM(Kind::INST_ATTRIBUTE, internal::Kind::INST_ATTRIBUTE),
         KIND_ENUM(Kind::INST_PATTERN_LIST, internal::Kind::INST_PATTERN_LIST),
         KIND_ENUM(Kind::LAST_KIND, internal::Kind::LAST_KIND),
@@ -467,7 +400,6 @@ const static std::unordered_map<internal::Kind,
         {internal::Kind::ITE, Kind::ITE},
         /* UF -------------------------------------------------------------- */
         {internal::Kind::APPLY_UF, Kind::APPLY_UF},
-        {internal::Kind::CARDINALITY_CONSTRAINT, Kind::CARDINALITY_CONSTRAINT},
         {internal::Kind::HO_APPLY, Kind::HO_APPLY},
         /* Arithmetic ------------------------------------------------------ */
         {internal::Kind::ADD, Kind::ADD},
@@ -582,59 +514,11 @@ const static std::unordered_map<internal::Kind,
         {internal::Kind::BITVECTOR_BIT_OP, Kind::BITVECTOR_BIT},
         {internal::Kind::BITVECTOR_BIT, Kind::BITVECTOR_BIT},
         /* Finite Fields --------------------------------------------------- */
-        
-        
-        
-        
-        
+
+
         /* FP -------------------------------------------------------------- */
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
+
         /* Arrays ---------------------------------------------------------- */
         {internal::Kind::SELECT, Kind::SELECT},
         {internal::Kind::STORE, Kind::STORE},
@@ -651,11 +535,8 @@ const static std::unordered_map<internal::Kind,
         {internal::Kind::TUPLE_PROJECT_OP, Kind::TUPLE_PROJECT},
         {internal::Kind::NULLABLE_LIFT, Kind::NULLABLE_LIFT},
         /* Separation Logic ------------------------------------------------ */
-        
-        
-        
-        
-        
+
+
         /* Sets ------------------------------------------------------------ */
         {internal::Kind::SET_EMPTY, Kind::SET_EMPTY},
         {internal::Kind::SET_UNION, Kind::SET_UNION},
@@ -665,9 +546,6 @@ const static std::unordered_map<internal::Kind,
         {internal::Kind::SET_MEMBER, Kind::SET_MEMBER},
         {internal::Kind::SET_SINGLETON, Kind::SET_SINGLETON},
         {internal::Kind::SET_INSERT, Kind::SET_INSERT},
-        {internal::Kind::SET_CARD, Kind::SET_CARD},
-        {internal::Kind::SET_COMPLEMENT, Kind::SET_COMPLEMENT},
-        {internal::Kind::SET_UNIVERSE, Kind::SET_UNIVERSE},
         {internal::Kind::SET_COMPREHENSION, Kind::SET_COMPREHENSION},
         {internal::Kind::SET_CHOOSE, Kind::SET_CHOOSE},
         {internal::Kind::SET_IS_EMPTY, Kind::SET_IS_EMPTY},
@@ -678,48 +556,9 @@ const static std::unordered_map<internal::Kind,
         {internal::Kind::SET_SOME, Kind::SET_SOME},
         {internal::Kind::SET_FOLD, Kind::SET_FOLD},
         /* Relations ------------------------------------------------------- */
-        {internal::Kind::RELATION_JOIN, Kind::RELATION_JOIN},
-        {internal::Kind::RELATION_TABLE_JOIN, Kind::RELATION_TABLE_JOIN},
-        {internal::Kind::RELATION_TABLE_JOIN_OP, Kind::RELATION_TABLE_JOIN},
-        {internal::Kind::RELATION_PRODUCT, Kind::RELATION_PRODUCT},
-        {internal::Kind::RELATION_TRANSPOSE, Kind::RELATION_TRANSPOSE},
-        {internal::Kind::RELATION_TCLOSURE, Kind::RELATION_TCLOSURE},
-        {internal::Kind::RELATION_JOIN_IMAGE, Kind::RELATION_JOIN_IMAGE},
-        {internal::Kind::RELATION_IDEN, Kind::RELATION_IDEN},
-        {internal::Kind::RELATION_GROUP, Kind::RELATION_GROUP},
-        {internal::Kind::RELATION_AGGREGATE_OP, Kind::RELATION_AGGREGATE},
-        {internal::Kind::RELATION_AGGREGATE, Kind::RELATION_AGGREGATE},
-        {internal::Kind::RELATION_PROJECT_OP, Kind::RELATION_PROJECT},
-        {internal::Kind::RELATION_PROJECT, Kind::RELATION_PROJECT},
         /* Bags ------------------------------------------------------------ */
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
+
         /* Strings --------------------------------------------------------- */
         {internal::Kind::STRING_CONCAT, Kind::STRING_CONCAT},
         {internal::Kind::STRING_IN_REGEXP, Kind::STRING_IN_REGEXP},
@@ -773,9 +612,6 @@ const static std::unordered_map<internal::Kind,
         {internal::Kind::BOUND_VAR_LIST, Kind::VARIABLE_LIST},
         {internal::Kind::INST_PATTERN, Kind::INST_PATTERN},
         {internal::Kind::INST_NO_PATTERN, Kind::INST_NO_PATTERN},
-        {internal::Kind::INST_POOL, Kind::INST_POOL},
-        {internal::Kind::INST_ADD_TO_POOL, Kind::INST_ADD_TO_POOL},
-        {internal::Kind::SKOLEM_ADD_TO_POOL, Kind::SKOLEM_ADD_TO_POOL},
         {internal::Kind::INST_ATTRIBUTE, Kind::INST_ATTRIBUTE},
         {internal::Kind::INST_PATTERN_LIST, Kind::INST_PATTERN_LIST},
         /* ----------------------------------------------------------------- */
@@ -790,11 +626,11 @@ const static std::
             {internal::Kind::NULL_EXPR, SortKind::NULL_SORT},
             {internal::Kind::ABSTRACT_TYPE, SortKind::ABSTRACT_SORT},
             {internal::Kind::ARRAY_TYPE, SortKind::ARRAY_SORT},
-            
+
             {internal::Kind::BITVECTOR_TYPE, SortKind::BITVECTOR_SORT},
             {internal::Kind::DATATYPE_TYPE, SortKind::DATATYPE_SORT},
-            
-            
+
+
             {internal::Kind::FUNCTION_TYPE, SortKind::FUNCTION_SORT},
             {internal::Kind::SEQUENCE_TYPE, SortKind::SEQUENCE_SORT},
             {internal::Kind::SET_TYPE, SortKind::SET_SORT},
@@ -828,34 +664,20 @@ const static std::unordered_map<Kind, internal::Kind> s_op_kinds{
     {Kind::BITVECTOR_SIGN_EXTEND, internal::Kind::BITVECTOR_SIGN_EXTEND_OP},
     {Kind::BITVECTOR_ZERO_EXTEND, internal::Kind::BITVECTOR_ZERO_EXTEND_OP},
     {Kind::DIVISIBLE, internal::Kind::DIVISIBLE_OP},
-    
-    
-    
-    
-    
-    
-    
+
+
     {Kind::IAND, internal::Kind::IAND_OP},
     {Kind::INT_TO_BITVECTOR, internal::Kind::INT_TO_BITVECTOR_OP},
     {Kind::REGEXP_REPEAT, internal::Kind::REGEXP_REPEAT_OP},
     {Kind::REGEXP_LOOP, internal::Kind::REGEXP_LOOP_OP},
     {Kind::TUPLE_PROJECT, internal::Kind::TUPLE_PROJECT_OP},
-    {Kind::RELATION_AGGREGATE, internal::Kind::RELATION_AGGREGATE_OP},
-    {Kind::RELATION_GROUP, internal::Kind::RELATION_GROUP_OP},
-    {Kind::RELATION_PROJECT, internal::Kind::RELATION_PROJECT_OP},
-    {Kind::RELATION_TABLE_JOIN, internal::Kind::RELATION_TABLE_JOIN_OP},
-    
-    
-    
-    
+
+
 };
 
 /* -------------------------------------------------------------------------- */
 /* Rounding Mode for Floating Points                                          */
 /* -------------------------------------------------------------------------- */
-
-
-
 
 
 /* -------------------------------------------------------------------------- */
@@ -3175,41 +2997,6 @@ std::vector<Term> Term::getSequenceValue() const
   AVA6_API_TRY_CATCH_END;
 }
 
-bool Term::isCardinalityConstraint() const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_CHECK_NOT_NULL;
-  //////// all checks before this line
-  return d_node->getKind() == internal::Kind::CARDINALITY_CONSTRAINT;
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-std::pair<Sort, uint32_t> Term::getCardinalityConstraint() const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_CHECK_NOT_NULL;
-  AVA6_API_ARG_CHECK_EXPECTED(
-      d_node->getKind() == internal::Kind::CARDINALITY_CONSTRAINT, *d_node)
-      << "Term to be a cardinality constraint when calling "
-         "getCardinalityConstraint()";
-  // this should never happen since we restrict what the user can create
-  AVA6_API_ARG_CHECK_EXPECTED(
-      detail::checkIntegerBounds<std::uint32_t>(
-          d_node->getOperator()
-              .getConst<internal::CardinalityConstraint>()
-              .getUpperBound()),
-      *d_node)
-      << "Upper bound for cardinality constraint does not fit uint32_t";
-  //////// all checks before this line
-  const internal::CardinalityConstraint& cc =
-      d_node->getOperator().getConst<internal::CardinalityConstraint>();
-  return std::make_pair(Sort(d_nm, cc.getType()),
-                        cc.getUpperBound().getUnsignedInt());
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
 bool Term::isRealAlgebraicNumber() const
 {
   AVA6_API_TRY_CATCH_BEGIN;
@@ -3513,21 +3300,19 @@ bool DatatypeConstructorDecl::isResolved() const
 DatatypeDecl::DatatypeDecl() : d_nm(nullptr), d_dtype(nullptr) {}
 
 DatatypeDecl::DatatypeDecl(NodeManagerSharedPtr nm,
-                           const std::string& name,
-                           bool isCoDatatype)
-    : d_nm(std::move(nm)), d_dtype(new internal::DType(name, isCoDatatype))
+                           const std::string& name)
+    : d_nm(std::move(nm)), d_dtype(new internal::DType(name))
 {
 }
 
 DatatypeDecl::DatatypeDecl(NodeManagerSharedPtr nm,
                            const std::string& name,
-                           const std::vector<Sort>& params,
-                           bool isCoDatatype)
+                           const std::vector<Sort>& params)
     : d_nm(std::move(nm))
 {
   std::vector<internal::TypeNode> tparams = Sort::sortVectorToTypeNodes(params);
   d_dtype = std::shared_ptr<internal::DType>(
-      new internal::DType(name, tparams, isCoDatatype));
+      new internal::DType(name, tparams));
 }
 
 bool DatatypeDecl::operator==(const DatatypeDecl& decl) const
@@ -4099,16 +3884,6 @@ bool Datatype::isParametric() const
   AVA6_API_TRY_CATCH_END;
 }
 
-bool Datatype::isCodatatype() const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_CHECK_NOT_NULL;
-  //////// all checks before this line
-  return d_dtype->isCodatatype();
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
 bool Datatype::isTuple() const
 {
   AVA6_API_TRY_CATCH_BEGIN;
@@ -4138,7 +3913,7 @@ bool Datatype::isFinite() const
   //////// all checks before this line
   // we assume that finite model finding is disabled by passing false as the
   // second argument
-  return isCardinalityClassFinite(d_dtype->getCardinalityClass(), false);
+  return isCardinalityClassFinite(d_dtype->getCardinalityClass());
   ////////
   AVA6_API_TRY_CATCH_END;
 }
@@ -5144,7 +4919,7 @@ Sort TermManager::mkDatatypeSort(const DatatypeDecl& dtypedecl)
   //////// all checks before this line
   Sort res = Sort(d_nm, d_nm->mkDatatypeType(*dtypedecl.d_dtype));
   const Datatype& dt = res.getDatatype();
-  AVA6_API_CHECK(dt.d_dtype->isCodatatype() || dt.d_dtype->isWellFounded())
+  AVA6_API_CHECK(dt.d_dtype->isWellFounded())
       << "Datatype sort " << dt.d_dtype->getName() + " is not well-founded";
   return res;
   ////////
@@ -5168,7 +4943,7 @@ std::vector<Sort> TermManager::mkDatatypeSorts(
   for (size_t i = 0, ndts = datatypes.size(); i < ndts; ++i)
   {
     const Datatype& dt = res[i].getDatatype();
-    AVA6_API_CHECK(dt.d_dtype->isCodatatype() || dt.d_dtype->isWellFounded())
+    AVA6_API_CHECK(dt.d_dtype->isWellFounded())
         << "Datatype sort " << dt.d_dtype->getName() + " is not well-founded";
   }
   return res;
@@ -5688,20 +5463,6 @@ Term TermManager::mkEmptySequence(const Sort& sort)
   AVA6_API_TRY_CATCH_END;
 }
 
-Term TermManager::mkUniverseSet(const Sort& sort)
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_TM_CHECK_SORT(sort);
-  //////// all checks before this line
-  internal::Node res =
-      d_nm->mkNullaryOperator(*sort.d_type, internal::Kind::SET_UNIVERSE);
-  // TODO(#2771): Reenable?
-  // (void)res->getType(true); /* kick off type checking */
-  return Term(d_nm, res);
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
 Term TermManager::mkBitVector(uint32_t size, uint64_t val)
 {
   AVA6_API_TRY_CATCH_BEGIN;
@@ -5774,11 +5535,6 @@ Term TermManager::mkFloatingPoint(const Term&,
                                   const Term&)
 {
   throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term TermManager::mkCardinalityConstraint(const Sort&, uint32_t)
-{
-  throw Ava6ApiException("This constructor is not part of the core SMT language");
 }
 
 Term TermManager::mkNullableLift(Kind, const std::vector<Term>&)
@@ -5874,24 +5630,22 @@ DatatypeConstructorDecl TermManager::mkDatatypeConstructorDecl(
 
 /* Datatype Declaration ----------------------------------------------------- */
 
-DatatypeDecl TermManager::mkDatatypeDecl(const std::string& name,
-                                         bool isCoDatatype)
+DatatypeDecl TermManager::mkDatatypeDecl(const std::string& name)
 {
   AVA6_API_TRY_CATCH_BEGIN;
   //////// all checks before this line
-  return DatatypeDecl(d_nm, name, isCoDatatype);
+  return DatatypeDecl(d_nm, name);
   ////////
   AVA6_API_TRY_CATCH_END;
 }
 
 DatatypeDecl TermManager::mkDatatypeDecl(const std::string& name,
-                                         const std::vector<Sort>& params,
-                                         bool isCoDatatype)
+                                         const std::vector<Sort>& params)
 {
   AVA6_API_TRY_CATCH_BEGIN;
   AVA6_API_TM_CHECK_SORTS(params);
   //////// all checks before this line
-  return DatatypeDecl(d_nm, name, params, isCoDatatype);
+  return DatatypeDecl(d_nm, name, params);
   ////////
   AVA6_API_TRY_CATCH_END;
 }
@@ -6678,69 +6432,6 @@ std::vector<Term> Solver::getUnsatCoreLemmas(void) const
   AVA6_API_TRY_CATCH_END;
 }
 
-std::map<Term, Term> Solver::getDifficulty() const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_RECOVERABLE_CHECK(d_slv->getSmtMode() == internal::SmtMode::UNSAT
-                             || d_slv->getSmtMode() == internal::SmtMode::SAT
-                             || d_slv->getSmtMode()
-                                    == internal::SmtMode::SAT_UNKNOWN)
-      << "cannot get difficulty unless after a UNSAT, SAT or UNKNOWN response.";
-  //////// all checks before this line
-  std::map<Term, Term> res;
-  std::map<internal::Node, internal::Node> dmap;
-  d_slv->getDifficultyMap(dmap);
-  for (const std::pair<const internal::Node, internal::Node>& d : dmap)
-  {
-    res[Term(d_tm.d_nm, d.first)] = Term(d_tm.d_nm, d.second);
-  }
-  return res;
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-std::pair<Result, std::vector<Term>> Solver::getTimeoutCore() const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_CHECK(d_slv->getOptions().smt.produceUnsatCores)
-      << "cannot get timeout core unless unsat cores are enabled "
-         "(try --"
-      << internal::options::smt::longName::produceUnsatCores << ")";
-  //////// all checks before this line
-  return getTimeoutCoreHelper({});
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-std::pair<Result, std::vector<Term>> Solver::getTimeoutCoreAssuming(
-    const std::vector<Term>& assumptions) const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_CHECK(!assumptions.empty())
-      << "cannot get timeout core assuming an empty set of assumptions";
-  AVA6_API_CHECK(d_slv->getOptions().smt.produceUnsatCores)
-      << "cannot get timeout core unless unsat cores are enabled "
-         "(try --"
-      << internal::options::smt::longName::produceUnsatCores << ")";
-  //////// all checks before this line
-  return getTimeoutCoreHelper(assumptions);
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-std::pair<Result, std::vector<Term>> Solver::getTimeoutCoreHelper(
-    const std::vector<Term>& assumptions) const
-{
-  std::vector<Term> res;
-  std::pair<internal::Result, std::vector<internal::Node>> resi =
-      d_slv->getTimeoutCore(Term::termVectorToNodes(assumptions));
-  for (internal::Node& c : resi.second)
-  {
-    res.push_back(Term(d_tm.d_nm, c));
-  }
-  return std::pair<Result, std::vector<Term>>(Result(resi.first), res);
-}
-
 std::vector<Proof> Solver::getProof(modes::ProofComponent c) const
 {
   AVA6_API_TRY_CATCH_BEGIN;
@@ -6778,26 +6469,6 @@ std::string Solver::proofToString(
   }
   this->d_slv->printProof(ss, proof.d_proofNode, format, nodeAssertionNames);
   return ss.str();
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-std::vector<Term> Solver::getLearnedLiterals(modes::LearnedLitType t) const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_CHECK(d_slv->getOptions().smt.produceLearnedLiterals)
-      << "cannot get learned literals unless enabled (try "
-         "--"
-      << internal::options::smt::longName::produceLearnedLiterals << ")";
-  AVA6_API_RECOVERABLE_CHECK(d_slv->getSmtMode() == internal::SmtMode::UNSAT
-                             || d_slv->getSmtMode() == internal::SmtMode::SAT
-                             || d_slv->getSmtMode()
-                                    == internal::SmtMode::SAT_UNKNOWN)
-      << "cannot get learned literals unless after a UNSAT, SAT or UNKNOWN "
-         "response.";
-  //////// all checks before this line
-  std::vector<internal::Node> lits = d_slv->getLearnedLiterals(t);
-  return Term::nodeVectorToTerms(d_tm.d_nm, lits);
   ////////
   AVA6_API_TRY_CATCH_END;
 }
@@ -6949,24 +6620,6 @@ std::string Solver::getModel(const std::vector<Sort>& sorts,
   AVA6_API_TRY_CATCH_END;
 }
 
-Term Solver::declarePool(const std::string& symbol,
-                         const Sort& sort,
-                         const std::vector<Term>& initValue) const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_SOLVER_CHECK_SORT(sort);
-  AVA6_API_SOLVER_CHECK_TERMS(initValue);
-  //////// all checks before this line
-  internal::TypeNode setType = d_tm.d_nm->mkSetType(*sort.d_type);
-  internal::Node pool = d_tm.mkVarHelper(setType, symbol);
-  std::vector<internal::Node> initv = Term::termVectorToNodes(initValue);
-  d_slv->declarePool(pool, initv);
-  d_tm.increment_vars_consts_stats(setType, true);
-  return Term(d_tm.d_nm, pool);
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
 void Solver::addPlugin(Plugin& p)
 {
   AVA6_API_TRY_CATCH_BEGIN;
@@ -6987,40 +6640,6 @@ void Solver::pop(uint32_t nscopes) const
   {
     d_slv->pop();
   }
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-void Solver::blockModel(modes::BlockModelsMode mode) const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_CHECK(d_slv->getOptions().smt.produceModels)
-      << "cannot get value unless model generation is enabled "
-         "(try --"
-      << internal::options::smt::longName::produceModels << ")";
-  AVA6_API_RECOVERABLE_CHECK(d_slv->isSmtModeSat())
-      << "can only block model after SAT or UNKNOWN response.";
-  //////// all checks before this line
-  d_slv->blockModel(mode);
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-void Solver::blockModelValues(const std::vector<Term>& terms) const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_CHECK(d_slv->getOptions().smt.produceModels)
-      << "cannot get value unless model generation is enabled "
-         "(try --"
-      << internal::options::smt::longName::produceModels << ")";
-  AVA6_API_RECOVERABLE_CHECK(d_slv->isSmtModeSat())
-      << "can only block model values after SAT or UNKNOWN response.";
-  AVA6_API_ARG_SIZE_CHECK_EXPECTED(!terms.empty(), terms)
-      << "a non-empty set of terms";
-  AVA6_API_SOLVER_CHECK_TERMS(terms);
-  ensureWellFormedTerms(terms);
-  //////// all checks before this line
-  d_slv->blockModelValues(Term::termVectorToNodes(terms));
   ////////
   AVA6_API_TRY_CATCH_END;
 }
@@ -7241,7 +6860,6 @@ std::string to_string(ava6::Kind k)
     case ava6::Kind::XOR: return "XOR";
     case ava6::Kind::ITE: return "ITE";
     case ava6::Kind::APPLY_UF: return "APPLY_UF";
-    case ava6::Kind::CARDINALITY_CONSTRAINT: return "CARDINALITY_CONSTRAINT";
     case ava6::Kind::HO_APPLY: return "HO_APPLY";
     case ava6::Kind::ADD: return "ADD";
     case ava6::Kind::MULT: return "MULT";
@@ -7405,9 +7023,6 @@ std::string to_string(ava6::Kind k)
     case ava6::Kind::SET_MEMBER: return "SET_MEMBER";
     case ava6::Kind::SET_SINGLETON: return "SET_SINGLETON";
     case ava6::Kind::SET_INSERT: return "SET_INSERT";
-    case ava6::Kind::SET_CARD: return "SET_CARD";
-    case ava6::Kind::SET_COMPLEMENT: return "SET_COMPLEMENT";
-    case ava6::Kind::SET_UNIVERSE: return "SET_UNIVERSE";
     case ava6::Kind::SET_COMPREHENSION: return "SET_COMPREHENSION";
     case ava6::Kind::SET_CHOOSE: return "SET_CHOOSE";
     case ava6::Kind::SET_IS_EMPTY: return "SET_IS_EMPTY";
@@ -7417,16 +7032,6 @@ std::string to_string(ava6::Kind k)
     case ava6::Kind::SET_ALL: return "SET_ALL";
     case ava6::Kind::SET_SOME: return "SET_SOME";
     case ava6::Kind::SET_FOLD: return "SET_FOLD";
-    case ava6::Kind::RELATION_JOIN: return "RELATION_JOIN";
-    case ava6::Kind::RELATION_TABLE_JOIN: return "RELATION_TABLE_JOIN";
-    case ava6::Kind::RELATION_PRODUCT: return "RELATION_PRODUCT";
-    case ava6::Kind::RELATION_TRANSPOSE: return "RELATION_TRANSPOSE";
-    case ava6::Kind::RELATION_TCLOSURE: return "RELATION_TCLOSURE";
-    case ava6::Kind::RELATION_JOIN_IMAGE: return "RELATION_JOIN_IMAGE";
-    case ava6::Kind::RELATION_IDEN: return "RELATION_IDEN";
-    case ava6::Kind::RELATION_GROUP: return "RELATION_GROUP";
-    case ava6::Kind::RELATION_AGGREGATE: return "RELATION_AGGREGATE";
-    case ava6::Kind::RELATION_PROJECT: return "RELATION_PROJECT";
     case ava6::Kind::BAG_EMPTY: return "BAG_EMPTY";
     case ava6::Kind::BAG_UNION_MAX: return "BAG_UNION_MAX";
     case ava6::Kind::BAG_UNION_DISJOINT: return "BAG_UNION_DISJOINT";
@@ -7512,9 +7117,6 @@ std::string to_string(ava6::Kind k)
     case ava6::Kind::VARIABLE_LIST: return "VARIABLE_LIST";
     case ava6::Kind::INST_PATTERN: return "INST_PATTERN";
     case ava6::Kind::INST_NO_PATTERN: return "INST_NO_PATTERN";
-    case ava6::Kind::INST_POOL: return "INST_POOL";
-    case ava6::Kind::INST_ADD_TO_POOL: return "INST_ADD_TO_POOL";
-    case ava6::Kind::SKOLEM_ADD_TO_POOL: return "SKOLEM_ADD_TO_POOL";
     case ava6::Kind::INST_ATTRIBUTE: return "INST_ATTRIBUTE";
     case ava6::Kind::INST_PATTERN_LIST: return "INST_PATTERN_LIST";
     case ava6::Kind::LAST_KIND: return "LAST_KIND";

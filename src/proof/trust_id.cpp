@@ -53,7 +53,6 @@ const char* toString(TrustId id)
     case TrustId::PREPROCESS_FF_BITSUM: return "PREPROCESS_FF_BITSUM";
     case TrustId::PREPROCESS_FF_DISJUNCTIVE_BIT:
       return "PREPROCESS_FF_DISJUNCTIVE_BIT";
-    case TrustId::PREPROCESS_FUN_DEF_FMF: return "PREPROCESS_FUN_DEF_FMF";
     case TrustId::PREPROCESS_ITE_SIMP: return "PREPROCESS_ITE_SIMP";
     case TrustId::PREPROCESS_LEARNED_REWRITE:
       return "PREPROCESS_LEARNED_REWRITE";

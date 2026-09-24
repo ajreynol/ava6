@@ -133,7 +133,7 @@ void TheoryEngine::finishInit()
                     << options().theory.tcMode << " not supported";
   }
   // create the relevance filter if any option requires it
-  if (options().theory.relevanceFilter || options().smt.produceDifficulty)
+  if (options().theory.relevanceFilter || false)
   {
     d_relManager.reset(new RelevanceManager(d_env, this));
     d_modules.push_back(d_relManager.get());
@@ -185,7 +185,6 @@ void TheoryEngine::finishInit()
     t->finishInit();
   }
 
-  
 
   // add user-provided plugins
   const std::vector<Plugin*> plugins = d_env.getPlugins();
@@ -1340,13 +1339,6 @@ theory::EqualityStatus TheoryEngine::getEqualityStatus(TNode a, TNode b)
 {
   AssertEqual(a.getType(), b.getType());
   return d_sharedSolver->getEqualityStatus(a, b);
-}
-
-void TheoryEngine::getDifficultyMap(std::map<Node, Node>& dmap,
-                                    bool includeLemmas)
-{
-  Assert(d_relManager != nullptr);
-  d_relManager->getDifficultyMap(dmap, includeLemmas);
 }
 
 theory::IncompleteId TheoryEngine::getModelUnsoundId() const

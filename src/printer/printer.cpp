@@ -245,15 +245,6 @@ void Printer::toStreamCmdDeclareFunction(std::ostream& out, const Node& v) const
   toStreamCmdDeclareFunction(out, ss.str(), argTypes, vt);
 }
 
-void Printer::toStreamCmdDeclarePool(
-    std::ostream& out,
-    AVA6_UNUSED const std::string& id,
-    AVA6_UNUSED TypeNode type,
-    AVA6_UNUSED const std::vector<Node>& initValue) const
-{
-  printUnknownCommand(out, "declare-pool");
-}
-
 void Printer::toStreamCmdDeclareOracleFun(
     std::ostream& out,
     AVA6_UNUSED const std::string& id,
@@ -406,18 +397,6 @@ void Printer::toStreamCmdGetModel(std::ostream& out) const
   printUnknownCommand(out, "ge-model");
 }
 
-void Printer::toStreamCmdBlockModel(
-    std::ostream& out, AVA6_UNUSED modes::BlockModelsMode mode) const
-{
-  printUnknownCommand(out, "block-model");
-}
-
-void Printer::toStreamCmdBlockModelValues(
-    std::ostream& out, AVA6_UNUSED const std::vector<Node>& nodes) const
-{
-  printUnknownCommand(out, "block-model-values");
-}
-
 void Printer::toStreamCmdGetProof(std::ostream& out,
                                   AVA6_UNUSED modes::ProofComponent c) const
 {
@@ -437,28 +416,6 @@ void Printer::toStreamCmdGetUnsatAssumptions(std::ostream& out) const
 void Printer::toStreamCmdGetUnsatCore(std::ostream& out) const
 {
   printUnknownCommand(out, "get-unsat-core");
-}
-
-void Printer::toStreamCmdGetDifficulty(std::ostream& out) const
-{
-  printUnknownCommand(out, "get-difficulty");
-}
-
-void Printer::toStreamCmdGetTimeoutCore(std::ostream& out) const
-{
-  printUnknownCommand(out, "get-timeout-core");
-}
-
-void Printer::toStreamCmdGetTimeoutCoreAssuming(
-    std::ostream& out, AVA6_UNUSED const std::vector<Node>& assumptions) const
-{
-  printUnknownCommand(out, "get-timeout-core-assuming");
-}
-
-void Printer::toStreamCmdGetLearnedLiterals(
-    std::ostream& out, AVA6_UNUSED modes::LearnedLitType t) const
-{
-  printUnknownCommand(out, "get-learned-literals");
 }
 
 void Printer::toStreamCmdGetAssertions(std::ostream& out) const

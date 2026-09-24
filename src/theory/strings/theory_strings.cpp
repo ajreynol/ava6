@@ -88,7 +88,6 @@ TheoryStrings::TheoryStrings(Env& env, OutputChannel& out, Valuation valuation)
           env,
           options().strings.regExpElim == options::RegExpElimMode::AGG,
           userContext()),
-      d_stringsFmf(env, valuation, d_termReg),
       d_mcd(env, d_state, d_csolver),
       d_strat(d_env),
       d_absModelCounter(0),
@@ -199,20 +198,11 @@ void TheoryStrings::presolve()
 {
   Trace("strings-presolve")
       << "TheoryStrings::Presolving : get fmf options "
-      << (options().strings.stringFMF ? "true" : "false") << std::endl;
+      << (false ? "true" : "false") << std::endl;
   d_strat.initializeStrategy();
 
   // if strings fmf is enabled, register the strategy
-  if (options().strings.stringFMF)
-  {
-    d_stringsFmf.presolve();
-    // This strategy is local to a check-sat call, since we refresh the strategy
-    // on every call to presolve.
-    d_im.getDecisionManager()->registerStrategy(
-        DecisionManager::STRAT_STRINGS_SUM_LENGTHS,
-        d_stringsFmf.getDecisionStrategy(),
-        DecisionManager::STRAT_SCOPE_LOCAL_SOLVE);
-  }
+
   Trace("strings-presolve") << "Finished presolve" << std::endl;
 }
 
@@ -926,7 +916,7 @@ void TheoryStrings::notifyFact(TNode atom,
     return;
   }
   // if not doing eager registration, we now register all subterms of the atom
-  
+
   Trace("strings-pending-debug") << "  Now collect terms" << std::endl;
   Trace("strings-pending-debug") << "  Finished collect terms" << std::endl;
 }
@@ -1134,7 +1124,7 @@ void TheoryStrings::notifySharedTerm(TNode n)
 {
   // a new shared term causes new terms to be relevant, hence we register
   // them if not doing eager registration.
-  
+
   TypeNode tn = n.getType();
   if (!d_env.isFirstClassType(tn))
   {
@@ -1187,19 +1177,7 @@ TrustNode TheoryStrings::ppRewrite(TNode atom, std::vector<SkolemLemma>& lems)
       atomRet = ret.getNode();
     }
   }
-  if (options().strings.stringFMF)
-  {
-    // Our decision strategy will minimize the length of this term if it is a
-    // variable but not an internally generated Skolem, or a term that does
-    // not belong to this theory.
-    if (atom.isVar() ? !d_termReg.getSkolemCache()->isSkolem(atom)
-                     : kindToTheoryId(ak) != THEORY_STRINGS
-                           && atom.getType().isStringLike())
-    {
-      d_termReg.preRegisterInputVar(atom);
-      Trace("strings-preregister") << "input variable: " << atom << std::endl;
-    }
-  }
+
 
   // all characters of constants should fall in the alphabet
   if (atom.isConst() && atom.getType().isString())

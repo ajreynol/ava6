@@ -95,14 +95,9 @@ class TheorySetsRewriter : public TheoryRewriter
    */
   bool checkConstantMembership(TNode elementTerm, TNode setTerm);
   /**
-   * Main entry point for rewriting relation kinds.
-   */
-  RewriteResponse postRewriteRelations(TNode node);
-  /**
    * Rewrite set comprehension
    */
   RewriteResponse postRewriteComprehension(TNode n);
-  RewriteResponse postRewriteTableJoin(TNode n);
   /**
    *  rewrites for n include:
    *  - (set.map f (as set.empty (Set T1)) = (as set.empty (Set T2))
@@ -153,26 +148,6 @@ class TheorySetsRewriter : public TheoryRewriter
    *  where f: T -> S -> S, and t : S
    */
   RewriteResponse postRewriteFold(TNode n);
-  /**
-   *  rewrites for n include:
-   *  - ((_ rel.group n1 ... nk) (as set.empty (Relation T))) =
-   *          (rel.singleton (as set.empty (Relation T) ))
-   *  - ((_ rel.group n1 ... nk) (set.singleton x)) =
-   *          (set.singleton (set.singleton x))
-   *  - Evaluation of ((_ rel.group n1 ... nk) A) when A is a constant
-   */
-  RewriteResponse postRewriteGroup(TNode n);
-  /**
-   * @param n has the form ((_ rel.aggr n1 ... n_k) f initial A)
-   * where initial and A are constants
-   * @return the aggregation result.
-   */
-  RewriteResponse postRewriteAggregate(TNode n);
-  /**
-   * If A has type (Set T), then rewrite ((rel.project n1 ... nk) A) as
-   * (set.map (lambda ((t T)) ((_ tuple.project n1 ... nk) t)) A)
-   */
-  RewriteResponse postRewriteProject(TNode n);
   /** Is sets+cardinality enabled? */
   bool d_cardEnabled;
   /** Are relations enabled? */

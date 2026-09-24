@@ -87,7 +87,7 @@ void Env::finishInit(smt::PfManager* pm)
   d_topLevelSubs.reset(
       new theory::TrustSubstitutionMap(*this, d_userContext.get()));
 
-  
+
   d_statisticsRegistry->setStatsAll(d_options.base.statisticsAll);
   d_statisticsRegistry->setStatsInternal(d_options.base.statisticsInternal);
 }
@@ -247,13 +247,12 @@ Node Env::rewriteViaMethod(TNode n, MethodId idr)
 
 bool Env::isFiniteType(TypeNode tn) const
 {
-  return isCardinalityClassFinite(tn.getCardinalityClass(),
-                                  d_options.quantifiers.finiteModelFind);
+  return isCardinalityClassFinite(tn.getCardinalityClass());
 }
 
 bool Env::isFiniteCardinalityClass(CardinalityClass cc) const
 {
-  return isCardinalityClassFinite(cc, d_options.quantifiers.finiteModelFind);
+  return isCardinalityClassFinite(cc);
 }
 
 bool Env::isFirstClassType(TypeNode tn) const
@@ -334,7 +333,7 @@ bool Env::isBooleanTermSkolem(const Node& k) const
 Node Env::getSharableFormula(const Node& n) const
 {
   Node on = n;
-  
+
   SkolemManager* skm = d_nm->getSkolemManager();
   std::vector<Node> toProcess;
   toProcess.push_back(on);
@@ -343,8 +342,7 @@ Node Env::getSharableFormula(const Node& n) const
   const std::unordered_set<Kind> excludeKinds = {
       Kind::INST_CONSTANT,
       Kind::DUMMY_SKOLEM,
-      Kind::CARDINALITY_CONSTRAINT,
-      Kind::COMBINED_CARDINALITY_CONSTRAINT};
+  };
   size_t index = 0;
   do
   {
@@ -363,7 +361,7 @@ Node Env::getSharableFormula(const Node& n) const
       }
       if (sk == Kind::SKOLEM)
       {
-        
+
         // must ensure that the indices of the skolem are also legal
         SkolemId id;
         Node cacheVal;

@@ -156,10 +156,7 @@ class TheoryDatatypes : public Theory
   std::map<Node, Node> d_uc_to_fresh_var;
 
  private:
-  /** singleton lemmas (for degenerate co-datatype case) */
-  std::map<TypeNode, Node> d_singleton_lemma[2];
   /** Cache for singleton equalities processed */
-  BoolMap d_singleton_eq;
 
  private:
   /** assert fact */
@@ -275,21 +272,6 @@ class TheoryDatatypes : public Theory
    * inference manager.
    */
   void checkSplit();
-  /** for checking whether two codatatype terms must be equal */
-  void separateBisimilar(std::vector<Node>& part,
-                         std::vector<std::vector<Node> >& part_out,
-                         std::vector<Node>& exp,
-                         std::map<Node, Node>& cn,
-                         std::map<Node, std::map<Node, int> >& dni,
-                         int dniLvl,
-                         bool mkExp);
-  /** build model */
-  Node getCodatatypesValue(Node n,
-                           std::map<Node, Node>& eqc_cons,
-                           std::map<Node, int>& vmap,
-                           int depth);
-  /** get singleton lemma */
-  Node getSingletonLemma(TypeNode tn, bool pol);
   /** get instantiate cons */
   Node getInstantiateCons(Node n, const DType& dt, int index);
   /** check instantiate, return true if an inference was generated. */

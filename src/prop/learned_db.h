@@ -10,6 +10,7 @@
  * Stores learned information
  */
 
+#include "prop/learned_literal_type.h"
 #include "ava6_private.h"
 
 #ifndef AVA6__PROP__LEARNED_DB_H
@@ -27,7 +28,7 @@ namespace prop {
 /**
  * This class stores high-level information learned during a run of the
  * PropEngine. This includes the set of learned literals for each category
- * (modes::LearnedLitType).
+ * (LearnedLitType).
  */
 class LearnedDb
 {
@@ -37,23 +38,23 @@ class LearnedDb
   LearnedDb(context::Context* c);
   ~LearnedDb();
   /** Add learned literal of the given type */
-  void addLearnedLiteral(const Node& lit, modes::LearnedLitType ltype);
+  void addLearnedLiteral(const Node& lit, LearnedLitType ltype);
   /** Get the learned literals for the given type */
   std::vector<Node> getLearnedLiterals(
-      modes::LearnedLitType ltype = modes::LearnedLitType::INPUT) const;
+      LearnedLitType ltype = LearnedLitType::INPUT) const;
   /** Get number of learned literals for the given type */
   size_t getNumLearnedLiterals(
-      modes::LearnedLitType ltype = modes::LearnedLitType::INPUT) const;
+      LearnedLitType ltype = LearnedLitType::INPUT) const;
   /** To string debug */
   std::string toStringDebug() const;
 
  private:
   /** Get literal set, const and non-const versions */
-  context::CDHashSet<Node>& getLiteralSet(modes::LearnedLitType ltype);
+  context::CDHashSet<Node>& getLiteralSet(LearnedLitType ltype);
   const context::CDHashSet<Node>& getLiteralSet(
-      modes::LearnedLitType ltype) const;
+      LearnedLitType ltype) const;
   /** To string debug for type of literals */
-  std::string toStringDebugType(modes::LearnedLitType ltype) const;
+  std::string toStringDebugType(LearnedLitType ltype) const;
   /** preprocess solved lits */
   NodeSet d_preprocessSolvedLits;
   /** preprocess lits */

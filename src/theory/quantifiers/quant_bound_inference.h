@@ -36,9 +36,6 @@ enum BoundVarType
   // a variable has a finite bound because it is in an integer range, e.g.
   //   forall x. u <= x <= l => P(x)
   BOUND_INT_RANGE,
-  // a variable has a finite bound because it is a member of a set, e.g.
-  //   forall x. x in S => P(x)
-  BOUND_SET_MEMBER,
   // a variable has a finite bound because only a fixed set of terms are
   // relevant for it in the domain of the quantified formula, e.g.
   //   forall x. ( x = t1 OR ... OR x = tn ) => P(x)
@@ -58,10 +55,8 @@ class QuantifiersBoundInference
   /**
    * @param cardMax The maximum cardinality we consider to be small enough
    * to "complete" below.
-   * @param isFmf Whether finite model finding (for uninterpreted sorts) is
-   * enabled.
    */
-  QuantifiersBoundInference(unsigned cardMax, bool isFmf = false);
+  QuantifiersBoundInference(unsigned cardMax);
   /** finish initialize */
   void finishInit(BoundedIntegers* b);
   /** may complete type
@@ -111,8 +106,6 @@ class QuantifiersBoundInference
  private:
   /** The maximum cardinality for which we complete */
   unsigned d_cardMax;
-  /** Whether finite model finding is enabled */
-  bool d_isFmf;
   /** may complete */
   std::unordered_map<TypeNode, bool> d_may_complete;
   /** The bounded integers module, which may help infer bounds */

@@ -34,30 +34,19 @@ RelevanceManager::RelevanceManager(Env& env, TheoryEngine* engine)
       d_inFullEffortCheck(false),
       d_fullEffortCheckFail(false),
       d_success(false),
-      d_trackRSetExp(false),
-      d_miniscopeTopLevel(true),
-      d_rsetExp(context()),
       d_jcache(context())
 {
-  if (options().smt.produceDifficulty)
-  {
-    d_dman = std::make_unique<DifficultyManager>(env, this, d_val);
-    d_trackRSetExp = true;
-    // we cannot miniscope AND at the top level, since we need to
-    // preserve the exact form of preprocessed assertions so the dependencies
-    // are tracked.
-    d_miniscopeTopLevel = false;
-  }
+
 }
 
 void RelevanceManager::notifyPreprocessedAssertions(
-    const std::vector<Node>& assertions, bool isInput)
+    const std::vector<Node>& assertions, bool)
 {
   // add to input list, which is user-context dependent
   std::vector<Node> toProcess;
   for (const Node& a : assertions)
   {
-    if (d_miniscopeTopLevel && a.getKind() == Kind::AND)
+    if (a.getKind() == Kind::AND)
     {
       // split top-level AND
       for (const Node& ac : a)
@@ -73,11 +62,7 @@ void RelevanceManager::notifyPreprocessedAssertions(
     }
   }
   addAssertionsInternal(toProcess);
-  // notify the difficulty manager if these are input assertions
-  if (isInput && d_dman != nullptr)
-  {
-    d_dman->notifyInputAssertions(assertions);
-  }
+
 }
 
 void RelevanceManager::notifyPreprocessedAssertion(Node n, bool isInput)
@@ -93,10 +78,9 @@ void RelevanceManager::addAssertionsInternal(std::vector<Node>& toProcess)
   while (i < toProcess.size())
   {
     Node a = toProcess[i];
-    if (d_miniscopeTopLevel && a.getKind() == Kind::AND)
+    if (a.getKind() == Kind::AND)
     {
-      // difficulty tracking disables miniscoping of AND
-      Assert(d_dman == nullptr);
+
       // split AND
       for (const Node& ac : a)
       {
@@ -157,7 +141,7 @@ void RelevanceManager::computeRelevance()
 {
   // if not at full effort, should be tracking something else, e.g. explanation
   // for why literals are relevant.
-  Assert(d_inFullEffortCheck || d_trackRSetExp);
+  Assert(d_inFullEffortCheck);
   Trace("rel-manager") << "RelevanceManager::computeRelevance, full effort = "
                        << d_inFullEffortCheck << "..." << std::endl;
   // if we already failed
@@ -181,11 +165,7 @@ void RelevanceManager::computeRelevance()
       Trace("rel-manager") << "...success (full), size = " << d_rset.size()
                            << std::endl;
     }
-    else
-    {
-      Trace("rel-manager") << "...success, exp size = " << d_rsetExp.size()
-                           << std::endl;
-    }
+
   }
   d_success = !d_fullEffortCheckFail;
 }
@@ -381,13 +361,7 @@ int32_t RelevanceManager::justify(TNode n)
           if (!hasPol || pol == value)
           {
             d_rset.insert(cur.first);
-            if (d_trackRSetExp)
-            {
-              d_rsetExp[cur.first] = n;
-              Trace("rel-manager-exp")
-                  << "Reason for " << cur.first << " is " << n
-                  << ", polarity is " << hasPol << "/" << pol << std::endl;
-            }
+
           }
         }
         d_jcache[cur] = ret;
@@ -441,64 +415,6 @@ bool RelevanceManager::isRelevant(TNode lit)
   return d_rset.find(lit) != d_rset.end();
 }
 
-TNode RelevanceManager::getExplanationForRelevant(TNode lit)
-{
-  // agnostic to negation
-  while (lit.getKind() == Kind::NOT)
-  {
-    lit = lit[0];
-  }
-  NodeList* ilist = nullptr;
-  TNode nextInput;
-  size_t ninputs = 0;
-  size_t index = 0;
-  do
-  {
-    // check if it has an explanation yet
-    TNode exp = getExplanationForRelevantInternal(lit);
-    if (!exp.isNull())
-    {
-      return exp;
-    }
-    // if the first time, we get the list of input formulas the atom occurs in
-    if (index == 0)
-    {
-      ilist = getInputListFor(lit, false);
-      if (ilist != nullptr)
-      {
-        ninputs = ilist->size();
-      }
-      Trace("rel-manager-exp-debug")
-          << "Atom " << lit << " occurs in " << ninputs << " assertions..."
-          << std::endl;
-    }
-    if (index < ninputs)
-    {
-      // justify the next
-      nextInput = (*ilist)[index];
-      index++;
-      // justify the next input that the atom occurs in
-      computeRelevanceFor(nextInput);
-    }
-    else
-    {
-      nextInput = TNode::null();
-    }
-  } while (!nextInput.isNull());
-
-  return TNode::null();
-}
-
-TNode RelevanceManager::getExplanationForRelevantInternal(TNode atom) const
-{
-  NodeMap::const_iterator it = d_rsetExp.find(atom);
-  if (it != d_rsetExp.end())
-  {
-    return it->second;
-  }
-  return TNode::null();
-}
-
 RelevanceManager::NodeList* RelevanceManager::getInputListFor(TNode atom,
                                                               bool doMake)
 {
@@ -549,37 +465,7 @@ void RelevanceManager::notifyLemma(TNode n,
     notifyPreprocessedAssertions(skAsserts, false);
   }
   // notice that we may be in FULL or STANDARD effort here.
-  if (d_dman != nullptr)
-  {
-    // notice that we don't compute relevance here, instead it is computed
-    // on demand based on the literals in n.
-    d_dman->notifyLemma(n, d_inFullEffortCheck);
-  }
-}
 
-bool RelevanceManager::needsCandidateModel()
-{
-  if (d_dman != nullptr)
-  {
-    return d_dman->needsCandidateModel();
-  }
-  return false;
-}
-void RelevanceManager::notifyCandidateModel(TheoryModel* m)
-{
-  if (d_dman != nullptr)
-  {
-    d_dman->notifyCandidateModel(m);
-  }
-}
-
-void RelevanceManager::getDifficultyMap(std::map<Node, Node>& dmap,
-                                        bool includeLemmas)
-{
-  if (d_dman != nullptr)
-  {
-    d_dman->getDifficultyMap(dmap, includeLemmas);
-  }
 }
 
 }  // namespace theory

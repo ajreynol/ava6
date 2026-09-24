@@ -269,25 +269,6 @@ class AVA6_EXPORT DeclareFunctionCommand : public DeclarationDefinitionCommand
   void toStream(std::ostream& out) const override;
 }; /* class DeclareFunctionCommand */
 
-class AVA6_EXPORT DeclarePoolCommand : public DeclarationDefinitionCommand
-{
- protected:
-  ava6::Sort d_sort;
-  std::vector<ava6::Term> d_initValue;
-
- public:
-  DeclarePoolCommand(const std::string& id,
-                     ava6::Sort sort,
-                     const std::vector<ava6::Term>& initValue);
-  ava6::Sort getSort() const;
-  const std::vector<ava6::Term>& getInitialValue() const;
-
-  void invoke(ava6::Solver* solver, parser::SymManager* sm) override;
-  std::string getCommandName() const override;
-  void toStream(std::ostream& out) const override;
-}; /* class DeclarePoolCommand */
-
-
 
 class AVA6_EXPORT DeclareSortCommand : public DeclarationDefinitionCommand
 {
@@ -515,35 +496,8 @@ class AVA6_EXPORT GetModelCommand : public Cmd
 }; /* class GetModelCommand */
 
 /** The command to block models. */
-class AVA6_EXPORT BlockModelCommand : public Cmd
-{
- public:
-  BlockModelCommand(modes::BlockModelsMode mode);
-
-  void invoke(ava6::Solver* solver, parser::SymManager* sm) override;
-  std::string getCommandName() const override;
-  void toStream(std::ostream& out) const override;
-
- private:
-  /** The mode to use for blocking. */
-  modes::BlockModelsMode d_mode;
-}; /* class BlockModelCommand */
 
 /** The command to block model values. */
-class AVA6_EXPORT BlockModelValuesCommand : public Cmd
-{
- public:
-  BlockModelValuesCommand(const std::vector<ava6::Term>& terms);
-
-  const std::vector<ava6::Term>& getTerms() const;
-  void invoke(ava6::Solver* solver, parser::SymManager* sm) override;
-  std::string getCommandName() const override;
-  void toStream(std::ostream& out) const override;
-
- protected:
-  /** The terms we are blocking */
-  std::vector<ava6::Term> d_terms;
-}; /* class BlockModelValuesCommand */
 
 class AVA6_EXPORT GetProofCommand : public Cmd
 {
@@ -633,68 +587,6 @@ class AVA6_EXPORT GetUnsatCoreLemmasCommand : public Cmd
   std::vector<ava6::Term> d_result;
 }; /* class GetUnsatCoreLemmasCommand */
 
-class AVA6_EXPORT GetDifficultyCommand : public Cmd
-{
- public:
-  GetDifficultyCommand();
-  const std::map<ava6::Term, ava6::Term>& getDifficultyMap() const;
-
-  void invoke(ava6::Solver* solver, parser::SymManager* sm) override;
-  void printResult(ava6::Solver* solver, std::ostream& out) const override;
-
-  std::string getCommandName() const override;
-  void toStream(std::ostream& out) const override;
-
- protected:
-  /** The symbol manager we were invoked with */
-  parser::SymManager* d_sm;
-  /** the result of the get difficulty call */
-  std::map<ava6::Term, ava6::Term> d_result;
-};
-
-class AVA6_EXPORT GetTimeoutCoreCommand : public Cmd
-{
- public:
-  GetTimeoutCoreCommand(const std::vector<Term>& assumptions);
-  GetTimeoutCoreCommand();
-  ava6::Result getResult() const;
-  const std::vector<ava6::Term>& getTimeoutCore() const;
-
-  void invoke(ava6::Solver* solver, parser::SymManager* sm) override;
-  void printResult(ava6::Solver* solver, std::ostream& out) const override;
-
-  std::string getCommandName() const override;
-  void toStream(std::ostream& out) const override;
-
- protected:
-  /** The solver we were invoked with */
-  ava6::Solver* d_solver;
-  /** The symbol manager we were invoked with */
-  parser::SymManager* d_sm;
-  /** Assumptions */
-  std::vector<Term> d_assumptions;
-  /** the result of the timeout core call */
-  std::pair<ava6::Result, std::vector<ava6::Term>> d_result;
-};
-
-class AVA6_EXPORT GetLearnedLiteralsCommand : public Cmd
-{
- public:
-  GetLearnedLiteralsCommand(modes::LearnedLitType t);
-  const std::vector<ava6::Term>& getLearnedLiterals() const;
-
-  void invoke(ava6::Solver* solver, parser::SymManager* sm) override;
-  void printResult(ava6::Solver* solver, std::ostream& out) const override;
-
-  std::string getCommandName() const override;
-  void toStream(std::ostream& out) const override;
-
- protected:
-  /** the result of the get learned literals call */
-  std::vector<ava6::Term> d_result;
-  /** The type of learned literals to get */
-  modes::LearnedLitType d_type;
-};
 
 class AVA6_EXPORT GetAssertionsCommand : public Cmd
 {

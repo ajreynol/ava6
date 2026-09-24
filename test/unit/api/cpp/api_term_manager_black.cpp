@@ -48,17 +48,11 @@ TEST_F(TestApiBlackTermManager, getStringSort)
 }
 
 
-
-
-
 TEST_F(TestApiBlackTermManager, mkBitVectorSort)
 {
   ASSERT_NO_THROW(d_tm.mkBitVectorSort(32));
   ASSERT_THROW(d_tm.mkBitVectorSort(0), Ava6ApiException);
 }
-
-
-
 
 
 TEST_F(TestApiBlackTermManager, mkDatatypeSort)
@@ -264,7 +258,6 @@ TEST_F(TestApiBlackTermManager, mkSetSort)
 }
 
 
-
 TEST_F(TestApiBlackTermManager, mkSequenceSort)
 {
   ASSERT_NO_THROW(d_tm.mkSequenceSort(d_tm.getBooleanSort()));
@@ -318,7 +311,6 @@ TEST_F(TestApiBlackTermManager, mkTupleSort)
 }
 
 
-
 TEST_F(TestApiBlackTermManager, mkBitVector)
 {
   ASSERT_NO_THROW(d_tm.mkBitVector(8, 2));
@@ -363,9 +355,6 @@ TEST_F(TestApiBlackTermManager, mkBitVector)
 }
 
 
-
-
-
 TEST_F(TestApiBlackTermManager, mkVar)
 {
   Sort boolSort = d_tm.getBooleanSort();
@@ -389,11 +378,6 @@ TEST_F(TestApiBlackTermManager, mkBoolean)
 }
 
 
-
-
-
-
-
 TEST_F(TestApiBlackTermManager, mkEmptySet)
 {
   Sort s = d_tm.mkSetSort(d_tm.getBooleanSort());
@@ -404,7 +388,6 @@ TEST_F(TestApiBlackTermManager, mkEmptySet)
   TermManager tm;
   ASSERT_THROW(tm.mkEmptySet(s), Ava6ApiException);
 }
-
 
 
 TEST_F(TestApiBlackTermManager, mkEmptySequence)
@@ -424,15 +407,6 @@ TEST_F(TestApiBlackTermManager, mkFalse)
 }
 
 
-
-
-
-
-
-
-
-
-
 TEST_F(TestApiBlackTermManager, mkOp)
 {
   // mkOp(Kind kind, const std::string& arg)
@@ -450,7 +424,6 @@ TEST_F(TestApiBlackTermManager, mkOp)
 
   ASSERT_NO_THROW(d_tm.mkOp(Kind::TUPLE_PROJECT, {1, 2, 2}));
 }
-
 
 
 TEST_F(TestApiBlackTermManager, mkInteger)
@@ -534,9 +507,6 @@ TEST_F(TestApiBlackTermManager, mkRegexpNone)
 }
 
 
-
-
-
 TEST_F(TestApiBlackTermManager, mkString)
 {
   ASSERT_NO_THROW(d_tm.mkString(""));
@@ -547,7 +517,6 @@ TEST_F(TestApiBlackTermManager, mkString)
   std::u32string s;
   ASSERT_EQ(d_tm.mkString(s).getU32StringValue(), s);
 }
-
 
 
 TEST_F(TestApiBlackTermManager, mkTermFromOp)
@@ -660,27 +629,6 @@ TEST_F(TestApiBlackTermManager, mkTuple)
   ASSERT_THROW(tm.mkTuple({d_tm.mkBitVector(3, "101", 2)}), Ava6ApiException);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-TEST_F(TestApiBlackTermManager, mkUniverseSet)
-{
-  ASSERT_NO_THROW(d_tm.mkUniverseSet(d_tm.getBooleanSort()));
-  ASSERT_THROW(d_tm.mkUniverseSet(Sort()), Ava6ApiException);
-  ASSERT_NO_THROW(d_tm.mkUniverseSet(d_tm.getBooleanSort()));
-
-  TermManager tm;
-  ASSERT_THROW(tm.mkUniverseSet(d_tm.getBooleanSort()), Ava6ApiException);
-}
 
 TEST_F(TestApiBlackTermManager, mkConst)
 {

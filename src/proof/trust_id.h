@@ -72,7 +72,6 @@ enum class TrustId : uint32_t
   /** FfDisjunctiveBit preprocessing pass */
   PREPROCESS_FF_DISJUNCTIVE_BIT,
   /** FunDefFmf preprocessing pass */
-  PREPROCESS_FUN_DEF_FMF,
   /** ITESimp preprocessing pass */
   PREPROCESS_ITE_SIMP,
   /** LearnedRewrite preprocessing pass */

@@ -95,7 +95,6 @@ bool Instantiate::addInstantiation(
   // do the instantiation
   bool ret = addInstantiationInternal(q, terms, id, pfArg, doVts);
   // process the instantiation with callbacks via term registry
-  d_treg.processInstantiation(q, terms);
   // return whether the instantiation was successful
   return ret;
 }

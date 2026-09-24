@@ -82,11 +82,8 @@ CardinalityClass maxCardinalityClass(CardinalityClass c1, CardinalityClass c2);
 /**
  * Is a type with the given cardinality class finite?
  *
- * If fmfEnabled is true, then this method assumes that uninterpreted sorts
- * have cardinality one. If fmfEnabled is false, then this method assumes that
- * uninterpreted sorts have infinite cardinality.
  */
-bool isCardinalityClassFinite(CardinalityClass c, bool fmfEnabled);
+bool isCardinalityClassFinite(CardinalityClass c);
 
 }  // namespace ava6::internal
 

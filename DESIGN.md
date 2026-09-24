@@ -35,6 +35,32 @@ CPC printing uses the existing `proof/eo` implementation. Alethe and DOT printer
 and the expert CPC signature are removed. Internal proof Nodes and debug traces
 remain available to solver code; these are not selectable proof output formats.
 
+Ordinary inductive datatypes remain, including their constructor, selector,
+tester, and matching operations. Codatatype declarations, cyclic values,
+bisimilarity, and their API construction flags are removed.
+
+Sets retain ordinary finite-set operations. Relational operators, cardinality,
+universe sets, and complement are removed. UF cardinality constraints,
+`--finite-model-find`, and strings FMF are removed. Bounded-integer quantification
+(`--fmf-bound`) and its model-checking machinery remain, including dependent
+integer bounds, fixed finite lists of terms, and small interpreted finite types.
+String operations use this machinery internally. Set-membership bounds that
+require set-cardinality machinery are removed. General quantified SMT solving
+and model construction remain. Mathematical type cardinality is still needed
+for bit-vectors, datatypes, arrays, and sequences; it is separate from the
+removed user-level cardinality constraints. Modern MBQI remains available.
+
+Quantifier-free solving uses the general theory model builder; quantified
+solving extends it with bounded-quantifier model construction. Its assignment exclusion-set interface and assigners are removed:
+the retained theories had no callers that populated these sets. Ordinary
+datatype model skeletons and fresh-value enumeration remain. Codatatype-specific
+value exclusion and FMF domain restrictions disappear with their solvers.
+
+Pool declarations/annotations and difficulty, timeout-core, learned-literal,
+and model-blocking queries have no API, parser commands, or solver-engine entry
+points. Internal learned-literal classification used by lemma preprocessing
+remains private to the propositional solver.
+
 ## Options and internal policies
 
 `[[option]]` entries define the configurable interface. There are no expert

@@ -14,7 +14,6 @@
 
 #include <unordered_map>
 
-#include "expr/cardinality_constraint.h"
 #include "expr/normalize_sort_converter.h"
 #include "expr/skolem_manager.h"
 #include "preprocessing/assertion_pipeline.h"
@@ -750,18 +749,7 @@ void collectTypes(TNode n,
       }
 
       // special cases where the type is not part of the AST
-      if (cur.getKind() == Kind::CARDINALITY_CONSTRAINT)
-      {
-        if (mark.find(
-                cur.getOperator().getConst<CardinalityConstraint>().getType())
-            == mark.end())
-        {
-          mark.insert(
-              cur.getOperator().getConst<CardinalityConstraint>().getType());
-          types.push_back(
-              cur.getOperator().getConst<CardinalityConstraint>().getType());
-        }
-      }
+
       visit.insert(visit.end(), cur.begin(), cur.end());
     }
   } while (!visit.empty());

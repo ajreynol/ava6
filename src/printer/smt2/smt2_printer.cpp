@@ -22,7 +22,6 @@
 
 #include "expr/array_store_all.h"
 #include "expr/ascription_type.h"
-#include "expr/cardinality_constraint.h"
 #include "expr/dtype.h"
 #include "expr/dtype_cons.h"
 #include "expr/emptyset.h"
@@ -343,20 +342,6 @@ bool Smt2Printer::toStreamBase(std::ostream& out,
             << n.getType() << ")";
         break;
       }
-      case Kind::CARDINALITY_CONSTRAINT_OP:
-      {
-        const CardinalityConstraint& cc = n.getConst<CardinalityConstraint>();
-        TypeNode tn = cc.getType();
-        out << "(_ fmf.card " << tn << " " << cc.getUpperBound() << ")";
-      }
-      break;
-      case Kind::COMBINED_CARDINALITY_CONSTRAINT_OP:
-      {
-        const CombinedCardinalityConstraint& cc =
-            n.getConst<CombinedCardinalityConstraint>();
-        out << "(_ fmf.combined_card " << cc.getUpperBound() << ")";
-      }
-      break;
       case Kind::DIVISIBLE_OP:
         out << "(_ divisible " << n.getConst<Divisible>().k << ")";
         break;
@@ -403,11 +388,8 @@ bool Smt2Printer::toStreamBase(std::ostream& out,
             << n.getConst<RegExpLoop>().d_loopMaxOcc << ")";
         break;
       case Kind::TUPLE_PROJECT_OP:
-      
-      case Kind::RELATION_GROUP_OP:
-      case Kind::RELATION_AGGREGATE_OP:
-      case Kind::RELATION_PROJECT_OP:
-      case Kind::RELATION_TABLE_JOIN_OP:
+
+
       {
         ProjectOp op = n.getConst<ProjectOp>();
         const std::vector<uint32_t>& indices = op.getIndices();
@@ -671,11 +653,6 @@ bool Smt2Printer::toStreamBase(std::ostream& out,
     out << ')';
     return true;
   }
-  else if (k == Kind::SET_UNIVERSE)
-  {
-    out << "(as set.universe " << n.getType() << ")";
-    return true;
-  }
   else if (k == Kind::FORALL || k == Kind::EXISTS || k == Kind::LAMBDA
            || k == Kind::WITNESS)
   {
@@ -711,30 +688,6 @@ bool Smt2Printer::toStreamBase(std::ostream& out,
           needsPrintAnnot = true;
           annot << " :no-pattern ";
           toStream(annot, nc[0], newDepth, dag);
-        }
-        else if (nck == Kind::INST_POOL || nck == Kind::INST_ADD_TO_POOL
-                 || nck == Kind::SKOLEM_ADD_TO_POOL)
-        {
-          needsPrintAnnot = true;
-          switch (nck)
-          {
-            case Kind::INST_POOL: annot << " :pool"; break;
-            case Kind::INST_ADD_TO_POOL: annot << " :inst-add-to-pool"; break;
-            case Kind::SKOLEM_ADD_TO_POOL:
-              annot << " :skolem-add-to-pool";
-              break;
-            default: break;
-          }
-          annot << " (";
-          for (size_t i = 0, nchild = nc.getNumChildren(); i < nchild; i++)
-          {
-            if (i > 0)
-            {
-              annot << " ";
-            }
-            toStream(annot, nc[i], newDepth, dag);
-          }
-          annot << ")";
         }
         else if (nck == Kind::INST_ATTRIBUTE)
         {
@@ -1168,7 +1121,6 @@ std::string Smt2Printer::smtKindString(Kind k)
 
     // set theory
     case Kind::SET_EMPTY: return "set.empty";
-    case Kind::SET_UNIVERSE: return "set.universe";
     case Kind::SET_UNION: return "set.union";
     case Kind::SET_INTER: return "set.inter";
     case Kind::SET_MINUS: return "set.minus";
@@ -1177,8 +1129,6 @@ std::string Smt2Printer::smtKindString(Kind k)
     case Kind::SET_TYPE: return "Set";
     case Kind::SET_SINGLETON: return "set.singleton";
     case Kind::SET_INSERT: return "set.insert";
-    case Kind::SET_COMPLEMENT: return "set.complement";
-    case Kind::SET_CARD: return "set.card";
     case Kind::SET_COMPREHENSION: return "set.comprehension";
     case Kind::SET_CHOOSE: return "set.choose";
     case Kind::SET_IS_EMPTY: return "set.is_empty";
@@ -1188,16 +1138,6 @@ std::string Smt2Printer::smtKindString(Kind k)
     case Kind::SET_ALL: return "set.all";
     case Kind::SET_SOME: return "set.some";
     case Kind::SET_FOLD: return "set.fold";
-    case Kind::RELATION_JOIN: return "rel.join";
-    case Kind::RELATION_TABLE_JOIN: return "rel.table_join";
-    case Kind::RELATION_PRODUCT: return "rel.product";
-    case Kind::RELATION_TRANSPOSE: return "rel.transpose";
-    case Kind::RELATION_TCLOSURE: return "rel.tclosure";
-    case Kind::RELATION_IDEN: return "rel.iden";
-    case Kind::RELATION_JOIN_IMAGE: return "rel.join_image";
-    case Kind::RELATION_GROUP: return "rel.group";
-    case Kind::RELATION_AGGREGATE: return "rel.aggr";
-    case Kind::RELATION_PROJECT: return "rel.project";
     case Kind::SET_EMPTY_OF_TYPE: return "@set.empty_of_type";
 
     // bag theory
@@ -1575,25 +1515,6 @@ void Smt2Printer::toStreamCmdDeclareOracleFun(
   out << " " << binName << ")";
 }
 
-void Smt2Printer::toStreamCmdDeclarePool(
-    std::ostream& out,
-    const std::string& id,
-    TypeNode type,
-    const std::vector<Node>& initValue) const
-{
-  out << "(declare-pool " << ava6::internal::quoteSymbol(id) << ' ' << type
-      << " (";
-  for (size_t i = 0, n = initValue.size(); i < n; ++i)
-  {
-    if (i != 0)
-    {
-      out << ' ';
-    }
-    out << initValue[i];
-  }
-  out << "))";
-}
-
 void Smt2Printer::toStreamCmdDefineFunction(std::ostream& out,
                                             const std::string& id,
                                             const std::vector<Node>& formals,
@@ -1737,34 +1658,6 @@ void Smt2Printer::toStreamCmdGetModel(std::ostream& out) const
   out << "(get-model)";
 }
 
-void Smt2Printer::toStreamCmdBlockModel(std::ostream& out,
-                                        modes::BlockModelsMode mode) const
-{
-  out << "(block-model :";
-  switch (mode)
-  {
-    case modes::BlockModelsMode::LITERALS: out << "literals"; break;
-    case modes::BlockModelsMode::VALUES: out << "values"; break;
-    default: Unreachable() << "Invalid block models mode " << mode;
-  }
-  out << ")";
-}
-
-void Smt2Printer::toStreamCmdBlockModelValues(
-    std::ostream& out, const std::vector<Node>& nodes) const
-{
-  out << "(block-model-values (";
-  for (size_t i = 0, n = nodes.size(); i < n; ++i)
-  {
-    if (i != 0)
-    {
-      out << ' ';
-    }
-    out << nodes[i];
-  }
-  out << "))";
-}
-
 void Smt2Printer::toStreamCmdGetAssignment(std::ostream& out) const
 {
   out << "(get-assignment)";
@@ -1794,47 +1687,6 @@ void Smt2Printer::toStreamCmdGetUnsatAssumptions(std::ostream& out) const
 void Smt2Printer::toStreamCmdGetUnsatCore(std::ostream& out) const
 {
   out << "(get-unsat-core)";
-}
-
-void Smt2Printer::toStreamCmdGetDifficulty(std::ostream& out) const
-{
-  out << "(get-difficulty)";
-}
-
-void Smt2Printer::toStreamCmdGetTimeoutCore(std::ostream& out) const
-{
-  out << "(get-timeout-core)";
-}
-
-void Smt2Printer::toStreamCmdGetTimeoutCoreAssuming(
-    std::ostream& out, const std::vector<Node>& assumptions) const
-{
-  out << "(get-timeout-core-assuming (";
-  bool firstTime = true;
-  for (const Node& a : assumptions)
-  {
-    if (firstTime)
-    {
-      firstTime = false;
-    }
-    else
-    {
-      out << " ";
-    }
-    out << a;
-  }
-  out << "))";
-}
-
-void Smt2Printer::toStreamCmdGetLearnedLiterals(std::ostream& out,
-                                                modes::LearnedLitType t) const
-{
-  out << "(get-learned-literals";
-  if (t != modes::LearnedLitType::INPUT)
-  {
-    out << " :" << t;
-  }
-  out << ")";
 }
 
 void Smt2Printer::toStreamCmdSetBenchmarkLogic(std::ostream& out,
@@ -1912,12 +1764,6 @@ void Smt2Printer::toStreamCmdDatatypeDeclaration(
     return;
   }
   out << "(declare-";
-  // Ethos does not support codatatypes, we just print as an ordinary
-  // datatype for now
-  if (d0.isCodatatype() && d_variant != Variant::eo_variant)
-  {
-    out << "co";
-  }
   out << "datatypes";
   out << " (";
   for (const TypeNode& t : datatypes)

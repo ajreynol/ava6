@@ -142,15 +142,14 @@ class DType
   static size_t cindexOfInternal(Node item);
 
   /** Create a new DType of the given name. */
-  DType(std::string name, bool isCo = false);
+  DType(std::string name);
 
   /**
    * Create a new DType of the given name, with the given
    * parameterization.
    */
   DType(std::string name,
-        const std::vector<TypeNode>& params,
-        bool isCo = false);
+        const std::vector<TypeNode>& params);
 
   ~DType();
 
@@ -234,9 +233,6 @@ class DType
   /** Get parameters */
   std::vector<TypeNode> getParameters() const;
 
-  /** is this a co-datatype? */
-  bool isCodatatype() const;
-
   /** is this a sygus datatype? */
   bool isSygus() const;
 
@@ -281,11 +277,10 @@ class DType
    * parametric datatype type whose datatype is this class.
    *
    * @param t The (instantiated) datatype type we are computing finiteness for
-   * @param fmfEnabled Whether finite model finding is enabled
    * @return true if finite model finding is enabled
    */
-  bool isFinite(TypeNode t, bool fmfEnabled = false) const;
-  bool isFinite(bool fmfEnabled = false) const;
+  bool isFinite(TypeNode t) const;
+  bool isFinite() const;
 
   /** is well-founded
    *
@@ -304,37 +299,6 @@ class DType
    * has nested recursion.
    */
   bool hasNestedRecursion() const;
-
-  /** is recursive singleton
-   *
-   * Return true iff this datatype is a recursive singleton
-   * (a recursive singleton is a recursive datatype with only
-   * one infinite value). For details, see Reynolds et al. CADE 2015.
-   *
-   * The versions of these methods that takes type t is required
-   * for parametric datatypes, where t is an instantiated
-   * parametric datatype type whose datatype is this class.
-   */
-  bool isRecursiveSingleton(TypeNode t) const;
-  bool isRecursiveSingleton() const;
-
-  /** recursive single arguments
-   *
-   * Get recursive singleton argument types (uninterpreted sorts that the
-   * cardinality of this datatype is dependent upon). For example, for :
-   *   stream :=  cons( head1 : U1, head2 : U2, tail : stream )
-   * Then, the recursive singleton argument types of stream are { U1, U2 },
-   * since if U1 and U2 have cardinality one, then stream has cardinality
-   * one as well.
-   *
-   * The versions of these methods that takes Type t is required
-   * for parametric datatypes, where t is an instantiated
-   * parametric datatype type whose datatype is this class.
-   */
-  unsigned getNumRecursiveSingletonArgTypes(TypeNode t) const;
-  TypeNode getRecursiveSingletonArgType(TypeNode t, size_t i) const;
-  unsigned getNumRecursiveSingletonArgTypes() const;
-  TypeNode getRecursiveSingletonArgType(size_t i) const;
 
   /**
    * Construct and return a ground term of this DType.  The
@@ -484,10 +448,6 @@ class DType
   /** compute the cardinality of this datatype */
   Cardinality computeCardinality(TypeNode t,
                                  std::vector<TypeNode>& processing) const;
-  /** compute whether this datatype is a recursive singleton */
-  bool computeCardinalityRecSingleton(TypeNode t,
-                                      std::vector<TypeNode>& processing,
-                                      std::vector<TypeNode>& u_assume) const;
   /** compute whether this datatype is well-founded */
   bool computeWellFounded(std::vector<TypeNode>& processing) const;
   /** compute ground term
@@ -569,8 +529,6 @@ class DType
   /** the type parameters of this datatype (if this is a parametric datatype)
    */
   std::vector<TypeNode> d_params;
-  /** whether the datatype is a codatatype. */
-  bool d_isCo;
   /** whether the datatype is a tuple */
   bool d_isTuple;
   /** whether the datatype is a nullable */
@@ -610,12 +568,6 @@ class DType
    * For definition of (co)recursive singleton, see
    * Section 2 of Reynolds et al. CADE 2015.
    */
-  mutable std::map<TypeNode, int> d_cardRecSingleton;
-  /** if d_cardRecSingleton is true,
-   * This datatype has infinite cardinality if at least one of the
-   * following uninterpreted sorts having cardinality > 1.
-   */
-  mutable std::map<TypeNode, std::vector<TypeNode> > d_cardUAssume;
   /**
    * Cache of whether this datatype is well-founded, where 0 means we have
    * not computed this information, 1 means it is well-founded, -1 means it is

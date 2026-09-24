@@ -90,7 +90,6 @@ class Smt2TermParser
    * constructor_dec := (<symbol> (<symbol> <sort>)∗)
    */
   std::vector<DatatypeDecl> parseDatatypesDef(
-      bool isCo,
       const std::vector<std::string>& dnames,
       const std::vector<size_t>& arities);
   /**

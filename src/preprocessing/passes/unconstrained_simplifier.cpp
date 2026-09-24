@@ -257,10 +257,7 @@ void UnconstrainedSimplifier::processUnconstrained()
           // in this case.
           if (c == CardinalityClass::INTERPRETED_ONE)
           {
-            if (options().quantifiers.finiteModelFind)
-            {
-              break;
-            }
+
           }
           if (parent[0].getType().isBoolean())
           {

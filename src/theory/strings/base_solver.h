@@ -82,9 +82,7 @@ class BaseSolver : protected EnvObj
     // we don't have to check cardinality for the given type
     NO_REQ,
     // we have to check cardinality
-    REQ,
-    // we don't know how to check cardinality
-    UNHANDLED
+    REQ
   };
   /**
    * Get the cardinality requirement for type tn, which is either:
@@ -93,8 +91,6 @@ class BaseSolver : protected EnvObj
    * - REQ, meaning we have a finite cardinality based on which we need to
    * check cardinality for. In this case, typeCardSize is set of the cardinality
    * of tn.
-   * - UNHANDLED, meaning we don't know how to handle cardinality for tn, in
-   * which case model construction is not guaranteed to succeed.
    */
   CardinalityResponse getCardinalityReq(TypeNode tn,
                                         size_t& typeCardSize) const;

@@ -97,41 +97,14 @@ struct EmptySetTypeRule
 /**
  * Type rule for (bag.card A) to check the argument A is a set.
  */
-struct CardTypeRule
-{
-  static TypeNode preComputeType(NodeManager* nm, TNode n);
-
-  static TypeNode computeType(NodeManager* nodeManager,
-                              TNode n,
-                              bool check,
-                              std::ostream* errOut);
-};
 
 /**
  * Type rule for (set.complement A) to check the argument A is a set.
  */
-struct ComplementTypeRule
-{
-  static TypeNode preComputeType(NodeManager* nm, TNode n);
-
-  static TypeNode computeType(NodeManager* nodeManager,
-                              TNode n,
-                              bool check,
-                              std::ostream* errOut);
-};
 
 /**
  * Type rule for (as set.universe (Set T)) where T is a type
  */
-struct UniverseSetTypeRule
-{
-  static TypeNode preComputeType(NodeManager* nm, TNode n);
-
-  static TypeNode computeType(NodeManager* nodeManager,
-                              TNode n,
-                              bool check,
-                              std::ostream* errOut);
-};
 
 /**
  * Type rule for (set.comprehension ((x1 T1) ... (xn Tn)) predicate body)
@@ -255,15 +228,6 @@ struct SetFoldTypeRule
  * - (rel.join A B) it checks that m, n > 1 and Am = B1 and computes the type
  *   (Relation (A1 ... Am-1 B2 ... Bn).
  */
-struct RelBinaryOperatorTypeRule
-{
-  static TypeNode preComputeType(NodeManager* nm, TNode n);
-
-  static TypeNode computeType(NodeManager* nodeManager,
-                              TNode n,
-                              bool check,
-                              std::ostream* errOut);
-};
 
 /**
  * Relation table join operator is indexed by a list of indices (m_1, m_k, n_1,
@@ -274,43 +238,17 @@ struct RelBinaryOperatorTypeRule
  * min(i,j) and types has constraints X_{m_1} = Y_{n_1}, ..., X_{m_k} = Y_{n_k}.
  * The returned type is (Relation X_1 ... X_i Y_1 ... Y_j)
  */
-struct RelationTableJoinTypeRule
-{
-  static TypeNode preComputeType(NodeManager* nm, TNode n);
-  static TypeNode computeType(NodeManager* nodeManager,
-                              TNode n,
-                              bool check,
-                              std::ostream* errOut);
-}; /* struct RelationTableJoinTypeRule */
 
 /**
  * Type rule for unary operator (rel.transpose A) to check that A is a relation
  * (set of Tuples). For an argument A of type (Relation A1 ... An)
  * it reveres A1 ... An and computes the type (Relation An ... A1).
  */
-struct RelTransposeTypeRule
-{
-  static TypeNode preComputeType(NodeManager* nm, TNode n);
-
-  static TypeNode computeType(NodeManager* nodeManager,
-                              TNode n,
-                              bool check,
-                              std::ostream* errOut);
-};
 
 /**
  * Type rule for unary operator (rel.tclosure A) to check that A is a binary
  * relation of type (Relation T T), where T is a type
  */
-struct RelTransClosureTypeRule
-{
-  static TypeNode preComputeType(NodeManager* nm, TNode n);
-
-  static TypeNode computeType(NodeManager* nodeManager,
-                              TNode n,
-                              bool check,
-                              std::ostream* errOut);
-};
 
 /**
  * Type rule for operator (rel.join_image A c) that checks A is a binary
@@ -318,30 +256,12 @@ struct RelTransClosureTypeRule
  * term (in fact c should be a non-negative constant, otherwise a logic
  * exception is thrown TheorySetsPrivate::preRegisterTerm).
  */
-struct JoinImageTypeRule
-{
-  static TypeNode preComputeType(NodeManager* nm, TNode n);
-
-  static TypeNode computeType(NodeManager* nodeManager,
-                              TNode n,
-                              bool check,
-                              std::ostream* errOut);
-};
 
 /**
  * Type rule for unary operator (rel.iden A) to check that A is a unary relation
  * of type (Relation T) and computes the type (Relation T T) for the
  * identity
  */
-struct RelIdenTypeRule
-{
-  static TypeNode preComputeType(NodeManager* nm, TNode n);
-
-  static TypeNode computeType(NodeManager* nodeManager,
-                              TNode n,
-                              bool check,
-                              std::ostream* errOut);
-};
 
 /**
  * Relation group operator is indexed by a list of indices (n_1, ..., n_k). It
@@ -349,15 +269,6 @@ struct RelIdenTypeRule
  * for i = 1, ..., k. If the passed relation is of type T, then the returned
  * type is (Set T), i.e., set of relations.
  */
-struct RelationGroupTypeRule
-{
-  static TypeNode preComputeType(NodeManager* nm, TNode n);
-
-  static TypeNode computeType(NodeManager* nodeManager,
-                              TNode n,
-                              bool check,
-                              std::ostream* errOut);
-}; /* struct RelationGroupTypeRule */
 
 /**
  * Relation project is indexed by a list of indices (n_1, ..., n_m). It ensures
@@ -365,15 +276,6 @@ struct RelationGroupTypeRule
  * for i = 1, ..., m. If the argument is of type (Relation T_1 ... T_k), then
  * the returned type is (Relation T_{n_1} ... T_{n_m}).
  */
-struct RelationProjectTypeRule
-{
-  static TypeNode preComputeType(NodeManager* nm, TNode n);
-
-  static TypeNode computeType(NodeManager* nodeManager,
-                              TNode n,
-                              bool check,
-                              std::ostream* errOut);
-}; /* struct RelationProjectTypeRule */
 
 /**
  * Relation aggregate operator is indexed by a list of indices (n_1, ..., n_k).
@@ -383,15 +285,6 @@ struct RelationProjectTypeRule
  * - A relation of type (Relation T_1 ... T_j) where 0 <= n_1, ..., n_k < j
  * the returned type is (Relation T).
  */
-struct RelationAggregateTypeRule
-{
-  static TypeNode preComputeType(NodeManager* nm, TNode n);
-
-  static TypeNode computeType(NodeManager* nodeManager,
-                              TNode n,
-                              bool check,
-                              std::ostream* errOut);
-}; /* struct RelationAggregateTypeRule */
 
 /**
  * Type rule for set.empty_of_type

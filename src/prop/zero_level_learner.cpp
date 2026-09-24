@@ -40,21 +40,21 @@ ZeroLevelLearner::ZeroLevelLearner(Env& env, TheoryEngine* theoryEngine)
   options::DeepRestartMode lmode = options::DeepRestartMode::NONE;
   if (lmode != options::DeepRestartMode::NONE)
   {
-    d_learnedTypes.insert(modes::LearnedLitType::INPUT);
+    d_learnedTypes.insert(LearnedLitType::INPUT);
     if (lmode == options::DeepRestartMode::ALL)
     {
-      d_learnedTypes.insert(modes::LearnedLitType::INTERNAL);
-      d_learnedTypes.insert(modes::LearnedLitType::SOLVABLE);
-      d_learnedTypes.insert(modes::LearnedLitType::CONSTANT_PROP);
+      d_learnedTypes.insert(LearnedLitType::INTERNAL);
+      d_learnedTypes.insert(LearnedLitType::SOLVABLE);
+      d_learnedTypes.insert(LearnedLitType::CONSTANT_PROP);
     }
     else if (lmode == options::DeepRestartMode::INPUT_AND_SOLVABLE)
     {
-      d_learnedTypes.insert(modes::LearnedLitType::SOLVABLE);
+      d_learnedTypes.insert(LearnedLitType::SOLVABLE);
     }
     else if (lmode == options::DeepRestartMode::INPUT_AND_PROP)
     {
-      d_learnedTypes.insert(modes::LearnedLitType::SOLVABLE);
-      d_learnedTypes.insert(modes::LearnedLitType::CONSTANT_PROP);
+      d_learnedTypes.insert(LearnedLitType::SOLVABLE);
+      d_learnedTypes.insert(LearnedLitType::CONSTANT_PROP);
     }
   }
   d_trackSimplifications = true;
@@ -91,7 +91,7 @@ void ZeroLevelLearner::notifyTopLevelSubstitution(const Node& lhs,
 {
   // process as a preprocess solved learned literal.
   Node eq = lhs.eqNode(rhs);
-  processLearnedLiteral(eq, modes::LearnedLitType::PREPROCESS_SOLVED);
+  processLearnedLiteral(eq, LearnedLitType::PREPROCESS_SOLVED);
 }
 
 void ZeroLevelLearner::notifyInputFormulas(const std::vector<Node>& assertions)
@@ -132,7 +132,7 @@ void ZeroLevelLearner::notifyInputFormulas(const std::vector<Node>& assertions)
       {
         computeLearnedLiteralType(lit);
       }
-      processLearnedLiteral(lit, modes::LearnedLitType::PREPROCESS);
+      processLearnedLiteral(lit, LearnedLitType::PREPROCESS);
       // also get its symbols
       expr::getSymbols(atom, inputSymbols, visitedWithinAtom);
     }
@@ -199,12 +199,12 @@ bool ZeroLevelLearner::notifyAsserted(TNode assertion, int32_t alevel)
     // remember we've processed this
     d_levelZeroAsserts.insert(assertion);
     // process what we should do with the learned literal
-    modes::LearnedLitType ltype = computeLearnedLiteralType(assertion);
+    LearnedLitType ltype = computeLearnedLiteralType(assertion);
     processLearnedLiteral(assertion, ltype);
     return true;
   }
   // request a deep restart?
-  
+
   if (TraceIsOn("level-zero-debug"))
   {
     if (d_assertNoLearnCount > 0 && d_deepRestartThreshold > 0
@@ -219,7 +219,7 @@ bool ZeroLevelLearner::notifyAsserted(TNode assertion, int32_t alevel)
   return true;
 }
 
-modes::LearnedLitType ZeroLevelLearner::computeLearnedLiteralType(
+LearnedLitType ZeroLevelLearner::computeLearnedLiteralType(
     const Node& input)
 {
   // literal was learned, determine its type
@@ -228,8 +228,8 @@ modes::LearnedLitType ZeroLevelLearner::computeLearnedLiteralType(
   bool internal = d_ppnAtoms.find(aatom) == d_ppnAtoms.end();
   // apply substitutions now
   Node lit = d_tsmap.apply(input, d_env.getRewriter());
-  modes::LearnedLitType ltype =
-      internal ? modes::LearnedLitType::INTERNAL : modes::LearnedLitType::INPUT;
+  LearnedLitType ltype =
+      internal ? LearnedLitType::INTERNAL : LearnedLitType::INPUT;
   // we don't try to solve for literals that simplify to constants
   if ((internal || d_trackSimplifications) && !lit.isConst())
   {
@@ -244,9 +244,9 @@ modes::LearnedLitType ZeroLevelLearner::computeLearnedLiteralType(
         if (d_ppnSyms.find(v) != d_ppnSyms.end())
         {
           Trace("level-zero-assert") << "...solvable due to " << v << std::endl;
-          if (ltype == modes::LearnedLitType::INTERNAL)
+          if (ltype == LearnedLitType::INTERNAL)
           {
-            ltype = modes::LearnedLitType::SOLVABLE;
+            ltype = LearnedLitType::SOLVABLE;
           }
         }
         if (d_trackSimplifications)
@@ -270,7 +270,7 @@ modes::LearnedLitType ZeroLevelLearner::computeLearnedLiteralType(
       }
     }
     if ((d_trackSimplifications && !processed)
-        || ltype != modes::LearnedLitType::SOLVABLE)
+        || ltype != LearnedLitType::SOLVABLE)
     {
       // maybe a constant prop?
       if (lit.getKind() == Kind::EQUAL)
@@ -281,10 +281,10 @@ modes::LearnedLitType ZeroLevelLearner::computeLearnedLiteralType(
           // A more general policy could consider lit[i].getNumChildren()==0.
           if (lit[i].isConst())
           {
-            if (ltype == modes::LearnedLitType::INTERNAL
+            if (ltype == LearnedLitType::INTERNAL
                 && d_ppnTerms.find(lit[1 - i]) != d_ppnTerms.end())
             {
-              ltype = modes::LearnedLitType::CONSTANT_PROP;
+              ltype = LearnedLitType::CONSTANT_PROP;
             }
             if (d_trackSimplifications && !processed)
             {
@@ -339,7 +339,7 @@ void ZeroLevelLearner::addSimplification(const Node& t, const Node& s)
 }
 
 void ZeroLevelLearner::processLearnedLiteral(const Node& lit,
-                                             modes::LearnedLitType ltype)
+                                             LearnedLitType ltype)
 {
   // add to the database
   d_ldb.addLearnedLiteral(lit, ltype);
@@ -368,7 +368,7 @@ void ZeroLevelLearner::processLearnedLiteral(const Node& lit,
 }
 
 std::vector<Node> ZeroLevelLearner::getLearnedZeroLevelLiterals(
-    modes::LearnedLitType ltype) const
+    LearnedLitType ltype) const
 {
   std::vector<Node> ret = d_ldb.getLearnedLiterals(ltype);
   if (TraceIsOn("level-zero"))
@@ -386,7 +386,7 @@ std::vector<Node> ZeroLevelLearner::getLearnedZeroLevelLiteralsForRestart()
     const
 {
   std::vector<Node> ret;
-  for (modes::LearnedLitType ltype : d_learnedTypes)
+  for (LearnedLitType ltype : d_learnedTypes)
   {
     std::vector<Node> rett = getLearnedZeroLevelLiterals(ltype);
     ret.insert(ret.end(), rett.begin(), rett.end());
@@ -396,7 +396,7 @@ std::vector<Node> ZeroLevelLearner::getLearnedZeroLevelLiteralsForRestart()
 
 bool ZeroLevelLearner::hasLearnedLiteralForRestart() const
 {
-  for (modes::LearnedLitType ltype : d_learnedTypes)
+  for (LearnedLitType ltype : d_learnedTypes)
   {
     if (d_ldb.getNumLearnedLiterals(ltype) > 0)
     {
@@ -406,7 +406,7 @@ bool ZeroLevelLearner::hasLearnedLiteralForRestart() const
   return false;
 }
 
-bool ZeroLevelLearner::isLearnable(modes::LearnedLitType ltype) const
+bool ZeroLevelLearner::isLearnable(LearnedLitType ltype) const
 {
   return d_learnedTypes.find(ltype) != d_learnedTypes.end();
 }

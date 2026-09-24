@@ -15,7 +15,6 @@
 #include <climits>
 #include <sstream>
 
-#include "expr/cardinality_constraint.h"
 #include "expr/function_array_const.h"
 #include "theory/uf/function_const.h"
 #include "util/bitvector.h"
@@ -97,63 +96,6 @@ TypeNode UfTypeRule::computeType(NodeManager* nodeManager,
     ret = nodeManager->mkFunctionType(argTypes, ret);
   }
   return ret;
-}
-
-TypeNode CardinalityConstraintOpTypeRule::preComputeType(
-    AVA6_UNUSED NodeManager* nm, AVA6_UNUSED TNode n)
-{
-  return TypeNode::null();
-}
-TypeNode CardinalityConstraintOpTypeRule::computeType(NodeManager* nodeManager,
-                                                      TNode n,
-                                                      bool check,
-                                                      std::ostream* errOut)
-{
-  if (check)
-  {
-    const CardinalityConstraint& cc = n.getConst<CardinalityConstraint>();
-    if (!cc.getType().isUninterpretedSort())
-    {
-      if (errOut)
-      {
-        (*errOut) << "cardinality constraint must apply to uninterpreted sort";
-      }
-      return TypeNode::null();
-    }
-    if (cc.getUpperBound().sgn() != 1)
-    {
-      if (errOut)
-      {
-        (*errOut) << "cardinality constraint must be positive";
-      }
-      return TypeNode::null();
-    }
-  }
-  return nodeManager->builtinOperatorType();
-}
-
-TypeNode CombinedCardinalityConstraintOpTypeRule::preComputeType(
-    AVA6_UNUSED NodeManager* nm, AVA6_UNUSED TNode n)
-{
-  return TypeNode::null();
-}
-TypeNode CombinedCardinalityConstraintOpTypeRule::computeType(
-    NodeManager* nodeManager, TNode n, bool check, std::ostream* errOut)
-{
-  if (check)
-  {
-    const CombinedCardinalityConstraint& cc =
-        n.getConst<CombinedCardinalityConstraint>();
-    if (cc.getUpperBound().sgn() != 1)
-    {
-      if (errOut)
-      {
-        (*errOut) << "combined cardinality constraint must be positive";
-      }
-      return TypeNode::null();
-    }
-  }
-  return nodeManager->builtinOperatorType();
 }
 
 TypeNode HoApplyTypeRule::preComputeType(AVA6_UNUSED NodeManager* nm,

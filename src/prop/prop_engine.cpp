@@ -852,18 +852,12 @@ std::vector<Node> PropEngine::getUnsatCoreLemmas()
   return lems;
 }
 
-std::vector<Node> PropEngine::getLearnedZeroLevelLiterals(
-    modes::LearnedLitType ltype) const
-{
-  return d_theoryProxy->getLearnedZeroLevelLiterals(ltype);
-}
-
 std::vector<Node> PropEngine::getLearnedZeroLevelLiteralsForRestart() const
 {
   return d_theoryProxy->getLearnedZeroLevelLiteralsForRestart();
 }
 
-modes::LearnedLitType PropEngine::getLiteralType(const Node& lit) const
+LearnedLitType PropEngine::getLiteralType(const Node& lit) const
 {
   return d_theoryProxy->getLiteralType(lit);
 }

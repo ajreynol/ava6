@@ -95,7 +95,6 @@ TrustNode Skolemize::process(Node q)
   }
   d_skolemized[q] = lem;
   // triggered when skolemizing
-  d_treg.processSkolemization(q, d_skolem_constants[q]);
   return TrustNode::mkTrustLemma(lem, pg);
 }
 
@@ -385,8 +384,7 @@ bool Skolemize::isInductionTerm(const Options& opts, Node n)
   TypeNode tn = n.getType();
   if (opts.quantifiers.dtStcInduction && tn.isDatatype())
   {
-    const DType& dt = tn.getDType();
-    return !dt.isCodatatype();
+    return true;
   }
   if (opts.quantifiers.intWfInduction && tn.isInteger())
   {

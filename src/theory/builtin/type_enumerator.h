@@ -28,8 +28,6 @@ class UninterpretedSortEnumerator
     : public TypeEnumeratorBase<UninterpretedSortEnumerator>
 {
   Integer d_count;
-  bool d_has_fixed_bound;
-  Integer d_fixed_bound;
 
  public:
   UninterpretedSortEnumerator(TypeNode type,

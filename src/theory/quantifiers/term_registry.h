@@ -26,7 +26,6 @@
 #include "theory/quantifiers/ieval/inst_evaluator_manager.h"
 #include "theory/quantifiers/term_database.h"
 #include "theory/quantifiers/term_enumeration.h"
-#include "theory/quantifiers/term_pools.h"
 
 namespace ava6::internal {
 namespace theory {
@@ -65,27 +64,6 @@ class TermRegistry : protected EnvObj
    * one exists, or otherwise a fresh variable.
    */
   Node getTermForType(TypeNode tn);
-  /** Get terms for pool p, adds them to the vector terms. */
-  void getTermsForPool(Node p, std::vector<Node>& terms);
-  /**
-   * Declare pool p with initial value initValue.
-   */
-  void declarePool(Node p, const std::vector<Node>& initValue);
-  /**
-   * Process instantiation, called when q is instantiated.
-   *
-   * @param q The quantified formula
-   * @param terms The terms it was instantiated with
-   */
-  void processInstantiation(Node q, const std::vector<Node>& terms);
-  /**
-   * Process skolemization, called when q is skolemized.
-   *
-   * @param q The quantified formula
-   * @param skolems The skolem variables used for skolemizing q
-   */
-  void processSkolemization(Node q, const std::vector<Node>& skolems);
-
   /** get term database */
   TermDb* getTermDatabase() const;
   /** get term database sygus */
@@ -96,8 +74,6 @@ class TermRegistry : protected EnvObj
   EntailmentCheck* getEntailmentCheck() const;
   /** get term enumeration utility */
   TermEnumeration* getTermEnumeration() const;
-  /** get the term pools utility */
-  TermPools* getTermPools() const;
   /** get the virtual term substitution term cache utility */
   VtsTermCache* getVtsTermCache() const;
   /** get the bv inverter utility */
@@ -131,7 +107,6 @@ class TermRegistry : protected EnvObj
   /** term enumeration utility */
   std::unique_ptr<TermEnumeration> d_termEnum;
   /** term enumeration utility */
-  std::unique_ptr<TermPools> d_termPools;
   /** term database */
   std::unique_ptr<TermDb> d_termDb;
   /** entailment check */

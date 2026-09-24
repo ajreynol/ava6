@@ -93,13 +93,6 @@ class Smt2Printer : public ava6::internal::Printer
                                    TypeNode type,
                                    const std::string& binName) const override;
 
-  /** Print declare-pool command */
-  void toStreamCmdDeclarePool(
-      std::ostream& out,
-      const std::string& id,
-      TypeNode type,
-      const std::vector<Node>& initValue) const override;
-
   /** Print declare-sort command */
   void toStreamCmdDeclareType(std::ostream& out,
                               const std::string& id,
@@ -152,14 +145,6 @@ class Smt2Printer : public ava6::internal::Printer
   /** Print get-model command */
   void toStreamCmdGetModel(std::ostream& out) const override;
 
-  /** Print block-model command */
-  void toStreamCmdBlockModel(std::ostream& out,
-                             modes::BlockModelsMode mode) const override;
-
-  /** Print block-model-values command */
-  void toStreamCmdBlockModelValues(
-      std::ostream& out, const std::vector<Node>& nodes) const override;
-
   /** Print get-proof command */
   void toStreamCmdGetProof(std::ostream& out,
                            modes::ProofComponent c) const override;
@@ -169,20 +154,6 @@ class Smt2Printer : public ava6::internal::Printer
 
   /** Print get-unsat-core command */
   void toStreamCmdGetUnsatCore(std::ostream& out) const override;
-
-  /** Print get-difficulty command */
-  void toStreamCmdGetDifficulty(std::ostream& out) const override;
-
-  /** Print get-timeout-core command */
-  void toStreamCmdGetTimeoutCore(std::ostream& out) const override;
-
-  /** Print get-timeout-core-assuming command */
-  void toStreamCmdGetTimeoutCoreAssuming(
-      std::ostream& out, const std::vector<Node>& assumptions) const override;
-
-  /** Print get-learned-literals command */
-  void toStreamCmdGetLearnedLiterals(std::ostream& out,
-                                     modes::LearnedLitType t) const override;
 
   /** Print get-assertions command */
   void toStreamCmdGetAssertions(std::ostream& out) const override;

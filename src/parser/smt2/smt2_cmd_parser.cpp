@@ -29,8 +29,6 @@ Smt2CmdParser::Smt2CmdParser(Smt2Lexer& lex,
   d_table["check-sat-assuming"] = Token::CHECK_SAT_ASSUMING_TOK;
   d_table["check-sat"] = Token::CHECK_SAT_TOK;
   d_table["declare-const"] = Token::DECLARE_CONST_TOK;
-  d_table["declare-codatatype"] = Token::DECLARE_CODATATYPE_TOK;
-  d_table["declare-codatatypes"] = Token::DECLARE_CODATATYPES_TOK;
   d_table["declare-datatypes"] = Token::DECLARE_DATATYPES_TOK;
   d_table["declare-datatype"] = Token::DECLARE_DATATYPE_TOK;
   d_table["declare-fun"] = Token::DECLARE_FUN_TOK;
@@ -49,8 +47,6 @@ Smt2CmdParser::Smt2CmdParser(Smt2Lexer& lex,
   d_table["get-model"] = Token::GET_MODEL_TOK;
   d_table["get-option"] = Token::GET_OPTION_TOK;
   d_table["get-proof"] = Token::GET_PROOF_TOK;
-  d_table["get-timeout-core"] = Token::GET_TIMEOUT_CORE_TOK;
-  d_table["get-timeout-core-assuming"] = Token::GET_TIMEOUT_CORE_ASSUMING_TOK;
   d_table["get-unsat-assumptions"] = Token::GET_UNSAT_ASSUMPTIONS_TOK;
   d_table["get-unsat-core"] = Token::GET_UNSAT_CORE_TOK;
   d_table["get-unsat-core-lemmas"] = Token::GET_UNSAT_CORE_LEMMAS_TOK;
@@ -65,15 +61,10 @@ Smt2CmdParser::Smt2CmdParser(Smt2Lexer& lex,
   d_table["set-option"] = Token::SET_OPTION_TOK;
   if (!d_lex.isStrict())
   {
-    d_table["block-model"] = Token::BLOCK_MODEL_TOK;
-    d_table["block-model-values"] = Token::BLOCK_MODEL_VALUES_TOK;
-    d_table["declare-pool"] = Token::DECLARE_POOL_TOK;
-    d_table["get-difficulty"] = Token::GET_DIFFICULTY_TOK;
-    d_table["get-learned-literals"] = Token::GET_LEARNED_LITERALS_TOK;
     d_table["include"] = Token::INCLUDE_TOK;
     d_table["simplify"] = Token::SIMPLIFY_TOK;
   }
-  
+
 }
 
 Token Smt2CmdParser::nextCommandToken()
@@ -121,27 +112,10 @@ std::unique_ptr<Cmd> Smt2CmdParser::parseNextCommand()
       }
     }
     break;
-    case Token::BLOCK_MODEL_TOK:
-    {
-      std::string key = d_tparser.parseKeyword();
-      d_state.checkThatLogicIsSet();
-      modes::BlockModelsMode mode = d_state.getBlockModelsMode(key);
-      cmd.reset(new BlockModelCommand(mode));
-    }
-    break;
-    // (block-model-values (<term>*))
-    case Token::BLOCK_MODEL_VALUES_TOK:
-    {
-      d_state.checkThatLogicIsSet();
-      std::vector<Term> terms = d_tparser.parseTermList();
-      cmd.reset(new BlockModelValuesCommand(terms));
-    }
-    break;
-    // (check-sat)
     case Token::CHECK_SAT_TOK:
     {
       d_state.checkThatLogicIsSet();
-      
+
       cmd.reset(new CheckSatCommand());
     }
     break;
@@ -153,7 +127,7 @@ std::unique_ptr<Cmd> Smt2CmdParser::parseNextCommand()
       cmd.reset(new CheckSatAssumingCommand(terms));
     }
     break;
-    case Token::DECLARE_CODATATYPE_TOK:
+
     case Token::DECLARE_DATATYPE_TOK:
     {
       d_state.checkThatLogicIsSet();
@@ -162,18 +136,16 @@ std::unique_ptr<Cmd> Smt2CmdParser::parseNextCommand()
       std::string name = d_tparser.parseSymbol(CHECK_UNDECLARED, SYM_SORT);
       d_state.checkReservedSymbol(name);
       dnames.push_back(name);
-      bool isCo = (tok == Token::DECLARE_CODATATYPE_TOK);
       // parse <datatype_dec>
       std::vector<DatatypeDecl> dts =
-          d_tparser.parseDatatypesDef(isCo, dnames, arities);
+          d_tparser.parseDatatypesDef( dnames, arities);
       cmd.reset(
           new DatatypeDeclarationCommand(d_state.mkMutualDatatypeTypes(dts)));
     }
     break;
     // multiple datatype
     // (declare-datatypes (<sort_dec>^{n+1}) (<datatype_dec>^{n+1}) )
-    // (declare-codatatypes (<sort_dec>^{n+1}) (<datatype_dec>^{n+1}) )
-    case Token::DECLARE_CODATATYPES_TOK:
+
     case Token::DECLARE_DATATYPES_TOK:
     {
       d_state.checkThatLogicIsSet();
@@ -195,11 +167,10 @@ std::unique_ptr<Cmd> Smt2CmdParser::parseNextCommand()
       {
         d_lex.parseError("Empty list of datatypes");
       }
-      bool isCo = (tok == Token::DECLARE_CODATATYPES_TOK);
       // parse (<datatype_dec>^{n+1})
       d_lex.eatToken(Token::LPAREN_TOK);
       std::vector<DatatypeDecl> dts =
-          d_tparser.parseDatatypesDef(isCo, dnames, arities);
+          d_tparser.parseDatatypesDef( dnames, arities);
       d_lex.eatToken(Token::RPAREN_TOK);
       cmd.reset(
           new DatatypeDeclarationCommand(d_state.mkMutualDatatypeTypes(dts)));
@@ -233,18 +204,6 @@ std::unique_ptr<Cmd> Smt2CmdParser::parseNextCommand()
     }
     break;
     // (declare-heap (<sort> <sort>))
-    case Token::DECLARE_POOL_TOK:
-    {
-      d_state.checkThatLogicIsSet();
-      std::string name = d_tparser.parseSymbol(CHECK_NONE, SYM_VARIABLE);
-      d_state.checkUserSymbol(name);
-      Sort t = d_tparser.parseSort();
-      std::vector<Term> terms = d_tparser.parseTermList();
-      Trace("parser") << "declare pool: '" << name << "'" << std::endl;
-      cmd.reset(new DeclarePoolCommand(name, t, terms));
-    }
-    break;
-    // (declare-sort <symbol> <numeral>)
     case Token::DECLARE_SORT_TOK:
     {
       d_state.checkThatLogicIsSet();
@@ -465,35 +424,12 @@ std::unique_ptr<Cmd> Smt2CmdParser::parseNextCommand()
       cmd.reset(new GetAssignmentCommand());
     }
     break;
-    // (get-difficulty)
-    case Token::GET_DIFFICULTY_TOK:
-    {
-      d_state.checkThatLogicIsSet();
-      cmd.reset(new GetDifficultyCommand);
-    }
-    break;
-    // (get-info <keyword>)
     case Token::GET_INFO_TOK:
     {
       std::string key = d_tparser.parseKeyword();
       cmd.reset(new GetInfoCommand(key));
     }
     break;
-    case Token::GET_LEARNED_LITERALS_TOK:
-    {
-      // optional keyword
-      tok = d_lex.peekToken();
-      modes::LearnedLitType llt = modes::LearnedLitType::INPUT;
-      if (tok == Token::KEYWORD)
-      {
-        std::string key = d_tparser.parseKeyword();
-        llt = d_state.getLearnedLitType(key);
-      }
-      d_state.checkThatLogicIsSet();
-      cmd.reset(new GetLearnedLiteralsCommand(llt));
-    }
-    break;
-    // (get-model)
     case Token::GET_MODEL_TOK:
     {
       d_state.checkThatLogicIsSet();
@@ -522,44 +458,6 @@ std::unique_ptr<Cmd> Smt2CmdParser::parseNextCommand()
       cmd.reset(new GetProofCommand(pc));
     }
     break;
-    // (get-timeout-core)
-    case Token::GET_TIMEOUT_CORE_TOK:
-    {
-      d_state.checkThatLogicIsSet();
-      cmd.reset(new GetTimeoutCoreCommand);
-    }
-    break;
-    case Token::GET_TIMEOUT_CORE_ASSUMING_TOK:
-    {
-      d_state.checkThatLogicIsSet();
-      // read optional assumptions
-      d_lex.eatToken(Token::LPAREN_TOK);
-      std::vector<Term> assumptions;
-      tok = d_lex.peekToken();
-      while (tok != Token::RPAREN_TOK)
-      {
-        d_state.clearLastNamedTerm();
-        Term t = d_tparser.parseTerm();
-        std::pair<Term, std::string> namedTerm = d_state.lastNamedTerm();
-        if (namedTerm.first == t)
-        {
-          d_state.getSymbolManager()->setExpressionName(
-              namedTerm.first, namedTerm.second, true);
-        }
-        assumptions.push_back(t);
-        tok = d_lex.peekToken();
-      }
-      if (assumptions.empty())
-      {
-        d_lex.parseError(
-            "Expected non-empty list of assumptions for "
-            "get-timeout-core-assuming");
-      }
-      d_lex.nextToken();
-      cmd.reset(new GetTimeoutCoreCommand(assumptions));
-    }
-    break;
-    // (get-unsat-assumptions)
     case Token::GET_UNSAT_ASSUMPTIONS_TOK:
     {
       d_state.checkThatLogicIsSet();

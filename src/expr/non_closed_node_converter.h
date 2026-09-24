@@ -27,7 +27,7 @@ namespace ava6::internal {
  * to theory solvers.
  *
  * Note this converter is necessary since models for certain types e.g.
- * uninterpreted sorts, codatatypes, arrays, involve terms that cannot be
+ * uninterpreted sorts and arrays, involve terms that cannot be
  * re-asserted to the solver as input.
  *
  * Other types may conditionally use model values that are also illegal in

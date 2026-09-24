@@ -187,11 +187,6 @@ bool CommandExecutor::doCommandSingleton(Cmd* cmd)
       getterCommands.emplace_back(new GetUnsatCoreLemmasCommand());
     }
 
-    if (d_solver->getOptionInfo("dump-difficulty").boolValue()
-        && (isResultUnsat || isResultSat || res.isUnknown()))
-    {
-      getterCommands.emplace_back(new GetDifficultyCommand());
-    }
 
     if (!getterCommands.empty())
     {

@@ -68,7 +68,6 @@ void TheorySets::finishInit()
   d_valuation.setUnevaluatedKind(Kind::WITNESS);
   // Universe set is not evaluated. This is moreover important for ensuring that
   // we do not eliminate terms whose value involves the universe set.
-  d_valuation.setUnevaluatedKind(Kind::SET_UNIVERSE);
 
   // functions we are doing congruence over
   d_equalityEngine->addFunctionKind(Kind::SET_SINGLETON);
@@ -78,16 +77,8 @@ void TheorySets::finishInit()
   d_equalityEngine->addFunctionKind(Kind::SET_MEMBER);
   d_equalityEngine->addFunctionKind(Kind::SET_SUBSET);
   // relation operators
-  d_equalityEngine->addFunctionKind(Kind::RELATION_PRODUCT);
-  d_equalityEngine->addFunctionKind(Kind::RELATION_JOIN);
-  d_equalityEngine->addFunctionKind(Kind::RELATION_TABLE_JOIN);
-  d_equalityEngine->addFunctionKind(Kind::RELATION_TRANSPOSE);
-  d_equalityEngine->addFunctionKind(Kind::RELATION_TCLOSURE);
-  d_equalityEngine->addFunctionKind(Kind::RELATION_JOIN_IMAGE);
-  d_equalityEngine->addFunctionKind(Kind::RELATION_IDEN);
   d_equalityEngine->addFunctionKind(Kind::APPLY_CONSTRUCTOR);
   // we do congruence over cardinality
-  d_equalityEngine->addFunctionKind(Kind::SET_CARD);
 
   // finish initialization internally
   d_internal->finishInit();
@@ -129,8 +120,7 @@ void TheorySets::preRegisterTerm(TNode node)
 TrustNode TheorySets::ppRewrite(TNode n, std::vector<SkolemLemma>& lems)
 {
   Kind nk = n.getKind();
-  if (nk == Kind::SET_UNIVERSE || nk == Kind::SET_COMPLEMENT
-      || nk == Kind::RELATION_JOIN_IMAGE || nk == Kind::SET_COMPREHENSION)
+  if (nk == Kind::SET_COMPREHENSION)
   {
     {
       std::stringstream ss;
@@ -149,8 +139,7 @@ TrustNode TheorySets::ppRewrite(TNode n, std::vector<SkolemLemma>& lems)
       throw LogicException(ss.str());
     }
   }
-  if (nk == Kind::RELATION_AGGREGATE || nk == Kind::RELATION_PROJECT
-      || nk == Kind::SET_MAP || nk == Kind::SET_FOLD)
+  if (nk == Kind::SET_MAP || nk == Kind::SET_FOLD)
   {
     // requires higher order
     if (!logicInfo().isHigherOrder())
@@ -171,16 +160,8 @@ TrustNode TheorySets::ppRewrite(TNode n, std::vector<SkolemLemma>& lems)
     d_im.lemma(andNode, InferenceId::SETS_FOLD);
     return TrustNode::mkTrustRewrite(n, ret, nullptr);
   }
-  if (nk == Kind::RELATION_AGGREGATE)
-  {
-    Node ret = SetReduction::reduceAggregateOperator(n);
-    return TrustNode::mkTrustRewrite(n, ret, nullptr);
-  }
-  if (nk == Kind::RELATION_PROJECT)
-  {
-    Node ret = SetReduction::reduceProjectOperator(n);
-    return TrustNode::mkTrustRewrite(n, ret, nullptr);
-  }
+
+
   return d_internal->ppRewrite(n, lems);
 }
 

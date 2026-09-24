@@ -22,7 +22,6 @@
 #include "proof/proof_node_manager.h"
 #include "rewriter/rewrite_db.h"
 #include "smt/assertions.h"
-#include "smt/difficulty_post_processor.h"
 #include "smt/env.h"
 #include "smt/preprocess_proof_generator.h"
 #include "smt/proof_logger.h"
@@ -54,7 +53,7 @@ PfManager::PfManager(Env& env)
     bool isNormalOut = isOutputOn(OutputTag::RARE_DB);
     if (isNormalOut)
     {
-      
+
       proof::EoNodeConverter atp(nodeManager());
       proof::EoPrinter eop(d_env, atp, d_rewriteDb.get());
       const std::map<ProofRewriteRule, RewriteProofRule>& rules =
@@ -68,7 +67,7 @@ PfManager::PfManager(Env& env)
           std::ostream& os = output(OutputTag::RARE_DB);
           eop.printDslRule(os, r.first);
         }
-        
+
       }
     }
   }
@@ -297,82 +296,6 @@ void PfManager::printProof(std::ostream& out,
   proof::EoNodeConverter atp(nodeManager());
   proof::EoPrinter eop(d_env, atp, d_rewriteDb.get());
   eop.print(out, fp, scopeMode);
-}
-
-void PfManager::translateDifficultyMap(std::map<Node, Node>& dmap,
-                                       Assertions& as)
-{
-  Trace("difficulty-proc") << "Translate difficulty start" << std::endl;
-  Trace("difficulty") << "PfManager::translateDifficultyMap" << std::endl;
-  if (dmap.empty())
-  {
-    return;
-  }
-  std::map<Node, Node> dmapp;
-  Trace("difficulty-proc") << "Get ppAsserts" << std::endl;
-  std::vector<Node> ppAsserts;
-  SubtypeElimNodeConverter senc(nodeManager());
-  for (const std::pair<const Node, Node>& ppa : dmap)
-  {
-    Node assertion = ppa.first;
-    // proof may eliminate mixed arithmetic from the assertion
-    {
-      assertion = senc.convert(ppa.first);
-    }
-    dmapp[assertion] = ppa.second;
-    Trace("difficulty") << "  preprocess difficulty: " << assertion << " for "
-                        << ppa.first << std::endl;
-    // The difficulty manager should only report difficulty for preprocessed
-    // assertions, or we will get an open proof below. This is ensured
-    // internally by the difficuly manager.
-    ppAsserts.push_back(ppa.first);
-  }
-  dmap.clear();
-  Trace("difficulty-proc") << "Make SAT refutation" << std::endl;
-  // assume a SAT refutation from all input assertions that were marked
-  // as having a difficulty
-  CDProof cdp(d_env);
-  Node fnode = nodeManager()->mkConst(false);
-  cdp.addStep(fnode, ProofRule::SAT_REFUTATION, ppAsserts, {});
-  std::shared_ptr<ProofNode> pf = cdp.getProofFor(fnode);
-  Trace("difficulty-proc") << "Get final proof" << std::endl;
-  std::shared_ptr<ProofNode> fpf = connectProofToAssertions(pf, as);
-  Trace("difficulty-debug") << "Final proof is " << *fpf.get() << std::endl;
-  // We are typically a SCOPE here, although if we are not, then the proofs
-  // have no free assumptions. If this is the case, then the only difficulty
-  // was incremented on auxiliary lemmas added during preprocessing. Since
-  // there are no dependencies, then the difficulty map is empty.
-  if (fpf->getRule() != ProofRule::SCOPE)
-  {
-    return;
-  }
-  fpf = fpf->getChildren()[0];
-  // analyze proof
-  Assert(fpf->getRule() == ProofRule::SAT_REFUTATION);
-  const std::vector<std::shared_ptr<ProofNode>>& children = fpf->getChildren();
-  DifficultyPostprocessCallback dpc;
-  ProofNodeUpdater dpnu(d_env, dpc);
-  Trace("difficulty-proc") << "Compute accumulated difficulty" << std::endl;
-  // For each child of SAT_REFUTATION, we increment the difficulty on all
-  // "source" free assumptions (see DifficultyPostprocessCallback) by the
-  // difficulty of the preprocessed assertion.
-  for (const std::shared_ptr<ProofNode>& c : children)
-  {
-    Node res = c->getResult();
-    Assert(dmapp.find(res) != dmapp.end())
-        << "Could not find assumption " << res;
-    Trace("difficulty-debug") << "  process: " << res << std::endl;
-    Trace("difficulty-debug") << "  .dvalue: " << dmapp[res] << std::endl;
-    Trace("difficulty-debug") << "  ..proof: " << *c.get() << std::endl;
-    if (!dpc.setCurrentDifficulty(dmapp[res]))
-    {
-      continue;
-    }
-    dpnu.process(c);
-  }
-  // get the accumulated difficulty map from the callback
-  dpc.getDifficultyMap(nodeManager(), dmap);
-  Trace("difficulty-proc") << "Translate difficulty end" << std::endl;
 }
 
 ProofChecker* PfManager::getProofChecker() const { return d_pchecker.get(); }

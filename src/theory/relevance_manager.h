@@ -23,7 +23,6 @@
 #include "context/cdlist.h"
 #include "expr/node.h"
 #include "expr/term_context.h"
-#include "theory/difficulty_manager.h"
 #include "theory/theory_engine_module.h"
 #include "theory/valuation.h"
 
@@ -118,12 +117,6 @@ class RelevanceManager : public TheoryEngineModule
    */
   bool isRelevant(TNode lit);
   /**
-   * Get the explanation for literal lit is relevant. This returns the
-   * preprocessed assertion that was the reason why the literal was relevant
-   * in the current context. It returns null if the literal is not relevant.
-   */
-  TNode getExplanationForRelevant(TNode lit);
-  /**
    * Get the current relevant selection (see above). This computes this set
    * if not already done so. This call is valid during a full effort check in
    * TheoryEngine, or after TheoryEngine has terminated with "sat". This method
@@ -143,19 +136,6 @@ class RelevanceManager : public TheoryEngineModule
                    LemmaProperty p,
                    const std::vector<Node>& skAsserts,
                    const std::vector<Node>& sks) override;
-  /** Needs candidate model, return true if the method below requires calling */
-  bool needsCandidateModel() override;
-  /** Notify that m is a (candidate) model, for difficulty measurements */
-  void notifyCandidateModel(TheoryModel* m) override;
-  /**
-   * Get difficulty map
-   *
-   * @param dmap The difficulty map to populate.
-   * @param includeLemmas Whether to include difficulty of lemmas in the domain
-   * of dmap.
-   */
-  void getDifficultyMap(std::map<Node, Node>& dmap, bool includeLemmas);
-
  private:
   /**
    * Called when an input assertion is added, this populates d_atomMap.
@@ -198,8 +178,6 @@ class RelevanceManager : public TheoryEngineModule
    */
   bool updateJustifyLastChild(const RlvPair& cur,
                               std::vector<int32_t>& childrenJustify);
-  /** Return the explanation for why atom is relevant, if it exists */
-  TNode getExplanationForRelevantInternal(TNode atom) const;
   /** Get the list of assertions that contain atom */
   NodeList* getInputListFor(TNode atom, bool doMake = true);
   /** The valuation object, used to query current value of theory literals */
@@ -227,20 +205,6 @@ class RelevanceManager : public TheoryEngineModule
    * This flag is only valid at FULL effort.
    */
   bool d_success;
-  /** Are we tracking the sources of why a literal is relevant */
-  bool d_trackRSetExp;
-  /**
-   * Whether we have miniscoped top-level AND of assertions, which is done
-   * as an optimization. This is disabled if e.g. we are computing difficulty,
-   * which requires preserving the original form of the preprocessed
-   * assertions.
-   */
-  bool d_miniscopeTopLevel;
-  /**
-   * Map from the domain of d_rset to the assertion in d_input that is the
-   * reason why that literal is currently relevant.
-   */
-  NodeMap d_rsetExp;
   /** For computing polarity on terms */
   PolarityTermContext d_ptctx;
   /**
@@ -253,8 +217,6 @@ class RelevanceManager : public TheoryEngineModule
    * asserted value matches its polarity.
    */
   RlvPairIntMap d_jcache;
-  /** Difficulty module */
-  std::unique_ptr<DifficultyManager> d_dman;
 };
 
 }  // namespace theory

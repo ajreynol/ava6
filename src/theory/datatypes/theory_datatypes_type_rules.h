@@ -220,19 +220,6 @@ class TupleProjectTypeRule
                               std::ostream* errOut);
 };
 
-/**
- * A codatatype bound variable is used for constructing values for codatatypes.
- * It stores an index and a type. The type rule returns that type.
- */
-class CodatatypeBoundVariableTypeRule
-{
- public:
-  static TypeNode preComputeType(NodeManager* nm, TNode n);
-  static TypeNode computeType(NodeManager* nodeManager,
-                              TNode n,
-                              bool check,
-                              std::ostream* errOut);
-};
 
 /**
  * Lifting a function to nullable terms.

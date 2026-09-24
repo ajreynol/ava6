@@ -33,8 +33,8 @@ const char* toString(IncompleteId i)
       return "QUANTIFIERS_SYGUS_NO_VERIFY";
     case IncompleteId::QUANTIFIERS_SYGUS_SMART_BLOCK_ANY_CONSTANT:
       return "QUANTIFIERS_SYGUS_SMART_BLOCK_ANY_CONSTANT";
-    case IncompleteId::QUANTIFIERS_CEGQI: return "QUANTIFIERS_CEGQI";
     case IncompleteId::QUANTIFIERS_FMF: return "QUANTIFIERS_FMF";
+    case IncompleteId::QUANTIFIERS_CEGQI: return "QUANTIFIERS_CEGQI";
     case IncompleteId::QUANTIFIERS_RECORDED_INST:
       return "QUANTIFIERS_RECORDED_INST";
     case IncompleteId::QUANTIFIERS_MAX_INST_ROUNDS:
@@ -46,15 +46,10 @@ const char* toString(IncompleteId i)
     case IncompleteId::SEP: return "SEP";
     case IncompleteId::SETS_HO_CARD: return "SETS_HO_CARD";
     case IncompleteId::SETS_RELS_CARD: return "SETS_RELS_CARD";
-    case IncompleteId::SETS_FMF_BOUND_CARD: return "SETS_FMF_BOUND_CARD";
     case IncompleteId::STRINGS_LOOP_SKIP: return "STRINGS_LOOP_SKIP";
     case IncompleteId::STRINGS_REGEXP_NO_SIMPLIFY:
       return "STRINGS_REGEXP_NO_SIMPLIFY";
-    case IncompleteId::SEQ_FINITE_DYNAMIC_CARDINALITY:
-      return "SEQ_FINITE_DYNAMIC_CARDINALITY";
     case IncompleteId::UF_HO_EXT_DISABLED: return "UF_HO_EXT_DISABLED";
-    case IncompleteId::UF_CARD_DISABLED: return "UF_CARD_DISABLED";
-    case IncompleteId::UF_CARD_MODE: return "UF_CARD_MODE";
     case IncompleteId::UNPROCESSED_THEORY_CONFLICT:
       return "UNPROCESSED_THEORY_CONFLICT";
     case IncompleteId::STOP_SEARCH: return "STOP_SEARCH";

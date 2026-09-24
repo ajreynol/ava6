@@ -10,14 +10,6 @@ name   = "Strings Theory"
   help       = "experimental features in the theory of strings"
 
 [[option]]
-  name       = "stringFMF"
-  category   = "regular"
-  long       = "strings-fmf"
-  type       = "bool"
-  default    = "false"
-  help       = "the finite model finding used by the theory of strings"
-
-[[option]]
   name       = "stringCheckEntailLen"
   category   = "regular"
   long       = "strings-check-entail-len"
@@ -38,7 +30,7 @@ name   = "Strings Theory"
   help = "Perform full processing of looping word equations."
 [[option.mode.SIMPLE]]
   name = "simple"
-  help = "Omit normal loop breaking (default with --strings-fmf)."
+  help = "Omit normal loop breaking."
 [[option.mode.SIMPLE_ABORT]]
   name = "simple-abort"
   help = "Abort when normal loop breaking is required."

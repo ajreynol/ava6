@@ -57,7 +57,6 @@ class AVA6_EXPORT LogicInfo
   /** difference-only arithmetic in this logic? */
   bool d_differenceLogic;
   /** cardinality constraints in this logic? */
-  bool d_cardinalityConstraints;
   /** higher-order constraints in this logic? */
   bool d_higherOrder;
 
@@ -152,9 +151,6 @@ class AVA6_EXPORT LogicInfo
   /** Does this logic only permit difference reasoning? (implies linear) */
   bool isDifferenceLogic() const;
 
-  /** Does this logic allow cardinality constraints? */
-  bool hasCardinalityConstraints() const;
-
   /** Is this a higher order logic? */
   bool isHigherOrder() const;
 
@@ -234,11 +230,6 @@ class AVA6_EXPORT LogicInfo
   void arithNonLinear();
 
   // for cardinality constraints
-
-  /** Enable the use of cardinality constraints in this logic. */
-  void enableCardinalityConstraints();
-  /** Disable the use of cardinality constraints in this logic. */
-  void disableCardinalityConstraints();
 
   // for higher-order
 

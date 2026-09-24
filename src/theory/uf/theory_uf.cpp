@@ -26,7 +26,6 @@
 #include "theory/arith/arith_utilities.h"
 #include "theory/theory_model.h"
 #include "theory/type_enumerator.h"
-#include "theory/uf/cardinality_extension.h"
 #include "theory/uf/conversions_solver.h"
 #include "theory/uf/ho_extension.h"
 #include "theory/uf/lambda_lift.h"
@@ -44,7 +43,6 @@ TheoryUF::TheoryUF(Env& env,
                    Valuation valuation,
                    std::string instanceName)
     : Theory(THEORY_UF, env, out, valuation, instanceName),
-      d_thss(nullptr),
       d_lambdaLift(new LambdaLift(env)),
       d_ho(nullptr),
       d_dpfgen(env),
@@ -73,14 +71,7 @@ bool TheoryUF::needsEqualityEngine(EeSetupInfo& esi)
 {
   esi.d_notify = &d_notify;
   esi.d_name = d_instanceName + "theory::uf::ee";
-  if (options().quantifiers.finiteModelFind
-      && options().uf.ufssMode != options::UfssMode::NONE)
-  {
-    // need notifications about sorts
-    esi.d_notifyNewClass = true;
-    esi.d_notifyMerge = true;
-    esi.d_notifyDisequal = true;
-  }
+
   return true;
 }
 
@@ -88,26 +79,13 @@ void TheoryUF::finishInit()
 {
   Assert(d_equalityEngine != nullptr);
   // combined cardinality constraints are not evaluated in getModelValue
-  d_valuation.setUnevaluatedKind(Kind::COMBINED_CARDINALITY_CONSTRAINT);
   // distinct should not be sent to the model
   d_valuation.setIrrelevantKind(Kind::DISTINCT);
-  if (logicInfo().hasCardinalityConstraints())
-  {
-    {
-      std::stringstream ss;
-      ss << "Logic with cardinality constraints not available in this "
-            "core solver.";
-      throw LogicException(ss.str());
-    }
-  }
+
   // Initialize the cardinality constraints solver if the logic includes UF,
   // finite model finding is enabled, and it is not disabled by
   // the ufssMode option.
-  if (options().quantifiers.finiteModelFind
-      && options().uf.ufssMode != options::UfssMode::NONE)
-  {
-    d_thss.reset(new CardinalityExtension(d_env, d_state, d_im, this));
-  }
+
   // The kinds we are treating as function application in congruence
   bool isHo = logicInfo().isHigherOrder();
   d_equalityEngine->addFunctionKind(Kind::APPLY_UF, false, isHo);
@@ -132,7 +110,7 @@ bool TheoryUF::needsCheckLastEffort()
 {
   // last call effort needed if using finite model finding,
   // arithmetic/bit-vector conversions, or higher-order extension
-  return d_thss != nullptr || d_csolver != nullptr || d_ho != nullptr
+  return d_csolver != nullptr || d_ho != nullptr
          || d_distinct.needsCheckLastEffort();
 }
 
@@ -143,10 +121,7 @@ void TheoryUF::postCheck(Effort level)
     return;
   }
   // check with the cardinality constraints extension
-  if (d_thss != nullptr)
-  {
-    d_thss->check(level);
-  }
+
   if (!d_state.isInConflict())
   {
     if (level == Effort::EFFORT_LAST_CALL)
@@ -175,17 +150,12 @@ void TheoryUF::notifyFact(TNode atom,
   {
     return;
   }
-  if (d_thss != nullptr)
-  {
-    bool isDecision =
-        d_valuation.isSatLiteral(fact) && d_valuation.isDecision(fact);
-    d_thss->assertNode(fact, isDecision);
-  }
+
   switch (atom.getKind())
   {
     case Kind::EQUAL:
     {
-      if (logicInfo().isHigherOrder() && true)
+      if (logicInfo().isHigherOrder())
       {
         if (!pol && !d_state.isInConflict() && atom[0].getType().isFunction())
         {
@@ -199,27 +169,6 @@ void TheoryUF::notifyFact(TNode atom,
     {
       // call the distinct extension
       d_distinct.assertDistinct(atom, pol, fact);
-    }
-    break;
-    case Kind::CARDINALITY_CONSTRAINT:
-    case Kind::COMBINED_CARDINALITY_CONSTRAINT:
-    {
-      if (d_thss == nullptr)
-      {
-        if (!logicInfo().hasCardinalityConstraints())
-        {
-          std::stringstream ss;
-          ss << "Cardinality constraint " << atom
-             << " was asserted, but the logic does not allow it." << std::endl;
-          ss << "Try using a logic containing \"UFC\"." << std::endl;
-          throw Exception(ss.str());
-        }
-        else
-        {
-          // support for cardinality constraints is not enabled, set incomplete
-          d_im.setModelUnsound(IncompleteId::UF_CARD_DISABLED);
-        }
-      }
     }
     break;
     default: break;
@@ -296,10 +245,6 @@ void TheoryUF::preRegisterTerm(TNode node)
 {
   Trace("uf") << "TheoryUF::preRegisterTerm(" << node << ")" << std::endl;
 
-  if (d_thss != nullptr)
-  {
-    d_thss->preRegisterTerm(node);
-  }
 
   Kind k = node.getKind();
   switch (k)
@@ -336,10 +281,6 @@ void TheoryUF::preRegisterTerm(TNode node)
       d_csolver->preRegisterTerm(node);
     }
     break;
-    case Kind::CARDINALITY_CONSTRAINT:
-    case Kind::COMBINED_CARDINALITY_CONSTRAINT:
-      // do nothing
-      break;
     case Kind::UNINTERPRETED_SORT_VALUE:
     {
       // Uninterpreted sort values should only appear in models, and should
@@ -439,11 +380,8 @@ void TheoryUF::presolve()
   // TimerStat::CodeTimer codeTimer(d_presolveTimer);
 
   Trace("uf") << "uf: begin presolve()" << endl;
-  
-  if (d_thss)
-  {
-    d_thss->presolve();
-  }
+
+
   Trace("uf") << "uf: end presolve()" << endl;
 }
 
@@ -454,7 +392,7 @@ void TheoryUF::ppStaticLearn(TNode n, std::vector<TrustNode>& learned)
   // Use the diamonds utility
   d_dpfgen.ppStaticLearn(n, learned);
 
-  
+
 } /* TheoryUF::ppStaticLearn() */
 
 EqualityStatus TheoryUF::getEqualityStatus(TNode a, TNode b)
@@ -664,30 +602,11 @@ void TheoryUF::computeCareGraph()
                        << std::endl;
 } /* TheoryUF::computeCareGraph() */
 
-void TheoryUF::eqNotifyNewClass(TNode t)
-{
-  if (d_thss != nullptr)
-  {
-    d_thss->newEqClass(t);
-  }
-}
-
 void TheoryUF::eqNotifyMerge(TNode t1, TNode t2)
 {
-  if (d_thss != nullptr)
-  {
-    d_thss->merge(t1, t2);
-  }
+
   // check if we have a conflict due to distinct
   d_distinct.eqNotifyMerge(t1, t2);
-}
-
-void TheoryUF::eqNotifyDisequal(TNode t1, TNode t2, TNode reason)
-{
-  if (d_thss != nullptr)
-  {
-    d_thss->assertDisequal(t1, t2, reason);
-  }
 }
 
 bool TheoryUF::isHigherOrderType(TypeNode tn)

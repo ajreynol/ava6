@@ -12,7 +12,6 @@
 
 #include "theory/quantifiers/theory_quantifiers_type_rules.h"
 
-#include "theory/quantifiers/inst_strategy_pool.h"
 
 namespace ava6::internal {
 namespace theory {
@@ -62,24 +61,7 @@ TypeNode QuantifierTypeRule::computeType(NodeManager* nodeManager,
         }
         return TypeNode::null();
       }
-      for (const Node& p : n[2])
-      {
-        if (p.getKind() != Kind::INST_POOL)
-        {
-          continue;
-        }
-        if (!InstStrategyPool::hasProductSemantics(n, p)
-            && !InstStrategyPool::hasTupleSemantics(n, p))
-        {
-          if (errOut)
-          {
-            (*errOut)
-                << "expected number of arguments to pool to be the same as the "
-                   "number of bound variables of the quantified formula";
-          }
-          return TypeNode::null();
-        }
-      }
+
     }
   }
   return nodeManager->booleanType();
@@ -150,7 +132,7 @@ TypeNode QuantifierAnnotationTypeRule::preComputeType(NodeManager* nm,
 TypeNode QuantifierAnnotationTypeRule::computeType(NodeManager* nodeManager,
                                                    TNode n,
                                                    bool check,
-                                                   std::ostream* errOut)
+                                                   std::ostream* errOut AVA6_UNUSED)
 {
   if (check)
   {
@@ -167,34 +149,8 @@ TypeNode QuantifierAnnotationTypeRule::computeType(NodeManager* nodeManager,
         }
       }
     }
-    else if (k == Kind::INST_POOL)
-    {
-      // arguments must have set types
-      for (const Node& nn : n)
-      {
-        if (!nn.getTypeOrNull().isSet())
-        {
-          throw TypeCheckingExceptionPrivate(n, "Expecting a set as argument.");
-        }
-      }
-    }
-    else if (k == Kind::INST_ADD_TO_POOL || k == Kind::SKOLEM_ADD_TO_POOL)
-    {
-      TypeNode tn = n[0].getTypeOrNull();
-      TypeNode tn1 = n[1].getTypeOrNull();
-      if (!tn1.isSet())
-      {
-        throw TypeCheckingExceptionPrivate(n, "Expecting a set as argument.");
-      }
-      if (tn1.getSetElementType() != tn)
-      {
-        if (errOut)
-        {
-          (*errOut) << "Expecting a keyword at the head of INST_ATTRIBUTE.";
-        }
-        return TypeNode::null();
-      }
-    }
+
+
   }
   return nodeManager->instPatternType();
 }
@@ -214,8 +170,7 @@ TypeNode QuantifierInstPatternListTypeRule::computeType(
     {
       Kind k = nc.getKind();
       if (k != Kind::INST_PATTERN && k != Kind::INST_NO_PATTERN
-          && k != Kind::INST_ATTRIBUTE && k != Kind::INST_POOL
-          && k != Kind::INST_ADD_TO_POOL && k != Kind::SKOLEM_ADD_TO_POOL)
+          && k != Kind::INST_ATTRIBUTE)
       {
         if (errOut)
         {

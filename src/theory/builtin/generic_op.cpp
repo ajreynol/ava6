@@ -57,10 +57,7 @@ bool GenericOp::isNumeralIndexedOperatorKind(Kind k)
          || k == Kind::BITVECTOR_REPEAT || k == Kind::BITVECTOR_ZERO_EXTEND
          || k == Kind::BITVECTOR_SIGN_EXTEND || k == Kind::BITVECTOR_ROTATE_LEFT
          || k == Kind::BITVECTOR_ROTATE_RIGHT || k == Kind::INT_TO_BITVECTOR
-         || k == Kind::BITVECTOR_BIT || k == Kind::IAND
-         || k == Kind::RELATION_AGGREGATE || k == Kind::RELATION_PROJECT
-         || k == Kind::RELATION_GROUP
-         || k == Kind::RELATION_TABLE_JOIN;
+         || k == Kind::BITVECTOR_BIT || k == Kind::IAND;
 }
 
 bool GenericOp::isIndexedOperatorKind(Kind k)
@@ -132,11 +129,8 @@ std::vector<Node> GenericOp::getIndicesForOperator(Kind k, Node n)
     case Kind::IAND:
       indices.push_back(nm->mkConstInt(Rational(n.getConst<IntAnd>().d_size)));
       break;
-    case Kind::RELATION_AGGREGATE:
-    case Kind::RELATION_PROJECT:
-    case Kind::RELATION_TABLE_JOIN:
-    case Kind::RELATION_GROUP:
-    
+
+
     case Kind::APPLY_TESTER:
     {
       unsigned index = DType::indexOf(n);
@@ -243,14 +237,6 @@ Node GenericOp::getOperatorForIndices(NodeManager* nm,
       case Kind::IAND:
         Assert(numerals.size() == 1);
         return nm->mkConst(IntAnd(numerals[0]));
-      case Kind::RELATION_AGGREGATE:
-        return nm->mkConst(Kind::RELATION_AGGREGATE_OP, ProjectOp(numerals));
-      case Kind::RELATION_PROJECT:
-        return nm->mkConst(Kind::RELATION_PROJECT_OP, ProjectOp(numerals));
-      case Kind::RELATION_TABLE_JOIN:
-        return nm->mkConst(Kind::RELATION_TABLE_JOIN_OP, ProjectOp(numerals));
-      case Kind::RELATION_GROUP:
-        return nm->mkConst(Kind::RELATION_GROUP_OP, ProjectOp(numerals));
       default:
         Unhandled() << "GenericOp::getOperatorForIndices: unhandled kind " << k;
         break;

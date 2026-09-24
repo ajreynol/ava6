@@ -690,7 +690,6 @@ BaseSolver::CardinalityResponse BaseSolver::getCardinalityReq(
   }
   // we check the cardinality class of the type, assuming that FMF is
   // disabled.
-  if (isCardinalityClassFinite(etn.getCardinalityClass(), false))
   {
     Cardinality c = etn.getCardinality();
     bool smallCardinality = false;
@@ -710,18 +709,6 @@ BaseSolver::CardinalityResponse BaseSolver::getCardinalityReq(
       // to do.
       return CardinalityResponse::NO_REQ;
     }
-  }
-  else
-  {
-    Assert(options().quantifiers.finiteModelFind);
-    // we are in a case where the cardinality of the type is infinite
-    // if not FMF, and finite given the Env's option value for FMF. In this
-    // case, FMF must be true, and the cardinality is finite and dynamic
-    // (i.e. it depends on the model's finite interpretation for uninterpreted
-    // sorts). We do not know how to handle this case, we set incomplete.
-    // TODO (cvc4-projects #23): how to handle sequence for finite types?
-    d_im.setModelUnsound(IncompleteId::SEQ_FINITE_DYNAMIC_CARDINALITY);
-    return CardinalityResponse::UNHANDLED;
   }
   return CardinalityResponse::REQ;
 }
@@ -819,17 +806,7 @@ void BaseSolver::checkCardinalityType(TypeNode tn,
     // no requirements, return
     return;
   }
-  else if (cr == CardinalityResponse::UNHANDLED)
-  {
-    // we are in a case where the cardinality of the type is infinite
-    // if not FMF, and finite given the Env's option value for FMF. In this
-    // case, FMF must be true, and the cardinality is finite and dynamic
-    // (i.e. it depends on the model's finite interpretation for uninterpreted
-    // sorts). We do not know how to handle this case, we set incomplete.
-    // TODO (cvc4-projects #23): how to handle sequence for finite types?
-    d_im.setModelUnsound(IncompleteId::SEQ_FINITE_DYNAMIC_CARDINALITY);
-    return;
-  }
+
   // for each collection
   for (unsigned i = 0, csize = cols.size(); i < csize; ++i)
   {

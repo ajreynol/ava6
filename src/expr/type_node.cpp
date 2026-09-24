@@ -236,7 +236,7 @@ bool TypeNode::isCardinalityLessThan(size_t n)
   {
     return std::log2(n) > getBitVectorSize();
   }
-  
+
   if (isRoundingMode())
   {
     return n > 5;
@@ -265,7 +265,7 @@ bool TypeNode::isClosedEnumerable()
   if (!getAttribute(IsClosedEnumerableComputedAttr()))
   {
     bool ret = true;
-    if (isArray() || isUninterpretedSort() || isCodatatype() || isFunction()
+    if (isArray() || isUninterpretedSort() || isFunction()
         || isRegExp())
     {
       ret = false;
@@ -676,15 +676,6 @@ bool TypeNode::isDatatypeTester() const
 bool TypeNode::isDatatypeUpdater() const
 {
   return getKind() == Kind::UPDATER_TYPE;
-}
-
-bool TypeNode::isCodatatype() const
-{
-  if (isDatatype())
-  {
-    return getDType().isCodatatype();
-  }
-  return false;
 }
 
 bool TypeNode::isSygusDatatype() const

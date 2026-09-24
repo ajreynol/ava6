@@ -20,7 +20,7 @@ using namespace ava6::internal::kind;
 namespace ava6::internal {
 namespace theory {
 
-DecisionStrategyFmf::DecisionStrategyFmf(Env& env, Valuation valuation)
+DecisionStrategySequence::DecisionStrategySequence(Env& env, Valuation valuation)
     : DecisionStrategy(env),
       d_valuation(valuation),
       d_has_curr_literal(context(), false),
@@ -28,9 +28,9 @@ DecisionStrategyFmf::DecisionStrategyFmf(Env& env, Valuation valuation)
 {
 }
 
-void DecisionStrategyFmf::initialize() { d_literals.clear(); }
+void DecisionStrategySequence::initialize() { d_literals.clear(); }
 
-Node DecisionStrategyFmf::getNextDecisionRequest()
+Node DecisionStrategySequence::getNextDecisionRequest()
 {
   Trace("dec-strategy-debug")
       << "Get next decision request " << identify() << "..." << std::endl;
@@ -84,7 +84,7 @@ Node DecisionStrategyFmf::getNextDecisionRequest()
   return Node::null();
 }
 
-bool DecisionStrategyFmf::getAssertedLiteralIndex(unsigned& i) const
+bool DecisionStrategySequence::getAssertedLiteralIndex(unsigned& i) const
 {
   if (d_has_curr_literal.get())
   {
@@ -94,7 +94,7 @@ bool DecisionStrategyFmf::getAssertedLiteralIndex(unsigned& i) const
   return false;
 }
 
-Node DecisionStrategyFmf::getAssertedLiteral()
+Node DecisionStrategySequence::getAssertedLiteral()
 {
   if (d_has_curr_literal.get())
   {
@@ -104,7 +104,7 @@ Node DecisionStrategyFmf::getAssertedLiteral()
   return Node::null();
 }
 
-Node DecisionStrategyFmf::getLiteral(unsigned n)
+Node DecisionStrategySequence::getLiteral(unsigned n)
 {
   // allocate until the index is valid
   while (n >= d_literals.size())
@@ -128,7 +128,7 @@ DecisionStrategySingleton::DecisionStrategySingleton(Env& env,
                                                      const char* name,
                                                      Node lit,
                                                      Valuation valuation)
-    : DecisionStrategyFmf(env, valuation), d_name(name), d_literal(lit)
+    : DecisionStrategySequence(env, valuation), d_name(name), d_literal(lit)
 {
 }
 
@@ -146,7 +146,7 @@ Node DecisionStrategySingleton::getSingleLiteral() { return d_literal; }
 DecisionStrategyVector::DecisionStrategyVector(Env& env,
                                                const char* name,
                                                Valuation valuation)
-    : DecisionStrategyFmf(env, valuation), d_name(name)
+    : DecisionStrategySequence(env, valuation), d_name(name)
 {
 }
 

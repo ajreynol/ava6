@@ -28,10 +28,8 @@ SolverState::SolverState(Env& env, Valuation val, SkolemCache& skc)
     : TheoryState(env, val),
       d_skCache(skc),
       d_mapTerms(env.getUserContext()),
-      d_groupTerms(env.getUserContext()),
       d_mapSkolemElements(env.getUserContext()),
-      d_members(env.getContext()),
-      d_partElementSkolems(env.getUserContext())
+      d_members(env.getContext())
 {
   d_true = nodeManager()->mkConst(true);
   d_false = nodeManager()->mkConst(false);
@@ -41,7 +39,6 @@ void SolverState::reset()
 {
   d_set_eqc.clear();
   d_eqc_emptyset.clear();
-  d_eqc_univset.clear();
   d_eqc_singleton.clear();
   d_congruent.clear();
   d_nvar_sets.clear();
@@ -99,7 +96,7 @@ void SolverState::registerTerm(Node r, TypeNode tnn, Node n)
   }
   else if (nk == Kind::SET_SINGLETON || nk == Kind::SET_UNION
            || nk == Kind::SET_INTER || nk == Kind::SET_MINUS
-           || nk == Kind::SET_EMPTY || nk == Kind::SET_UNIVERSE)
+           || nk == Kind::SET_EMPTY)
   {
     if (nk == Kind::SET_SINGLETON)
     {
@@ -119,13 +116,7 @@ void SolverState::registerTerm(Node r, TypeNode tnn, Node n)
     {
       d_eqc_emptyset[tnn] = r;
     }
-    else if (nk == Kind::SET_UNIVERSE)
-    {
-      Assert(false);
-      d_eqc_univset[tnn] = r;
-    }
-    else
-    {
+    else {
       Node r1 = d_ee->getRepresentative(n[0]);
       Node r2 = d_ee->getRepresentative(n[1]);
       std::map<Node, Node>& binr1 = d_bop_index[nk][r1];
@@ -158,13 +149,6 @@ void SolverState::registerTerm(Node r, TypeNode tnn, Node n)
           std::make_shared<context::CDHashSet<Node>>(d_env.getUserContext());
       d_mapSkolemElements[n] = set;
     }
-  }
-  else if (nk == Kind::RELATION_GROUP)
-  {
-    d_groupTerms.insert(n);
-    std::shared_ptr<context::CDHashSet<Node>> set =
-        std::make_shared<context::CDHashSet<Node>>(d_env.getUserContext());
-    d_partElementSkolems[n] = set;
   }
   else if (nk == Kind::SET_COMPREHENSION)
   {
@@ -206,16 +190,6 @@ Node SolverState::getEmptySetEqClass(TypeNode tn) const
 {
   std::map<TypeNode, Node>::const_iterator it = d_eqc_emptyset.find(tn);
   if (it != d_eqc_emptyset.end())
-  {
-    return it->second;
-  }
-  return Node::null();
-}
-
-Node SolverState::getUnivSetEqClass(TypeNode tn) const
-{
-  std::map<TypeNode, Node>::const_iterator it = d_eqc_univset.find(tn);
-  if (it != d_eqc_univset.end())
   {
     return it->second;
   }
@@ -499,11 +473,6 @@ const context::CDHashSet<Node>& SolverState::getMapTerms() const
   return d_mapTerms;
 }
 
-const context::CDHashSet<Node>& SolverState::getGroupTerms() const
-{
-  return d_groupTerms;
-}
-
 std::shared_ptr<context::CDHashSet<Node>> SolverState::getMapSkolemElements(
     Node n)
 {
@@ -653,20 +622,6 @@ void SolverState::registerMapSkolemElement(const Node& n, const Node& element)
   Assert(element.getKind() == Kind::SKOLEM
          && AVA6_EQUAL(element.getType(), n[1].getType().getSetElementType()));
   d_mapSkolemElements[n].get()->insert(element);
-}
-
-void SolverState::registerPartElementSkolem(Node group, Node skolemElement)
-{
-  Assert(group.getKind() == Kind::RELATION_GROUP);
-  AssertEqual(skolemElement.getType(), group[0].getType().getSetElementType());
-  d_partElementSkolems[group].get()->insert(skolemElement);
-}
-
-std::shared_ptr<context::CDHashSet<Node>> SolverState::getPartElementSkolems(
-    Node n)
-{
-  Assert(n.getKind() == Kind::RELATION_GROUP);
-  return d_partElementSkolems[n];
 }
 
 }  // namespace sets

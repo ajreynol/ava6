@@ -236,6 +236,13 @@ class CpcTester(CpcTesterBase):
 
     def run_internal(self, benchmark_info):
         with tempfile.NamedTemporaryFile() as tmpf:
+            if not os.access(benchmark_info.ethos_binary, os.X_OK):
+                print_error(
+                    "Ethos checker not found: " + benchmark_info.ethos_binary
+                    + ". Run ./contrib/get-ethos-checker or configure "
+                    "-DETHOS_EXECUTABLE=/path/to/ethos."
+                )
+                return EXIT_FAILURE
             ava6_args = [
                 "--dump-proofs",
             ] + benchmark_info.command_line_args

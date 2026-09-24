@@ -525,11 +525,7 @@ Term Smt2TermParser::parseTerm()
             // current attribute.
             Kind attrKind = Kind::NULL_TERM;
             Term attrValue;
-            if (key == ":inst-add-to-pool")
-            {
-              attrKind = Kind::INST_ADD_TO_POOL;
-            }
-            else if (key == ":quant-inst-max-level")
+            if (key == ":quant-inst-max-level")
             {
               // a numeral
               d_lex.eatToken(Token::INTEGER_LITERAL);
@@ -552,20 +548,12 @@ Term Smt2TermParser::parseTerm()
             {
               attrKind = Kind::INST_PATTERN;
             }
-            else if (key == ":pool")
-            {
-              attrKind = Kind::INST_POOL;
-            }
             else if (key == ":qid")
             {
               std::string sym = parseSymbol(CHECK_NONE, SYM_VARIABLE);
               // must create a variable whose name is the name of the quantified
               // formula, not a string.
               attrValue = tm.mkConst(tm.getBooleanSort(), sym);
-            }
-            else if (key == ":skolem-add-to-pool")
-            {
-              attrKind = Kind::SKOLEM_ADD_TO_POOL;
             }
             else
             {
@@ -911,9 +899,6 @@ std::string Smt2TermParser::parseKeyword()
 }
 
 
-
-
-
 uint32_t Smt2TermParser::parseIntegerNumeral()
 {
   d_lex.eatToken(Token::INTEGER_LITERAL);
@@ -975,7 +960,6 @@ std::vector<std::string> Smt2TermParser::parseNumeralList()
 }
 
 std::vector<DatatypeDecl> Smt2TermParser::parseDatatypesDef(
-    bool isCo,
     const std::vector<std::string>& dnames,
     const std::vector<size_t>& arities)
 {
@@ -1031,14 +1015,14 @@ std::vector<DatatypeDecl> Smt2TermParser::parseDatatypesDef(
       }
       Trace("parser-dt") << params.size() << " parameters for " << dnames[i]
                          << std::endl;
-      dts.push_back(tm.mkDatatypeDecl(dnames[i], params, isCo));
+      dts.push_back(tm.mkDatatypeDecl(dnames[i], params));
     }
     else
     {
       d_lex.reinsertToken(tok);
       // we will parse the parentheses-enclosed construct list below
       d_lex.reinsertToken(Token::LPAREN_TOK);
-      dts.push_back(tm.mkDatatypeDecl(dnames[i], params, isCo));
+      dts.push_back(tm.mkDatatypeDecl(dnames[i], params));
     }
     if (i >= arities.size())
     {

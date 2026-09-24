@@ -15,7 +15,6 @@
 #include <sstream>
 
 #include "base/check.h"
-#include "expr/codatatype_bound_variable.h"
 #include "expr/dtype.h"
 #include "expr/dtype_cons.h"
 #include "expr/kind.h"
@@ -55,7 +54,6 @@ TheoryDatatypes::TheoryDatatypes(Env& env,
       d_selector_apps(context()),
       d_initialLemmaCache(userContext()),
       d_functionTerms(context()),
-      d_singleton_eq(userContext()),
       d_rewriter(nodeManager(), env.getEvaluator(), options()),
       d_state(env, valuation),
       d_im(env, *this, d_state),
@@ -122,7 +120,7 @@ void TheoryDatatypes::finishInit()
   // this is not done.
   // Enable the sygus extension if we will introduce sygus datatypes. This
   // is the case for sygus problems and when using sygus-inst.
-  
+
   // testers are not relevant for model building
   d_valuation.setIrrelevantKind(Kind::APPLY_TESTER);
   d_valuation.setIrrelevantKind(Kind::DT_SYGUS_BOUND);
@@ -280,7 +278,7 @@ void TheoryDatatypes::notifyFact(TNode atom,
   Trace("datatypes-debug") << "TheoryDatatypes::assertFact : " << fact
                            << ", isInternal = " << isInternal << std::endl;
   // could be sygus-specific
-  
+
   // add to tester if applicable
   Node t_arg;
   int tindex = utils::isTester(atom, t_arg);
@@ -297,7 +295,7 @@ void TheoryDatatypes::notifyFact(TNode atom,
     Trace("dt-tester") << "Done pending merges." << std::endl;
     if (!d_state.isInConflict() && polarity)
     {
-      
+
     }
   }
   else
@@ -340,14 +338,7 @@ void TheoryDatatypes::preRegisterTerm(TNode n)
       }
       Trace("dt-expand") << "...nested recursion ok" << std::endl;
     }
-    if (dt.isCodatatype())
-    {
-      {
-        std::stringstream ss;
-        ss << "Codatatypes not available in this core solver.";
-        throw LogicException(ss.str());
-      }
-    }
+
   }
   switch (n.getKind())
   {
@@ -370,7 +361,7 @@ void TheoryDatatypes::preRegisterTerm(TNode n)
       registerInitialLemmas(n);
       // Function applications/predicates
       d_equalityEngine->addTerm(n);
-      
+
       break;
   }
   d_im.process();
@@ -1186,24 +1177,6 @@ bool TheoryDatatypes::collectModelValues(TheoryModel* m,
        ++it)
   {
     Node eqc = it->first;
-    if (eqc.getType().isCodatatype())
-    {
-      // must proactive expand to avoid looping behavior in model builder
-      if (!it->second.isNull())
-      {
-        std::map<Node, int> vmap;
-        Node v = getCodatatypesValue(it->first, eqc_cons, vmap, 0);
-        Trace("dt-cmi") << "  EQC(" << it->first << "), constructor is "
-                        << it->second << ", value is " << v
-                        << ", const = " << v.isConst() << std::endl;
-        if (!m->assertEquality(eqc, v, true))
-        {
-          return false;
-        }
-        m->assertSkeleton(v);
-      }
-    }
-    else
     {
       Trace("dt-cmi") << "Datatypes : assert representative " << it->second
                       << " for " << it->first << std::endl;
@@ -1211,77 +1184,6 @@ bool TheoryDatatypes::collectModelValues(TheoryModel* m,
     }
   }
   return true;
-}
-
-Node TheoryDatatypes::getCodatatypesValue(Node n,
-                                          std::map<Node, Node>& eqc_cons,
-                                          std::map<Node, int>& vmap,
-                                          int depth)
-{
-  std::map<Node, int>::iterator itv = vmap.find(n);
-  NodeManager* nm = nodeManager();
-  if (itv != vmap.end())
-  {
-    int debruijn = depth - 1 - itv->second;
-    return nm->mkConst(CodatatypeBoundVariable(n.getType(), debruijn));
-  }
-  else if (n.getType().isDatatype())
-  {
-    Node nc = eqc_cons[n];
-    if (!nc.isNull())
-    {
-      vmap[n] = depth;
-      Trace("dt-cmi-cdt-debug")
-          << "    map " << n << " -> " << depth << std::endl;
-      Assert(nc.getKind() == Kind::APPLY_CONSTRUCTOR);
-      std::vector<Node> children;
-      children.push_back(nc.getOperator());
-      for (unsigned i = 0; i < nc.getNumChildren(); i++)
-      {
-        Node r = getRepresentative(nc[i]);
-        Node rv = getCodatatypesValue(r, eqc_cons, vmap, depth + 1);
-        children.push_back(rv);
-      }
-      vmap.erase(n);
-      return nm->mkNode(Kind::APPLY_CONSTRUCTOR, children);
-    }
-  }
-  return n;
-}
-
-Node TheoryDatatypes::getSingletonLemma(TypeNode tn, bool pol)
-{
-  NodeManager* nm = nodeManager();
-  int index = pol ? 0 : 1;
-  std::map<TypeNode, Node>::iterator it = d_singleton_lemma[index].find(tn);
-  if (it == d_singleton_lemma[index].end())
-  {
-    Node a;
-    if (pol)
-    {
-      Node v1 = NodeManager::mkBoundVar(tn);
-      Node v2 = NodeManager::mkBoundVar(tn);
-      a = nm->mkNode(Kind::FORALL,
-                     {nm->mkNode(Kind::BOUND_VAR_LIST, v1, v2), v1.eqNode(v2)});
-    }
-    else
-    {
-      Node v1 = NodeManager::mkDummySkolem("k1", tn);
-      Node v2 = NodeManager::mkDummySkolem("k2", tn);
-      a = v1.eqNode(v2).negate();
-      // send out immediately as lemma
-      d_im.lemma(a, InferenceId::DATATYPES_REC_SINGLETON_FORCE_DEQ);
-      Trace("dt-singleton")
-          << "******** assert " << a
-          << " to avoid singleton cardinality for type " << tn << std::endl;
-    }
-    d_singleton_lemma[index][tn] = a;
-    return a;
-  }
-  else
-  {
-    return it->second;
-  }
 }
 
 void TheoryDatatypes::registerInitialLemmas(Node n)
@@ -1415,7 +1317,6 @@ void TheoryDatatypes::notifyInstantiate(TNode t)
 void TheoryDatatypes::checkCycles()
 {
   Trace("datatypes-cycle-check") << "Check acyclicity" << std::endl;
-  std::vector<Node> cdt_eqc;
   eq::EqClassesIterator eqcs_i = eq::EqClassesIterator(d_equalityEngine);
   std::map<TNode, bool> visited;
   std::map<TNode, bool> proc;
@@ -1426,7 +1327,6 @@ void TheoryDatatypes::checkCycles()
     TypeNode tn = eqc.getType();
     if (tn.isDatatype())
     {
-      if (!tn.isCodatatype())
       {
         {
           // do cycle checks
@@ -1455,250 +1355,12 @@ void TheoryDatatypes::checkCycles()
           }
         }
       }
-      else
-      {
-        // indexing
-        cdt_eqc.push_back(eqc);
-      }
     }
     ++eqcs_i;
-  }
-  Trace("datatypes-cycle-check") << "Check uniqueness" << std::endl;
-  // process codatatypes
-  if (cdt_eqc.size() > 1 && true)
-  {
-    printModelDebug("dt-cdt-debug");
-    Trace("dt-cdt-debug") << "Process " << cdt_eqc.size() << " co-datatypes"
-                          << std::endl;
-    std::vector<std::vector<Node> > part_out;
-    std::vector<Node> exp;
-    std::map<Node, Node> cn;
-    std::map<Node, std::map<Node, int> > dni;
-    for (unsigned i = 0; i < cdt_eqc.size(); i++)
-    {
-      cn[cdt_eqc[i]] = cdt_eqc[i];
-    }
-    separateBisimilar(cdt_eqc, part_out, exp, cn, dni, 0, false);
-    Trace("dt-cdt-debug") << "Done separate bisimilar." << std::endl;
-    if (!part_out.empty())
-    {
-      Trace("dt-cdt-debug")
-          << "Process partition size " << part_out.size() << std::endl;
-      for (unsigned i = 0; i < part_out.size(); i++)
-      {
-        std::vector<Node> part;
-        part.push_back(part_out[i][0]);
-        for (unsigned j = 1; j < part_out[i].size(); j++)
-        {
-          Trace("dt-cdt") << "Codatatypes : " << part_out[i][0] << " and "
-                          << part_out[i][j] << " must be equal!!" << std::endl;
-          part.push_back(part_out[i][j]);
-          std::vector<std::vector<Node> > tpart_out;
-          exp.clear();
-          cn.clear();
-          cn[part_out[i][0]] = part_out[i][0];
-          cn[part_out[i][j]] = part_out[i][j];
-          dni.clear();
-          separateBisimilar(part, tpart_out, exp, cn, dni, 0, true);
-          Assert(tpart_out.size() == 1 && tpart_out[0].size() == 2);
-          part.pop_back();
-          // merge based on explanation
-          Trace("dt-cdt") << "  exp is : ";
-          for (unsigned k = 0; k < exp.size(); k++)
-          {
-            Trace("dt-cdt") << exp[k] << " ";
-          }
-          Trace("dt-cdt") << std::endl;
-          Node eq = part_out[i][0].eqNode(part_out[i][j]);
-          Node eqExp = nodeManager()->mkAnd(exp);
-          d_im.addPendingInference(eq, InferenceId::DATATYPES_BISIMILAR, eqExp);
-          Trace("datatypes-infer") << "DtInfer : cdt-bisimilar : " << eq
-                                   << " by " << eqExp << std::endl;
-        }
-      }
-    }
   }
 }
 
 // everything is in terms of representatives
-void TheoryDatatypes::separateBisimilar(
-    std::vector<Node>& part,
-    std::vector<std::vector<Node> >& part_out,
-    std::vector<Node>& exp,
-    std::map<Node, Node>& cn,
-    std::map<Node, std::map<Node, int> >& dni,
-    int dniLvl,
-    bool mkExp)
-{
-  if (!mkExp)
-  {
-    Trace("dt-cdt-debug") << "Separate bisimilar : " << std::endl;
-    for (unsigned i = 0; i < part.size(); i++)
-    {
-      Trace("dt-cdt-debug")
-          << "   " << part[i] << ", current = " << cn[part[i]] << std::endl;
-    }
-  }
-  Assert(part.size() > 1);
-  std::map<Node, std::vector<Node> > new_part;
-  std::map<Node, std::vector<Node> > new_part_c;
-  std::map<int, std::vector<Node> > new_part_rec;
-
-  std::map<Node, Node> cn_cons;
-  for (unsigned j = 0; j < part.size(); j++)
-  {
-    Node c = cn[part[j]];
-    std::map<Node, int>::iterator it_rec = dni[part[j]].find(c);
-    if (it_rec != dni[part[j]].end())
-    {
-      // looped
-      if (!mkExp)
-      {
-        Trace("dt-cdt-debug") << "  - " << part[j] << " is looping at index "
-                              << it_rec->second << std::endl;
-      }
-      new_part_rec[it_rec->second].push_back(part[j]);
-    }
-    else
-    {
-      if (c.getType().isDatatype())
-      {
-        Node ncons = getEqcConstructor(c);
-        if (ncons.getKind() == Kind::APPLY_CONSTRUCTOR)
-        {
-          Node cc = ncons.getOperator();
-          cn_cons[part[j]] = ncons;
-          if (mkExp && c != ncons)
-          {
-            exp.push_back(c.eqNode(ncons));
-          }
-          new_part[cc].push_back(part[j]);
-          if (!mkExp)
-          {
-            Trace("dt-cdt-debug") << "  - " << part[j] << " is datatype "
-                                  << ncons << "." << std::endl;
-          }
-        }
-        else
-        {
-          new_part_c[c].push_back(part[j]);
-          if (!mkExp)
-          {
-            Trace("dt-cdt-debug") << "  - " << part[j]
-                                  << " is unspecified datatype." << std::endl;
-          }
-        }
-      }
-      else
-      {
-        // add equivalences
-        if (!mkExp)
-        {
-          Trace("dt-cdt-debug")
-              << "  - " << part[j] << " is term " << c << "." << std::endl;
-        }
-        new_part_c[c].push_back(part[j]);
-      }
-    }
-  }
-  // direct add for constants
-  for (std::map<Node, std::vector<Node> >::iterator it = new_part_c.begin();
-       it != new_part_c.end();
-       ++it)
-  {
-    if (it->second.size() > 1)
-    {
-      std::vector<Node> vec;
-      vec.insert(vec.begin(), it->second.begin(), it->second.end());
-      part_out.push_back(vec);
-    }
-  }
-  // direct add for recursive
-  for (std::map<int, std::vector<Node> >::iterator it = new_part_rec.begin();
-       it != new_part_rec.end();
-       ++it)
-  {
-    if (it->second.size() > 1)
-    {
-      std::vector<Node> vec;
-      vec.insert(vec.begin(), it->second.begin(), it->second.end());
-      part_out.push_back(vec);
-    }
-    else
-    {
-      // add back : could match a datatype?
-    }
-  }
-  // recurse for the datatypes
-  for (std::map<Node, std::vector<Node> >::iterator it = new_part.begin();
-       it != new_part.end();
-       ++it)
-  {
-    if (it->second.size() > 1)
-    {
-      // set dni to check for loops
-      std::map<Node, Node> dni_rem;
-      for (unsigned i = 0; i < it->second.size(); i++)
-      {
-        Node n = it->second[i];
-        dni[n][cn[n]] = dniLvl;
-        dni_rem[n] = cn[n];
-      }
-
-      // we will split based on the arguments of the datatype
-      std::vector<std::vector<Node> > split_new_part;
-      split_new_part.push_back(it->second);
-
-      unsigned nChildren = cn_cons[it->second[0]].getNumChildren();
-      // for each child of constructor
-      unsigned cindex = 0;
-      while (cindex < nChildren && !split_new_part.empty())
-      {
-        if (!mkExp)
-        {
-          Trace("dt-cdt-debug") << "Split argument #" << cindex << " of "
-                                << it->first << "..." << std::endl;
-        }
-        std::vector<std::vector<Node> > next_split_new_part;
-        for (unsigned j = 0; j < split_new_part.size(); j++)
-        {
-          // set current node
-          for (unsigned k = 0; k < split_new_part[j].size(); k++)
-          {
-            Node n = split_new_part[j][k];
-            Node cnc = cn_cons[n][cindex];
-            Node nr = getRepresentative(cnc);
-            cn[n] = nr;
-            if (mkExp && cnc != nr)
-            {
-              exp.push_back(nr.eqNode(cnc));
-            }
-          }
-          std::vector<std::vector<Node> > c_part_out;
-          separateBisimilar(
-              split_new_part[j], c_part_out, exp, cn, dni, dniLvl + 1, mkExp);
-          next_split_new_part.insert(
-              next_split_new_part.end(), c_part_out.begin(), c_part_out.end());
-        }
-        split_new_part.clear();
-        split_new_part.insert(split_new_part.end(),
-                              next_split_new_part.begin(),
-                              next_split_new_part.end());
-        cindex++;
-      }
-      part_out.insert(
-          part_out.end(), split_new_part.begin(), split_new_part.end());
-
-      for (std::map<Node, Node>::iterator it2 = dni_rem.begin();
-           it2 != dni_rem.end();
-           ++it2)
-      {
-        dni[it2->first].erase(it2->second);
-      }
-    }
-  }
-}
-
 // postcondition: if cycle detected, explanation is why n is a subterm of on
 Node TheoryDatatypes::searchForCycle(TNode n,
                                      TNode on,
@@ -1770,7 +1432,6 @@ Node TheoryDatatypes::searchForCycle(TNode n,
     TypeNode tn = nn.getType();
     if (tn.isDatatype())
     {
-      if (!tn.isCodatatype())
       {
         return nn;
       }
@@ -1794,7 +1455,6 @@ void TheoryDatatypes::checkSplit()
       termSetReps.insert(eqc);
     }
   }
-  std::map<TypeNode, Node> rec_singletons;
   for (const Node& n : termSetReps)
   {
     Trace("datatypes-debug") << "Process equivalence class " << n << std::endl;
@@ -1811,68 +1471,8 @@ void TheoryDatatypes::checkSplit()
     const DType& dt = tn.getDType();
     Trace("datatypes-debug")
         << "Datatype " << dt.getName() << " is " << dt.getCardinalityClass(tn)
-        << " " << dt.isRecursiveSingleton(tn) << std::endl;
-    if (dt.isRecursiveSingleton(tn))
-    {
-      Trace("datatypes-debug") << "Check recursive singleton..." << std::endl;
-      bool isQuantifiedLogic = logicInfo().isQuantified();
-      // handle recursive singleton case
-      std::map<TypeNode, Node>::iterator itrs = rec_singletons.find(tn);
-      if (itrs != rec_singletons.end())
-      {
-        Node eq = n.eqNode(itrs->second);
-        if (d_singleton_eq.find(eq) == d_singleton_eq.end())
-        {
-          d_singleton_eq[eq] = true;
-          // get assumptions
-          bool success = true;
-          std::vector<Node> assumptions;
-          // if there is at least one uninterpreted sort occurring within the
-          // datatype and the logic is not quantified, add lemmas ensuring
-          // cardinality is more than one,
-          //  do not infer the equality if at least one sort was processed.
-          // otherwise, if the logic is quantified, under the assumption that
-          // all uninterpreted sorts have cardinality one,
-          //  infer the equality.
-          for (size_t i = 0; i < dt.getNumRecursiveSingletonArgTypes(tn); i++)
-          {
-            TypeNode type = dt.getRecursiveSingletonArgType(tn, i);
-            if (isQuantifiedLogic)
-            {
-              // under the assumption that the cardinality of this type is one
-              Node a = getSingletonLemma(type, true);
-              assumptions.push_back(a.negate());
-            }
-            else
-            {
-              success = false;
-              // assert that the cardinality of this type is more than one
-              getSingletonLemma(type, false);
-            }
-          }
-          if (success)
-          {
-            Node assumption = n.eqNode(itrs->second);
-            assumptions.push_back(assumption);
-            Node lemma = assumptions.size() == 1
-                             ? assumptions[0]
-                             : nodeManager()->mkNode(Kind::OR, assumptions);
-            Trace("dt-singleton") << "*************Singleton equality lemma "
-                                  << lemma << std::endl;
-            d_im.lemma(lemma, InferenceId::DATATYPES_REC_SINGLETON_EQ);
-          }
-        }
-      }
-      else
-      {
-        rec_singletons[tn] = n;
-      }
-      // do splitting for quantified logics (incomplete anyways)
-      if (!isQuantifiedLogic)
-      {
-        continue;
-      }
-    }
+        << " " << false << std::endl;
+
     Trace("datatypes-debug") << "Get possible cons..." << std::endl;
     // all other cases
     std::vector<bool> pcons;

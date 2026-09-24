@@ -127,8 +127,6 @@ class QuantifiersEngine : protected EnvObj
    */
   void getSkolemTermVectors(std::map<Node, std::vector<Node> >& sks) const;
 
-  /** Declare pool */
-  void declarePool(Node p, const std::vector<Node>& initValue);
   //----------end user interface for instantiations
  private:
   /**

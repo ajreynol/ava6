@@ -66,17 +66,6 @@ class BoundedIntegers : public QuantifiersModule
   std::map<Node, std::map<Node, Node>> d_nground_range;
   // integer lower/upper bounds
   std::map<Node, std::map<Node, Node>> d_bounds[2];
-  // set membership range
-  std::map<Node, std::map<Node, Node>> d_setm_range;
-  std::map<Node, std::map<Node, Node>> d_setm_range_lit;
-  /** set membership element choice functions
-   *
-   * For each set S and integer n, d_setm_choice[S][n] is the canonical
-   * representation for the (n+1)^th member of set S. It is of the form:
-   * witness x. (|S| <= n OR ( x in S AND
-   *   distinct( x, d_setm_choice[S][0], ..., d_setm_choice[S][n-1] ) ) )
-   */
-  std::map<Node, std::vector<Node>> d_setm_choice;
   // fixed finite set range
   std::map<Node, std::map<Node, std::vector<Node>>> d_fixed_set_gr_range;
   std::map<Node, std::map<Node, std::vector<Node>>> d_fixed_set_ngr_range;
@@ -89,10 +78,6 @@ class BoundedIntegers : public QuantifiersModule
                std::map<int, std::map<Node, Node>>& bound_int_range_term,
                std::map<Node, std::vector<Node>>& bound_fixed_set);
   bool processEqDisjunct(Node q, Node n, Node& v, std::vector<Node>& v_cases);
-  void processMatchBoundVars(Node q,
-                             Node n,
-                             std::vector<Node>& bvs,
-                             std::map<Node, bool>& visited);
   std::vector<Node> d_bound_quants;
 
  private:
@@ -101,7 +86,7 @@ class BoundedIntegers : public QuantifiersModule
    * arithmetic term t. It decides positively on literals of the form
    * t < 0, t <= 0, t <= 1, t <=2, and so on.
    */
-  class IntRangeDecisionHeuristic : public DecisionStrategyFmf
+  class IntRangeDecisionHeuristic : public DecisionStrategySequence
   {
    public:
     IntRangeDecisionHeuristic(Env& env,
@@ -256,20 +241,6 @@ class BoundedIntegers : public QuantifiersModule
   void getBounds(Node f, Node v, RepSetIterator* rsi, Node& l, Node& u);
   void getBoundValues(Node f, Node v, RepSetIterator* rsi, Node& l, Node& u);
   bool isGroundRange(Node f, Node v);
-  /**
-   * Get the current value for set variable v of quantified formula q based
-   * on the current iterator rsi.
-   */
-  Node getSetRange(Node q, Node v, RepSetIterator* rsi);
-  /**
-   * Get the current value for set variable v of quantified formula q based
-   * on the current iterator rsi. Additionally transforms the model value for
-   * v based on the set_choose operator for the purposes of instantiating with
-   * symbolic elements of the model of v.
-   */
-  Node getSetRangeValue(Node q, Node v, RepSetIterator* rsi);
-  Node matchBoundVar(Node v, Node t, Node e);
-
   bool getRsiSubsitution(Node q,
                          Node v,
                          std::vector<Node>& vars,

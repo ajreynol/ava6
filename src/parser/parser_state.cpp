@@ -530,10 +530,6 @@ Term ParserState::applyTypeAscription(Term t, Sort s)
     }
     t = d_tm.mkEmptySequence(s.getSequenceElementSort());
   }
-  else if (k == Kind::SET_UNIVERSE)
-  {
-    t = d_tm.mkUniverseSet(s);
-  }
   else if (k == Kind::SEP_NIL)
   {
     t = d_tm.mkSepNil(s);

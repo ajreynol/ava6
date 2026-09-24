@@ -30,10 +30,6 @@ libava6_add_sources(
   beta_reduce_converter.h
   bound_var_manager.cpp
   bound_var_manager.h
-  cardinality_constraint.cpp
-  cardinality_constraint.h
-  codatatype_bound_variable.cpp
-  codatatype_bound_variable.h
   elim_shadow_converter.cpp
   elim_shadow_converter.h
   elim_witness_converter.cpp

@@ -48,7 +48,7 @@ enum class IncompleteId
   QUANTIFIERS_SYGUS_SMART_BLOCK_ANY_CONSTANT,
   // incomplete due to counterexample-guided instantiation not being complete
   QUANTIFIERS_CEGQI,
-  // incomplete due to finite model finding not being complete
+  // incomplete due to bounded-quantifier model checking
   QUANTIFIERS_FMF,
   // incomplete due to explicitly recorded instantiations
   QUANTIFIERS_RECORDED_INST,
@@ -67,7 +67,6 @@ enum class IncompleteId
   // relations were used in combination with set cardinality constraints
   SETS_RELS_CARD,
   // finite model finding used in combination with set cardinality constraints
-  SETS_FMF_BOUND_CARD,
   // we skipped processing a looping word equation
   STRINGS_LOOP_SKIP,
   // we could not simplify a regular expression membership
@@ -76,13 +75,10 @@ enum class IncompleteId
   // we know is finite, but its exact cardinality is not fixed. For example,
   // when finite model finding is enabled, uninterpreted sorts have a
   // cardinality that depends on their interpretation in the current model).
-  SEQ_FINITE_DYNAMIC_CARDINALITY,
   // HO extensionality axiom was disabled
   UF_HO_EXT_DISABLED,
   // UF+cardinality solver was disabled
-  UF_CARD_DISABLED,
   // UF+cardinality solver used in an incomplete mode
-  UF_CARD_MODE,
 
   //------------------- other causes external to theories
   // unprocessed theory conflict

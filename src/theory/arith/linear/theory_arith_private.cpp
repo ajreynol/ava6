@@ -58,7 +58,6 @@
 #include "theory/arith/rewriter/rewrite_atom.h"
 #include "theory/arith/theory_arith.h"
 #include "theory/ext_theory.h"
-#include "theory/quantifiers/fmf/bounded_integers.h"
 #include "theory/rewriter.h"
 #include "theory/theory_model.h"
 #include "theory/trust_substitutions.h"
@@ -3036,7 +3035,7 @@ std::vector<ConstraintCPVec> TheoryArithPrivate::replayLogRec(
     resolveOutPropagated(res);
     Trace("approx::replayLogRec") << "replayLogRec() ending" << std::endl;
 
-    
+
   } /* pop the sat context */
 
   /* move into the current context. */
@@ -3782,7 +3781,7 @@ bool TheoryArithPrivate::postCheck(Theory::Effort effortLevel)
       {
         Assert(entireStateIsConsistent("sat comit"));
       }
-      
+
       break;
     case Result::UNKNOWN:
       ++d_unknownsInARow;
@@ -3794,7 +3793,7 @@ bool TheoryArithPrivate::postCheck(Theory::Effort effortLevel)
       d_partialModel.commitAssignmentChanges();
       d_statistics.d_maxUnknownsInARow.maxAssign(d_unknownsInARow);
 
-      
+
       break;
     case Result::UNSAT:
       d_unknownsInARow = 0;
@@ -3815,7 +3814,7 @@ bool TheoryArithPrivate::postCheck(Theory::Effort effortLevel)
       emmittedConflictOrSplit = true;
       Trace("arith::conflict") << "simplex conflict" << endl;
 
-      
+
       break;
     default: Unimplemented();
   }

@@ -22,9 +22,8 @@ namespace ava6::internal {
 namespace theory {
 namespace quantifiers {
 
-QuantifiersBoundInference::QuantifiersBoundInference(unsigned cardMax,
-                                                     bool isFmf)
-    : d_cardMax(cardMax), d_isFmf(isFmf), d_bint(nullptr)
+QuantifiersBoundInference::QuantifiersBoundInference(unsigned cardMax)
+    : d_cardMax(cardMax), d_bint(nullptr)
 {
 }
 
@@ -50,9 +49,7 @@ bool QuantifiersBoundInference::mayComplete(TypeNode tn, unsigned maxCard)
     return false;
   }
   bool mc = false;
-  // we cannot use FMF to complete interpreted types, thus we pass
-  // false for fmfEnabled here
-  if (isCardinalityClassFinite(tn.getCardinalityClass(), false))
+  if (isCardinalityClassFinite(tn.getCardinalityClass()))
   {
     Cardinality c = tn.getCardinality();
     if (!c.isLargeFinite())
@@ -71,11 +68,7 @@ bool QuantifiersBoundInference::isFiniteBound(Node q, Node v)
     return true;
   }
   TypeNode tn = v.getType();
-  if (tn.isUninterpretedSort() && d_isFmf)
-  {
-    return true;
-  }
-  else if (mayComplete(tn))
+  if (mayComplete(tn))
   {
     return true;
   }

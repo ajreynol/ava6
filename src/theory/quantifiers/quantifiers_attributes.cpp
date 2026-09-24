@@ -55,7 +55,7 @@ using PreserveStructureAttribute =
 bool QAttributes::isStandard() const
 {
   return !d_sygus && !d_preserveStructure && !isFunDef() && !isOracleInterface()
-         && !d_isQuantBounded && !d_hasPool;
+         && !d_isQuantBounded;
 }
 
 QuantAttributes::QuantAttributes(context::Context* userContext)
@@ -242,11 +242,6 @@ void QuantAttributes::computeQuantAttributes(Node q, QAttributes& qa)
       if (k == Kind::INST_PATTERN || k == Kind::INST_NO_PATTERN)
       {
         qa.d_hasPattern = true;
-      }
-      else if (k == Kind::INST_POOL || k == Kind::INST_ADD_TO_POOL
-               || k == Kind::SKOLEM_ADD_TO_POOL)
-      {
-        qa.d_hasPool = true;
       }
       else if (k == Kind::INST_ATTRIBUTE)
       {

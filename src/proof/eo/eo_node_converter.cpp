@@ -18,7 +18,6 @@
 
 #include "expr/aci_norm.h"
 #include "expr/array_store_all.h"
-#include "expr/cardinality_constraint.h"
 #include "expr/dtype.h"
 #include "expr/dtype_cons.h"
 #include "expr/sequence.h"
@@ -274,15 +273,7 @@ Node EoNodeConverter::postConvert(Node n)
     // return app of?
     std::vector<Node> args =
         GenericOp::getIndicesForOperator(k, n.getOperator());
-    if (k == Kind::RELATION_GROUP)
-    {
-      Node list = mkList(args);
-      std::vector<Node> children;
-      children.push_back(list);
-      children.insert(children.end(), n.begin(), n.end());
-      return mkInternalApp(
-          printer::smt2::Smt2Printer::smtKindString(k), children, tn);
-    }
+
     args.insert(args.end(), n.begin(), n.end());
     return mkInternalApp(
         printer::smt2::Smt2Printer::smtKindString(k), args, tn);

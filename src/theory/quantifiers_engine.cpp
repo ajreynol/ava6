@@ -61,17 +61,10 @@ QuantifiersEngine::QuantifiersEngine(Env& env,
       d_quants_red(userContext()),
       d_numInstRoundsLemma(0)
 {
-  options::FmfMbqiMode mmode = options().quantifiers.fmfMbqiMode;
-  Trace("quant-init-debug")
-      << "Initialize model engine, mbqi : " << mmode << " "
-      << options().quantifiers.fmfBound << std::endl;
   // Finite model finding requires specialized ways of building the model.
   // We require constructing the model here, since it is required for
   // initializing the CombinationEngine and the rest of quantifiers engine.
-  if (options().quantifiers.fmfBound || options().strings.stringExp
-      || (options().quantifiers.finiteModelFind
-          && (mmode == options::FmfMbqiMode::FMC
-              || mmode == options::FmfMbqiMode::TRUST)))
+  if (options().quantifiers.fmfBound || options().strings.stringExp)
   {
     Trace("quant-init-debug") << "...make fmc builder." << std::endl;
     d_builder.reset(new fmcheck::FullModelChecker(env, qs, qim, qr, tr));
@@ -100,7 +93,6 @@ QuantifiersEngine::QuantifiersEngine(Env& env,
   d_util.push_back(&d_qreg);
   d_util.push_back(tr.getTermDatabase());
   d_util.push_back(qim.getInstantiate());
-  d_util.push_back(tr.getTermPools());
   d_util.push_back(tr.getInstEvaluatorManager());
 }
 
@@ -817,11 +809,6 @@ Node QuantifiersEngine::getNameForQuant(Node q) const
 bool QuantifiersEngine::getNameForQuant(Node q, Node& name, bool req) const
 {
   return d_qreg.getNameForQuant(q, name, req);
-}
-
-void QuantifiersEngine::declarePool(Node p, const std::vector<Node>& initValue)
-{
-  d_treg.declarePool(p, initValue);
 }
 
 }  // namespace theory

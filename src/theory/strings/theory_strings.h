@@ -41,7 +41,6 @@
 #include "theory/strings/sequences_stats.h"
 #include "theory/strings/solver_state.h"
 #include "theory/strings/strategy.h"
-#include "theory/strings/strings_fmf.h"
 #include "theory/strings/strings_rewriter.h"
 #include "theory/strings/term_registry.h"
 #include "theory/theory.h"
@@ -298,7 +297,6 @@ class TheoryStrings : public Theory
   /** regular expression elimination module */
   RegExpElimination d_regexp_elim;
   /** Strings finite model finding decision strategy */
-  StringsFmf d_stringsFmf;
   /** Model constructor (default) */
   ModelConsDefault d_mcd;
   /** The representation of the strategy */

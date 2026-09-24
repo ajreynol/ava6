@@ -100,24 +100,6 @@ class PfManager : protected EnvObj
                   ProofScopeMode scopeMode);
 
   /**
-   * Translate difficulty map. This takes a mapping dmap from preprocessed
-   * assertions to values estimating their difficulty. It translates this
-   * map so that dmap contains a mapping from *input* assertions to values
-   * estimating their difficulty.
-   *
-   * It does this translation by constructing a proof of preprocessing for all
-   * preprocessed assertions marked as having a difficulty, traversing those
-   * proofs, and conditionally incrementing the difficulty of the input
-   * assertion on which they depend. This is based on whether the free
-   * assumption is the "source" of an assertion.
-   *
-   * @param dmap Map estimating the difficulty of preprocessed assertions
-   * @param smt The SMT solver that owns the assertions and the preprocess
-   * proof generator.
-   */
-  void translateDifficultyMap(std::map<Node, Node>& dmap, Assertions& as);
-
-  /**
    * Connect proof to assertions
    *
    * Replaces the free assumptions of pfn that correspond to preprocessed

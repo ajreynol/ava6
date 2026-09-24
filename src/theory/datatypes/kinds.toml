@@ -192,9 +192,9 @@ comment  = "datatypes sygus evaluation function"
 typerule = "::ava6::internal::theory::datatypes::DtSygusEvalTypeRule"
 
 # Kinds for match terms. For example, the match term
-#   (match l (((cons h t) h) (nil 0))) 
+#   (match l (((cons h t) h) (nil 0)))
 # is represented by the AST
-#   (MATCH l 
+#   (MATCH l
 #      (MATCH_BIND_CASE (BOUND_VAR_LIST h t) (cons h t) h)
 #      (MATCH_CASE nil 0)
 #   )
@@ -241,16 +241,6 @@ comment  = "projects a tuple from an existing tuple using indices passed in Tupl
 typerule = "::ava6::internal::theory::datatypes::TupleProjectTypeRule"
 
 # For representing codatatype values
-[[kinds]]
-type      = "constant"
-name      = "CODATATYPE_BOUND_VARIABLE"
-class_key = "class"
-cpp_type  = "CodatatypeBoundVariable"
-hasher    = "::ava6::internal::CodatatypeBoundVariableHashFunction"
-header    = "expr/codatatype_bound_variable.h"
-comment   = "the kind of expressions representing bound variables in codatatype constants, which are de Bruijn indexed variables; payload is an instance of the ava6::internal::CodatatypeBoundVariable class (used in models)"
-typerule  = "::ava6::internal::theory::datatypes::CodatatypeBoundVariableTypeRule"
-
 [[kinds]]
 type     = "operator"
 name     = "NULLABLE_TYPE"

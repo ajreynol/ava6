@@ -67,7 +67,6 @@ class SmtDriver;
 struct SolverEngineStatistics;
 class PfManager;
 class UnsatCoreManager;
-class TimeoutCoreManager;
 
 }  // namespace smt
 
@@ -193,28 +192,6 @@ class AVA6_EXPORT SolverEngine
   bool isInternalSubsolver() const;
 
   /**
-   * Block the current model. Can be called only if immediately preceded by
-   * a SAT or INVALID query. Only permitted if produce-models is on, and the
-   * block-models option is set to a mode other than "none".
-   *
-   * This adds an assertion to the assertion stack that blocks the current
-   * model based on the current options configured by ava6.
-   */
-  void blockModel(modes::BlockModelsMode mode);
-
-  /**
-   * Block the current model values of (at least) the values in exprs. Can be
-   * called only if immediately preceded by a SAT query. Only permitted if
-   * produce-models is on, and the block-models option is set to a mode other
-   * than "none".
-   *
-   * This adds an assertion to the assertion stack of the form:
-   *  (or (not (= exprs[0] M0)) ... (not (= exprs[n] Mn)))
-   * where M0 ... Mn are the current model values of exprs[0] ... exprs[n].
-   */
-  void blockModelValues(const std::vector<Node>& exprs);
-
-  /**
    * Declare heap. For smt2 inputs, this is called when the command
    * (declare-heap (locT datat)) is invoked by the user. This sets locT as the
    * location type and dataT is the data type for the heap. This command should
@@ -236,12 +213,6 @@ class AVA6_EXPORT SolverEngine
 
   /** When using separation logic, obtain the expression for nil.  */
   Node getSepNilExpr();
-
-  /**
-   * Get the list of top-level learned literals that are entailed by the current
-   * set of assertions.
-   */
-  std::vector<Node> getLearnedLiterals(modes::LearnedLitType t);
 
   /**
    * Get an aspect of the current SMT execution environment.
@@ -330,15 +301,6 @@ class AVA6_EXPORT SolverEngine
   Result checkSat(const std::vector<Node>& assumptions);
 
   /**
-   * Get a timeout core, which computes a subset of the current assertions that
-   * cause a timeout. Note it does not require being proceeded by a call to
-   * checkSat. For details, see Solver::getTimeoutCore.
-   *
-   * @return The result of the timeout core computation.
-   */
-  std::pair<Result, std::vector<Node>> getTimeoutCore(
-      const std::vector<Node>& assumptions);
-  /**
    * Returns a set of so-called "failed" assumptions.
    *
    * The returned set is a subset of the set of assumptions of a previous
@@ -349,18 +311,6 @@ class AVA6_EXPORT SolverEngine
    * minimal.
    */
   std::vector<Node> getUnsatAssumptions(void);
-
-  /**
-   * Declare pool whose initial value is the terms in initValue. A pool is
-   * a variable of type (Set T) that is used in quantifier annotations and does
-   * not occur in constraints.
-   *
-   * @param p The pool to declare, which should be a variable of type (Set T)
-   * for some type T.
-   * @param initValue The initial value of p, which should be a vector of terms
-   * of type T.
-   */
-  void declarePool(const Node& p, const std::vector<Node>& initValue);
 
   /**
    * Adds plugin to the theory engine of this solver engine.
@@ -503,12 +453,6 @@ class AVA6_EXPORT SolverEngine
    * SolverEngine is set to operate interactively.
    */
   std::vector<Node> getAssertions();
-
-  /**
-   * Get difficulty map, which populates dmap, mapping input assertions
-   * to a value that estimates their difficulty for solving the current problem.
-   */
-  void getDifficultyMap(std::map<Node, Node>& dmap);
 
   /**
    * Push a user-level context.
@@ -877,11 +821,6 @@ class AVA6_EXPORT SolverEngine
    * The unsat core manager, which produces unsat cores and related information
    * from refutations. */
   std::unique_ptr<smt::UnsatCoreManager> d_ucManager;
-  /**
-   * The timeout core manager, for responding to get-timeout-core commands.
-   */
-  std::unique_ptr<smt::TimeoutCoreManager> d_tcm;
-
 
 
   /**

@@ -129,11 +129,6 @@ class AVA6_EXPORT Printer
                                           TypeNode type) const;
   /** Variant of above for a pre-existing variable */
   void toStreamCmdDeclareFunction(std::ostream& out, const Node& v) const;
-  /** Print declare-pool command */
-  virtual void toStreamCmdDeclarePool(std::ostream& out,
-                                      const std::string& id,
-                                      TypeNode type,
-                                      const std::vector<Node>& initValue) const;
   /** Print declare-oracle-fun command */
   virtual void toStreamCmdDeclareOracleFun(
       std::ostream& out,
@@ -207,14 +202,6 @@ class AVA6_EXPORT Printer
   /** Print get-model command */
   virtual void toStreamCmdGetModel(std::ostream& out) const;
 
-  /** Print block-model command */
-  virtual void toStreamCmdBlockModel(std::ostream& out,
-                                     modes::BlockModelsMode mode) const;
-
-  /** Print block-model-values command */
-  virtual void toStreamCmdBlockModelValues(
-      std::ostream& out, const std::vector<Node>& nodes) const;
-
   /** Print get-proof command */
   virtual void toStreamCmdGetProof(std::ostream& out,
                                    modes::ProofComponent c) const;
@@ -227,20 +214,6 @@ class AVA6_EXPORT Printer
 
   /** Print get-unsat-core command */
   virtual void toStreamCmdGetUnsatCore(std::ostream& out) const;
-
-  /** Print get-difficulty command */
-  virtual void toStreamCmdGetDifficulty(std::ostream& out) const;
-
-  /** Print get-timeout-core command */
-  virtual void toStreamCmdGetTimeoutCore(std::ostream& out) const;
-
-  /** Print get-timeout-core-assuming command */
-  virtual void toStreamCmdGetTimeoutCoreAssuming(
-      std::ostream& out, const std::vector<Node>& assumptions) const;
-
-  /** Print get-learned-literals command */
-  virtual void toStreamCmdGetLearnedLiterals(std::ostream& out,
-                                             modes::LearnedLitType t) const;
 
   /** Print get-assertions command */
   virtual void toStreamCmdGetAssertions(std::ostream& out) const;

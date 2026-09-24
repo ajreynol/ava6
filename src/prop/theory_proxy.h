@@ -10,6 +10,7 @@
  * SAT Solver.
  */
 
+#include "prop/learned_literal_type.h"
 #include "ava6_private.h"
 
 #ifndef AVA6__PROP__SAT_H
@@ -194,13 +195,10 @@ class TheoryProxy : protected EnvObj, public Registrar
    */
   void notifyBacktrack();
 
-  /** Get the zero-level assertions */
-  std::vector<Node> getLearnedZeroLevelLiterals(
-      modes::LearnedLitType ltype) const;
   /** Get the zero-level assertions that should be used on deep restart */
   std::vector<Node> getLearnedZeroLevelLiteralsForRestart() const;
   /** Get literal type using ZLL utility */
-  modes::LearnedLitType getLiteralType(const Node& lit) const;
+  LearnedLitType getLiteralType(const Node& lit) const;
 
   /** Inprocess lemma */
   TrustNode inprocessLemma(TrustNode& trn);

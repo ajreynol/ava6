@@ -18,7 +18,7 @@ header = "theory/uf/theory_uf_rewriter.h"
 [[kinds]]
 type     = "parameterized"
 K1       = "APPLY_UF"
-K2       = "VARIABLE" 
+K2       = "VARIABLE"
 children = "1:"
 comment  = "application of an uninterpreted function; first parameter is the function, remaining ones are parameters to that function"
 typerule = "::ava6::internal::theory::uf::UfTypeRule"
@@ -52,42 +52,6 @@ name     = "HO_APPLY"
 children = 2
 comment  = "higher-order (partial) function application"
 typerule = "::ava6::internal::theory::uf::HoApplyTypeRule"
-
-[[kinds]]
-type      = "constant"
-name      = "CARDINALITY_CONSTRAINT_OP" 
-class_key = "class"
-cpp_type  = "CardinalityConstraint"
-hasher    = "::ava6::internal::CardinalityConstraintHashFunction"
-header    = "expr/cardinality_constraint.h"
-comment   = "the cardinality constraint operator; payload is an instance of the ava6::internal::CardinalityConstraint class"
-typerule  = "::ava6::internal::theory::uf::CardinalityConstraintOpTypeRule"
-
-[[kinds]]
-type     = "parameterized"
-K1       = "CARDINALITY_CONSTRAINT"
-K2       = "CARDINALITY_CONSTRAINT_OP"
-children = 0
-comment  = "a fixed upper bound on the cardinality of an uninterpreted sort"
-typerule = "SimpleTypeRule<RBool>"
-
-[[kinds]]
-type      = "constant"
-name      = "COMBINED_CARDINALITY_CONSTRAINT_OP"
-class_key = "class"
-cpp_type  = "CombinedCardinalityConstraint"
-hasher    = "::ava6::internal::CombinedCardinalityConstraintHashFunction"
-header    = "expr/cardinality_constraint.h"
-comment   = "the combined cardinality constraint operator; payload is an instance of the ava6::internal::CombinedCardinalityConstraint class"
-typerule  = "::ava6::internal::theory::uf::CombinedCardinalityConstraintOpTypeRule"
-
-[[kinds]]
-type     = "parameterized"
-K1       = "COMBINED_CARDINALITY_CONSTRAINT"
-K2       = "COMBINED_CARDINALITY_CONSTRAINT_OP"
-children = 0
-comment  = "a fixed upper bound on the sum of cardinalities of uninterpreted sorts"
-typerule = "SimpleTypeRule<RBool>"
 
 [[kinds]]
 type      = "constant"
@@ -135,6 +99,6 @@ typerule = "::ava6::internal::theory::uf::BitVectorConversionTypeRule"
 [[kinds]]
 type     = "operator"
 name     = "DISTINCT"
-children = "2:" 
+children = "2:"
 comment  = "disequality (N-ary, sorts must match)"
 typerule = "::ava6::internal::theory::uf::DistinctTypeRule"

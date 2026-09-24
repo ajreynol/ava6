@@ -12,6 +12,7 @@
  * Main interface point between ava6's SMT infrastructure and the SAT solver.
  */
 
+#include "prop/learned_literal_type.h"
 #include "ava6_private.h"
 
 #ifndef AVA6__PROP_ENGINE_H
@@ -348,15 +349,11 @@ class PropEngine : protected EnvObj
    */
   std::vector<Node> getUnsatCoreLemmas();
 
-  /** Get the zero-level assertions of the given type */
-  std::vector<Node> getLearnedZeroLevelLiterals(
-      modes::LearnedLitType ltype) const;
-
   /** Get the zero-level assertions that should be used on deep restart */
   std::vector<Node> getLearnedZeroLevelLiteralsForRestart() const;
 
   /** Get the literal type through the ZLL utilities */
-  modes::LearnedLitType getLiteralType(const Node& lit) const;
+  LearnedLitType getLiteralType(const Node& lit) const;
 
  private:
   /** Dump out the satisfying assignment (after SAT result) */

@@ -223,9 +223,7 @@ int ModelEngine::checkModel()
   }
 
   Trace("model-engine-debug") << "Do exhaustive instantiation..." << std::endl;
-  // FMC uses two sub-effort levels. In trust mode, we intentionally skip
-  // exhaustive instantiation, which means any active quantifier we would have
-  // processed here must force an unknown answer instead of sat.
+  // FMC uses two sub-effort levels.
   options::FmfMbqiMode mode = options().quantifiers.fmfMbqiMode;
   int e_max = mode == options::FmfMbqiMode::FMC ? 2 : 1;
   for (int e = 0; e < e_max; e++)
@@ -245,14 +243,6 @@ int ModelEngine::checkModel()
       if (!shouldProcess(q))
       {
         Trace("fmf-exh-inst") << "-> Not processed : " << q << std::endl;
-        d_incompleteQuants.insert(q);
-        continue;
-      }
-      if (mode == options::FmfMbqiMode::TRUST)
-      {
-        Trace("fmf-exh-inst")
-            << "-> Trust mode skips exhaustive instantiation." << std::endl;
-        d_incomplete_check = true;
         d_incompleteQuants.insert(q);
         continue;
       }
@@ -419,8 +409,8 @@ bool ModelEngine::shouldProcess(Node q)
     // for processing q.
     return false;
   }
-  // if finite model finding or fmf bound is on, we process everything
-  if (options().quantifiers.finiteModelFind || options().quantifiers.fmfBound)
+  // With --fmf-bound, consider user quantifiers as well as internal ones.
+  if (options().quantifiers.fmfBound)
   {
     return true;
   }

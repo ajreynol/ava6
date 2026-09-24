@@ -10,6 +10,8 @@
  * Implementation of the theory of quantifiers.
  */
 
+#include "theory/ee_setup_info.h"
+#include "theory/theory_model.h"
 #include "theory/quantifiers/theory_quantifiers.h"
 
 #include "options/quantifiers_options.h"

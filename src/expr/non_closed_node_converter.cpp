@@ -107,7 +107,6 @@ void NonClosedNodeConverter::getNonClosedKinds(
   {
     ncks.insert(Kind::STORE_ALL);
   }
-  ncks.insert(Kind::CODATATYPE_BOUND_VARIABLE);
   ncks.insert(Kind::UNINTERPRETED_SORT_VALUE);
   // may appear in certain models e.g. strings of excessive length
   ncks.insert(Kind::WITNESS);

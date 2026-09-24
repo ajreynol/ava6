@@ -411,8 +411,7 @@ class AVA6_EXPORT TypeNode
    * of types that are not closed enumerable are:
    * (1) uninterpreted sorts,
    * (2) arrays,
-   * (3) codatatypes,
-   * (4) functions,
+   * (3) functions,
    * (5) parametric sorts involving any of the above.
    */
   bool isClosedEnumerable();
@@ -654,9 +653,6 @@ class AVA6_EXPORT TypeNode
 
   /** Is this a parameterized datatype type */
   bool isParametricDatatype() const;
-
-  /** Is this a codatatype type */
-  bool isCodatatype() const;
 
   /** Is this a fully instantiated datatype type */
   bool isInstantiatedDatatype() const;

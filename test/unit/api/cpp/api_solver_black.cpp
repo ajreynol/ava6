@@ -28,11 +28,6 @@ class TestApiBlackSolver : public TestApi
 };
 
 
-
-
-
-
-
 TEST_F(TestApiBlackSolver, recoverableException)
 {
   d_solver->setOption("produce-models", "true");
@@ -606,7 +601,6 @@ TEST_F(TestApiBlackSolver, getOptionNames)
 }
 
 
-
 TEST_F(TestApiBlackSolver, getUnsatAssumptions1)
 {
   d_solver->setOption("incremental", "false");
@@ -694,7 +688,6 @@ TEST_F(TestApiBlackSolver, getUnsatCoreAndProof)
 }
 
 
-
 TEST_F(TestApiBlackSolver, getUnsatCoreLemmas2)
 {
   d_solver->setOption("incremental", "true");
@@ -725,45 +718,6 @@ TEST_F(TestApiBlackSolver, getUnsatCoreLemmas2)
   ASSERT_NO_THROW(d_solver->getUnsatCoreLemmas());
 }
 
-
-
-
-
-
-
-
-
-
-
-TEST_F(TestApiBlackSolver, declarePool)
-{
-  Sort setSort = d_tm.mkSetSort(d_int);
-  Term zero = d_tm.mkInteger(0);
-  Term x = d_tm.mkConst(d_int, "x");
-  Term y = d_tm.mkConst(d_int, "y");
-  // declare a pool with initial value { 0, x, y }
-  Term p = d_solver->declarePool("p", d_int, {zero, x, y});
-  // pool should have the same sort
-  ASSERT_TRUE(p.getSort() == setSort);
-  // cannot pass null sort
-  Sort nullSort;
-  ASSERT_THROW(d_solver->declarePool("i", nullSort, {}), Ava6ApiException);
-
-  TermManager tm;
-  Solver slv(tm);
-  Sort tm_int = tm.getIntegerSort();
-  Term tm_zero = tm.mkInteger(0);
-  Term tm_x = tm.mkConst(tm_int, "x");
-  Term tm_y = tm.mkConst(tm_int, "y");
-  ASSERT_THROW(slv.declarePool("p", d_int, {tm_zero, tm_x, tm_y}),
-               Ava6ApiException);
-  ASSERT_THROW(slv.declarePool("p", tm_int, {zero, tm_x, tm_y}),
-               Ava6ApiException);
-  ASSERT_THROW(slv.declarePool("p", tm_int, {tm_zero, x, tm_y}),
-               Ava6ApiException);
-  ASSERT_THROW(slv.declarePool("p", tm_int, {tm_zero, tm_x, y}),
-               Ava6ApiException);
-}
 
 TEST_F(TestApiBlackSolver, getDriverOptions)
 {
@@ -856,125 +810,6 @@ TEST_F(TestApiBlackSolver, printStatisticsSafe)
   testing::internal::GetCapturedStdout();
 }
 
-
-
-
-
-TEST_F(TestApiBlackSolver, getDifficulty)
-{
-  d_solver->setOption("produce-difficulty", "true");
-  // cannot ask before a check sat
-  ASSERT_THROW(d_solver->getDifficulty(), Ava6ApiException);
-  d_solver->checkSat();
-  ASSERT_NO_THROW(d_solver->getDifficulty());
-}
-
-TEST_F(TestApiBlackSolver, getDifficulty2)
-{
-  d_solver->checkSat();
-  // option is not set
-  ASSERT_THROW(d_solver->getDifficulty(), Ava6ApiException);
-}
-
-TEST_F(TestApiBlackSolver, getDifficulty3)
-{
-  d_solver->setOption("produce-difficulty", "true");
-  Term x = d_tm.mkConst(d_int, "x");
-  Term zero = d_tm.mkInteger(0);
-  Term ten = d_tm.mkInteger(10);
-  Term f0 = d_tm.mkTerm(Kind::GEQ, {x, ten});
-  Term f1 = d_tm.mkTerm(Kind::GEQ, {zero, x});
-  d_solver->assertFormula(f0);
-  d_solver->assertFormula(f1);
-  d_solver->checkSat();
-  std::map<Term, Term> dmap;
-  ASSERT_NO_THROW(dmap = d_solver->getDifficulty());
-  // difficulty should map assertions to integer values
-  for (const std::pair<const Term, Term>& t : dmap)
-  {
-    ASSERT_TRUE(t.first == f0 || t.first == f1);
-    ASSERT_TRUE(t.second.getKind() == Kind::CONST_INTEGER);
-  }
-}
-
-TEST_F(TestApiBlackSolver, getLearnedLiterals)
-{
-  d_solver->setOption("produce-learned-literals", "true");
-  // cannot ask before a check sat
-  ASSERT_THROW(d_solver->getLearnedLiterals(), Ava6ApiException);
-  d_solver->checkSat();
-  ASSERT_NO_THROW(d_solver->getLearnedLiterals());
-  ASSERT_NO_THROW(
-      d_solver->getLearnedLiterals(modes::LearnedLitType::PREPROCESS));
-}
-
-TEST_F(TestApiBlackSolver, getLearnedLiterals2)
-{
-  d_solver->setOption("produce-learned-literals", "true");
-  Term x = d_tm.mkConst(d_int, "x");
-  Term y = d_tm.mkConst(d_int, "y");
-  Term zero = d_tm.mkInteger(0);
-  Term ten = d_tm.mkInteger(10);
-  Term f0 = d_tm.mkTerm(Kind::GEQ, {x, ten});
-  Term f1 = d_tm.mkTerm(
-      Kind::OR,
-      {d_tm.mkTerm(Kind::GEQ, {zero, x}), d_tm.mkTerm(Kind::GEQ, {y, zero})});
-  d_solver->assertFormula(f0);
-  d_solver->assertFormula(f1);
-  d_solver->checkSat();
-  ASSERT_NO_THROW(d_solver->getLearnedLiterals());
-}
-
-TEST_F(TestApiBlackSolver, getTimeoutCore)
-{
-  d_solver->setOption("timeout-core-timeout", "100");
-  d_solver->setOption("produce-unsat-cores", "true");
-  Term x = d_tm.mkConst(d_int, "x");
-  Term tt = d_tm.mkBoolean(true);
-  Term hard =
-      d_tm.mkTerm(Kind::EQUAL,
-                  {d_tm.mkTerm(Kind::MULT, {x, x}),
-                   d_tm.mkInteger("501240912901901249014210220059591")});
-  d_solver->assertFormula(tt);
-  d_solver->assertFormula(hard);
-  std::pair<ava6::Result, std::vector<Term>> res = d_solver->getTimeoutCore();
-  ASSERT_TRUE(res.first.isUnknown());
-  ASSERT_TRUE(res.second.size() == 1);
-  ASSERT_EQ(res.second[0], hard);
-}
-
-TEST_F(TestApiBlackSolver, getTimeoutCoreUnsat)
-{
-  d_solver->setOption("produce-unsat-cores", "true");
-  Term ff = d_tm.mkBoolean(false);
-  Term tt = d_tm.mkBoolean(true);
-  d_solver->assertFormula(tt);
-  d_solver->assertFormula(ff);
-  d_solver->assertFormula(tt);
-  std::pair<ava6::Result, std::vector<Term>> res = d_solver->getTimeoutCore();
-  ASSERT_TRUE(res.first.isUnsat());
-  ASSERT_TRUE(res.second.size() == 1);
-  ASSERT_EQ(res.second[0], ff);
-}
-
-TEST_F(TestApiBlackSolver, getTimeoutCoreAssuming)
-{
-  d_solver->setOption("produce-unsat-cores", "true");
-  Term ff = d_tm.mkBoolean(false);
-  Term tt = d_tm.mkBoolean(true);
-  d_solver->assertFormula(tt);
-  std::pair<ava6::Result, std::vector<Term>> res =
-      d_solver->getTimeoutCoreAssuming({ff, tt});
-  ASSERT_TRUE(res.first.isUnsat());
-  ASSERT_TRUE(res.second.size() == 1);
-  ASSERT_EQ(res.second[0], ff);
-}
-
-TEST_F(TestApiBlackSolver, getTimeoutCoreAssumingEmpty)
-{
-  d_solver->setOption("produce-unsat-cores", "true");
-  ASSERT_THROW(d_solver->getTimeoutCoreAssuming({}), Ava6ApiException);
-}
 
 TEST_F(TestApiBlackSolver, getValue1)
 {
@@ -1074,21 +909,6 @@ TEST_F(TestApiBlackSolver, getModelDomainElements)
   ASSERT_THROW(slv.getModelDomainElements(d_uninterpreted), Ava6ApiException);
 }
 
-TEST_F(TestApiBlackSolver, getModelDomainElements2)
-{
-  d_solver->setOption("produce-models", "true");
-  d_solver->setOption("finite-model-find", "true");
-  Term x = d_tm.mkVar(d_uninterpreted, "x");
-  Term y = d_tm.mkVar(d_uninterpreted, "y");
-  Term eq = d_tm.mkTerm(Kind::EQUAL, {x, y});
-  Term bvl = d_tm.mkTerm(Kind::VARIABLE_LIST, {x, y});
-  Term f = d_tm.mkTerm(Kind::FORALL, {bvl, eq});
-  d_solver->assertFormula(f);
-  d_solver->checkSat();
-  auto elems = d_solver->getModelDomainElements(d_uninterpreted);
-  // a model for the above must interpret u as size 1
-  ASSERT_TRUE(elems.size() == 1);
-}
 
 TEST_F(TestApiBlackSolver, isModelCoreSymbol)
 {
@@ -1184,83 +1004,6 @@ TEST_F(TestApiBlackSolver, pop3)
   ASSERT_THROW(d_solver->pop(1), Ava6ApiException);
 }
 
-TEST_F(TestApiBlackSolver, blockModel1)
-{
-  Term x = d_tm.mkConst(d_bool, "x");
-  d_solver->assertFormula(x.eqTerm(x));
-  d_solver->checkSat();
-  ASSERT_THROW(d_solver->blockModel(modes::BlockModelsMode::LITERALS),
-               Ava6ApiException);
-}
-
-TEST_F(TestApiBlackSolver, blockModel2)
-{
-  d_solver->setOption("produce-models", "true");
-  Term x = d_tm.mkConst(d_bool, "x");
-  d_solver->assertFormula(x.eqTerm(x));
-  ASSERT_THROW(d_solver->blockModel(modes::BlockModelsMode::LITERALS),
-               Ava6ApiException);
-}
-
-TEST_F(TestApiBlackSolver, blockModel3)
-{
-  d_solver->setOption("produce-models", "true");
-  Term x = d_tm.mkConst(d_bool, "x");
-  d_solver->assertFormula(x.eqTerm(x));
-  d_solver->checkSat();
-  ASSERT_NO_THROW(d_solver->blockModel(modes::BlockModelsMode::LITERALS));
-}
-
-TEST_F(TestApiBlackSolver, blockModelValues1)
-{
-  d_solver->setOption("produce-models", "true");
-  Term x = d_tm.mkConst(d_bool, "x");
-  d_solver->assertFormula(x.eqTerm(x));
-  d_solver->checkSat();
-  ASSERT_THROW(d_solver->blockModelValues({}), Ava6ApiException);
-  ASSERT_THROW(d_solver->blockModelValues({Term()}), Ava6ApiException);
-  ASSERT_NO_THROW(d_solver->blockModelValues({d_tm.mkBoolean(false)}));
-
-  TermManager tm;
-  Solver slv(tm);
-  slv.setOption("produce-models", "true");
-  slv.checkSat();
-  ASSERT_THROW(slv.blockModelValues({d_tm.mkFalse()}), Ava6ApiException);
-}
-
-TEST_F(TestApiBlackSolver, blockModelValues2)
-{
-  d_solver->setOption("produce-models", "true");
-  Term x = d_tm.mkConst(d_bool, "x");
-  d_solver->assertFormula(x.eqTerm(x));
-  d_solver->checkSat();
-  ASSERT_NO_THROW(d_solver->blockModelValues({x}));
-}
-
-TEST_F(TestApiBlackSolver, blockModelValues3)
-{
-  Term x = d_tm.mkConst(d_bool, "x");
-  d_solver->assertFormula(x.eqTerm(x));
-  d_solver->checkSat();
-  ASSERT_THROW(d_solver->blockModelValues({x}), Ava6ApiException);
-}
-
-TEST_F(TestApiBlackSolver, blockModelValues4)
-{
-  d_solver->setOption("produce-models", "true");
-  Term x = d_tm.mkConst(d_bool, "x");
-  d_solver->assertFormula(x.eqTerm(x));
-  ASSERT_THROW(d_solver->blockModelValues({x}), Ava6ApiException);
-}
-
-TEST_F(TestApiBlackSolver, blockModelValues5)
-{
-  d_solver->setOption("produce-models", "true");
-  Term x = d_tm.mkConst(d_bool, "x");
-  d_solver->assertFormula(x.eqTerm(x));
-  d_solver->checkSat();
-  ASSERT_NO_THROW(d_solver->blockModelValues({x}));
-}
 
 TEST_F(TestApiBlackSolver, getInstantiations)
 {
@@ -1352,37 +1095,6 @@ TEST_F(TestApiBlackSolver, resetAssertions)
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 TEST_F(TestApiBlackSolver, tupleProject)
 {
   std::vector<Term> elements = {
@@ -1457,13 +1169,6 @@ TEST_F(TestApiBlackSolver, getDatatypeArity)
 }
 
 
-
-
-
-
-
-
-
 class PluginUnsat : public Plugin
 {
  public:
@@ -1524,9 +1229,6 @@ class PluginListen : public Plugin
 };
 
 
-
-
-
 TEST_F(TestApiBlackSolver, verticalBars)
 {
   Term a = d_solver->declareFun("|a |", {}, d_real);
@@ -1579,9 +1281,6 @@ TEST_F(TestApiBlackSolver, multipleSolvers)
 }
 
 #ifdef AVA6_USE_COCOA
-
-
-
 
 
 #endif  // AVA6_USE_COCOA

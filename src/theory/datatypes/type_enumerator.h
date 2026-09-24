@@ -32,7 +32,6 @@ class DatatypesEnumerator : public TypeEnumeratorBase<DatatypesEnumerator>
   /** The datatype we're enumerating */
   const DType& d_datatype;
   /** extra cons */
-  unsigned d_has_debruijn;
   /** type */
   TypeNode d_type;
   /** The datatype constructor we're currently enumerating */
@@ -56,27 +55,6 @@ class DatatypesEnumerator : public TypeEnumeratorBase<DatatypesEnumerator>
   /** current bound on the number of times we can iterate argument enumerators
    */
   unsigned d_size_limit;
-  /** child */
-  bool d_child_enum;
-
-  bool hasCyclesDt(const DType& dt)
-  {
-    return dt.isRecursiveSingleton(d_type)
-           || dt.getCardinalityClass(d_type) == CardinalityClass::INFINITE;
-  }
-  bool hasCycles(TypeNode tn)
-  {
-    if (tn.isDatatype())
-    {
-      const DType& dt = tn.getDType();
-      return hasCyclesDt(dt);
-    }
-    else
-    {
-      return false;
-    }
-  }
-
   Node getTermEnum(TypeNode tn, unsigned i);
 
   bool increment(unsigned index);
@@ -85,7 +63,7 @@ class DatatypesEnumerator : public TypeEnumeratorBase<DatatypesEnumerator>
 
   bool isEnumerationComplete()
   {
-    return d_ctor >= d_has_debruijn + d_datatype.getNumConstructors();
+    return d_ctor >= d_datatype.getNumConstructors();
   }
 
   void init();
@@ -99,20 +77,6 @@ class DatatypesEnumerator : public TypeEnumeratorBase<DatatypesEnumerator>
         d_ctor(0),
         d_zeroTermActive(false)
   {
-    d_child_enum = false;
-    init();
-  }
-  DatatypesEnumerator(TypeNode type,
-                      bool childEnum,
-                      TypeEnumeratorProperties* tep = nullptr)
-      : TypeEnumeratorBase<DatatypesEnumerator>(type),
-        d_tep(tep),
-        d_datatype(type.getDType()),
-        d_type(type),
-        d_ctor(0),
-        d_zeroTermActive(false)
-  {
-    d_child_enum = childEnum;
     init();
   }
   DatatypesEnumerator(const DatatypesEnumerator& de)
@@ -158,8 +122,6 @@ class DatatypesEnumerator : public TypeEnumeratorBase<DatatypesEnumerator>
         d_children.end(), de.d_children.begin(), de.d_children.end());
     d_sel_sum.insert(d_sel_sum.end(), de.d_sel_sum.begin(), de.d_sel_sum.end());
     d_size_limit = de.d_size_limit;
-    d_has_debruijn = de.d_has_debruijn;
-    d_child_enum = de.d_child_enum;
   }
 
   Node operator*() override
@@ -169,7 +131,7 @@ class DatatypesEnumerator : public TypeEnumeratorBase<DatatypesEnumerator>
     {
       return d_zeroTerm;
     }
-    else if (d_ctor < d_has_debruijn + d_datatype.getNumConstructors())
+    else if (d_ctor < d_datatype.getNumConstructors())
     {
       return getCurrentTerm(d_ctor);
     }

@@ -85,56 +85,6 @@ std::string to_string(ava6::UnknownExplanation exp)
 }  // namespace std
 
 namespace ava6::modes {
-std::ostream& operator<<(std::ostream& out, BlockModelsMode mode)
-{
-  switch (mode)
-  {
-    case BlockModelsMode::LITERALS: out << "literals"; break;
-    case BlockModelsMode::VALUES: out << "values"; break;
-    default: out << "?";
-  }
-  return out;
-}
-
-}  // namespace ava6::modes
-
-namespace std {
-std::string to_string(ava6::modes::BlockModelsMode mode)
-{
-  std::stringstream ss;
-  ss << mode;
-  return ss.str();
-}
-}  // namespace std
-
-namespace ava6::modes {
-std::ostream& operator<<(std::ostream& out, LearnedLitType ltype)
-{
-  switch (ltype)
-  {
-    case LearnedLitType::PREPROCESS_SOLVED: out << "preprocess_solved"; break;
-    case LearnedLitType::PREPROCESS: out << "preprocess"; break;
-    case LearnedLitType::INPUT: out << "input"; break;
-    case LearnedLitType::SOLVABLE: out << "solvable"; break;
-    case LearnedLitType::CONSTANT_PROP: out << "constant_prop"; break;
-    case LearnedLitType::INTERNAL: out << "internal"; break;
-    case LearnedLitType::UNKNOWN: out << "unknown"; break;
-    default: out << "?";
-  }
-  return out;
-}
-}  // namespace ava6::modes
-
-namespace std {
-std::string to_string(ava6::modes::LearnedLitType type)
-{
-  std::stringstream ss;
-  ss << type;
-  return ss.str();
-}
-}  // namespace std
-
-namespace ava6::modes {
 std::ostream& operator<<(std::ostream& out, ProofComponent pc)
 {
   switch (pc)

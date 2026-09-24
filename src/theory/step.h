@@ -46,20 +46,15 @@ enum class Step : uint32_t
   // check basic sets operations
   SETS_CHECK_BASIC,
   // check cardinality operations
-  SETS_CHECK_CARDINALITY,
   // check basic relational operators
-  SETS_CHECK_RELATIONS,
   // check the transitive closure down rule, which introduces fresh elements
-  SETS_CHECK_TRANSITIVE_CLOSURE_DOWN,
   // check the transitive closure up rule, which chains the closure graph built
   // by the down rule
-  SETS_CHECK_TRANSITIVE_CLOSURE_UP,
   // check filter
   SETS_CHECK_FILTER,
   // check map
   SETS_CHECK_MAP,
   // check group
-  SETS_CHECK_GROUP,
   // check disequalities
   SETS_CHECK_DISEQUALITY,
   // check comprehension reductions

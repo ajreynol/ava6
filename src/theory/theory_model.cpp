@@ -12,7 +12,6 @@
 #include "theory/theory_model.h"
 
 #include "expr/attribute.h"
-#include "expr/cardinality_constraint.h"
 #include "expr/node_algorithm.h"
 #include "expr/skolem_manager.h"
 #include "expr/sort_to_term.h"
@@ -78,9 +77,6 @@ void TheoryModel::reset()
   d_sep_heap = Node::null();
   d_sep_nil_eq = Node::null();
   d_reps.clear();
-  d_assignExcSet.clear();
-  d_aesMaster.clear();
-  d_aesSlaves.clear();
   d_rep_set.clear();
   d_uf_terms.clear();
   d_ho_uf_terms.clear();
@@ -278,16 +274,7 @@ Node TheoryModel::getModelValue(TNode n) const
     ret = rewrite(ret);
     Trace("model-getvalue-debug") << "ret (post-rewrite): " << ret << std::endl;
     // special cases
-    if (ret.getKind() == Kind::CARDINALITY_CONSTRAINT)
-    {
-      const CardinalityConstraint& cc =
-          ret.getOperator().getConst<CardinalityConstraint>();
-      Trace("model-getvalue-debug")
-          << "get cardinality constraint " << cc.getType() << std::endl;
-      size_t cval = getCardinality(cc.getType());
-      Assert(cval > 0);
-      ret = nm->mkConst(Integer(cval) <= cc.getUpperBound());
-    }
+
     // if the value was constant, we return it. If it was non-constant,
     // we only return it if we are an evaluated kind. This can occur if the
     // children of n failed to evaluate.
@@ -610,69 +597,6 @@ void TheoryModel::assignRepresentative(const Node& r,
     d_reps[r] = n;
   }
   d_rep_set.add(tn, n);
-}
-
-void TheoryModel::setAssignmentExclusionSet(TNode n,
-                                            const std::vector<Node>& eset)
-{
-  // should not be assigned yet
-  Assert(d_assignExcSet.find(n) == d_assignExcSet.end());
-  Trace("model-builder-debug")
-      << "Exclude values of " << n << " : " << eset << std::endl;
-  std::vector<Node>& aes = d_assignExcSet[n];
-  aes.insert(aes.end(), eset.begin(), eset.end());
-}
-
-void TheoryModel::setAssignmentExclusionSetGroup(
-    const std::vector<TNode>& group, const std::vector<Node>& eset)
-{
-  if (group.empty())
-  {
-    return;
-  }
-  // for efficiency, we store a single copy of eset and set a slave/master
-  // relationship
-  setAssignmentExclusionSet(group[0], eset);
-  std::vector<Node>& gslaves = d_aesSlaves[group[0]];
-  for (unsigned i = 1, gsize = group.size(); i < gsize; ++i)
-  {
-    Node gs = group[i];
-    // set master
-    d_aesMaster[gs] = group[0];
-    // add to slaves
-    gslaves.push_back(gs);
-  }
-}
-
-bool TheoryModel::getAssignmentExclusionSet(TNode n,
-                                            std::vector<Node>& group,
-                                            std::vector<Node>& eset)
-{
-  // does it have a master?
-  std::map<Node, Node>::iterator itm = d_aesMaster.find(n);
-  if (itm != d_aesMaster.end())
-  {
-    return getAssignmentExclusionSet(itm->second, group, eset);
-  }
-  std::map<Node, std::vector<Node>>::iterator ita = d_assignExcSet.find(n);
-  if (ita == d_assignExcSet.end())
-  {
-    return false;
-  }
-  eset.insert(eset.end(), ita->second.begin(), ita->second.end());
-  group.push_back(n);
-  // does it have slaves?
-  ita = d_aesSlaves.find(n);
-  if (ita != d_aesSlaves.end())
-  {
-    group.insert(group.end(), ita->second.begin(), ita->second.end());
-  }
-  return true;
-}
-
-bool TheoryModel::hasAssignmentExclusionSets() const
-{
-  return !d_assignExcSet.empty();
 }
 
 bool TheoryModel::isUsingModelCore() const { return d_using_model_core; }

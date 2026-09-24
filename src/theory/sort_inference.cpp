@@ -488,8 +488,7 @@ int SortInference::process(Node n,
     // we only do this for non-finite types, as finite types have cardinality
     // restrictions.
     if (n.getKind() == Kind::EQUAL
-        && !isCardinalityClassFinite(n[0].getType().getCardinalityClass(),
-                                     false))
+        && !isCardinalityClassFinite(n[0].getType().getCardinalityClass()))
     {
       Trace("sort-inference-debug")
           << "For equality " << n
@@ -822,7 +821,7 @@ Node SortInference::simplifyNode(
         }
         else if (n.getKind() == Kind::EQUAL
                  && !isCardinalityClassFinite(
-                     n[0].getType().getCardinalityClass(), false)
+                     n[0].getType().getCardinalityClass())
                  && i == 0)
         {
           Assert(d_equality_types.find(n) != d_equality_types.end());

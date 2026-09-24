@@ -52,7 +52,7 @@ static bool isTheoryAtom(TNode a)
 
     /* from uf */
     case Kind::APPLY_UF: return a.getType().isBoolean();
-    case Kind::CARDINALITY_CONSTRAINT:
+
     case Kind::DIVISIBLE:
     case Kind::LT:
     case Kind::LEQ:

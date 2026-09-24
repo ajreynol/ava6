@@ -60,7 +60,7 @@ TheoryProxy::TheoryProxy(Env& env,
   bool trackZeroLevel =
       options::DeepRestartMode::NONE != options::DeepRestartMode::NONE
       || isOutputOn(OutputTag::LEARNED_LITS)
-      || options().smt.produceLearnedLiterals
+      || false
       || options().theory.lemmaInprocess != options::LemmaInprocessMode::NONE;
   if (trackZeroLevel)
   {
@@ -523,23 +523,13 @@ void TheoryProxy::notifyBacktrack()
   d_prr->notifyBacktrack();
 }
 
-std::vector<Node> TheoryProxy::getLearnedZeroLevelLiterals(
-    modes::LearnedLitType ltype) const
-{
-  if (d_zll != nullptr)
-  {
-    return d_zll->getLearnedZeroLevelLiterals(ltype);
-  }
-  return {};
-}
-
-modes::LearnedLitType TheoryProxy::getLiteralType(const Node& lit) const
+LearnedLitType TheoryProxy::getLiteralType(const Node& lit) const
 {
   if (d_zll != nullptr)
   {
     return d_zll->computeLearnedLiteralType(lit);
   }
-  return modes::LearnedLitType::UNKNOWN;
+  return LearnedLitType::UNKNOWN;
 }
 
 std::vector<Node> TheoryProxy::getLearnedZeroLevelLiteralsForRestart() const

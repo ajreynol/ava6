@@ -196,11 +196,6 @@ const char* toString(InferenceId i)
       return "DATATYPES_TESTER_CONFLICT";
     case InferenceId::DATATYPES_TESTER_MERGE_CONFLICT:
       return "DATATYPES_TESTER_MERGE_CONFLICT";
-    case InferenceId::DATATYPES_BISIMILAR: return "DATATYPES_BISIMILAR";
-    case InferenceId::DATATYPES_REC_SINGLETON_EQ:
-      return "DATATYPES_REC_SINGLETON_EQ";
-    case InferenceId::DATATYPES_REC_SINGLETON_FORCE_DEQ:
-      return "DATATYPES_REC_SINGLETON_FORCE_DEQ";
     case InferenceId::DATATYPES_CYCLE: return "DATATYPES_CYCLE";
     case InferenceId::DATATYPES_HEIGHT_ZERO: return "DATATYPES_HEIGHT_ZERO";
     case InferenceId::DATATYPES_SYGUS_SYM_BREAK:
@@ -260,9 +255,6 @@ const char* toString(InferenceId i)
     case InferenceId::QUANTIFIERS_INST_MBQI_ENUM:
       return "QUANTIFIERS_INST_MBQI_ENUM";
     case InferenceId::QUANTIFIERS_INST_ENUM: return "QUANTIFIERS_INST_ENUM";
-    case InferenceId::QUANTIFIERS_INST_POOL: return "QUANTIFIERS_INST_POOL";
-    case InferenceId::QUANTIFIERS_INST_POOL_TUPLE:
-      return "QUANTIFIERS_INST_POOL_TUPLE";
     case InferenceId::QUANTIFIERS_BINT_PROXY: return "QUANTIFIERS_BINT_PROXY";
     case InferenceId::QUANTIFIERS_BINT_MIN_NG: return "QUANTIFIERS_BINT_MIN_NG";
     case InferenceId::QUANTIFIERS_CEGQI_CEX: return "QUANTIFIERS_CEGQI_CEX";

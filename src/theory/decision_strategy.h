@@ -63,11 +63,11 @@ class DecisionStrategy : protected EnvObj
  * that is not assigned false. If L_j is unassigned, we return it as a decision,
  * otherwise we return no decisions.
  */
-class DecisionStrategyFmf : public DecisionStrategy
+class DecisionStrategySequence : public DecisionStrategy
 {
  public:
-  DecisionStrategyFmf(Env& env, Valuation valuation);
-  virtual ~DecisionStrategyFmf() {}
+  DecisionStrategySequence(Env& env, Valuation valuation);
+  virtual ~DecisionStrategySequence() {}
   /** initialize */
   void initialize() override;
   /** get next decision request */
@@ -114,7 +114,7 @@ class DecisionStrategyFmf : public DecisionStrategy
 /**
  * Special case of above where we only wish to allocate a single literal L_1.
  */
-class DecisionStrategySingleton : public DecisionStrategyFmf
+class DecisionStrategySingleton : public DecisionStrategySequence
 {
  public:
   DecisionStrategySingleton(Env& env,
@@ -142,7 +142,7 @@ class DecisionStrategySingleton : public DecisionStrategyFmf
  * Special case of above where we only wish to allocate a (dynamic) vector
  * of literals.
  */
-class DecisionStrategyVector : public DecisionStrategyFmf
+class DecisionStrategyVector : public DecisionStrategySequence
 {
  public:
   DecisionStrategyVector(Env& env, const char* name, Valuation valuation);

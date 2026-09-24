@@ -313,7 +313,6 @@ TEST_F(TestApiBlackDatatype, datatypeStructs)
   dtypeSpec.addConstructor(nil);
   Sort dtypeSort = d_tm.mkDatatypeSort(dtypeSpec);
   Datatype dt = dtypeSort.getDatatype();
-  ASSERT_FALSE(dt.isCodatatype());
   ASSERT_FALSE(dt.isTuple());
   ASSERT_FALSE(dt.isRecord());
   ASSERT_FALSE(dt.isFinite());
@@ -335,19 +334,6 @@ TEST_F(TestApiBlackDatatype, datatypeStructs)
   Datatype dtEnum = dtypeSortEnum.getDatatype();
   ASSERT_FALSE(dtEnum.isTuple());
   ASSERT_TRUE(dtEnum.isFinite());
-
-  // create codatatype
-  DatatypeDecl dtypeSpecStream = d_tm.mkDatatypeDecl("stream", true);
-  DatatypeConstructorDecl consStream = d_tm.mkDatatypeConstructorDecl("cons");
-  consStream.addSelector("head", intSort);
-  consStream.addSelectorSelf("tail");
-  dtypeSpecStream.addConstructor(consStream);
-  Sort dtypeSortStream = d_tm.mkDatatypeSort(dtypeSpecStream);
-  Datatype dtStream = dtypeSortStream.getDatatype();
-  ASSERT_TRUE(dtStream.isCodatatype());
-  ASSERT_FALSE(dtStream.isFinite());
-  // codatatypes may be well-founded
-  ASSERT_TRUE(dtStream.isWellFounded());
 
   // create tuple
   Sort tupSort = d_tm.mkTupleSort({boolSort});

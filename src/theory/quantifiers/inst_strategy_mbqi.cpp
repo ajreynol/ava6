@@ -45,12 +45,11 @@ InstStrategyMbqi::InstStrategyMbqi(Env& env,
   {
     d_nonClosedKinds.insert(Kind::STORE_ALL);
   }
-  d_nonClosedKinds.insert(Kind::CODATATYPE_BOUND_VARIABLE);
   d_nonClosedKinds.insert(Kind::UNINTERPRETED_SORT_VALUE);
   // may appear in certain models e.g. strings of excessive length
   d_nonClosedKinds.insert(Kind::WITNESS);
 
-  
+
   d_subOptions.copyValues(options());
   d_subOptions.write_quantifiers().instMaxRounds = 5;
   smt::SetDefaults::disableChecking(d_subOptions);
@@ -325,7 +324,7 @@ void InstStrategyMbqi::process(Node q)
                     << std::endl;
     }
   }
-  
+
   tryInstantiation(q, mvs, InferenceId::QUANTIFIERS_INST_MBQI, mvToFreshVar);
 }
 
@@ -660,7 +659,7 @@ Result InstStrategyMbqi::checkWithSubsolverSimple(
     Node query, const SubsolverSetupInfo& info)
 {
   query = extendedRewrite(query);
-  
+
   return checkWithSubsolver(query,
                             info,
                             options().quantifiers.mbqiCheckTimeout != 0,

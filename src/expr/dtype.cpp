@@ -24,10 +24,9 @@ using namespace ava6::internal::kind;
 
 namespace ava6::internal {
 
-DType::DType(std::string name, bool isCo)
+DType::DType(std::string name)
     : d_name(name),
       d_params(),
-      d_isCo(isCo),
       d_isTuple(false),
       d_isNullable(false),
       d_isRecord(false),
@@ -44,10 +43,9 @@ DType::DType(std::string name, bool isCo)
 {
 }
 
-DType::DType(std::string name, const std::vector<TypeNode>& params, bool isCo)
+DType::DType(std::string name, const std::vector<TypeNode>& params)
     : d_name(name),
       d_params(params),
-      d_isCo(isCo),
       d_isTuple(false),
       d_isNullable(false),
       d_isRecord(false),
@@ -83,8 +81,6 @@ std::vector<TypeNode> DType::getParameters() const
   Assert(isParametric());
   return d_params;
 }
-
-bool DType::isCodatatype() const { return d_isCo; }
 
 bool DType::isSygus() const { return !d_sygusType.isNull(); }
 
@@ -403,149 +399,6 @@ Cardinality DType::computeCardinality(TypeNode t,
   return d_card;
 }
 
-bool DType::isRecursiveSingleton(TypeNode t) const
-{
-  Trace("datatypes-init") << "DType::isRecursiveSingleton " << std::endl;
-  Assert(isResolved());
-  Assert(t.isDatatype() && t.getDType().getTypeNode() == d_self);
-  if (d_cardRecSingleton.find(t) != d_cardRecSingleton.end())
-  {
-    return d_cardRecSingleton[t] == 1;
-  }
-  if (isCodatatype())
-  {
-    Assert(d_cardUAssume[t].empty());
-    std::vector<TypeNode> processing;
-    if (computeCardinalityRecSingleton(t, processing, d_cardUAssume[t]))
-    {
-      d_cardRecSingleton[t] = 1;
-      if (TraceIsOn("dt-card"))
-      {
-        Trace("dt-card") << "DType " << getName()
-                         << " is recursive singleton, dependent upon "
-                         << d_cardUAssume[t].size()
-                         << " uninterpreted sorts: " << std::endl;
-        for (size_t i = 0; i < d_cardUAssume[t].size(); i++)
-        {
-          Trace("dt-card") << "  " << d_cardUAssume[t][i] << std::endl;
-        }
-        Trace("dt-card") << std::endl;
-      }
-    }
-    else
-    {
-      d_cardRecSingleton[t] = -1;
-    }
-  }
-  else
-  {
-    d_cardRecSingleton[t] = -1;
-  }
-  return d_cardRecSingleton[t] == 1;
-}
-
-bool DType::isRecursiveSingleton() const
-{
-  Assert(!isParametric());
-  return isRecursiveSingleton(d_self);
-}
-
-unsigned DType::getNumRecursiveSingletonArgTypes(TypeNode t) const
-{
-  Assert(d_cardRecSingleton.find(t) != d_cardRecSingleton.end());
-  Assert(isRecursiveSingleton(t));
-  return d_cardUAssume[t].size();
-}
-
-unsigned DType::getNumRecursiveSingletonArgTypes() const
-{
-  Assert(!isParametric());
-  return getNumRecursiveSingletonArgTypes(d_self);
-}
-
-TypeNode DType::getRecursiveSingletonArgType(TypeNode t, size_t i) const
-{
-  Assert(d_cardRecSingleton.find(t) != d_cardRecSingleton.end());
-  Assert(isRecursiveSingleton(t));
-  return d_cardUAssume[t][i];
-}
-
-TypeNode DType::getRecursiveSingletonArgType(size_t i) const
-{
-  Assert(!isParametric());
-  return getRecursiveSingletonArgType(d_self, i);
-}
-
-bool DType::computeCardinalityRecSingleton(
-    TypeNode t,
-    std::vector<TypeNode>& processing,
-    std::vector<TypeNode>& u_assume) const
-{
-  Trace("datatypes-init") << "DType::computeCardinalityRecSingleton "
-                          << std::endl;
-  if (std::find(processing.begin(), processing.end(), d_self)
-      != processing.end())
-  {
-    return true;
-  }
-  if (d_cardRecSingleton[t] == 0)
-  {
-    // if not yet computed
-    if (d_constructors.size() != 1)
-    {
-      return false;
-    }
-    bool success = false;
-    processing.push_back(d_self);
-    for (size_t i = 0, nargs = d_constructors[0]->getNumArgs(); i < nargs; i++)
-    {
-      TypeNode tc = d_constructors[0]->getArgType(i);
-      // if it is an uninterpreted sort, then we depend on it having cardinality
-      // one
-      if (tc.isUninterpretedSort())
-      {
-        if (std::find(u_assume.begin(), u_assume.end(), tc) == u_assume.end())
-        {
-          u_assume.push_back(tc);
-        }
-        // if it is a datatype, recurse
-      }
-      else if (tc.isDatatype())
-      {
-        const DType& dt = tc.getDType();
-        if (!dt.computeCardinalityRecSingleton(t, processing, u_assume))
-        {
-          return false;
-        }
-        else
-        {
-          success = true;
-        }
-        // if it is a builtin type, it must have cardinality one
-      }
-      else if (!tc.getCardinality().isOne())
-      {
-        return false;
-      }
-    }
-    processing.pop_back();
-    return success;
-  }
-  else if (d_cardRecSingleton[t] == -1)
-  {
-    return false;
-  }
-  for (size_t i = 0, csize = d_cardUAssume[t].size(); i < csize; i++)
-  {
-    if (std::find(u_assume.begin(), u_assume.end(), d_cardUAssume[t][i])
-        == u_assume.end())
-    {
-      u_assume.push_back(d_cardUAssume[t][i]);
-    }
-  }
-  return true;
-}
-
 CardinalityClass DType::getCardinalityClass(TypeNode t) const
 {
   Trace("datatypes-init") << "DType::isFinite " << std::endl;
@@ -582,14 +435,14 @@ CardinalityClass DType::getCardinalityClass() const
   return getCardinalityClass(d_self);
 }
 
-bool DType::isFinite(TypeNode t, bool fmfEnabled) const
+bool DType::isFinite(TypeNode t) const
 {
-  return isCardinalityClassFinite(getCardinalityClass(t), fmfEnabled);
+  return isCardinalityClassFinite(getCardinalityClass(t));
 }
 
-bool DType::isFinite(bool fmfEnabled) const
+bool DType::isFinite() const
 {
-  return isFinite(d_self, fmfEnabled);
+  return isFinite(d_self);
 }
 
 bool DType::isWellFounded() const
@@ -623,7 +476,7 @@ bool DType::computeWellFounded(std::vector<TypeNode>& processing) const
   if (std::find(processing.begin(), processing.end(), d_self)
       != processing.end())
   {
-    return d_isCo;
+    return false;
   }
   processing.push_back(d_self);
   for (std::shared_ptr<DTypeConstructor> ctor : d_constructors)

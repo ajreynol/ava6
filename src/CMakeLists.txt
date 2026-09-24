@@ -71,8 +71,6 @@ libava6_add_sources(
   preprocessing/passes/extended_rewriter_pass.h
   preprocessing/passes/foreign_theory_rewrite.cpp
   preprocessing/passes/foreign_theory_rewrite.h
-  preprocessing/passes/fun_def_fmf.cpp
-  preprocessing/passes/fun_def_fmf.h
   preprocessing/passes/global_negate.cpp
   preprocessing/passes/global_negate.h
   preprocessing/passes/ho_elim.cpp
@@ -221,6 +219,7 @@ libava6_add_sources(
   prop/cnf_stream.h
   prop/learned_db.cpp
   prop/learned_db.h
+  prop/learned_literal_type.h
   prop/lemma_inprocess.cpp
   prop/lemma_inprocess.h
   prop/minisat/core/Dimacs.h
@@ -273,8 +272,6 @@ libava6_add_sources(
   smt/check_models.h
   smt/context_manager.cpp
   smt/context_manager.h
-  smt/difficulty_post_processor.cpp
-  smt/difficulty_post_processor.h
   smt/env.cpp
   smt/env.h
   smt/env_obj.cpp
@@ -288,8 +285,6 @@ libava6_add_sources(
   smt/model.h
   smt/model_core_builder.cpp
   smt/model_core_builder.h
-  smt/model_blocker.cpp
-  smt/model_blocker.h
   smt/preprocessor.cpp
   smt/preprocessor.h
   smt/preprocess_proof_generator.cpp
@@ -324,8 +319,6 @@ libava6_add_sources(
   smt/smt_solver.h
   smt/term_formula_removal.cpp
   smt/term_formula_removal.h
-  smt/timeout_core_manager.cpp
-  smt/timeout_core_manager.h
   smt/unsat_core_manager.cpp
   smt/unsat_core_manager.h
   smt/witness_form.cpp
@@ -587,8 +580,6 @@ libava6_add_sources(
   theory/decision_manager.h
   theory/decision_strategy.cpp
   theory/decision_strategy.h
-  theory/difficulty_manager.cpp
-  theory/difficulty_manager.h
   theory/ee_manager.cpp
   theory/ee_manager.h
   theory/ee_manager_central.cpp
@@ -685,8 +676,6 @@ libava6_add_sources(
   theory/quantifiers/equality_query.h
   theory/quantifiers/extended_rewrite.cpp
   theory/quantifiers/extended_rewrite.h
-  theory/quantifiers/first_order_model.cpp
-  theory/quantifiers/first_order_model.h
   theory/quantifiers/fmf/bounded_integers.cpp
   theory/quantifiers/fmf/bounded_integers.h
   theory/quantifiers/fmf/first_order_model_fmc.cpp
@@ -697,6 +686,10 @@ libava6_add_sources(
   theory/quantifiers/fmf/model_builder.h
   theory/quantifiers/fmf/model_engine.cpp
   theory/quantifiers/fmf/model_engine.h
+  theory/quantifiers/quant_rep_bound_ext.cpp
+  theory/quantifiers/quant_rep_bound_ext.h
+  theory/quantifiers/first_order_model.cpp
+  theory/quantifiers/first_order_model.h
   theory/quantifiers/fun_def_evaluator.cpp
   theory/quantifiers/fun_def_evaluator.h
   theory/quantifiers/ho_term_database.cpp
@@ -725,8 +718,6 @@ libava6_add_sources(
   theory/quantifiers/inst_strategy_enumerative.h
   theory/quantifiers/inst_strategy_mbqi.cpp
   theory/quantifiers/inst_strategy_mbqi.h
-  theory/quantifiers/inst_strategy_pool.cpp
-  theory/quantifiers/inst_strategy_pool.h
   theory/quantifiers/instantiate.cpp
   theory/quantifiers/instantiate.h
   theory/quantifiers/instantiation_list.cpp
@@ -743,8 +734,6 @@ libava6_add_sources(
   theory/quantifiers/quant_conflict_find.h
   theory/quantifiers/quant_relevance.cpp
   theory/quantifiers/quant_relevance.h
-  theory/quantifiers/quant_rep_bound_ext.cpp
-  theory/quantifiers/quant_rep_bound_ext.h
   theory/quantifiers/quant_split.cpp
   theory/quantifiers/quant_split.h
   theory/quantifiers/quant_util.cpp
@@ -775,16 +764,12 @@ libava6_add_sources(
   theory/quantifiers/single_inv_partition.h
   theory/quantifiers/skolemize.cpp
   theory/quantifiers/skolemize.h
-  theory/quantifiers/term_pools.cpp
-  theory/quantifiers/term_pools.h
   theory/quantifiers/term_tuple_enumerator.cpp
   theory/quantifiers/term_tuple_enumerator.h
   theory/quantifiers/term_database.cpp
   theory/quantifiers/term_database.h
   theory/quantifiers/term_enumeration.cpp
   theory/quantifiers/term_enumeration.h
-  theory/quantifiers/term_pools.cpp
-  theory/quantifiers/term_pools.h
   theory/quantifiers/term_registry.cpp
   theory/quantifiers/term_registry.h
   theory/quantifiers/term_util.cpp
@@ -811,8 +796,6 @@ libava6_add_sources(
   theory/sets/normal_form.h
   theory/sets/proof_checker.cpp
   theory/sets/proof_checker.h
-  theory/sets/rels_utils.cpp
-  theory/sets/rels_utils.h
   theory/sets/set_reduction.cpp
   theory/sets/set_reduction.h
   theory/sets/skolem_cache.cpp
@@ -910,8 +893,6 @@ libava6_add_sources(
   theory/strings/strategy.h
   theory/strings/strings_entail.cpp
   theory/strings/strings_entail.h
-  theory/strings/strings_fmf.cpp
-  theory/strings/strings_fmf.h
   theory/strings/strings_rewriter.cpp
   theory/strings/strings_rewriter.h
   theory/strings/theory_strings.cpp
@@ -966,8 +947,6 @@ libava6_add_sources(
   theory/type_enumerator.h
   theory/type_set.cpp
   theory/type_set.h
-  theory/uf/cardinality_extension.cpp
-  theory/uf/cardinality_extension.h
   theory/uf/conversions_solver.cpp
   theory/uf/conversions_solver.h
   theory/uf/diamonds_proof_generator.cpp

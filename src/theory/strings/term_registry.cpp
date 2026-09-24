@@ -42,7 +42,6 @@ TermRegistry::TermRegistry(Env& env, Theory& t, SolverState& s)
       d_skCache(nodeManager(), env.getRewriter()),
       d_aent(nodeManager(), env.getRewriter()),
       d_functionsTerms(context()),
-      d_inputVars(userContext()),
       d_preregisteredTerms(context()),
       d_registeredTerms(userContext()),
       d_registeredTypes(userContext()),
@@ -189,8 +188,6 @@ void TermRegistry::preRegisterTerm(TNode n)
     d_functionsTerms.push_back(n);
   }
 }
-
-void TermRegistry::preRegisterInputVar(TNode n) { d_inputVars.insert(n); }
 
 void TermRegistry::registerSubterms(Node n)
 {
@@ -412,11 +409,6 @@ SkolemCache* TermRegistry::getSkolemCache() { return &d_skCache; }
 const context::CDList<TNode>& TermRegistry::getFunctionTerms() const
 {
   return d_functionsTerms;
-}
-
-const context::CDHashSet<Node>& TermRegistry::getInputVars() const
-{
-  return d_inputVars;
 }
 
 bool TermRegistry::hasStringCode() const { return d_hasStrCode; }

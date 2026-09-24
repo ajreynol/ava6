@@ -10,6 +10,7 @@
  * Learner for literals asserted at level zero.
  */
 
+#include "prop/learned_literal_type.h"
 #include "ava6_private.h"
 
 #ifndef AVA6__PROP__ZERO_LEVEL_LEARNER_H
@@ -61,11 +62,11 @@ class ZeroLevelLearner : protected EnvObj
 
   /** Get the zero-level assertions */
   std::vector<Node> getLearnedZeroLevelLiterals(
-      modes::LearnedLitType ltype) const;
+      LearnedLitType ltype) const;
   /** Get the zero-level assertions that should be used on deep restart */
   std::vector<Node> getLearnedZeroLevelLiteralsForRestart() const;
   /** compute type for learned literal */
-  modes::LearnedLitType computeLearnedLiteralType(const Node& lit);
+  LearnedLitType computeLearnedLiteralType(const Node& lit);
 
   /**
    * Get inferred simplifications. This is a (term) substitution that can be
@@ -79,9 +80,9 @@ class ZeroLevelLearner : protected EnvObj
                        std::unordered_set<TNode>& visited,
                        std::unordered_set<Node>& atoms);
   /** Process learned literal */
-  void processLearnedLiteral(const Node& lit, modes::LearnedLitType ltype);
+  void processLearnedLiteral(const Node& lit, LearnedLitType ltype);
   /** is learnable based on the value of options */
-  bool isLearnable(modes::LearnedLitType ltype) const;
+  bool isLearnable(LearnedLitType ltype) const;
   /** get solved */
   bool getSolved(const Node& lit, Subs& subs);
   /** has learned literal */
@@ -120,7 +121,7 @@ class ZeroLevelLearner : protected EnvObj
   /** The threshold */
   size_t d_deepRestartThreshold;
   /** learnable learned literal types (for deep restart), based on option */
-  std::unordered_set<modes::LearnedLitType> d_learnedTypes;
+  std::unordered_set<LearnedLitType> d_learnedTypes;
   /** Should we track the simplification map? */
   bool d_trackSimplifications;
   /**

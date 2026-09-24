@@ -596,63 +596,8 @@ void DeclareFunctionCommand::toStream(std::ostream& out) const
 }
 
 /* -------------------------------------------------------------------------- */
-/* class DeclarePoolCommand                                               */
-/* -------------------------------------------------------------------------- */
-
-DeclarePoolCommand::DeclarePoolCommand(const std::string& id,
-                                       ava6::Sort sort,
-                                       const std::vector<ava6::Term>& initValue)
-    : DeclarationDefinitionCommand(id), d_sort(sort), d_initValue(initValue)
-{
-}
-
-ava6::Sort DeclarePoolCommand::getSort() const { return d_sort; }
-const std::vector<ava6::Term>& DeclarePoolCommand::getInitialValue() const
-{
-  return d_initValue;
-}
-
-void DeclarePoolCommand::invoke(ava6::Solver* solver, SymManager* sm)
-{
-  Term pool = solver->declarePool(d_symbol, d_sort, d_initValue);
-  if (!bindToTerm(sm, pool, true))
-  {
-    return;
-  }
-  // Notice that the pool is already declared by the parser so that it the
-  // symbol is bound eagerly.
-  // Hence, we do nothing here.
-  d_commandStatus = CommandSuccess::instance();
-}
-
-std::string DeclarePoolCommand::getCommandName() const
-{
-  return "declare-pool";
-}
-
-void DeclarePoolCommand::toStream(std::ostream& out) const
-{
-  internal::Printer::getPrinter(out)->toStreamCmdDeclarePool(
-      out, d_symbol, sortToTypeNode(d_sort), termVectorToNodes(d_initValue));
-}
-
-/* -------------------------------------------------------------------------- */
 /* class DeclareOracleFunCommand */
 /* -------------------------------------------------------------------------- */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /* -------------------------------------------------------------------------- */
@@ -894,15 +839,6 @@ void DefineFunctionRecCommand::toStream(std::ostream& out) const
 /* -------------------------------------------------------------------------- */
 /* class DeclareHeapCommand                                                   */
 /* -------------------------------------------------------------------------- */
-
-
-
-
-
-
-
-
-
 
 
 /* -------------------------------------------------------------------------- */
@@ -1174,82 +1110,6 @@ void GetModelCommand::toStream(std::ostream& out) const
 }
 
 /* -------------------------------------------------------------------------- */
-/* class BlockModelCommand */
-/* -------------------------------------------------------------------------- */
-
-BlockModelCommand::BlockModelCommand(modes::BlockModelsMode mode) : d_mode(mode)
-{
-}
-void BlockModelCommand::invoke(ava6::Solver* solver, AVA6_UNUSED SymManager* sm)
-{
-  try
-  {
-    solver->blockModel(d_mode);
-    d_commandStatus = CommandSuccess::instance();
-  }
-  catch (ava6::Ava6ApiRecoverableException& e)
-  {
-    d_commandStatus = new CommandRecoverableFailure(e.what());
-  }
-  catch (exception& e)
-  {
-    d_commandStatus = new CommandFailure(e.what());
-  }
-}
-
-std::string BlockModelCommand::getCommandName() const { return "block-model"; }
-
-void BlockModelCommand::toStream(std::ostream& out) const
-{
-  internal::Printer::getPrinter(out)->toStreamCmdBlockModel(out, d_mode);
-}
-
-/* -------------------------------------------------------------------------- */
-/* class BlockModelValuesCommand */
-/* -------------------------------------------------------------------------- */
-
-BlockModelValuesCommand::BlockModelValuesCommand(
-    const std::vector<ava6::Term>& terms)
-    : d_terms(terms)
-{
-  Assert(terms.size() >= 1)
-      << "cannot block-model-values of an empty set of terms";
-}
-
-const std::vector<ava6::Term>& BlockModelValuesCommand::getTerms() const
-{
-  return d_terms;
-}
-void BlockModelValuesCommand::invoke(ava6::Solver* solver,
-                                     AVA6_UNUSED SymManager* sm)
-{
-  try
-  {
-    solver->blockModelValues(d_terms);
-    d_commandStatus = CommandSuccess::instance();
-  }
-  catch (ava6::Ava6ApiRecoverableException& e)
-  {
-    d_commandStatus = new CommandRecoverableFailure(e.what());
-  }
-  catch (exception& e)
-  {
-    d_commandStatus = new CommandFailure(e.what());
-  }
-}
-
-std::string BlockModelValuesCommand::getCommandName() const
-{
-  return "block-model-values";
-}
-
-void BlockModelValuesCommand::toStream(std::ostream& out) const
-{
-  internal::Printer::getPrinter(out)->toStreamCmdBlockModelValues(
-      out, termVectorToNodes(d_terms));
-}
-
-/* -------------------------------------------------------------------------- */
 /* class GetProofCommand                                                      */
 /* -------------------------------------------------------------------------- */
 
@@ -1265,9 +1125,8 @@ void GetProofCommand::invoke(ava6::Solver* solver, SymManager* sm)
                            || d_component == modes::ProofComponent::FULL);
     modes::ProofFormat format = modes::ProofFormat::DEFAULT;
     // Ignore proof format, if the proof is not the full proof
-    
 
-    
+
     for (Proof p : ps)
     {
       if (commentProves)
@@ -1283,7 +1142,7 @@ void GetProofCommand::invoke(ava6::Solver* solver, SymManager* sm)
         ss << ":proves " << p.getResult() << ")" << std::endl;
       }
     }
-    
+
     d_result = ss.str();
     d_commandStatus = CommandSuccess::instance();
   }
@@ -1501,215 +1360,6 @@ std::string GetUnsatCoreLemmasCommand::getCommandName() const
 void GetUnsatCoreLemmasCommand::toStream(std::ostream& out) const
 {
   internal::Printer::getPrinter(out)->toStreamCmdGetUnsatCore(out);
-}
-
-/* -------------------------------------------------------------------------- */
-/* class GetDifficultyCommand */
-/* -------------------------------------------------------------------------- */
-
-GetDifficultyCommand::GetDifficultyCommand() : d_sm(nullptr) {}
-void GetDifficultyCommand::invoke(ava6::Solver* solver, SymManager* sm)
-{
-  try
-  {
-    d_sm = sm;
-    d_result = solver->getDifficulty();
-
-    d_commandStatus = CommandSuccess::instance();
-  }
-  catch (ava6::Ava6ApiRecoverableException& e)
-  {
-    d_commandStatus = new CommandRecoverableFailure(e.what());
-  }
-  catch (exception& e)
-  {
-    d_commandStatus = new CommandFailure(e.what());
-  }
-}
-
-void GetDifficultyCommand::printResult(AVA6_UNUSED ava6::Solver* solver,
-                                       std::ostream& out) const
-{
-  out << "(" << std::endl;
-  for (const std::pair<const ava6::Term, ava6::Term>& d : d_result)
-  {
-    out << "(";
-    // use name if it has one
-    std::string name;
-    if (d_sm->getExpressionName(d.first, name, true))
-    {
-      out << name;
-    }
-    else
-    {
-      out << d.first;
-    }
-    out << " " << d.second << ")" << std::endl;
-  }
-  out << ")" << std::endl;
-}
-
-const std::map<ava6::Term, ava6::Term>& GetDifficultyCommand::getDifficultyMap()
-    const
-{
-  return d_result;
-}
-
-std::string GetDifficultyCommand::getCommandName() const
-{
-  return "get-difficulty";
-}
-
-void GetDifficultyCommand::toStream(std::ostream& out) const
-{
-  internal::Printer::getPrinter(out)->toStreamCmdGetDifficulty(out);
-}
-
-/* -------------------------------------------------------------------------- */
-/* class GetTimeoutCoreCommand */
-/* -------------------------------------------------------------------------- */
-
-GetTimeoutCoreCommand::GetTimeoutCoreCommand()
-    : d_solver(nullptr), d_sm(nullptr), d_assumptions()
-{
-}
-GetTimeoutCoreCommand::GetTimeoutCoreCommand(
-    const std::vector<Term>& assumptions)
-    : d_solver(nullptr), d_sm(nullptr), d_assumptions(assumptions)
-{
-  // providing an empty list of assumptions will make us call getTimeoutCore
-  // below instead of getTimeoutCoreAssuming.
-  Assert(!d_assumptions.empty());
-}
-void GetTimeoutCoreCommand::invoke(ava6::Solver* solver, SymManager* sm)
-{
-  try
-  {
-    d_sm = sm;
-    d_solver = solver;
-    if (!d_assumptions.empty())
-    {
-      d_result = solver->getTimeoutCoreAssuming(d_assumptions);
-    }
-    else
-    {
-      d_result = solver->getTimeoutCore();
-    }
-    d_commandStatus = CommandSuccess::instance();
-  }
-  catch (ava6::Ava6ApiRecoverableException& e)
-  {
-    d_commandStatus = new CommandRecoverableFailure(e.what());
-  }
-  catch (exception& e)
-  {
-    d_commandStatus = new CommandFailure(e.what());
-  }
-}
-
-void GetTimeoutCoreCommand::printResult(AVA6_UNUSED ava6::Solver* solver,
-                                        std::ostream& out) const
-{
-  ava6::Result res = d_result.first;
-  out << res << std::endl;
-  if (res.isUnsat()
-      || (res.isUnknown()
-          && res.getUnknownExplanation() == UnknownExplanation::TIMEOUT))
-  {
-    if (d_solver->getOption("print-cores-full") == "true")
-    {
-      // use the assertions
-      internal::UnsatCore ucr(termVectorToNodes(d_result.second));
-      ucr.toStream(out);
-    }
-    else
-    {
-      // otherwise, use the names
-      std::vector<std::string> names;
-      d_sm->getExpressionNames(d_result.second, names, true);
-      internal::UnsatCore ucr(names);
-      ucr.toStream(out);
-    }
-  }
-}
-ava6::Result GetTimeoutCoreCommand::getResult() const { return d_result.first; }
-const std::vector<ava6::Term>& GetTimeoutCoreCommand::getTimeoutCore() const
-{
-  return d_result.second;
-}
-
-std::string GetTimeoutCoreCommand::getCommandName() const
-{
-  return d_assumptions.empty() ? "get-timeout-core"
-                               : "get-timeout-core-assuming";
-}
-
-void GetTimeoutCoreCommand::toStream(std::ostream& out) const
-{
-  if (d_assumptions.empty())
-  {
-    internal::Printer::getPrinter(out)->toStreamCmdGetTimeoutCore(out);
-  }
-  else
-  {
-    internal::Printer::getPrinter(out)->toStreamCmdGetTimeoutCoreAssuming(
-        out, termVectorToNodes(d_assumptions));
-  }
-}
-
-/* -------------------------------------------------------------------------- */
-/* class GetLearnedLiteralsCommand */
-/* -------------------------------------------------------------------------- */
-
-GetLearnedLiteralsCommand::GetLearnedLiteralsCommand(modes::LearnedLitType t)
-    : d_type(t)
-{
-}
-void GetLearnedLiteralsCommand::invoke(ava6::Solver* solver,
-                                       AVA6_UNUSED SymManager* sm)
-{
-  try
-  {
-    d_result = solver->getLearnedLiterals(d_type);
-
-    d_commandStatus = CommandSuccess::instance();
-  }
-  catch (ava6::Ava6ApiRecoverableException& e)
-  {
-    d_commandStatus = new CommandRecoverableFailure(e.what());
-  }
-  catch (exception& e)
-  {
-    d_commandStatus = new CommandFailure(e.what());
-  }
-}
-
-void GetLearnedLiteralsCommand::printResult(AVA6_UNUSED ava6::Solver* solver,
-                                            std::ostream& out) const
-{
-  out << "(" << std::endl;
-  for (const ava6::Term& lit : d_result)
-  {
-    out << lit << std::endl;
-  }
-  out << ")" << std::endl;
-}
-
-const std::vector<ava6::Term>& GetLearnedLiteralsCommand::getLearnedLiterals()
-    const
-{
-  return d_result;
-}
-
-std::string GetLearnedLiteralsCommand::getCommandName() const
-{
-  return "get-learned-literals";
-}
-
-void GetLearnedLiteralsCommand::toStream(std::ostream& out) const
-{
-  internal::Printer::getPrinter(out)->toStreamCmdGetLearnedLiterals(out,
-                                                                    d_type);
 }
 
 /* -------------------------------------------------------------------------- */

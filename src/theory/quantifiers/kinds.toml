@@ -86,28 +86,6 @@ typerule = "::ava6::internal::theory::quantifiers::QuantifierAnnotationTypeRule"
 
 [[kinds]]
 type     = "operator"
-name     = "INST_POOL"
-children = "1:"
-comment  = "instantiation pool"
-typerule = "::ava6::internal::theory::quantifiers::QuantifierAnnotationTypeRule"
-
-[[kinds]]
-type     = "operator"
-name     = "INST_ADD_TO_POOL"
-children = 2
-comment  = "instantiation add to pool"
-typerule = "::ava6::internal::theory::quantifiers::QuantifierAnnotationTypeRule"
-
-[[kinds]]
-type     = "operator"
-name     = "SKOLEM_ADD_TO_POOL"
-children = 2
-comment  = "skolemization add to pool"
-# oracle formula generator is a pair (assumption generator, constraint generator)
-typerule = "::ava6::internal::theory::quantifiers::QuantifierAnnotationTypeRule"
-
-[[kinds]]
-type     = "operator"
 name     = "ORACLE_FORMULA_GEN"
 children = 2
 comment  = "oracle interface"

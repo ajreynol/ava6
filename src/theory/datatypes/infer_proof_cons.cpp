@@ -486,8 +486,6 @@ void InferProofCons::convert(InferenceId infer,
       }
     }
     break;
-    // inferences currently not supported
-    case InferenceId::DATATYPES_BISIMILAR:
     default:
       Trace("dt-ipc") << "...no conversion for inference " << infer
                       << std::endl;

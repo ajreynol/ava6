@@ -371,38 +371,6 @@ name   = "Quantifiers"
   help       = "enumerating tuples of quantifiers by increasing the sum of indices, rather than the maximum"
 
 [[option]]
-  name       = "finiteModelFind"
-  category   = "regular"
-  long       = "finite-model-find"
-  type       = "bool"
-  default    = "false"
-  help       = "use finite model finding heuristic for quantifier instantiation"
-
-[[option]]
-  name       = "fmfOneInstPerRound"
-  category   = "regular"
-  long       = "mbqi-one-inst-per-round"
-  type       = "bool"
-  default    = "false"
-  help       = "only add one instantiation per quantifier per round for mbqi"
-
-[[option]]
-  name       = "fmfBound"
-  category   = "regular"
-  long       = "fmf-bound"
-  type       = "bool"
-  default    = "false"
-  help       = "finite model finding on bounded quantification"
-
-[[option]]
-  name       = "fmfTypeCompletionThresh"
-  category   = "regular"
-  long       = "fmf-type-completion-thresh=N"
-  type       = "int64_t"
-  default    = "1000"
-  help       = "the maximum cardinality of an interpreted type for which exhaustive enumeration in finite model finding is attempted"
-
-[[option]]
   name       = "conflictBasedInst"
   category   = "common"
   long       = "cbqi"
@@ -654,33 +622,6 @@ name = "agg-predicate"
 name = "agg"
 
 [[setting]]
-name = "userPoolQuant"
-type = "UserPoolMode"
-default = "TRUST"
-[[setting.mode.USE]]
-name = "use"
-[[setting.mode.TRUST]]
-name = "trust"
-[[setting.mode.IGNORE]]
-name = "ignore"
-
-[[setting]]
-name = "fmfFunWellDefined"
-type = "bool"
-default = "false"
-
-[[setting]]
-name = "fmfMbqiMode"
-type = "FmfMbqiMode"
-default = "FMC"
-[[setting.mode.NONE]]
-name = "none"
-[[setting.mode.FMC]]
-name = "fmc"
-[[setting.mode.TRUST]]
-name = "trust"
-
-[[setting]]
 name = "dtStcInduction"
 type = "bool"
 default = "false"
@@ -725,4 +666,37 @@ name = "keep"
 name = "hoElimStoreAx"
 type = "bool"
 default = "true"
+
+[[option]]
+  name       = "fmfOneInstPerRound"
+  category   = "regular"
+  long       = "mbqi-one-inst-per-round"
+  type       = "bool"
+  default    = "false"
+  help       = "only add one instantiation per quantifier per round for mbqi"
+
+[[option]]
+  name       = "fmfBound"
+  category   = "regular"
+  long       = "fmf-bound"
+  type       = "bool"
+  default    = "false"
+  help       = "finite model finding on bounded quantification"
+
+[[option]]
+  name       = "fmfTypeCompletionThresh"
+  category   = "regular"
+  long       = "fmf-type-completion-thresh=N"
+  type       = "int64_t"
+  default    = "1000"
+  help       = "the maximum cardinality of an interpreted type for which exhaustive enumeration in finite model finding is attempted"
+
+[[setting]]
+name = "fmfMbqiMode"
+type = "FmfMbqiMode"
+default = "FMC"
+[[setting.mode.NONE]]
+name = "none"
+[[setting.mode.FMC]]
+name = "fmc"
 

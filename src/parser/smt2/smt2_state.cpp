@@ -52,7 +52,6 @@ void Smt2State::addArithmeticOperators()
 }
 
 
-
 void Smt2State::addQuantifiersOperators() {}
 
 void Smt2State::addBitvectorOperators()
@@ -108,7 +107,6 @@ void Smt2State::addBitvectorOperators()
   addIndexedOperator(Kind::BITVECTOR_ROTATE_LEFT, "rotate_left");
   addIndexedOperator(Kind::BITVECTOR_ROTATE_RIGHT, "rotate_right");
 }
-
 
 
 void Smt2State::addDatatypesOperators()
@@ -203,9 +201,6 @@ void Smt2State::addStringOperators()
 }
 
 
-
-
-
 void Smt2State::addCoreSymbols()
 {
   defineType("Bool", d_tm.getBooleanSort(), false);
@@ -281,50 +276,6 @@ bool Smt2State::isOperatorEnabled(const std::string& name) const
   return d_operatorKindMap.find(name) != d_operatorKindMap.end();
 }
 
-modes::BlockModelsMode Smt2State::getBlockModelsMode(const std::string& mode)
-{
-  if (mode == "literals")
-  {
-    return modes::BlockModelsMode::LITERALS;
-  }
-  else if (mode == "values")
-  {
-    return modes::BlockModelsMode::VALUES;
-  }
-  parseError(std::string("Unknown block models mode `") + mode + "'");
-  return modes::BlockModelsMode::LITERALS;
-}
-
-modes::LearnedLitType Smt2State::getLearnedLitType(const std::string& mode)
-{
-  if (mode == "preprocess_solved")
-  {
-    return modes::LearnedLitType::PREPROCESS_SOLVED;
-  }
-  else if (mode == "preprocess")
-  {
-    return modes::LearnedLitType::PREPROCESS;
-  }
-  else if (mode == "input")
-  {
-    return modes::LearnedLitType::INPUT;
-  }
-  else if (mode == "solvable")
-  {
-    return modes::LearnedLitType::SOLVABLE;
-  }
-  else if (mode == "constant_prop")
-  {
-    return modes::LearnedLitType::CONSTANT_PROP;
-  }
-  else if (mode == "internal")
-  {
-    return modes::LearnedLitType::INTERNAL;
-  }
-  parseError(std::string("Unknown learned literal type `") + mode + "'");
-  return modes::LearnedLitType::UNKNOWN;
-}
-
 modes::ProofComponent Smt2State::getProofComponent(const std::string& pc)
 {
   if (pc == "raw_preprocess")
@@ -352,18 +303,12 @@ modes::ProofComponent Smt2State::getProofComponent(const std::string& pc)
 }
 
 
-
 bool Smt2State::isTheoryEnabled(internal::theory::TheoryId theory) const
 {
   return d_logic.isTheoryEnabled(theory);
 }
 
 bool Smt2State::isHoEnabled() const { return d_logic.isHigherOrder(); }
-
-bool Smt2State::hasCardinalityConstraints() const
-{
-  return d_logic.hasCardinalityConstraints();
-}
 
 bool Smt2State::logicIsSet() { return d_logicSet; }
 
@@ -384,7 +329,7 @@ bool Smt2State::getTesterName(Term cons, std::string& name)
 Term Smt2State::mkIndexedConstant(const std::string& name,
                                   const std::vector<uint32_t>& numerals)
 {
-  
+
 
   if (d_logic.isTheoryEnabled(internal::theory::THEORY_BV)
       && name.find("bv") == 0)
@@ -422,20 +367,7 @@ Term Smt2State::mkIndexedConstant(const std::string& name,
       return mkCharConstant(symbols[0].substr(2));
     }
   }
-  else if (d_logic.hasCardinalityConstraints())
-  {
-    if (name == "fmf.card")
-    {
-      if (symbols.size() != 2)
-      {
-        parseError("Unexpected number of indices for fmf.card");
-      }
-      Sort t = getSort(symbols[0]);
-      // convert second symbol back to a numeral
-      uint32_t ubound = parseStringToUnsigned(symbols[1]);
-      return d_tm.mkCardinalityConstraint(t, ubound);
-    }
-  }
+
   parseError(std::string("Unknown indexed literal `") + name + "'");
   return Term();
 }
@@ -572,7 +504,6 @@ void Smt2State::reset()
 }
 
 
-
 void Smt2State::setLogic(std::string name)
 {
   bool smLogicAlreadySet = getSymbolManager()->isLogicSet();
@@ -584,13 +515,12 @@ void Smt2State::setLogic(std::string name)
   d_logicSet = true;
   d_logic = name;
 
-  
 
   // Core theory belongs to every logic
   addCoreSymbols();
 
   // add skolems
-  
+
 
   if (d_logic.isTheoryEnabled(internal::theory::THEORY_UF))
   {
@@ -643,7 +573,7 @@ void Smt2State::setLogic(std::string name)
       addOperator(Kind::TO_REAL, "to_real");
     }
 
-    
+
     if (!strictModeEnabled())
     {
       // integer version of AND
@@ -699,7 +629,6 @@ void Smt2State::setLogic(std::string name)
     // without type annotation
     Sort btype = d_tm.getBooleanSort();
     defineVar("set.empty", d_tm.mkEmptySet(d_tm.mkSetSort(btype)));
-    defineVar("set.universe", d_tm.mkUniverseSet(btype));
 
     addOperator(Kind::SET_UNION, "set.union");
     addOperator(Kind::SET_INTER, "set.inter");
@@ -709,7 +638,6 @@ void Smt2State::setLogic(std::string name)
     addOperator(Kind::SET_SINGLETON, "set.singleton");
     addOperator(Kind::SET_INSERT, "set.insert");
 
-    addOperator(Kind::SET_COMPLEMENT, "set.complement");
     addOperator(Kind::SET_CHOOSE, "set.choose");
     addOperator(Kind::SET_IS_EMPTY, "set.is_empty");
     addOperator(Kind::SET_IS_SINGLETON, "set.is_singleton");
@@ -720,24 +648,14 @@ void Smt2State::setLogic(std::string name)
     addOperator(Kind::SET_FOLD, "set.fold");
 
 
-
-
-
-
-
     // these operators can be with/without indices
-
-
-
-
-
 
 
     // set.comprehension is a closure kind
     addClosureKind(Kind::SET_COMPREHENSION, "set.comprehension");
   }
 
-  
+
   if (d_logic.isTheoryEnabled(internal::theory::THEORY_STRINGS))
   {
     defineType("String", d_tm.getStringSort(), false);
@@ -758,11 +676,6 @@ void Smt2State::setLogic(std::string name)
     addQuantifiersOperators();
   }
 
-  
-
-  
-
-  
 
   // Builtin symbols of the logic are declared at context level zero, hence
   // we push the outermost scope in the symbol manager here.
@@ -776,11 +689,6 @@ void Smt2State::setLogic(std::string name)
     pushScope(true);
   }
 }
-
-
-
-
-
 
 
 bool Smt2State::usingFreshBinders() const { return d_freshBinders; }
@@ -954,7 +862,7 @@ Term Smt2State::applyParseOp(const ParseOp& p, std::vector<Term>& args)
       Trace("parser") << "++ " << *i << std::endl;
     }
   }
-  
+
   if (!p.d_indices.empty())
   {
     Op op;
@@ -1092,9 +1000,7 @@ Term Smt2State::applyParseOp(const ParseOp& p, std::vector<Term>& args)
       // special case: indexed operators with zero arguments
       if (kind == Kind::TUPLE_PROJECT || kind == Kind::TABLE_PROJECT
           || kind == Kind::TABLE_AGGREGATE || kind == Kind::TABLE_JOIN
-          || kind == Kind::TABLE_GROUP || kind == Kind::RELATION_GROUP
-          || kind == Kind::RELATION_AGGREGATE || kind == Kind::RELATION_PROJECT
-          || kind == Kind::RELATION_TABLE_JOIN)
+          || kind == Kind::TABLE_GROUP)
       {
         std::vector<uint32_t> indices;
         Op op = d_tm.mkOp(kind, indices);
@@ -1542,8 +1448,8 @@ Sort Smt2State::getIndexedSort(const std::string& name,
     }
     ret = d_tm.mkBitVectorSort(n0);
   }
-  
-  
+
+
   else
   {
     std::stringstream ss;

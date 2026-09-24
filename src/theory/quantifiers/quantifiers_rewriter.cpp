@@ -542,18 +542,9 @@ void QuantifiersRewriter::computeArgVec2(const std::vector<Node>& args,
   std::map<Node, bool> activeMap;
   std::map<Node, bool> visited;
   computeArgs(args, activeMap, n, visited);
-  // Collect variables in inst pattern list only if we cannot eliminate
-  // quantifier, or if we have an add-to-pool annotation.
+  // Collect variables in the pattern list if the quantifier remains.
   bool varComputePatList = !activeMap.empty();
-  for (const Node& ip : ipl)
-  {
-    Kind k = ip.getKind();
-    if (k == Kind::INST_ADD_TO_POOL || k == Kind::SKOLEM_ADD_TO_POOL)
-    {
-      varComputePatList = true;
-      break;
-    }
-  }
+
   if (varComputePatList)
   {
     computeArgs(args, activeMap, ipl, visited);
@@ -1732,7 +1723,7 @@ Node QuantifiersRewriter::computeVarElimination(Node body,
     Trace("var-elim-quant") << "Return " << body << std::endl;
   }
   // Leibniz equality elimination
-  
+
   return body;
 }
 
@@ -2445,10 +2436,7 @@ bool QuantifiersRewriter::doOperation(Node q,
     {
       return false;
     }
-    if (qa.d_hasPool)
-    {
-      return false;
-    }
+
     return d_opts.quantifiers.prenexQuant != options::PrenexQuantMode::NONE
            && d_opts.quantifiers.miniscopeQuant
                   != options::MiniscopeQuantMode::AGG
@@ -2460,7 +2448,7 @@ bool QuantifiersRewriter::doOperation(Node q,
   }
   else if (computeOption == COMPUTE_DT_VAR_EXPAND)
   {
-    return true && is_std && !is_strict_trigger;
+    return is_std && !is_strict_trigger;
   }
   else
   {

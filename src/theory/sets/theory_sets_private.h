@@ -101,151 +101,6 @@ class TheorySetsPrivate : protected EnvObj
    *   where x is a fresh skolem
    */
   void checkMapDown();
-  void checkGroup(Node n);
-  /**
-   * @param n has form ((_ rel.group n1 ... nk) A) where A has type T
-   * @return an inference that represents:
-   * (=>
-   *  (= A (as set.empty T))
-   *  (= skolem (set.singleton (as set.empty T)))
-   * )
-   */
-  void groupNotEmpty(Node n);
-  /**
-   * @param n has form ((_ rel.group n1 ... nk) A) where A has type (Relation T)
-   * @param e an element of type T
-   * @param part a skolem function of type T -> (Relation T) created uniquely
-   * for n by defineSkolemPartFunction function below
-   * @return an inference that represents:
-   * (=>
-   *   (set.member x A)
-   *   (and
-   *     (set.member (part x) skolem)
-   *     (set.member x (part x))
-   *     (not (set.member (as set.empty (Relation T)) skolem))
-   *   )
-   * )
-   *
-   * where skolem is a variable equals ((_ rel.group n1 ... nk) A)
-   */
-  void groupUp1(Node n, Node x, Node part);
-  /**
-   * @param n has form ((_ rel.group n1 ... nk) A) where A has type (Relation T)
-   * @param e an element of type T
-   * @param part a skolem function of type T -> (Relation T) created uniquely
-   * for n by defineSkolemPartFunction function below
-   * @return an inference that represents:
-   * (=>
-   *   (not (set.member x A))
-   *   (= (part x) (as set.empty (Relation T)))
-   * )
-   *
-   * where skolem is a variable equals ((_ rel.group n1 ... nk) A)
-   */
-  void groupUp2(Node n, Node x, Node part);
-  /**
-   * @param n has form ((_ rel.group n1 ... nk) A) where A has type (Relation T)
-   * @param B an element of type (Relation T)
-   * @param x an element of type T
-   * @param part a skolem function of type T -> (Relation T) created uniquely
-   * for n by defineSkolemPartFunction function below
-   * @return an inference that represents:
-   * (=>
-   *   (and
-   *     (set.member B skolem)
-   *     (set.member x B)
-   *   )
-   *   (and
-   *     (set.member x A)
-   *     (= (part x) B)
-   *   )
-   * )
-   * where skolem is a variable equals ((_ table.group n1 ... nk) A).
-   */
-  void groupDown(Node n, Node B, Node x, Node part);
-  /**
-   * @param n has form ((_ rel.group n1 ... nk) A) where A has type (Relation T)
-   * @param B an element of type (Relation T) and B is not of the form (part x)
-   * @param part a skolem function of type T -> (Relation T) created uniquely
-   * for n by defineSkolemPartFunction function below
-   * @return an inference that represents:
-   * (=>
-   *   (and
-   *     (set.member B skolem)
-   *     (not (= A (as set.empty (Relation T)))
-   *   )
-   *   (and
-   *     (= B (part k_{n, B}))
-   *     (set.member k_{n,B} B)
-   *     (set.member k_{n,B} A)
-   *   )
-   * )
-   * where skolem is a variable equals ((_ rel.group n1 ... nk) A), and
-   * k_{n, B} is a fresh skolem of type T.
-   */
-  void groupPartMember(Node n, Node B, Node part);
-  /**
-   * @param n has form ((_ rel.group n1 ... nk) A) where A has type (Relation T)
-   * @param B an element of type (Relation T)
-   * @param x an element of type T
-   * @param y an element of type T
-   * @param part a skolem function of type T -> (Relation T) created uniquely
-   * for n by defineSkolemPartFunction function below
-   * @return an inference that represents:
-   * (=>
-   *   (and
-   *     (set.member B skolem)
-   *     (set.member x B)
-   *     (set.member y B)
-   *     (distinct x y)
-   *   )
-   *   (and
-   *     (= ((_ tuple.project n1 ... nk) x)
-   *        ((_ tuple.project n1 ... nk) y))
-   *     (= (part x) (part y))
-   *     (= (part x) B)
-   *   )
-   * )
-   * where skolem is a variable equals ((_ rel.group n1 ... nk) A).
-   */
-  void groupSameProjection(Node n, Node B, Node x, Node y, Node part);
-  /**
-   * @param n has form ((_ rel.group n1 ... nk) A) where A has type (Relation T)
-   * @param B an element of type (Relation T)
-   * @param x an element of type T
-   * @param y an element of type T
-   * @param part a skolem function of type T -> (Relation T) created uniquely
-   * for n by defineSkolemPartFunction function below
-   * @return an inference that represents:
-   * (=>
-   *   (and
-   *     (set.member B skolem)
-   *     (set.member x B)
-   *     (set.member y A)
-   *     (distinct x y)
-   *     (= ((_ tuple.project n1 ... nk) x)
-   *        ((_ tuple.project n1 ... nk) y))
-   *   )
-   *   (and
-   *     (set.member y B)
-   *     (= (part x) (part y))
-   *     (= (part x) B)
-   *   )
-   * )
-   * where skolem is a variable equals ((_ rel.group n1 ... nk) A).
-   */
-  void groupSamePart(Node n, Node B, Node x, Node y, Node part);
-  /**
-   * @param n has form ((_ rel.group n1 ... nk) A) where A has type (Relation T)
-   * @return a function of type T -> (Relation T) that maps elements T to a
-   * part in the partition
-   */
-  Node defineSkolemPartFunction(Node n);
-  /**
-   * generate skolem variable for node n and add pending lemma for the equality
-   */
-  Node registerAndAssertSkolemLemma(Node& n);
-
   Node d_true;
   Node d_false;
   Node d_zero;
@@ -327,28 +182,10 @@ class TheorySetsPrivate : protected EnvObj
    * been produced, so the strategy can flush and restart.
    */
   void checkBasic();
-  /** Run the cardinality subsolver, if cardinality constraints are present. */
-  void checkCardinality();
-  /** Run the relations subsolver, if relational constraints are present. */
-  void checkRelations();
-  /**
-   * Run the transitive-closure down rule, which introduces fresh skolem
-   * elements. One sweep over the current TC members is done per call, so only
-   * finitely many fresh elements are introduced per strategy pass.
-   */
-  void checkTransitiveClosureDown();
-  /**
-   * Run the transitive-closure up rule, which chains the closure graph built by
-   * checkTransitiveClosureDown. It must run in the same strategy pass as the
-   * down rule, since the two share that graph.
-   */
-  void checkTransitiveClosureUp();
   /** Run the set.filter inference rules (checkFilterUp / checkFilterDown). */
   void checkFilters();
   /** Run the set.map inference rules (checkMapUp / checkMapDown). */
   void checkMaps();
-  /** Run the rel.group / table.group inference rules. */
-  void checkGroups();
   /**
    * Split on set disequalities (SET DISEQUALITY rule from Bansal et al IJCAR
    * 2016). Runs after the operator rules to preserve the original inference
@@ -407,16 +244,6 @@ class TheorySetsPrivate : protected EnvObj
   /** ensure that the set type is over first class type, throw logic exception
    * if not */
   void ensureFirstClassSetType(TypeNode tn) const;
-  /**
-   * Ensure cardinality is enabled, which may throw a logic exception if
-   * setCardExp is false.
-   */
-  void ensureCardinalityEnabled();
-  /**
-   * Ensure relations are enabled, which may throw a logic exception if
-   * relsExp is false.
-   */
-  void ensureRelationsEnabled();
   /** subtheory solver for the theory of relations */
   /** subtheory solver for the theory of sets with cardinality */
   /** Have we ever seen relations? */

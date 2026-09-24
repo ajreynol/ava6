@@ -63,23 +63,14 @@ class TypeEnumeratorInterface
   const TypeNode d_type;
 }; /* class TypeEnumeratorInterface */
 
-/**
- * This class stores particular information that is relevant to type
- * enumeration. For finite model finding, we set d_fixed_usort=true, and store
- * the finite cardinality bounds for each uninterpreted sort encountered in the
- * model. For strings, we store the cardinality for the alphabet that we are
- * assuming.
- */
+/** String-alphabet configuration propagated to nested enumerators. */
 class TypeEnumeratorProperties
 {
  public:
-  TypeEnumeratorProperties(bool fixUSortCard, uint32_t strAlphaCard)
-      : d_fixed_usort_card(fixUSortCard), d_stringAlphaCard(strAlphaCard)
+  TypeEnumeratorProperties(uint32_t strAlphaCard)
+      : d_stringAlphaCard(strAlphaCard)
   {
   }
-  Integer getFixedCardinality(TypeNode tn) { return d_fixed_card[tn]; }
-  bool d_fixed_usort_card;
-  std::map<TypeNode, Integer> d_fixed_card;
   /** Get the alphabet for strings */
   uint32_t getStringsAlphabetCard() const { return d_stringAlphaCard; }
 

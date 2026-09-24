@@ -17,7 +17,6 @@
 #include "options/smt_options.h"
 #include "theory/quantifiers/entailment_check.h"
 #include "theory/quantifiers/first_order_model.h"
-#include "theory/quantifiers/fmf/first_order_model_fmc.h"
 #include "theory/quantifiers/ho_term_database.h"
 #include "theory/quantifiers/quantifiers_attributes.h"
 #include "theory/quantifiers/quantifiers_state.h"
@@ -32,7 +31,6 @@ TermRegistry::TermRegistry(Env& env,
                            QuantifiersRegistry& qr)
     : EnvObj(env),
       d_termEnum(new TermEnumeration),
-      d_termPools(new TermPools(env, qs)),
       d_termDb(logicInfo().isHigherOrder() ? new HoTermDb(env, qs, qr)
                                            : new TermDb(env, qs, qr)),
       d_echeck(new EntailmentCheck(env, qs, *d_termDb.get())),
@@ -40,9 +38,8 @@ TermRegistry::TermRegistry(Env& env,
       d_ievalMan(new ieval::InstEvaluatorManager(env, qs, *d_termDb.get())),
       d_qmodel(nullptr)
 {
-  
-  
-  
+
+
   Trace("quant-engine-debug") << "Initialize quantifiers engine." << std::endl;
 }
 
@@ -51,7 +48,7 @@ void TermRegistry::finishInit(FirstOrderModel* fm,
 {
   d_qmodel = fm;
   d_termDb->finishInit(qim);
-  
+
 }
 
 void TermRegistry::addQuantifierBody(TNode n) { addTermInternal(n, true); }
@@ -72,7 +69,7 @@ void TermRegistry::addTermInternal(TNode n, bool withinQuant)
     return;
   }
   d_termDb->addTerm(n);
-  
+
 }
 
 Node TermRegistry::getTermForType(TypeNode tn)
@@ -82,39 +79,6 @@ Node TermRegistry::getTermForType(TypeNode tn)
     return d_termEnum->getEnumerateTerm(tn, 0);
   }
   return d_termDb->getOrMakeTypeGroundTerm(tn);
-}
-
-void TermRegistry::getTermsForPool(Node p, std::vector<Node>& terms)
-{
-  if (p.getKind() == Kind::SET_UNIVERSE)
-  {
-    // get all ground terms of the given type
-    TypeNode ptn = p.getType().getSetElementType();
-    size_t nterms = d_termDb->getNumTypeGroundTerms(ptn);
-    for (size_t i = 0; i < nterms; i++)
-    {
-      terms.push_back(d_termDb->getTypeGroundTerm(ptn, i));
-    }
-  }
-  else
-  {
-    d_termPools->getTermsForPool(p, terms);
-  }
-}
-
-void TermRegistry::declarePool(Node p, const std::vector<Node>& initValue)
-{
-  d_termPools->registerPool(p, initValue);
-}
-
-void TermRegistry::processInstantiation(Node q, const std::vector<Node>& terms)
-{
-  d_termPools->processInstantiation(q, terms);
-}
-void TermRegistry::processSkolemization(Node q,
-                                        const std::vector<Node>& skolems)
-{
-  d_termPools->processSkolemization(q, skolems);
 }
 
 TermDb* TermRegistry::getTermDatabase() const { return d_termDb.get(); }
@@ -138,8 +102,6 @@ TermEnumeration* TermRegistry::getTermEnumeration() const
 {
   return d_termEnum.get();
 }
-
-TermPools* TermRegistry::getTermPools() const { return d_termPools.get(); }
 
 VtsTermCache* TermRegistry::getVtsTermCache() const { return d_vtsCache.get(); }
 

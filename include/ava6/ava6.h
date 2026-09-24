@@ -1690,8 +1690,6 @@ class AVA6_EXPORT Term
    * where @f$c_1 ... c_n@f$ are values ordered by id such that
    * @f$c_1 > ... > c_n@f$ (see @ref Term::operator>(const Term&) const).
    *
-   * @note A universe set term (kind `SET_UNIVERSE`) is not considered to be
-   *       a set value.
    *
    * @return True if the term is a set value.
    */
@@ -1756,18 +1754,6 @@ class AVA6_EXPORT Term
    * @return The representation of a sequence value as a vector of terms.
    */
   std::vector<Term> getSequenceValue() const;
-
-  /**
-   * Determine if this term is a cardinality constraint.
-   * @return True if the term is a cardinality constraint.
-   */
-  bool isCardinalityConstraint() const;
-  /**
-   * Get a cardinality constraint as a pair of its sort and upper bound.
-   * @note Asserts isCardinalityConstraint().
-   * @return The sort the cardinality constraint is for and its upper bound.
-   */
-  std::pair<Sort, uint32_t> getCardinalityConstraint() const;
 
   /**
    * Determine if this term is a real algebraic number.
@@ -2149,12 +2135,10 @@ class AVA6_EXPORT DatatypeDecl
    * Constructor.
    * @param nm   The associated node manager.
    * @param name The name of the datatype.
-   * @param isCoDatatype True if a codatatype is to be constructed.
    * @return The DatatypeDecl.
    */
   DatatypeDecl(NodeManagerSharedPtr nm,
-               const std::string& name,
-               bool isCoDatatype = false);
+               const std::string& name);
 
   /**
    * Constructor for parameterized datatype declaration.
@@ -2162,12 +2146,10 @@ class AVA6_EXPORT DatatypeDecl
    * @param nm   The associated node manager.
    * @param name The name of the datatype.
    * @param params A list of sort parameters.
-   * @param isCoDatatype True if a codatatype is to be constructed.
    */
   DatatypeDecl(NodeManagerSharedPtr nm,
                const std::string& name,
-               const std::vector<Sort>& params,
-               bool isCoDatatype = false);
+               const std::vector<Sort>& params);
 
   /** @return The internal wrapped Dtype of this datatype declaration. */
   internal::DType& getDatatype(void) const;
@@ -2705,12 +2687,6 @@ class AVA6_EXPORT Datatype
   bool isParametric() const;
 
   /**
-   * Determine if this datatype corresponds to a co-datatype.
-   * @return True if this datatype corresponds to a co-datatype.
-   */
-  bool isCodatatype() const;
-
-  /**
    * Determine if this datatype corresponds to a tuple.
    * @return True if this datatype corresponds to a tuple.
    */
@@ -2732,7 +2708,7 @@ class AVA6_EXPORT Datatype
   /**
    * Determine if this datatype is well-founded.
    *
-   * If this datatype is not a codatatype, this returns false if there are no
+   * Returns false if there are no
    * values of this datatype that are of finite size.
    *
    * @return True if this datatype is well-founded.
@@ -3968,12 +3944,6 @@ class AVA6_EXPORT TermManager
    */
   Term mkEmptySequence(const Sort& sort);
   /**
-   * Create a universe set of the given sort.
-   * @param sort The sort of the set elements.
-   * @return The universe set constant.
-   */
-  Term mkUniverseSet(const Sort& sort);
-  /**
    * Create a bit-vector constant of given size and value.
    *
    * @note The given value must fit into a bit-vector of the given size.
@@ -4081,16 +4051,6 @@ class AVA6_EXPORT TermManager
    */
   Term mkFloatingPoint(const Term& sign, const Term& exp, const Term& sig);
   /**
-   * Create a cardinality constraint for an uninterpreted sort.
-   *
-   * @warning This function is experimental and may change in future versions.
-   *
-   * @param sort       The sort the cardinality constraint is for.
-   * @param upperBound The upper bound on the cardinality of the sort.
-   * @return The cardinality constraint.
-   */
-  Term mkCardinalityConstraint(const Sort& sort, uint32_t upperBound);
-  /**
    * Create a tuple term.
    * @param terms The elements in the tuple.
    * @return The tuple Term.
@@ -4195,11 +4155,9 @@ class AVA6_EXPORT TermManager
   /**
    * Create a datatype declaration.
    * @param name         The name of the datatype.
-   * @param isCoDatatype True if a codatatype is to be constructed.
    * @return The DatatypeDecl.
    */
-  DatatypeDecl mkDatatypeDecl(const std::string& name,
-                              bool isCoDatatype = false);
+  DatatypeDecl mkDatatypeDecl(const std::string& name);
 
   /**
    * Create a datatype declaration.
@@ -4208,13 +4166,11 @@ class AVA6_EXPORT TermManager
    *
    * @param name         The name of the datatype.
    * @param params       A list of sort parameters.
-   * @param isCoDatatype True if a codatatype is to be constructed.
    * @return The DatatypeDecl.
    * @warning This function is experimental and may change in future versions.
    */
   DatatypeDecl mkDatatypeDecl(const std::string& name,
-                              const std::vector<Sort>& params,
-                              bool isCoDatatype = false);
+                              const std::vector<Sort>& params);
 
  private:
   /** Reset the API statistics. */
@@ -4784,90 +4740,6 @@ class AVA6_EXPORT Solver
   std::vector<Term> getUnsatCoreLemmas() const;
 
   /**
-   * Get a difficulty estimate for an asserted formula. This function is
-   * intended to be called immediately after any response to a checkSat.
-   *
-   * @warning This function is experimental and may change in future versions.
-   *
-   * @return A map from (a subset of) the input assertions to a real value that.
-   *         is an estimate of how difficult each assertion was to solve.
-   *         Unmentioned assertions can be assumed to have zero difficulty.
-   */
-  std::map<Term, Term> getDifficulty() const;
-
-  /**
-   * Get a timeout core.
-   *
-   * \verbatim embed:rst:leading-asterisk
-   * This function computes a subset of the current assertions that cause a
-   * timeout. It may make multiple checks for satisfiability internally, each
-   * limited by the timeout value given by
-   * :ref:`timeout-core-timeout <lbl-option-timeout-core-timeout>`.
-   *
-   * If the result is unknown and the reason is timeout, then returned the set
-   * of assertions corresponds to a subset of the current assertions that cause
-   * a timeout in the specified time :ref:`timeout-core-timeout
-   * <lbl-option-timeout-core-timeout>`. If the result is unsat, then the list
-   * of formulas correspond to an unsat core for the current assertions.
-   * Otherwise, the result is sat, indicating that the current assertions are
-   * satisfiable, and the returned set of assertions is empty.
-   * \endverbatim
-   *
-   * SMT-LIB:
-   *
-   * \verbatim embed:rst:leading-asterisk
-   * .. code:: smtlib
-   *
-   *     (get-timeout-core)
-   *
-   * \endverbatim
-   *
-   * @warning This function is experimental and may change in future versions.
-   *
-   * @return The result of the timeout core computation. This is a pair
-   *         containing a result and a set of assertions.
-   */
-  std::pair<Result, std::vector<Term>> getTimeoutCore() const;
-
-  /**
-   * Get a timeout core of the given assumptions.
-   *
-   * This function computes a subset of the given assumptions that cause a
-   * timeout when added to the current assertions.
-   *
-   * \verbatim embed:rst:leading-asterisk
-   * If the result is unknown and the reason is timeout, then the set of
-   * assumptions corresponds to a subset of the given assumptions that cause a
-   * timeout when added to the current assertions in the specified time
-   * :ref:`timeout-core-timeout <lbl-option-timeout-core-timeout>`. If the
-   * result is unsat, then the set of assumptions together with the current
-   * assertions correspond to an unsat core for the current assertions.
-   * Otherwise, the result is sat, indicating that the given assumptions plus
-   * the current assertions are satisfiable, and the returned set of
-   * assumptions is empty.
-   * \endverbatim
-   *
-   * @note This command does not require being preceeded by a call to
-   *       `checkSat()`.
-   *
-   * SMT-LIB:
-   *
-   * \verbatim embed:rst:leading-asterisk
-   * .. code:: smtlib
-   *
-   *     (get-timeout-core (<assert>*))
-   * \endverbatim
-   *
-   * @warning This function is experimental and may change in future versions.
-   *
-   * @param assumptions The (non-empty) set of formulas to assume.
-   *
-   * @return The result of the timeout core computation. This is a pair
-   *         containing a result and a set of assumptions.
-   */
-  std::pair<Result, std::vector<Term>> getTimeoutCoreAssuming(
-      const std::vector<Term>& assumptions) const;
-  /**
    * Get a proof associated with the most recent call to checkSat.
    *
    * SMT-LIB:
@@ -4910,18 +4782,6 @@ class AVA6_EXPORT Solver
       modes::ProofFormat format = modes::ProofFormat::DEFAULT,
       const std::map<ava6::Term, std::string>& assertionNames =
           std::map<ava6::Term, std::string>()) const;
-
-  /**
-   * Get a list of learned literals that are entailed by the current set of
-   * assertions.
-   *
-   * @warning This function is experimental and may change in future versions.
-   *
-   * @param t The type of learned literals to return
-   * @return A list of literals that were learned at top-level.
-   */
-  std::vector<Term> getLearnedLiterals(
-      modes::LearnedLitType t = modes::LearnedLitType::INPUT) const;
 
   /**
    * Get the value of the given term in the current model.
@@ -5008,30 +4868,6 @@ class AVA6_EXPORT Solver
                        const std::vector<Term>& consts) const;
 
   /**
-   * Declare a symbolic pool of terms with the given initial value.
-   *
-   * For details on how pools are used to specify instructions for quantifier
-   * instantiation, see documentation for the #INST_POOL kind.
-   *
-   * SMT-LIB:
-   *
-   * \verbatim embed:rst:leading-asterisk
-   * .. code:: smtlib
-   *
-   *     (declare-pool <symbol> <sort> ( <term>* ))
-   * \endverbatim
-   *
-   * @warning This function is experimental and may change in future versions.
-   *
-   * @param symbol The name of the pool.
-   * @param sort The sort of the elements of the pool.
-   * @param initValue The initial value of the pool.
-   * @return The pool symbol.
-   */
-  Term declarePool(const std::string& symbol,
-                   const Sort& sort,
-                   const std::vector<Term>& initValue) const;
-  /**
    * Add plugin to this solver. Its callbacks will be called throughout the
    * lifetime of this solver.
    * @warning This function is experimental and may change in future versions.
@@ -5052,47 +4888,6 @@ class AVA6_EXPORT Solver
    * @param nscopes The number of levels to pop.
    */
   void pop(uint32_t nscopes = 1) const;
-
-  /**
-   * Block the current model. Can be called only if immediately preceded by a
-   * SAT or INVALID query.
-   *
-   * SMT-LIB:
-   *
-   * \verbatim embed:rst:leading-asterisk
-   * .. code:: smtlib
-   *
-   *     (block-model)
-   *
-   * Requires enabling option
-   * :ref:`produce-models <lbl-option-produce-models>`.
-   * \endverbatim
-   *
-   * @warning This function is experimental and may change in future versions.
-   *
-   * @param mode The mode to use for blocking.
-   */
-  void blockModel(modes::BlockModelsMode mode) const;
-
-  /**
-   * Block the current model values of (at least) the values in terms. Can be
-   * called only if immediately preceded by a SAT query.
-   *
-   * SMT-LIB:
-   *
-   * \verbatim embed:rst:leading-asterisk
-   * .. code:: smtlib
-   *
-   *     (block-model-values ( <terms>+ ))
-   *
-   * Requires enabling option
-   * :ref:`produce-models <lbl-option-produce-models>`.
-   * \endverbatim
-   *
-   * @warning This function is experimental and may change in future versions.
-   * @param terms The model values to block.
-   */
-  void blockModelValues(const std::vector<Term>& terms) const;
 
   /**
    * @warning This function is experimental and may change in future versions.
@@ -5264,9 +5059,6 @@ class AVA6_EXPORT Solver
    */
   void resetInternal();
 
-  /** Helper for getting timeout cores */
-  std::pair<Result, std::vector<Term>> getTimeoutCoreHelper(
-      const std::vector<Term>& assumptions) const;
   /**
    * Get value helper, which accounts for subtyping.
    * @param term The term to get the value from.

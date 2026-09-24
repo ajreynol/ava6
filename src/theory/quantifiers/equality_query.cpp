@@ -48,32 +48,7 @@ Node EqualityQuery::getInternalRepresentative(Node a, Node q, size_t index)
 {
   Assert(q.isNull() || q.getKind() == Kind::FORALL);
   Node r = d_qstate.getRepresentative(a);
-  if (options().quantifiers.finiteModelFind)
-  {
-    if (r.isConst() && quantifiers::TermUtil::containsUninterpretedConstant(r))
-    {
-      // map back from values assigned by model, if any
-      if (d_model != nullptr)
-      {
-        Node tr = d_model->getRepSet()->getTermForRepresentative(r);
-        if (!tr.isNull())
-        {
-          r = tr;
-          r = d_qstate.getRepresentative(r);
-        }
-        else
-        {
-          if (r.getType().isUninterpretedSort())
-          {
-            Trace("internal-rep-warn")
-                << "No representative for UF constant." << std::endl;
-            // should never happen : UF constants should never escape model
-            DebugUnhandled();
-          }
-        }
-      }
-    }
-  }
+
   TypeNode v_tn = q.isNull() ? a.getType() : q[0][index].getType();
   if (options().quantifiers.quantRepMode == options::QuantRepMode::EE)
   {

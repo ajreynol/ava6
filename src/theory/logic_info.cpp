@@ -35,7 +35,6 @@ LogicInfo::LogicInfo()
       d_transcendentals(true),
       d_linear(false),
       d_differenceLogic(false),
-      d_cardinalityConstraints(false),
       d_higherOrder(false),
       d_locked(false)
 {
@@ -54,7 +53,6 @@ LogicInfo::LogicInfo(std::string logicString)
       d_transcendentals(false),
       d_linear(false),
       d_differenceLogic(false),
-      d_cardinalityConstraints(false),
       d_higherOrder(false),
       d_locked(false)
 {
@@ -71,7 +69,6 @@ LogicInfo::LogicInfo(const char* logicString)
       d_transcendentals(false),
       d_linear(false),
       d_differenceLogic(false),
-      d_cardinalityConstraints(false),
       d_higherOrder(false),
       d_locked(false)
 {
@@ -209,14 +206,6 @@ bool LogicInfo::isDifferenceLogic() const
   return d_differenceLogic;
 }
 
-bool LogicInfo::hasCardinalityConstraints() const
-{
-  PrettyCheckArgument(d_locked,
-                      *this,
-                      "This LogicInfo isn't locked yet, and cannot be queried");
-  return d_cardinalityConstraints;
-}
-
 bool LogicInfo::operator==(const LogicInfo& other) const
 {
   PrettyCheckArgument(isLocked() && other.isLocked(),
@@ -234,8 +223,7 @@ bool LogicInfo::operator==(const LogicInfo& other) const
   PrettyCheckArgument(d_sharingTheories == other.d_sharingTheories,
                       *this,
                       "LogicInfo internal inconsistency");
-  if (d_cardinalityConstraints != other.d_cardinalityConstraints
-      || d_higherOrder != other.d_higherOrder)
+  if (d_higherOrder != other.d_higherOrder)
   {
     return false;
   }
@@ -265,8 +253,7 @@ bool LogicInfo::operator<=(const LogicInfo& other) const
   PrettyCheckArgument(d_sharingTheories <= other.d_sharingTheories,
                       *this,
                       "LogicInfo internal inconsistency");
-  bool res = (!d_cardinalityConstraints || other.d_cardinalityConstraints)
-             && (!d_higherOrder || other.d_higherOrder);
+  bool res = (!d_higherOrder || other.d_higherOrder);
   if (isTheoryEnabled(theory::THEORY_ARITH)
       && other.isTheoryEnabled(theory::THEORY_ARITH))
   {
@@ -297,8 +284,7 @@ bool LogicInfo::operator>=(const LogicInfo& other) const
   PrettyCheckArgument(d_sharingTheories >= other.d_sharingTheories,
                       *this,
                       "LogicInfo internal inconsistency");
-  bool res = (d_cardinalityConstraints || !other.d_cardinalityConstraints)
-             && (d_higherOrder || !other.d_higherOrder);
+  bool res = (d_higherOrder || !other.d_higherOrder);
   if (isTheoryEnabled(theory::THEORY_ARITH)
       && other.isTheoryEnabled(theory::THEORY_ARITH))
   {
@@ -339,7 +325,7 @@ std::string LogicInfo::getLogicString() const
     else
     {
       size_t seen = 0;  // make sure we support all the active theories
-      
+
       if (d_theories[THEORY_ARRAYS])
       {
         ss << (d_sharingTheories == 1 ? "AX" : "A");
@@ -350,17 +336,14 @@ std::string LogicInfo::getLogicString() const
         ss << "UF";
         ++seen;
       }
-      if (d_cardinalityConstraints)
-      {
-        ss << "C";
-      }
+
       if (d_theories[THEORY_BV])
       {
         ss << "BV";
         ++seen;
       }
-      
-      
+
+
       if (d_theories[THEORY_DATATYPES])
       {
         ss << "DT";
@@ -394,7 +377,7 @@ std::string LogicInfo::getLogicString() const
         ss << "FS";
         ++seen;
       }
-      
+
       if (seen != d_sharingTheories)
       {
         Unhandled()
@@ -544,15 +527,6 @@ void LogicInfo::setLogicString(std::string logicString)
           enableTheory(THEORY_UF);
           p += 2;
         }
-        else if (!strncmp(p, "C", 1))
-        {
-          if (d_cardinalityConstraints)
-          {
-            throw ava6::internal::Exception("duplicate theory: C");
-          }
-          enableCardinalityConstraints();
-          p += 1;
-        }
         else if (!strncmp(p, "BV", 2))
         {
           checkDuplicateTheory(THEORY_BV, "BV");
@@ -690,7 +664,6 @@ void LogicInfo::setLogicString(std::string logicString)
     }
   }
 
-  
 
   if (*p != '\0')
   {
@@ -864,22 +837,6 @@ void LogicInfo::arithNonLinear()
   d_logicString = "";
   d_linear = false;
   d_differenceLogic = false;
-}
-
-void LogicInfo::enableCardinalityConstraints()
-{
-  PrettyCheckArgument(
-      !d_locked, *this, "This LogicInfo is locked, and cannot be modified");
-  d_logicString = "";
-  d_cardinalityConstraints = true;
-}
-
-void LogicInfo::disableCardinalityConstraints()
-{
-  PrettyCheckArgument(
-      !d_locked, *this, "This LogicInfo is locked, and cannot be modified");
-  d_logicString = "";
-  d_cardinalityConstraints = false;
 }
 
 void LogicInfo::enableHigherOrder()

@@ -53,8 +53,6 @@ class TermRegistry : protected EnvObj
   Node getProxy(Node n);
   /** Get the empty set of type tn */
   Node getEmptySet(TypeNode tn);
-  /** Get the universe set of type tn if it exists or create a new one */
-  Node getUnivSet(TypeNode tn);
   /** debug print set */
   void debugPrintSet(Node s, const char* c) const;
 
@@ -72,7 +70,6 @@ class TermRegistry : protected EnvObj
   /** Map from types to empty set of that type */
   std::map<TypeNode, Node> d_emptyset;
   /** Map from types to universe set of that type */
-  std::map<TypeNode, Node> d_univset;
   /** Eager proof generator for purification lemmas */
   std::unique_ptr<EagerProofGenerator> d_epg;
 }; /* class TheorySetsPrivate */

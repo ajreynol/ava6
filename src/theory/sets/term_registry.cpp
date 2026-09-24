@@ -39,8 +39,7 @@ Node TermRegistry::getProxy(Node n)
 {
   Kind nk = n.getKind();
   if (nk != Kind::SET_EMPTY && nk != Kind::SET_SINGLETON
-      && nk != Kind::SET_INTER && nk != Kind::SET_MINUS && nk != Kind::SET_UNION
-      && nk != Kind::SET_UNIVERSE && nk != Kind::SET_MAP)
+      && nk != Kind::SET_INTER && nk != Kind::SET_MINUS && nk != Kind::SET_UNION && nk != Kind::SET_MAP)
   {
     return n;
   }
@@ -74,19 +73,6 @@ Node TermRegistry::getEmptySet(TypeNode tn)
   }
   Node n = nodeManager()->mkConst(EmptySet(tn));
   d_emptyset[tn] = n;
-  return n;
-}
-
-Node TermRegistry::getUnivSet(TypeNode tn)
-{
-  std::map<TypeNode, Node>::iterator it = d_univset.find(tn);
-  if (it != d_univset.end())
-  {
-    return it->second;
-  }
-  NodeManager* nm = nodeManager();
-  Node n = nm->mkNullaryOperator(tn, Kind::SET_UNIVERSE);
-  d_univset[tn] = n;
   return n;
 }
 

@@ -417,14 +417,6 @@ class TheoryEngine : protected EnvObj
    */
   std::unordered_set<TNode> getRelevantAssertions(bool& success);
 
-  /**
-   * Get difficulty map, which populates dmap, mapping preprocessed assertions
-   * to a value that estimates their difficulty for solving the current problem.
-   *
-   * For details, see theory/difficuly_manager.h.
-   */
-  void getDifficultyMap(std::map<Node, Node>& dmap, bool includeLemmas = false);
-
   /** Get incomplete id, valid when isModelUnsound is true. */
   theory::IncompleteId getModelUnsoundId() const;
   /** Get unsound id, valid when isRefutationUnsound is true. */

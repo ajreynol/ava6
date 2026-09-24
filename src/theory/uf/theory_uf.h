@@ -29,7 +29,6 @@ namespace ava6::internal {
 namespace theory {
 namespace uf {
 
-class CardinalityExtension;
 class HoExtension;
 class ConversionsSolver;
 class LambdaLift;
@@ -45,12 +44,6 @@ class TheoryUF : public Theory
     {
     }
 
-    void eqNotifyNewClass(TNode t) override
-    {
-      Trace("uf-notify") << "NotifyClass::eqNotifyNewClass(" << t << ")"
-                         << std::endl;
-      d_uf.eqNotifyNewClass(t);
-    }
 
     void eqNotifyMerge(TNode t1, TNode t2) override
     {
@@ -59,12 +52,6 @@ class TheoryUF : public Theory
       d_uf.eqNotifyMerge(t1, t2);
     }
 
-    void eqNotifyDisequal(TNode t1, TNode t2, TNode reason) override
-    {
-      Trace("uf-notify") << "NotifyClass::eqNotifyDisequal(" << t1 << ", " << t2
-                         << ", " << reason << ")" << std::endl;
-      d_uf.eqNotifyDisequal(t1, t2, reason);
-    }
 
    private:
     /** Reference to the parent theory */
@@ -73,7 +60,6 @@ class TheoryUF : public Theory
 
  private:
   /** The associated cardinality extension (or nullptr if it does not exist) */
-  std::unique_ptr<CardinalityExtension> d_thss;
   /** the lambda lifting utility */
   std::unique_ptr<LambdaLift> d_lambdaLift;
   /** the higher-order solver extension (or nullptr if it does not exist) */
@@ -91,14 +77,8 @@ class TheoryUF : public Theory
 
   /** Symmetry analyzer */
 
-  /** called when a new equivalance class is created */
-  void eqNotifyNewClass(TNode t);
-
   /** called when two equivalance classes have merged */
   void eqNotifyMerge(TNode t1, TNode t2);
-
-  /** called when two equivalence classes are made disequal */
-  void eqNotifyDisequal(TNode t1, TNode t2, TNode reason);
 
  public:
   /** Constructs a new instance of TheoryUF w.r.t. the provided context.*/

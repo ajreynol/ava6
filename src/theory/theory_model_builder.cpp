@@ -36,39 +36,6 @@ namespace theory {
 
 TheoryEngineModelBuilder::TheoryEngineModelBuilder(Env& env) : EnvObj(env) {}
 
-void TheoryEngineModelBuilder::Assigner::initialize(
-    TypeNode tn, TypeEnumeratorProperties* tep, const std::vector<Node>& aes)
-{
-  d_te.reset(new TypeEnumerator(tn, tep));
-  d_assignExcSet.insert(d_assignExcSet.end(), aes.begin(), aes.end());
-}
-
-Node TheoryEngineModelBuilder::Assigner::getNextAssignment()
-{
-  Assert(d_te != nullptr);
-  Node n;
-  bool success = false;
-  TypeEnumerator& te = *d_te;
-  // Check if we have run out of elements. This should never happen; if it
-  // does we assert false and return null.
-  if (te.isFinished())
-  {
-    DebugUnhandled();
-    return Node::null();
-  }
-  // must increment until we find one that is not in the assignment
-  // exclusion set
-  do
-  {
-    n = *te;
-    success = std::find(d_assignExcSet.begin(), d_assignExcSet.end(), n)
-              == d_assignExcSet.end();
-    // increment regardless of fail or succeed, to set up the next value
-    ++te;
-  } while (!success);
-  return n;
-}
-
 Node TheoryEngineModelBuilder::evaluateEqc(TheoryModel* m, TNode r)
 {
   eq::EqClassIterator eqc_i = eq::EqClassIterator(r, m->d_equalityEngine);
@@ -90,43 +57,6 @@ Node TheoryEngineModelBuilder::evaluateEqc(TheoryModel* m, TNode r)
     }
   }
   return Node::null();
-}
-
-bool TheoryEngineModelBuilder::isAssignerActive(TheoryModel* tm, Assigner& a)
-{
-  if (a.d_isActive)
-  {
-    return true;
-  }
-  std::vector<Node>& eset = a.d_assignExcSet;
-  std::map<Node, Node>::iterator it;
-  for (unsigned i = 0, size = eset.size(); i < size; i++)
-  {
-    // Members of exclusion set must have values, otherwise we are not yet
-    // assignable.
-    Node er = eset[i];
-    if (tm->isValue(er))
-    {
-      // already processed
-      continue;
-    }
-    // Assignable members of assignment exclusion set should be representatives
-    // of their equivalence classes. This ensures we look up the constant
-    // representatives for assignable members of assignment exclusion sets.
-    Assert(er == tm->getRepresentative(er));
-    it = d_constantReps.find(er);
-    if (it == d_constantReps.end())
-    {
-      Trace("model-build-aes")
-          << "isAssignerActive: not active due to " << er << std::endl;
-      return false;
-    }
-    // update
-    eset[i] = it->second;
-  }
-  Trace("model-build-aes") << "isAssignerActive: active!" << std::endl;
-  a.d_isActive = true;
-  return true;
 }
 
 bool TheoryEngineModelBuilder::isAssignable(TNode n)
@@ -197,136 +127,6 @@ void TheoryEngineModelBuilder::assignConstantRep(TheoryModel* tm,
   tm->d_rep_set.setTermForRepresentative(constRep, eqc);
 }
 
-bool TheoryEngineModelBuilder::isExcludedCdtValue(
-    Node val,
-    std::set<Node>* repSet,
-    std::map<Node, Node>& assertedReps,
-    Node eqc)
-{
-  Trace("model-builder-debug")
-      << "Is " << val << " and excluded codatatype value for " << eqc << "? "
-      << std::endl;
-  for (set<Node>::iterator i = repSet->begin(); i != repSet->end(); ++i)
-  {
-    Assert(assertedReps.find(*i) != assertedReps.end());
-    Node rep = assertedReps[*i];
-    Trace("model-builder-debug") << "  Rep : " << rep << std::endl;
-    // check whether it is possible that rep will be assigned the same value
-    // as val.
-    if (isCdtValueMatch(val, rep))
-    {
-      return true;
-    }
-  }
-  return false;
-}
-
-bool TheoryEngineModelBuilder::isCdtValueMatch(Node v, Node r)
-{
-  if (r == v)
-  {
-    // values equal match trivially
-    return true;
-  }
-  else if (v.isConst() && r.isConst())
-  {
-    // distinct constant values do not match
-    return false;
-  }
-  else if (r.getKind() == Kind::APPLY_CONSTRUCTOR)
-  {
-    if (v.getKind() != Kind::APPLY_CONSTRUCTOR)
-    {
-      Assert(v.getKind() == Kind::CODATATYPE_BOUND_VARIABLE);
-      // v is the position of a loop. It may be possible to match, we return
-      // true, which is an over-approximation of when it is unsafe to use v.
-      return true;
-    }
-    if (v.getOperator() == r.getOperator())
-    {
-      for (size_t i = 0, nchild = v.getNumChildren(); i < nchild; i++)
-      {
-        if (!isCdtValueMatch(v[i], r[i]))
-        {
-          // if one child fails to match, we cannot match
-          return false;
-        }
-      }
-      return true;
-    }
-    // operators do not match
-    return false;
-  }
-  else if (v.getKind() == Kind::APPLY_CONSTRUCTOR)
-  {
-    // v has a constructor in a position that we have yet to fill in r.
-    // we are either a finite type in which case this subfield of r can be
-    // assigned a default value (or otherwise would have been split on).
-    // otherwise we are an infinite type and the subfield of r will be
-    // chosen not to clash with the subfield of v.
-    return false;
-  }
-  return true;
-}
-
-bool TheoryEngineModelBuilder::involvesUSort(TypeNode tn) const
-{
-  if (tn.isUninterpretedSort())
-  {
-    return true;
-  }
-  else if (tn.isArray())
-  {
-    return involvesUSort(tn.getArrayIndexType())
-           || involvesUSort(tn.getArrayConstituentType());
-  }
-  else if (tn.isSet())
-  {
-    return involvesUSort(tn.getSetElementType());
-  }
-  else if (tn.isDatatype())
-  {
-    const DType& dt = tn.getDType();
-    return dt.involvesUninterpretedType();
-  }
-  else
-  {
-    return false;
-  }
-}
-
-bool TheoryEngineModelBuilder::isExcludedUSortValue(
-    std::map<TypeNode, unsigned>& eqc_usort_count,
-    Node v,
-    std::map<Node, bool>& visited)
-{
-  Assert(v.isConst());
-  if (visited.find(v) == visited.end())
-  {
-    visited[v] = true;
-    TypeNode tn = v.getType();
-    if (tn.isUninterpretedSort())
-    {
-      Trace("model-builder-debug")
-          << "Is excluded usort value : " << v << " " << tn << std::endl;
-      unsigned card = eqc_usort_count[tn];
-      Trace("model-builder-debug") << "  Cardinality is " << card << std::endl;
-      unsigned index =
-          v.getConst<UninterpretedSortValue>().getIndex().toUnsignedInt();
-      Trace("model-builder-debug") << "  Index is " << index << std::endl;
-      return index > 0 && index >= card;
-    }
-    for (unsigned i = 0; i < v.getNumChildren(); i++)
-    {
-      if (isExcludedUSortValue(eqc_usort_count, v[i], visited))
-      {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
 void TheoryEngineModelBuilder::addToTypeList(
     TypeNode tn,
     std::vector<TypeNode>& type_list,
@@ -391,11 +191,6 @@ bool TheoryEngineModelBuilder::buildModel(TheoryModel* tm)
          ", collect representatives and compute assignable information..."
       << std::endl;
 
-  // type enumerator properties
-  bool tepFixUSortCard = options().quantifiers.finiteModelFind;
-  uint32_t tepStrAlphaCard = options().strings.stringsAlphaCard;
-  TypeEnumeratorProperties tep(tepFixUSortCard, tepStrAlphaCard);
-
   // In the first step of model building, we do a traversal of the
   // equality engine and record the information in the following:
 
@@ -415,9 +210,6 @@ bool TheoryEngineModelBuilder::buildModel(TheoryModel* tm)
   // uninterpreted sorts, but is probably a good idea to do in general since it
   // leads to models with smaller term sizes. -AJR
   std::vector<TypeNode> type_list;
-  // The count of equivalence classes per sort (for finite model finding).
-  std::map<TypeNode, unsigned> eqc_usort_count;
-
   // the set of equivalence classes that are "assignable", i.e. those that have
   // an assignable expression in them (see isAssignable), and have not already
   // been assigned a constant.
@@ -426,24 +218,11 @@ bool TheoryEngineModelBuilder::buildModel(TheoryModel* tm)
   // an expression in them that is not assignable, and have not already been
   // assigned a constant.
   std::unordered_set<Node> evaluableEqc;
-  // Assigner objects for relevant equivalence classes that require special
-  // ways of assigning values, e.g. those that take into account assignment
-  // exclusion sets.
-  std::map<Node, Assigner> eqcToAssigner;
-  // A map from equivalence classes to the equivalence class that it shares an
-  // assigner object with (all elements in the range of this map are in the
-  // domain of eqcToAssigner).
-  std::map<Node, Node> eqcToAssignerMaster;
-
   // Loop through equivalence classes of the equality engine of the model.
   eq::EqualityEngine* ee = tm->d_equalityEngine;
   NodeSet assignableCache;
   std::map<Node, Node>::iterator itm;
   eq::EqClassesIterator eqcs_i = eq::EqClassesIterator(ee);
-  // should we compute assigner objects?
-  bool computeAssigners = tm->hasAssignmentExclusionSets();
-  // the set of exclusion sets we have processed
-  std::unordered_set<Node> processedExcSet;
   for (; !eqcs_i.isFinished(); ++eqcs_i)
   {
     Node eqc = *eqcs_i;
@@ -460,22 +239,6 @@ bool TheoryEngineModelBuilder::buildModel(TheoryModel* tm)
     // Set to true if the current equivalence class is evaluatable (see
     // evaluableEqc).
     bool evaluable = false;
-    // Set to true if a term in the current equivalence class has been given an
-    // assignment exclusion set.
-    bool hasESet AVA6_UNUSED = false;
-    // Set to true if we found that a term in the current equivalence class has
-    // been given an assignment exclusion set, and we have not seen this term
-    // as part of a previous assignment exclusion group. In other words, when
-    // this flag is true we construct a new assigner object with the current
-    // equivalence class as its master.
-    bool foundESet = false;
-    // The assignment exclusion set for the current equivalence class.
-    std::vector<Node> eset;
-    // The group to which this equivalence class belongs when exclusion sets
-    // were assigned (see the argument group of
-    // TheoryModel::getAssignmentExclusionSet).
-    std::vector<Node> esetGroup;
-
     // Loop through terms in this EC
     eq::EqClassIterator eqc_i = eq::EqClassIterator(eqc, ee);
     for (; !eqc_i.isFinished(); ++eqc_i)
@@ -577,66 +340,15 @@ bool TheoryEngineModelBuilder::buildModel(TheoryModel* tm)
         // one exception is that higher-order variables when in HOL should be
         // considered neither assignable nor evaluable, which we check for here.
         evaluable = !n.isVar();
-        // expressions that are not assignable should not be given assignment
-        // exclusion sets
-        Assert(!tm->getAssignmentExclusionSet(n, esetGroup, eset));
         continue;
       }
       assignable = true;
-      if (!computeAssigners)
-      {
-        // we don't compute assigners, skip
-        continue;
-      }
-      // process the assignment exclusion set for term n
-      // was it processed based on a master exclusion group (see
-      // eqcToAssignerMaster)?
-      if (processedExcSet.find(n) != processedExcSet.end())
-      {
-        // Should not have two assignment exclusion sets for the same
-        // equivalence class
-        Assert(!hasESet);
-        Assert(eqcToAssignerMaster.find(eqc) != eqcToAssignerMaster.end());
-        // already processed as a slave term
-        hasESet = true;
-        continue;
-      }
-      // was it assigned one?
-      if (tm->getAssignmentExclusionSet(n, esetGroup, eset))
-      {
-        // Should not have two assignment exclusion sets for the same
-        // equivalence class
-        Assert(!hasESet);
-        foundESet = true;
-        hasESet = true;
-      }
     }
 
     // finished traversing the equality engine
     TypeNode eqct = eqc.getType();
     // count the number of equivalence classes of sorts in finite model finding
-    if (options().quantifiers.finiteModelFind)
-    {
-      if (eqct.isUninterpretedSort())
-      {
-        // we never assign uninterpreted sorts a priori.
-        Assert(constRep.isNull());
-        eqc_usort_count[eqct]++;
-        // For uninterpreted sorts when finite model finding is enabled,
-        // we preemptively assign the next value in the enumeration here.
-        // This is important because uninterpreted sorts are considered
-        // "INTERPRETED_FINITE" cardinality when finite model finding is
-        // enabled, and hence would otherwise be assigned using the finite
-        // case below (assigning them to the first value), which we do not
-        // want. Instead, all initial equivalence classes of uninterpreted
-        // sorts are assigned distinct values, and all further values
-        // (e.g. terms introduced as subfields of datatypes) are assign
-        // arbitrary values.
-        constRep = typeConstSet.nextTypeEnum(eqct);
-        Trace("model-value-enum") << "Enum fmf usort " << eqct << " "
-                                  << constRep << " for " << eqc << std::endl;
-      }
-    }
+
     // Assign representative for this equivalence class
     if (!constRep.isNull())
     {
@@ -671,71 +383,9 @@ bool TheoryEngineModelBuilder::buildModel(TheoryModel* tm)
     {
       evaluableEqc.insert(eqc);
     }
-    // If we found an assignment exclusion set, we construct a new assigner
-    // object.
-    if (foundESet)
-    {
-      // we don't accept assignment exclusion sets for evaluable eqc
-      Assert(!evaluable);
-      // construct the assigner
-      Assigner& a = eqcToAssigner[eqc];
-      // Take the representatives of each term in the assignment exclusion
-      // set, which ensures we can look up their value in d_constReps later.
-      std::vector<Node> aes;
-      for (const Node& e : eset)
-      {
-        // Should only supply terms that occur in the model or constants
-        // in assignment exclusion sets.
-        Assert(tm->hasTerm(e) || e.isConst());
-        Node er = tm->hasTerm(e) ? tm->getRepresentative(e) : e;
-        aes.push_back(er);
-      }
-      // initialize
-      a.initialize(eqc.getType(), &tep, aes);
-      // all others in the group are slaves of this
-      for (const Node& g : esetGroup)
-      {
-        Assert(isAssignable(g));
-        if (!tm->hasTerm(g))
-        {
-          // Ignore those that aren't in the model, in the case the user
-          // has supplied an assignment exclusion set to a variable not in
-          // the model.
-          continue;
-        }
-        Node gr = tm->getRepresentative(g);
-        if (gr != eqc)
-        {
-          eqcToAssignerMaster[gr] = eqc;
-          // remember that this term has been processed
-          processedExcSet.insert(g);
-        }
-      }
-    }
   }
 
   // Now finished initialization
-
-  // Compute type enumerator properties. This code ensures we do not
-  // enumerate terms that have uninterpreted constants that violate the
-  // bounds imposed by finite model finding. For example, if finite
-  // model finding insists that there are only 2 values { U1, U2 } of type U,
-  // then the type enumerator for list of U should enumerate:
-  //   nil, (cons U1 nil), (cons U2 nil), (cons U1 (cons U1 nil)), ...
-  // instead of enumerating (cons U3 nil).
-  if (options().quantifiers.finiteModelFind)
-  {
-    tep.d_fixed_usort_card = true;
-    for (std::map<TypeNode, unsigned>::iterator it = eqc_usort_count.begin();
-         it != eqc_usort_count.end();
-         ++it)
-    {
-      Trace("model-builder") << "Fixed bound (#eqc) for " << it->first << " : "
-                             << it->second << std::endl;
-      tep.d_fixed_card[it->first] = Integer(it->second);
-    }
-    typeConstSet.setTypeEnumeratorProperties(&tep);
-  }
 
   // Need to ensure that each EC has a constant representative.
 
@@ -900,23 +550,6 @@ bool TheoryEngineModelBuilder::buildModel(TheoryModel* tm)
         continue;
       }
 
-      // get properties of this type
-      bool isCorecursive = false;
-      if (t.isDatatype())
-      {
-        const DType& dt = t.getDType();
-        isCorecursive =
-            dt.isCodatatype()
-            && (!d_env.isFiniteType(t) || dt.isRecursiveSingleton(t));
-      }
-#ifdef AVA6_ASSERTIONS
-      bool isUSortFiniteRestricted = false;
-      if (options().quantifiers.finiteModelFind)
-      {
-        isUSortFiniteRestricted = !t.isUninterpretedSort() && involvesUSort(t);
-      }
-#endif
-
       TypeNode tb = t;
       if (!assignOne)
       {
@@ -933,9 +566,6 @@ bool TheoryEngineModelBuilder::buildModel(TheoryModel* tm)
       Trace("model-builder")
           << "  Assign phase, working on type: " << t << endl;
       bool assignable, evaluable AVA6_UNUSED;
-      std::map<Node, Assigner>::iterator itAssigner;
-      std::map<Node, Node>::iterator itAssignerM;
-      set<Node>* repSet = typeRepSet.getSet(t);
       for (i = noRepSet.begin(); i != noRepSet.end();)
       {
         i2 = i;
@@ -947,27 +577,7 @@ bool TheoryEngineModelBuilder::buildModel(TheoryModel* tm)
           // we never assign to evaluable equivalence classes
           continue;
         }
-        // check whether it has an assigner object
-        itAssignerM = eqcToAssignerMaster.find(*i2);
-        if (itAssignerM != eqcToAssignerMaster.end())
-        {
-          // Take the master's assigner. Notice we don't care which order
-          // equivalence classes are assigned. For instance, the master can
-          // be assigned after one of its slaves.
-          itAssigner = eqcToAssigner.find(itAssignerM->second);
-        }
-        else
-        {
-          itAssigner = eqcToAssigner.find(*i2);
-        }
-        if (itAssigner != eqcToAssigner.end())
-        {
-          assignable = isAssignerActive(tm, itAssigner->second);
-        }
-        else
-        {
-          assignable = assignableEqc.find(*i2) != assignableEqc.end();
-        }
+        assignable = assignableEqc.find(*i2) != assignableEqc.end();
         Trace("model-builder-debug")
             << "    eqc " << *i2 << " is assignable=" << assignable
             << std::endl;
@@ -981,68 +591,10 @@ bool TheoryEngineModelBuilder::buildModel(TheoryModel* tm)
           // assigning.
           Assert(!t.isBoolean() || isAssignable(*i2));
           Node n;
-          if (itAssigner != eqcToAssigner.end())
+          if (!d_env.isFiniteType(t))
           {
-            Trace("model-builder-debug")
-                << "Get value from assigner for finite type..." << std::endl;
-            // if it has an assigner, get the value from the assigner.
-            n = itAssigner->second.getNextAssignment();
-            Assert(!n.isNull());
-          }
-          else if (!d_env.isFiniteType(t))
-          {
-            // If its infinite, we get a fresh value that does not occur in the
-            // model. Note that uninterpreted sorts are handled in the finite
-            // case below in the case that finite model finding is enabled.
-            bool success;
-            do
-            {
-              Trace("model-builder-debug")
-                  << "Enumerate term of type " << t << std::endl;
-              n = typeConstSet.nextTypeEnum(t);
-              //--- AJR: this code checks whether n is a legal value
-              Assert(!n.isNull());
-              success = true;
-              Trace("model-builder-debug")
-                  << "Check if excluded : " << n << std::endl;
-#ifdef AVA6_ASSERTIONS
-              if (isUSortFiniteRestricted)
-              {
-                // must not involve uninterpreted constants beyond cardinality
-                // bound (which assumed to coincide with #eqc)
-                // this is just an assertion now, since TypeEnumeratorProperties
-                // should ensure that only legal values are enumerated wrt this
-                // constraint.
-                std::map<Node, bool> visited;
-                success = !isExcludedUSortValue(eqc_usort_count, n, visited);
-                if (!success)
-                {
-                  Trace("model-builder")
-                      << "Excluded value for " << t << " : " << n
-                      << " due to out of range uninterpreted constant."
-                      << std::endl;
-                }
-                Assert(success);
-              }
-#endif
-              if (success && isCorecursive)
-              {
-                if (repSet != nullptr && !repSet->empty())
-                {
-                  // in the case of codatatypes, check if it is in the set of
-                  // values that we cannot assign
-                  success = !isExcludedCdtValue(n, repSet, assertedReps, *i2);
-                  if (!success)
-                  {
-                    Trace("model-builder")
-                        << "Excluded value : " << n
-                        << " due to alpha-equivalent codatatype expression."
-                        << std::endl;
-                  }
-                }
-              }
-              //---
-            } while (!success);
+            // Assign a fresh value of infinite type.
+            n = typeConstSet.nextTypeEnum(t);
             Assert(!n.isNull());
             Trace("model-value-enum") << "Enum infinite " << t << " " << n
                                       << " for " << *i2 << std::endl;
@@ -1050,11 +602,6 @@ bool TheoryEngineModelBuilder::buildModel(TheoryModel* tm)
           else
           {
             // Otherwise, we get the first value from the type enumerator.
-            // Note that uninterpreted sorts in finite model finding assign
-            // an arbitrary constant when unassigned. This case is applied
-            // e.g. for datatypes over uninterpreted sorts, where subfields
-            // of the datatype may be introduced when assigning arbitrary
-            // values.
             Trace("model-builder-debug")
                 << "Get first value from finite type..." << std::endl;
             TypeEnumerator te(t);

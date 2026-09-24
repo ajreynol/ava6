@@ -31,7 +31,6 @@
 #include "preprocessing/passes/distinct_elim.h"
 #include "preprocessing/passes/extended_rewriter_pass.h"
 #include "preprocessing/passes/foreign_theory_rewrite.h"
-#include "preprocessing/passes/fun_def_fmf.h"
 #include "preprocessing/passes/global_negate.h"
 #include "preprocessing/passes/ho_elim.h"
 #include "preprocessing/passes/int_to_bv.h"
@@ -117,7 +116,7 @@ PreprocessingPass* callCtor(PreprocessingPassContext* ppCtx)
 PreprocessingPassRegistry::PreprocessingPassRegistry()
 {
   registerPassInfo("apply-substs", callCtor<ApplySubsts>);
-  
+
   registerPassInfo("static-learning", callCtor<StaticLearning>);
   registerPassInfo("ite-simp", callCtor<ITESimp>);
   registerPassInfo("global-negate", callCtor<GlobalNegate>);
@@ -146,7 +145,6 @@ PreprocessingPassRegistry::PreprocessingPassRegistry()
   registerPassInfo("nl-ext-purify", callCtor<NlExtPurify>);
   registerPassInfo("bool-to-bv", callCtor<BoolToBV>);
   registerPassInfo("ho-elim", callCtor<HoElim>);
-  registerPassInfo("fun-def-fmf", callCtor<FunDefFmf>);
   registerPassInfo("static-rewrite", callCtor<StaticRewrite>);
   registerPassInfo("strings-eager-pp", callCtor<StringsEagerPp>);
   registerPassInfo("normalize", callCtor<Normalize>);

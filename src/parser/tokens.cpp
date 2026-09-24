@@ -27,20 +27,15 @@ std::ostream& operator<<(std::ostream& o, Token t)
     case Token::AS_TOK: o << "AS_TOK"; break;
     case Token::ATTRIBUTE_TOK: o << "ATTRIBUTE_TOK"; break;
     case Token::BINARY_LITERAL: o << "BINARY_LITERAL"; break;
-    case Token::BLOCK_MODEL_TOK: o << "BLOCK_MODEL_TOK"; break;
-    case Token::BLOCK_MODEL_VALUES_TOK: o << "BLOCK_MODEL_VALUES_TOK"; break;
     case Token::CHECK_SAT_ASSUMING_TOK: o << "CHECK_SAT_ASSUMING_TOK"; break;
     case Token::CHECK_SAT_TOK: o << "CHECK_SAT_TOK"; break;
     case Token::DECIMAL_LITERAL: o << "DECIMAL_LITERAL"; break;
-    case Token::DECLARE_CODATATYPES_TOK: o << "DECLARE_CODATATYPES_TOK"; break;
-    case Token::DECLARE_CODATATYPE_TOK: o << "DECLARE_CODATATYPE_TOK"; break;
     case Token::DECLARE_CONST_TOK: o << "DECLARE_CONST_TOK"; break;
     case Token::DECLARE_DATATYPES_TOK: o << "DECLARE_DATATYPES_TOK"; break;
     case Token::DECLARE_DATATYPE_TOK: o << "DECLARE_DATATYPE_TOK"; break;
     case Token::DECLARE_FUN_TOK: o << "DECLARE_FUN_TOK"; break;
     case Token::DECLARE_HEAP_TOK: o << "DECLARE_HEAP_TOK"; break;
     case Token::DECLARE_ORACLE_FUN_TOK: o << "DECLARE_ORACLE_FUN_TOK"; break;
-    case Token::DECLARE_POOL_TOK: o << "DECLARE_POOL_TOK"; break;
     case Token::DECLARE_SORT_TOK: o << "DECLARE_SORT_TOK"; break;
     case Token::DECLARE_SORT_PARAMETER_TOK:
       o << "DECLARE_SORT_PARAMETER_TOK";
@@ -55,18 +50,10 @@ std::ostream& operator<<(std::ostream& o, Token t)
     case Token::FIELD_LITERAL: o << "FIELD_LITERAL"; break;
     case Token::GET_ASSERTIONS_TOK: o << "GET_ASSERTIONS_TOK"; break;
     case Token::GET_ASSIGNMENT_TOK: o << "GET_ASSIGNMENT_TOK"; break;
-    case Token::GET_DIFFICULTY_TOK: o << "GET_DIFFICULTY_TOK"; break;
     case Token::GET_INFO_TOK: o << "GET_INFO_TOK"; break;
-    case Token::GET_LEARNED_LITERALS_TOK:
-      o << "GET_LEARNED_LITERALS_TOK";
-      break;
     case Token::GET_MODEL_TOK: o << "GET_MODEL_TOK"; break;
     case Token::GET_OPTION_TOK: o << "GET_OPTION_TOK"; break;
     case Token::GET_PROOF_TOK: o << "GET_PROOF_TOK"; break;
-    case Token::GET_TIMEOUT_CORE_TOK: o << "GET_TIMEOUT_CORE_TOK"; break;
-    case Token::GET_TIMEOUT_CORE_ASSUMING_TOK:
-      o << "GET_TIMEOUT_CORE_ASSUMING_TOK";
-      break;
     case Token::GET_UNSAT_ASSUMPTIONS_TOK:
       o << "GET_UNSAT_ASSUMPTIONS_TOK";
       break;

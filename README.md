@@ -21,6 +21,13 @@ are excluded. Expert command-line and SMT-LIB options are removed.
 The retained language is the default, with no safe/unrestricted modes or
 separate illegal-input checker.
 
+Ordinary datatypes and bounded-integer quantification (`--fmf-bound`) remain;
+codatatypes are removed. Pools, `--finite-model-find`, strings FMF,
+UF cardinality constraints, set cardinality, relational
+set operators, and universe sets/complement are removed. Difficulty,
+timeout-core, learned-literal, and model-blocking queries are removed from the
+C++ API, parser, and solver engine.
+
 See [DESIGN.md](DESIGN.md) for the boundary between retained core policies and
 removed features, and [test/README.md](test/README.md) for test selection.
 
@@ -53,7 +60,20 @@ The thin `configure.sh` wrapper also accepts `debug`, `production`, `testing`,
 `--unit-testing`, `--auto-download`, and `-DKEY=VALUE`. Unsupported optional libraries and language bindings are rejected at
 configuration time. No documentation build or publication target is provided.
 
-For external checking of the smoke-test CPC proofs, add
+Install the pinned Ethos checker to `deps/bin/ethos` and run the CPC regressions:
+
+```sh
+./contrib/get-ethos-checker
+cmake --build build --target regress-cpc # or: make -C build regress-cpc
+python3 tools/check_core.py build/bin/ava6 --ethos deps/bin/ethos
+```
+
+The installer needs CMake, a C++17 compiler, GMP, Python 3, and curl or wget.
+It accepts CMake options such as `-DCMAKE_PREFIX_PATH=/path/to/dependencies`;
+`JOBS=8` sets build parallelism, and `ETHOS_ARCHIVE=/path/to/archive.tar.gz`
+allows an offline installation of the pinned archive. An existing checker can
+be selected with `-DETHOS_EXECUTABLE=/path/to/ethos` when configuring Ava6.
+For external checking of the smoke-test CPC proofs, pass
 `--ethos /path/to/ethos` to `tools/check_core.py`. The signature is
 [proofs/eo/cpc/Cpc.eo](proofs/eo/cpc/Cpc.eo).
 

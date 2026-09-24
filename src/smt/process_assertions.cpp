@@ -110,7 +110,6 @@ bool ProcessAssertions::apply(AssertionPipeline& ap)
     return true;
   }
 
-  
 
   // Add dummy assertion in last position - to be used as a
   // placeholder for any new assertions to get added
@@ -164,7 +163,6 @@ bool ProcessAssertions::apply(AssertionPipeline& ap)
     applyPass("global-negate", ap);
   }
 
-  
 
   if (options().smt.solveRealAsInt)
   {
@@ -197,7 +195,6 @@ bool ProcessAssertions::apply(AssertionPipeline& ap)
     applyPass("unconstrained-simplifier", ap);
   }
 
-  
 
   // Lift bit-vectors of size 1 to bool
   if (options().bv.bitvectorToBool)
@@ -208,7 +205,7 @@ bool ProcessAssertions::apply(AssertionPipeline& ap)
   {
     applyPass("bv-to-int", ap);
   }
-  
+
   // Eagerly eliminate distinct terms up to the configured threshold. Only run
   // if the threshold option was explicitly set by the user (a value of 0 means
   // no limit, i.e. eliminate all distinct terms).
@@ -225,7 +222,7 @@ bool ProcessAssertions::apply(AssertionPipeline& ap)
   {
     applyPass("bool-to-bv", ap);
   }
-  
+
 
   if (logicInfo().isQuantified())
   {
@@ -234,10 +231,7 @@ bool ProcessAssertions::apply(AssertionPipeline& ap)
 
     // fmf-fun : assume admissible functions, applying preprocessing reduction
     // to FMF
-    if (options().quantifiers.fmfFunWellDefined)
-    {
-      applyPass("fun-def-fmf", ap);
-    }
+
     if (options().quantifiers.preSkolemQuant
         != options::PreSkolemQuantMode::OFF)
     {
@@ -246,7 +240,7 @@ bool ProcessAssertions::apply(AssertionPipeline& ap)
       applyPass("apply-substs", ap);
     }
   }
-  
+
   if (options().smt.sortInference)
   {
     applyPass("sort-inference", ap);
@@ -258,7 +252,7 @@ bool ProcessAssertions::apply(AssertionPipeline& ap)
   }
 
   // rephrasing normal inputs as sygus problems
-  
+
 
   Trace("smt-proc") << "ProcessAssertions::processAssertions() : pre-simplify"
                     << endl;
@@ -329,8 +323,7 @@ bool ProcessAssertions::apply(AssertionPipeline& ap)
   Trace("smt") << " assertions     : " << ap.size() << endl;
 
   // ff
-  
-  
+
 
   // ensure rewritten
   applyPass("rewrite", ap);
@@ -409,7 +402,7 @@ bool ProcessAssertions::simplifyAssertions(AssertionPipeline& ap)
     Trace("smt") << " assertions     : " << ap.size() << endl;
 
     // ITE simplification
-    
+
 
     Trace("smt") << " assertions     : " << ap.size() << endl;
 

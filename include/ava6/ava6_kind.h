@@ -424,26 +424,6 @@ enum ENUM(Kind)
    */
   EVALUE(APPLY_UF),
   /**
-   * Cardinality constraint on uninterpreted sort.
-   *
-   * \rst
-   * Interpreted as a predicate that is true when the cardinality of
-   * uinterpreted Sort :math:`S` is less than or equal to an upper bound.
-   * \endrst
-   *
-   * - Create Term of this Kind with:
-   *
-   *   - TermManager::mkCardinalityConstraint(const Sort&, uint32_t)
-   *
-   * \rst
-   * .. warning:
-   *
-   *     This kind is experimental and may be changed or removed in future
-   *     versions.
-   * \endrst
-   */
-  EVALUE(CARDINALITY_CONSTRAINT),
-  /**
    * Higher-order applicative encoding of function application, left
    * associative.
    *
@@ -555,13 +535,13 @@ enum ENUM(Kind)
    *
    *     ((_ ubv_to_int k) x)
    *
-   * such that x is the bitwise and of bit-vectors b1 and b2, such that 
+   * such that x is the bitwise and of bit-vectors b1 and b2, such that
    * b1 is the bit-vector of width k representing (mod i_1 2^k) and
    * b2 is the bit-vector of width k representing (mod i_2 2^k),
    * for all integers ``k``, ``i_1``, ``i_2``.
-   * 
+   *
    * If k <= 0 then
-   * 
+   *
    * .. code:: smtlib
    *
    *     (piand k i_1 i_2)
@@ -569,7 +549,7 @@ enum ENUM(Kind)
    * is equivalent to
    *
    * .. code:: smtlib
-   *    
+   *
    *       0
    *
    * - Arity: ``3``
@@ -3222,11 +3202,11 @@ enum ENUM(Kind)
   EVALUE(TUPLE_PROJECT),
   /**
    * Lifting operator for nullable terms.
-   * This operator lifts a built-in operator or a user-defined function 
+   * This operator lifts a built-in operator or a user-defined function
    * to nullable terms.
    * For built-in kinds use mkNullableLift.
    * For user-defined functions use mkTerm.
-   * 
+   *
    * - Arity: ``n > 1``
    *
    * - ``1..n:`` Terms of nullable sort
@@ -3485,58 +3465,6 @@ enum ENUM(Kind)
    */
   EVALUE(SET_INSERT),
   /**
-   * Set cardinality.
-   *
-   * - Arity: ``1``
-   *
-   *   - ``1:`` Term of set Sort
-   *
-   * - Create Term of this Kind with:
-   *
-   *   - TermManager::mkTerm(Kind, const std::vector<Term>&)
-   *   - TermManager::mkTerm(const Op&, const std::vector<Term>&)
-   *
-   * - Create Op of this kind with:
-   *
-   *   - TermManager::mkOp(Kind, const std::vector<uint32_t>&)
-   */
-  EVALUE(SET_CARD),
-  /**
-   * Set complement with respect to finite universe.
-   *
-   * - Arity: ``1``
-   *
-   *   - ``1:`` Term of set Sort
-   *
-   * - Create Term of this Kind with:
-   *
-   *   - TermManager::mkTerm(Kind, const std::vector<Term>&)
-   *   - TermManager::mkTerm(const Op&, const std::vector<Term>&)
-   *
-   * - Create Op of this kind with:
-   *
-   *   - TermManager::mkOp(Kind, const std::vector<uint32_t>&)
-   */
-  EVALUE(SET_COMPLEMENT),
-  /**
-   * Finite universe set.
-   *
-   * All set variables must be interpreted as subsets of it.
-   *
-   * - Create Term of this Kind with:
-   *
-   *   - TermManager::mkUniverseSet(const Sort&)
-   *
-   * \rst
-   * .. note::
-   *
-   *     :cpp:enumerator:`SET_UNIVERSE` is considered a special symbol of the
-   *     theory of sets and is not considered as a set value, i.e.,
-   *     Term::isSetValue() will return ``false``.
-   * \endrst
-   */
-  EVALUE(SET_UNIVERSE),
-  /**
    * Set comprehension
    *
    * \rst
@@ -3723,11 +3651,11 @@ enum ENUM(Kind)
    * Set all.
    *
    * \rst
-   * This operator checks whether all elements of a set satisfy a predicate. 
+   * This operator checks whether all elements of a set satisfy a predicate.
    * (set.all :math:`p \; A`) takes a predicate :math:`p` of Sort
    * :math:`(\rightarrow T \; Bool)` as a first argument, and a set :math:`A`
-   * of Sort (Set :math:`T`) as a second argument, and returns true iff all 
-   * elements of :math:`A` satisfy predicate :math:`p`. 
+   * of Sort (Set :math:`T`) as a second argument, and returns true iff all
+   * elements of :math:`A` satisfy predicate :math:`p`.
    *
    * - Arity: ``2``
    *
@@ -3750,11 +3678,11 @@ enum ENUM(Kind)
    * Set some.
    *
    * \rst
-   * This operator checks whether at least one element of a set satisfies a predicate. 
+   * This operator checks whether at least one element of a set satisfies a predicate.
    * (set.some :math:`p \; A`) takes a predicate :math:`p` of Sort
    * :math:`(\rightarrow T \; Bool)` as a first argument, and a set :math:`A`
-   * of Sort (Set :math:`T`) as a second argument, and returns true iff at least  
-   * one element of :math:`A` satisfies predicate :math:`p`. 
+   * of Sort (Set :math:`T`) as a second argument, and returns true iff at least
+   * one element of :math:`A` satisfies predicate :math:`p`.
    *
    * - Arity: ``2``
    *
@@ -3804,250 +3732,6 @@ enum ENUM(Kind)
 
   /* Relations ------------------------------------------------------------- */
 
-  /**
-   * Relation join.
-   *
-   * - Arity: ``2``
-   *
-   *   - ``1..2:`` Terms of relation Sort
-   *
-   * - Create Term of this Kind with:
-   *
-   *   - TermManager::mkTerm(Kind, const std::vector<Term>&)
-   *   - TermManager::mkTerm(const Op&, const std::vector<Term>&)
-   *
-   * - Create Op of this kind with:
-   *
-   *   - TermManager::mkOp(Kind, const std::vector<uint32_t>&)
-   */
-  EVALUE(RELATION_JOIN),
-   /**
-   * \rst
-   *  Table join operator for relations has the form
-   *  :math:`((\_ \; rel.table\_join \; m_1 \; n_1 \; \dots \; m_k \; n_k) \; A \; B)`
-   *  where :math:`m_1 \; n_1 \; \dots \; m_k \; n_k` are natural numbers,
-   *  and :math:`A, B` are relations.
-   *  This operator filters the product of two sets based on the equality of
-   *  projected tuples using indices :math:`m_1, \dots, m_k` in relation :math:`A`,
-   *  and indices :math:`n_1, \dots, n_k` in relation :math:`B`.
-   *
-   * - Arity: ``2``
-   *
-   *   - ``1:`` Term of relation Sort
-   *
-   *   - ``2:`` Term of relation Sort
-   *
-   * - Indices: ``n``
-   *   - ``1..n:``  Indices of the projection
-   *
-   * \endrst
-   * - Create Term of this Kind with:
-   *   - TermManager::mkTerm(const Op&, const std::vector<Term>&)
-   *
-   * - Create Op of this kind with:
-   *   - TermManager::mkOp(Kind, const std::vector<uint32_t>&)
-   *
-   * \rst
-   * .. warning:
-   *
-   *     This kind is experimental and may be changed or removed in future
-   *     versions.
-   * \endrst
-   */
-  EVALUE(RELATION_TABLE_JOIN),
-  /**
-   * Relation cartesian product.
-   *
-   * - Arity: ``2``
-   *
-   *   - ``1..2:`` Terms of relation Sort
-   *
-   * - Create Term of this Kind with:
-   *
-   *   - TermManager::mkTerm(Kind, const std::vector<Term>&)
-   *   - TermManager::mkTerm(const Op&, const std::vector<Term>&)
-   *
-   * - Create Op of this kind with:
-   *
-   *   - TermManager::mkOp(Kind, const std::vector<uint32_t>&)
-   */
-  EVALUE(RELATION_PRODUCT),
-  /**
-   * Relation transpose.
-   *
-   * - Arity: ``1``
-   *
-   *   - ``1:`` Term of relation Sort
-   *
-   * - Create Term of this Kind with:
-   *
-   *   - TermManager::mkTerm(Kind, const std::vector<Term>&)
-   *   - TermManager::mkTerm(const Op&, const std::vector<Term>&)
-   *
-   * - Create Op of this kind with:
-   *
-   *   - TermManager::mkOp(Kind, const std::vector<uint32_t>&)
-   */
-  EVALUE(RELATION_TRANSPOSE),
-  /**
-   * Relation transitive closure.
-   *
-   * - Arity: ``1``
-   *
-   *   - ``1:`` Term of relation Sort
-   *
-   * - Create Term of this Kind with:
-   *
-   *   - TermManager::mkTerm(Kind, const std::vector<Term>&)
-   *   - TermManager::mkTerm(const Op&, const std::vector<Term>&)
-   *
-   * - Create Op of this kind with:
-   *
-   *   - TermManager::mkOp(Kind, const std::vector<uint32_t>&)
-   */
-  EVALUE(RELATION_TCLOSURE),
-  /**
-   * Relation join image.
-   *
-   * - Arity: ``2``
-   *
-   *   - ``1..2:`` Terms of relation Sort
-   *
-   * - Create Term of this Kind with:
-   *
-   *   - TermManager::mkTerm(Kind, const std::vector<Term>&)
-   *   - TermManager::mkTerm(const Op&, const std::vector<Term>&)
-   *
-   * - Create Op of this kind with:
-   *
-   *   - TermManager::mkOp(Kind, const std::vector<uint32_t>&)
-   *
-   * \rst
-   * .. warning::
-   *
-   *     This kind is experimental and may be changed or removed in future
-   *     versions.
-   * \endrst
-   */
-  EVALUE(RELATION_JOIN_IMAGE),
-  /**
-   * Relation identity.
-   *
-   * - Arity: ``1``
-   *
-   *   - ``1:`` Term of relation Sort
-   *
-   * - Create Term of this Kind with:
-   *
-   *   - TermManager::mkTerm(Kind, const std::vector<Term>&)
-   *   - TermManager::mkTerm(const Op&, const std::vector<Term>&)
-   *
-   * - Create Op of this kind with:
-   *
-   *   - TermManager::mkOp(Kind, const std::vector<uint32_t>&)
-   *
-   * \rst
-   * .. warning::
-   *
-   *     This kind is experimental and may be changed or removed in future
-   *     versions.
-   * \endrst
-   */
-  EVALUE(RELATION_IDEN),
-  /**
-   * Relation group
-   *
-   * \rst
-   * :math:`((\_ \; rel.group \; n_1 \; \dots \; n_k) \; A)` partitions tuples
-   * of relation :math:`A` such that tuples that have the same projection
-   * with indices :math:`n_1 \; \dots \; n_k` are in the same part.
-   * It returns a set of relations of type :math:`(Set \; T)` where
-   * :math:`T` is the type of :math:`A`.
-   *
-   * - Arity: ``1``
-   *
-   *   - ``1:`` Term of relation sort
-   *
-   * - Indices: ``n``
-   *
-   *   - ``1..n:``  Indices of the projection
-   *
-   * \endrst
-   *
-   * - Create Term of this Kind with:
-   *
-   *   - TermManager::mkTerm(Kind, const std::vector<Term>&)
-   *   - TermManager::mkTerm(const Op&, const std::vector<Term>&)
-   *
-   * \rst
-   * .. warning::
-   *
-   *     This kind is experimental and may be changed or removed in future
-   *     versions.
-   * \endrst
-   */
-  EVALUE(RELATION_GROUP),
-  /**
-   * \rst
-   *
-   * Relation aggregate operator has the form
-   * :math:`((\_ \; rel.aggr \; n_1 ... n_k) \; f \; i \; A)`
-   * where :math:`n_1, ..., n_k` are natural numbers,
-   * :math:`f` is a function of type
-   * :math:`(\rightarrow (Tuple \;  T_1 \; ... \; T_j)\; T \; T)`,
-   * :math:`i` has the type :math:`T`,
-   * and :math:`A` has type :math:`(Relation \;  T_1 \; ... \; T_j)`.
-   * The returned type is :math:`(Set \; T)`.
-   *
-   * This operator aggregates elements in A that have the same tuple projection
-   * with indices n_1, ..., n_k using the combining function :math:`f`,
-   * and initial value :math:`i`.
-   *
-   * - Arity: ``3``
-   *
-   *   - ``1:`` Term of sort :math:`(\rightarrow (Tuple \;  T_1 \; ... \; T_j)\; T \; T)`
-   *   - ``2:`` Term of Sort :math:`T`
-   *   - ``3:`` Term of relation sort :math:`Relation T_1 ... T_j`
-   *
-   * - Indices: ``n``
-   *   - ``1..n:`` Indices of the projection
-   * \endrst
-   * - Create Term of this Kind with:
-   *   - TermManager::mkTerm(const Op&, const std::vector<Term>&)
-   *
-   * - Create Op of this kind with:
-   *   - TermManager::mkOp(Kind, const std::vector<uint32_t>&)
-   *
-   * \rst
-   * .. warning::
-   *
-   *     This kind is experimental and may be changed or removed in future
-   *     versions.
-   * \endrst
-   */
-  EVALUE(RELATION_AGGREGATE),
-  /**
-   * Relation projection operator extends tuple projection operator to sets.
-   *
-   * - Arity: ``1``
-   *   - ``1:`` Term of relation Sort
-   *
-   * - Indices: ``n``
-   *   - ``1..n:`` Indices of the projection
-   *
-   * - Create Term of this Kind with:
-   *   - TermManager::mkTerm(const Op&, const std::vector<Term>&)
-   *
-   * - Create Op of this kind with:
-   *   - TermManager::mkOp(Kind, const std::vector<uint32_t>&)
-   * \rst
-   * .. warning::
-   *
-   *     This kind is experimental and may be changed or removed in future
-   *     versions.
-   * \endrst
-   */
-  EVALUE(RELATION_PROJECT),
 
   /* Bags ------------------------------------------------------------------ */
 
@@ -4365,11 +4049,11 @@ enum ENUM(Kind)
    * Bag all.
    *
    * \rst
-   * This operator checks whether all elements of a bag satisfy a predicate. 
+   * This operator checks whether all elements of a bag satisfy a predicate.
    * (bag.all :math:`p \; A`) takes a predicate :math:`p` of Sort
    * :math:`(\rightarrow T \; Bool)` as a first argument, and a bag :math:`A`
-   * of Sort (Bag :math:`T`) as a second argument, and returns true iff all 
-   * elements of :math:`A` satisfy predicate :math:`p`. 
+   * of Sort (Bag :math:`T`) as a second argument, and returns true iff all
+   * elements of :math:`A` satisfy predicate :math:`p`.
    *
    * - Arity: ``2``
    *
@@ -4392,11 +4076,11 @@ enum ENUM(Kind)
   * Bag some.
   *
   * \rst
-  * This operator checks whether at least one element of a bag satisfies a predicate. 
+  * This operator checks whether at least one element of a bag satisfies a predicate.
   * (bag.some :math:`p \; A`) takes a predicate :math:`p` of Sort
   * :math:`(\rightarrow T \; Bool)` as a first argument, and a bag :math:`A`
-  * of Sort (Bag :math:`T`) as a second argument, and returns true iff at least  
-  * one element of :math:`A` satisfies predicate :math:`p`. 
+  * of Sort (Bag :math:`T`) as a second argument, and returns true iff at least
+  * one element of :math:`A` satisfies predicate :math:`p`.
   *
   * - Arity: ``2``
   *
@@ -5875,161 +5559,6 @@ enum ENUM(Kind)
    */
   EVALUE(INST_NO_PATTERN),
   /**
-   * Instantiation pool annotation.
-   *
-   * Specifies an annotation for pool based instantiation.
-   *
-   * In detail, pool symbols can be declared via the method
-   *  - Solver::declarePool(const std::string&, const Sort&, const std::vector<Term>&) const
-   *
-   * A pool symbol represents a set of terms of a given sort. An instantiation
-   * pool annotation should either:
-   * (1) have child sets matching the types of the quantified formula,
-   * (2) have a child set of tuple type whose component types match the types
-   * of the quantified formula.
-   *
-   * For an example of (1), for a quantified formula:
-   *
-   * \rst
-   * .. code:: lisp
-   *
-   *     (FORALL (VARIABLE_LIST x y) F (INST_PATTERN_LIST (INST_POOL p q)))
-   *
-   * if :math:`x` and :math:`y` have Sorts :math:`S_1` and :math:`S_2`, then
-   * pool symbols :math:`p` and :math:`q` should have Sorts (Set :math:`S_1`)
-   * and (Set :math:`S_2`), respectively. This annotation specifies that the
-   * quantified formula above should be instantiated with the product of all
-   * terms that occur in the sets :math:`p` and :math:`q`.
-   * \endrst
-   *
-   * Alternatively, as an example of (2), for a quantified formula:
-   *
-   * \rst
-   * .. code:: lisp
-   *
-   *     (FORALL (VARIABLE_LIST x y) F (INST_PATTERN_LIST (INST_POOL s)))
-   *
-   * :math:`s` should have Sort (Set (Tuple :math:`S_1` :math:`S_2`)). This
-   * annotation specifies that the quantified formula above should be
-   * instantiated with the pairs of values in :math:`s`.
-   *
-   * - Arity: ``n > 0``
-   *
-   *   - ``1..n:`` Terms that comprise the pools, which are one-to-one with the variables of the quantified formula to be instantiated
-   *
-   * - Create Term of this Kind with:
-   *
-   *   - TermManager::mkTerm(Kind, const std::vector<Term>&)
-   *   - TermManager::mkTerm(const Op&, const std::vector<Term>&)
-   *
-   * - Create Op of this kind with:
-   *
-   *   - TermManager::mkOp(Kind, const std::vector<uint32_t>&)
-   *
-   * .. warning::
-   *
-   *     This kind is experimental and may be changed or removed in future
-   *     versions.
-   *
-   * .. note::
-   *
-   *     Should only be used as a child of :cpp:enumerator:`INST_PATTERN_LIST`.
-   * \endrst
-   */
-  EVALUE(INST_POOL),
-  /**
-   * A instantantiation-add-to-pool annotation.
-   *
-   * An instantantiation-add-to-pool annotation indicates that when a quantified
-   * formula is instantiated, the instantiated version of a term should be
-   * added to the given pool.
-   *
-   * For example, consider a quantified formula:
-   *
-   * \rst
-   * .. code:: lisp
-   *
-   *     (FORALL (VARIABLE_LIST x) F
-   *             (INST_PATTERN_LIST (INST_ADD_TO_POOL (ADD x 1) p)))
-   *
-   * where assume that :math:`x` has type Int. When this quantified formula is
-   * instantiated with, e.g., the term :math:`t`, the term ``(ADD t 1)`` is
-   * added to pool :math:`p`.
-   * \endrst
-   *
-   * - Arity: ``2``
-   *
-   *   - ``1:`` The Term whose free variables are bound by the quantified formula.
-   *   - ``2:`` The pool to add to, whose Sort should be a set of elements that match the Sort of the first argument.
-   *
-   * - Create Term of this Kind with:
-   *
-   *   - TermManager::mkTerm(Kind, const std::vector<Term>&)
-   *   - TermManager::mkTerm(const Op&, const std::vector<Term>&)
-   *
-   * - Create Op of this kind with:
-   *
-   *   - TermManager::mkOp(Kind, const std::vector<uint32_t>&)
-   *
-   * \rst
-   * .. warning::
-   *
-   *     This kind is experimental and may be changed or removed in future
-   *     versions.
-   *
-   * .. note::
-   *
-   *     Should only be used as a child of :cpp:enumerator:`INST_PATTERN_LIST`.
-   * \endrst
-   */
-  EVALUE(INST_ADD_TO_POOL),
-  /**
-   * A skolemization-add-to-pool annotation.
-   *
-   * An skolemization-add-to-pool annotation indicates that when a quantified
-   * formula is skolemized, the skolemized version of a term should be added to
-   * the given pool.
-   *
-   * For example, consider a quantified formula:
-   *
-   * \rst
-   * .. code:: lisp
-   *
-   *     (FORALL (VARIABLE_LIST x) F
-   *             (INST_PATTERN_LIST (SKOLEM_ADD_TO_POOL (ADD x 1) p)))
-   *
-   * where assume that :math:`x` has type Int. When this quantified formula is
-   * skolemized, e.g., with :math:`k` of type Int, then the term ``(ADD k 1)``
-   * is added to the pool :math:`p`.
-   * \endrst
-   *
-   * - Arity: ``2``
-   *
-   *   - ``1:`` The Term whose free variables are bound by the quantified formula.
-   *   - ``2:`` The pool to add to, whose Sort should be a set of elements that match the Sort of the first argument.
-   *
-   * - Create Term of this Kind with:
-   *
-   *   - TermManager::mkTerm(Kind, const std::vector<Term>&)
-   *   - TermManager::mkTerm(const Op&, const std::vector<Term>&)
-   *
-   * - Create Op of this kind with:
-   *
-   *   - TermManager::mkOp(Kind, const std::vector<uint32_t>&)
-   *
-   * \rst
-   * .. warning::
-   *
-   *     This kind is experimental and may be changed or removed in future
-   *     versions.
-   *
-   * .. note::
-   *
-   *     Should only be used as a child of :cpp:enumerator:`INST_PATTERN_LIST`.
-   * \endrst
-   */
-  EVALUE(SKOLEM_ADD_TO_POOL),
-  /**
    * Instantiation attribute.
    *
    * Specifies a custom property for a quantified formula given by a
@@ -6062,7 +5591,7 @@ enum ENUM(Kind)
    * \rst
    * - Arity: ``n > 1``
    *
-   *   - ``1..n:`` Terms of Kind :cpp:enumerator:`INST_PATTERN`, :cpp:enumerator:`INST_NO_PATTERN`, :cpp:enumerator:`INST_POOL`, :cpp:enumerator:`INST_ADD_TO_POOL`, :cpp:enumerator:`SKOLEM_ADD_TO_POOL`, :cpp:enumerator:`INST_ATTRIBUTE`
+   *   - ``1..n:`` Terms of Kind :cpp:enumerator:`INST_PATTERN`, :cpp:enumerator:`INST_NO_PATTERN`, :cpp:enumerator:`INST_ATTRIBUTE`
    * \endrst
    *
    * - Create Term of this Kind with:

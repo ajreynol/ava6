@@ -15,7 +15,6 @@
 #include <sstream>
 
 #include "expr/ascription_type.h"
-#include "expr/codatatype_bound_variable.h"
 #include "expr/dtype.h"
 #include "expr/dtype_cons.h"
 #include "expr/type_matcher.h"
@@ -767,20 +766,6 @@ TypeNode TupleProjectTypeRule::computeType(AVA6_UNUSED NodeManager* nm,
   }
   TypeNode tupleType = n[0].getTypeOrNull();
   return TupleUtils::getTupleProjectionType(indices, tupleType);
-}
-
-TypeNode CodatatypeBoundVariableTypeRule::preComputeType(
-    AVA6_UNUSED NodeManager* nm, AVA6_UNUSED TNode n)
-{
-  return TypeNode::null();
-}
-TypeNode CodatatypeBoundVariableTypeRule::computeType(
-    AVA6_UNUSED NodeManager* nodeManager,
-    TNode n,
-    AVA6_UNUSED bool check,
-    AVA6_UNUSED std::ostream* errOut)
-{
-  return n.getConst<CodatatypeBoundVariable>().getType();
 }
 
 TypeNode NullableLiftTypeRule::preComputeType(AVA6_UNUSED NodeManager* nm,
