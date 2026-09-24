@@ -16,8 +16,13 @@ namespace ava6::internal::prop::cadical {
 CadicalPropagator::CadicalPropagator(prop::TheoryProxy* proxy,
                                      context::Context* context,
                                      CaDiCaL::Solver& solver,
-                                     StatisticsRegistry& stats)
-    : d_proxy(proxy), d_context(*context), d_solver(solver), d_stats(stats)
+                                     StatisticsRegistry& stats,
+                                     bool proofProducing)
+    : d_proxy(proxy),
+      d_context(*context),
+      d_solver(solver),
+      d_proofProducing(proofProducing),
+      d_stats(stats)
 {
   d_var_info.emplace_back();  // 0: Not used
 }
@@ -499,7 +504,11 @@ void CadicalPropagator::add_clause(const SatClause& clause, bool forgettable)
   //       level N - 2. In this case we can add the clause at N - 2 instead
   //       of deleting the clause when popping user level N, which would
   //       require us to relearn the clause again.
-  uint32_t max_user_level = d_in_search ? 0 : current_user_level();
+  // Proofs of theory clauses are stored in the current user context. A clause
+  // must not survive the pop that discards its proof, even if all its variables
+  // were introduced at lower levels.
+  uint32_t max_user_level =
+      d_in_search && !d_proofProducing ? 0 : current_user_level();
   for (const SatLiteral& lit : clause)
   {
     SatVariable var = lit.getSatVariable();
@@ -740,7 +749,7 @@ const SatLiteral& CadicalPropagator::activation_lit(size_t user_level) const
 
 uint32_t CadicalPropagator::clause_user_level(const SatClause& clause) const
 {
-  uint32_t max_user_level = 0;
+  uint32_t max_user_level = d_proofProducing ? current_user_level() : 0;
   for (const SatLiteral& lit : clause)
   {
     SatVariable var = lit.getSatVariable();

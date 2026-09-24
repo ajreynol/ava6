@@ -508,6 +508,22 @@ bool InferProofCons::convert(Env& env,
           useBuffer = true;
           Trace("strings-ipc-core") << "...success!" << std::endl;
         }
+        else
+        {
+          // Cancel the other end explicitly. Extended equality rewriting may
+          // cancel a common suffix/prefix without recursively rewriting the
+          // resulting equality, while rewriting conc directly may reduce it
+          // further (even to false). In that case pred transform cannot match
+          // the two results. CONCAT_EQ preserves the equality we need here.
+          Node remainder = psb.tryStep(
+              ProofRule::CONCAT_EQ, {mainEqCeq}, {nm->mkConst(!isRev)});
+          useBuffer = psb.applyPredTransform(remainder,
+                                            conc,
+                                            cexp,
+                                            MethodId::SB_DEFAULT,
+                                            MethodId::SBA_SEQUENTIAL,
+                                            MethodId::RW_REWRITE_EQ_EXT);
+        }
         // Otherwise, note that EMP rules conclude ti = "" where
         // t1 ++ ... ++ tn == "". However, these are very rarely applied, let
         // alone for 2+ children. This case is intentionally unhandled here.

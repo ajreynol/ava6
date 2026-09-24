@@ -36,7 +36,8 @@ class TestPropWhiteCadicalPropagator : public TestInternal
     d_context.reset(new context::Context());
     d_solver.reset(new CaDiCaL::Solver());
     d_prop.reset(
-        new CadicalPropagator(nullptr, d_context.get(), *d_solver, *d_stats));
+        new CadicalPropagator(
+            nullptr, d_context.get(), *d_solver, *d_stats, proofProducing()));
     // Observed variables require a connected external propagator.
     d_solver->connect_external_propagator(d_prop.get());
 
@@ -70,6 +71,8 @@ class TestPropWhiteCadicalPropagator : public TestInternal
     d_stats.reset(nullptr);
   }
 
+  virtual bool proofProducing() const { return false; }
+
   /**
    * Drain the next clause buffered by add_clause() (during search) via the
    * external-clause callbacks and return its CaDiCaL literals (without the
@@ -93,6 +96,30 @@ class TestPropWhiteCadicalPropagator : public TestInternal
   std::unique_ptr<CaDiCaL::Solver> d_solver;
   std::unique_ptr<CadicalPropagator> d_prop;
 };
+
+class TestPropWhiteCadicalPropagatorProof : public TestPropWhiteCadicalPropagator
+{
+ protected:
+  bool proofProducing() const override { return true; }
+};
+
+TEST_F(TestPropWhiteCadicalPropagatorProof, learned_clause_keeps_proof_level)
+{
+  d_prop->in_search(true);
+  SatClause clause{SatLiteral(1), SatLiteral(4)};
+  d_prop->add_clause(clause, false);
+  EXPECT_EQ(nextClause(),
+            (std::vector<int>{toCadicalLit(SatLiteral(5)),
+                              toCadicalLit(SatLiteral(1)),
+                              toCadicalLit(SatLiteral(4))}));
+}
+
+TEST_F(TestPropWhiteCadicalPropagatorProof, reason_clause_keeps_proof_level)
+{
+  SatClause clause{SatLiteral(1), SatLiteral(2)};
+  EXPECT_EQ(d_prop->activation_lit(d_prop->clause_user_level(clause)),
+            SatLiteral(5));
+}
 
 TEST_F(TestPropWhiteCadicalPropagator, activation_lit_indexing)
 {

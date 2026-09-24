@@ -27,7 +27,8 @@ class CadicalPropagator : public CaDiCaL::ExternalPropagator,
   CadicalPropagator(prop::TheoryProxy* proxy,
                     context::Context* context,
                     CaDiCaL::Solver& solver,
-                    StatisticsRegistry& stats);
+                    StatisticsRegistry& stats,
+                    bool proofProducing);
 
   /**
    * Notification from the SAT solver on assignment of a new literal.
@@ -221,6 +222,8 @@ class CadicalPropagator : public CaDiCaL::ExternalPropagator,
    * A learned clause is guarded by the activation literal of this level (see
    * cb_add_reason_clause_lit()), so that it survives popping user levels above
    * it and only gets disabled once the level it actually depends on is popped.
+   * With proofs enabled, use the current level instead: the clause's proof
+   * justification is stored in the current user context.
    */
   uint32_t clause_user_level(const SatClause& clause) const;
 
@@ -265,6 +268,9 @@ class CadicalPropagator : public CaDiCaL::ExternalPropagator,
   /** The SAT context. */
   context::Context& d_context;
   CaDiCaL::Solver& d_solver;
+
+  /** Whether theory clause proofs must survive as long as their clauses. */
+  const bool d_proofProducing;
 
   /** Struct to store information on variables. */
   struct VarInfo
