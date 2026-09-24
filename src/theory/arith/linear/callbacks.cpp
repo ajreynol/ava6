@@ -23,17 +23,8 @@ namespace ava6::internal {
 namespace theory {
 namespace arith::linear {
 
-SetupLiteralCallBack::SetupLiteralCallBack(TheoryArithPrivate& ta) : d_arith(ta)
-{
-}
-void SetupLiteralCallBack::operator()(TNode lit)
-{
-  TNode atom = (lit.getKind() == Kind::NOT) ? lit[0] : lit;
-  if (!d_arith.isSetup(atom))
-  {
-    d_arith.setupAtom(atom);
-  }
-}
+
+
 
 DeltaComputeCallback::DeltaComputeCallback(const TheoryArithPrivate& ta)
     : d_ta(ta)
@@ -188,17 +179,10 @@ ConstraintCP FarkasConflictBuilder::commitConflict(NodeManager* nm)
   return not_c;
 }
 
-RaiseEqualityEngineConflict::RaiseEqualityEngineConflict(TheoryArithPrivate& ta)
-    : d_ta(ta)
-{
-}
+
 
 /* If you are not an equality engine, don't use this! */
-void RaiseEqualityEngineConflict::raiseEEConflict(
-    Node n, std::shared_ptr<ProofNode> pf) const
-{
-  d_ta.raiseBlackBoxConflict(n, pf);
-}
+
 
 BoundCountingLookup::BoundCountingLookup(TheoryArithPrivate& ta) : d_ta(ta) {}
 

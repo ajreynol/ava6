@@ -26,7 +26,7 @@ namespace theory {
 namespace quantifiers {
 namespace inst {
 
-PatternTermSelector::PatternTermSelector(const Options& opts,
+PatternTermSelector::PatternTermSelector(AVA6_UNUSED const Options& opts,
                                          Node q,
                                          options::TriggerSelMode tstrt,
                                          const std::vector<Node>& exc,
@@ -743,7 +743,7 @@ Node PatternTermSelector::getInversion(Node n, Node x)
   return Node::null();
 }
 
-void PatternTermSelector::getTriggerVariables(const Options& opts,
+void PatternTermSelector::getTriggerVariables(AVA6_UNUSED const Options& opts,
                                               Node n,
                                               Node q,
                                               std::vector<Node>& tvars)

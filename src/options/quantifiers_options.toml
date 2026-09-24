@@ -512,27 +512,6 @@ name   = "Quantifiers"
 
 ### SyGuS instantiation options
 
-[[setting]]
-name = "prenexQuant"
-type = "PrenexQuantMode"
-default = "SIMPLE"
-[[setting.mode.NONE]]
-name = "none"
-[[setting.mode.SIMPLE]]
-name = "simple"
-[[setting.mode.NORMAL]]
-name = "norm"
-
-[[setting]]
-name = "preSkolemQuantNested"
-type = "bool"
-default = "true"
-
-[[setting]]
-name = "cegqiFullEffort"
-type = "bool"
-default = "false"
-
 [[option]]
   name       = "fmfOneInstPerRound"
   category   = "regular"
@@ -556,13 +535,4 @@ default = "false"
   type       = "int64_t"
   default    = "1000"
   help       = "the maximum cardinality of an interpreted type for which exhaustive enumeration in finite model finding is attempted"
-
-[[setting]]
-name = "fmfMbqiMode"
-type = "FmfMbqiMode"
-default = "FMC"
-[[setting.mode.NONE]]
-name = "none"
-[[setting.mode.FMC]]
-name = "fmc"
 

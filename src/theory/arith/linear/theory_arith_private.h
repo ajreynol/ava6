@@ -32,7 +32,6 @@
 #include "theory/arith/linear/arith_static_learner.h"
 #include "theory/arith/linear/arithvar.h"
 #include "theory/arith/linear/attempt_solution_simplex.h"
-#include "theory/arith/linear/congruence_manager.h"
 #include "theory/arith/linear/constraint.h"
 #include "theory/arith/linear/dio_solver.h"
 #include "theory/arith/linear/dual_simplex.h"
@@ -397,8 +396,6 @@ class TheoryArithPrivate : protected EnvObj
   bool safeToReset() const;
 
   /** This keeps track of difference equalities. Mostly for sharing. */
-  ArithCongruenceManager d_congruenceManager;
-  context::CDO<bool> d_cmEnabled;
 
   /** This implements the Simplex decision procedure. */
   DualSimplexDecisionProcedure d_dualSimplex;
@@ -455,8 +452,6 @@ class TheoryArithPrivate : protected EnvObj
   ~TheoryArithPrivate();
 
   //--------------------------------- initialization
-  /** finish initialize */
-  void finishInit(eq::EqualityEngine* ee);
   //--------------------------------- end initialization
 
   /**
@@ -539,9 +534,6 @@ class TheoryArithPrivate : protected EnvObj
    */
   bool foundNonlinear() const;
 
-  /** get the congruence manager, if we are using one */
-  ArithCongruenceManager* getCongruenceManager();
-
  private:
   /** The constant zero. */
   DeltaRational d_DELTA_ZERO;
@@ -561,9 +553,6 @@ class TheoryArithPrivate : protected EnvObj
    * disequalities are satisfied in the current model.
    */
   bool splitDisequalities();
-
-  /** A Difference variable is known to be 0.*/
-  void zeroDifferenceDetected(ArithVar x);
 
   /**
    * Looks for the next integer variable without an integer assignment in a

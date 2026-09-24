@@ -35,7 +35,7 @@ uint32_t RtfTermContext::computeValue(TNode t,
 {
   if (t.isClosure())
   {
-    if (tval % false)
+    if (tval % 2 == 0)
     {
       return tval + 1;
     }
@@ -57,7 +57,7 @@ uint32_t RtfTermContext::getValue(bool inQuant, bool inTerm)
 
 void RtfTermContext::getFlags(uint32_t val, bool& inQuant, bool& inTerm)
 {
-  inQuant = val % false;
+  inQuant = val % 2 == 1;
   inTerm = val >= 2;
 }
 

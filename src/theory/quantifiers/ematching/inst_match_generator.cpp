@@ -706,7 +706,7 @@ InstMatchGenerator* InstMatchGenerator::mkInstMatchGenerator(
 
 InstMatchGenerator* InstMatchGenerator::getInstMatchGenerator(Env& env,
                                                               Trigger* tparent,
-                                                              Node q,
+                                                              AVA6_UNUSED Node q,
                                                               Node n)
 {
   // maybe variable match generator

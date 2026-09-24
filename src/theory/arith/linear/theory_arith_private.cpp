@@ -45,7 +45,6 @@
 #include "theory/arith/linear/approx_simplex.h"
 #include "theory/arith/linear/arith_static_learner.h"
 #include "theory/arith/linear/arithvar.h"
-#include "theory/arith/linear/congruence_manager.h"
 #include "theory/arith/linear/constraint.h"
 #include "theory/arith/linear/cut_log.h"
 #include "theory/arith/linear/dio_solver.h"
@@ -99,7 +98,6 @@ TheoryArithPrivate::TheoryArithPrivate(Env& env,
           env, nullptr, userContext(), "TheoryArithPrivate::ppAssertPf")),
       d_constraintDatabase(d_env,
                            d_partialModel,
-                           d_congruenceManager,
                            RaiseConflict(*this),
                            d_pfGen.get()),
       d_qflraStatus(Result::UNKNOWN),
@@ -132,13 +130,6 @@ TheoryArithPrivate::TheoryArithPrivate(Env& env,
       d_conflicts(context()),
       d_blackBoxConflict(context(), Node::null()),
       d_blackBoxConflictPf(context(), std::shared_ptr<ProofNode>(nullptr)),
-      d_congruenceManager(d_env,
-                          d_constraintDatabase,
-                          SetupLiteralCallBack(*this),
-                          d_partialModel,
-                          RaiseEqualityEngineConflict(*this)),
-      d_cmEnabled(context(), !true),
-
       d_dualSimplex(
           env, d_linEq, d_errorSet, RaiseConflict(*this), TempVarMalloc(*this)),
       d_fcSimplex(
@@ -183,15 +174,6 @@ TheoryArithPrivate::~TheoryArithPrivate()
   if (d_approxStats != nullptr)
   {
     delete d_approxStats;
-  }
-}
-
-void TheoryArithPrivate::finishInit(eq::EqualityEngine* ee)
-{
-  if (d_cmEnabled)
-  {
-    Assert(ee != nullptr);
-    d_congruenceManager.finishInit(ee);
   }
 }
 
@@ -435,32 +417,6 @@ void TheoryArithPrivate::revertOutOfConflict()
 
 void TheoryArithPrivate::clearUpdates() { d_updatedBounds.purge(); }
 
-void TheoryArithPrivate::zeroDifferenceDetected(ArithVar x)
-{
-  if (d_cmEnabled)
-  {
-    Assert(d_congruenceManager.isWatchedVariable(x));
-    Assert(d_partialModel.upperBoundIsZero(x));
-    Assert(d_partialModel.lowerBoundIsZero(x));
-
-    ConstraintP lb = d_partialModel.getLowerBoundConstraint(x);
-    ConstraintP ub = d_partialModel.getUpperBoundConstraint(x);
-
-    if (lb->isEquality())
-    {
-      d_congruenceManager.watchedVariableIsZero(lb);
-    }
-    else if (ub->isEquality())
-    {
-      d_congruenceManager.watchedVariableIsZero(ub);
-    }
-    else
-    {
-      d_congruenceManager.watchedVariableIsZero(lb, ub);
-    }
-  }
-}
-
 bool TheoryArithPrivate::getSolveIntegerResource()
 {
   if (d_attemptSolveIntTurnedOff > 0)
@@ -538,16 +494,7 @@ bool TheoryArithPrivate::AssertLower(ConstraintP constraint)
     }
     ConstraintP ub = d_partialModel.getUpperBoundConstraint(x_i);
 
-    if (d_cmEnabled)
-    {
-      if (!d_congruenceManager.isWatchedVariable(x_i) || c_i.sgn() != 0)
-      {
-        // if it is not a watched variable report it
-        // if it is is a watched variable and c_i == 0,
-        // let zeroDifferenceDetected(x_i) catch this
-        d_congruenceManager.equalsConstant(constraint, ub);
-      }
-    }
+    
 
     const ValueCollection& vc = constraint->getValueCollection();
     if (vc.hasEquality())
@@ -616,21 +563,7 @@ bool TheoryArithPrivate::AssertLower(ConstraintP constraint)
 
   d_partialModel.setLowerBoundConstraint(constraint);
 
-  if (d_cmEnabled)
-  {
-    if (d_congruenceManager.isWatchedVariable(x_i))
-    {
-      int sgn = c_i.sgn();
-      if (sgn > 0)
-      {
-        d_congruenceManager.watchedVariableCannotBeZero(constraint);
-      }
-      else if (sgn == 0 && d_partialModel.upperBoundIsZero(x_i))
-      {
-        zeroDifferenceDetected(x_i);
-      }
-    }
-  }
+  
 
   d_updatedBounds.softAdd(x_i);
 
@@ -708,16 +641,7 @@ bool TheoryArithPrivate::AssertUpper(ConstraintP constraint)
 
     const ValueCollection& vc = constraint->getValueCollection();
     ConstraintP lb = d_partialModel.getLowerBoundConstraint(x_i);
-    if (d_cmEnabled)
-    {
-      if (!d_congruenceManager.isWatchedVariable(x_i) || c_i.sgn() != 0)
-      {
-        // if it is not a watched variable report it
-        // if it is is a watched variable and c_i == 0,
-        // let zeroDifferenceDetected(x_i) catch this
-        d_congruenceManager.equalsConstant(lb, constraint);
-      }
-    }
+    
 
     if (vc.hasDisequality())
     {
@@ -785,21 +709,7 @@ bool TheoryArithPrivate::AssertUpper(ConstraintP constraint)
 
   d_partialModel.setUpperBoundConstraint(constraint);
 
-  if (d_cmEnabled)
-  {
-    if (d_congruenceManager.isWatchedVariable(x_i))
-    {
-      int sgn = c_i.sgn();
-      if (sgn < 0)
-      {
-        d_congruenceManager.watchedVariableCannotBeZero(constraint);
-      }
-      else if (sgn == 0 && d_partialModel.lowerBoundIsZero(x_i))
-      {
-        zeroDifferenceDetected(x_i);
-      }
-    }
-  }
+  
 
   d_updatedBounds.softAdd(x_i);
 
@@ -891,26 +801,7 @@ bool TheoryArithPrivate::AssertEquality(ConstraintP constraint)
   d_partialModel.setUpperBoundConstraint(constraint);
   d_partialModel.setLowerBoundConstraint(constraint);
 
-  if (d_cmEnabled)
-  {
-    if (d_congruenceManager.isWatchedVariable(x_i))
-    {
-      int sgn = c_i.sgn();
-      if (sgn == 0)
-      {
-        zeroDifferenceDetected(x_i);
-      }
-      else
-      {
-        d_congruenceManager.watchedVariableCannotBeZero(constraint);
-        d_congruenceManager.equalsConstant(constraint);
-      }
-    }
-    else
-    {
-      d_congruenceManager.equalsConstant(constraint);
-    }
-  }
+  
 
   d_updatedBounds.softAdd(x_i);
 
@@ -959,17 +850,7 @@ bool TheoryArithPrivate::AssertDisequality(ConstraintP constraint)
   // Should be fine in integers
   Assert(!isInteger(x_i) || c_i.isIntegral());
 
-  if (d_cmEnabled)
-  {
-    if (d_congruenceManager.isWatchedVariable(x_i))
-    {
-      int sgn = c_i.sgn();
-      if (sgn == 0)
-      {
-        d_congruenceManager.watchedVariableCannotBeZero(constraint);
-      }
-    }
-  }
+  
 
   const ValueCollection& vc = constraint->getValueCollection();
   if (vc.hasLowerBound() && vc.hasUpperBound())
@@ -1383,33 +1264,6 @@ void TheoryArithPrivate::setupPolynomial(const Polynomial& poly)
     d_tableau.addRow(varSlack, coefficients, variables);
     setupBasicValue(varSlack);
     d_linEq.trackRowIndex(d_tableau.basicToRowIndex(varSlack));
-
-    // Add differences to the difference manager
-    Polynomial::iterator i = poly.begin(), end = poly.end();
-    if (i != end)
-    {
-      Monomial first = *i;
-      ++i;
-      if (i != end)
-      {
-        Monomial second = *i;
-        ++i;
-        if (i == end)
-        {
-          if (first.getConstant().isOne()
-              && second.getConstant().getValue() == -1)
-          {
-            VarList vl0 = first.getVarList();
-            VarList vl1 = second.getVarList();
-            if (vl0.singleton() && vl1.singleton())
-            {
-              d_congruenceManager.addWatchedPair(
-                  varSlack, vl0.getNode(), vl1.getNode());
-            }
-          }
-        }
-      }
-    }
 
     ++(d_statistics.d_statAuxiliaryVariables);
     markSetup(polyNode);
@@ -2158,7 +2012,7 @@ void TheoryArithPrivate::outputConflicts()
 bool TheoryArithPrivate::isLeaf(TNode x) const
 {
   return x.getNumChildren() == 0
-         || Theory::theoryOf(x, options().theory.theoryOfMode) != THEORY_ARITH;
+         || Theory::theoryOf(x, options().solver.theoryOfMode) != THEORY_ARITH;
 }
 TheoryId TheoryArithPrivate::theoryOf(TNode x) const
 {
@@ -2299,7 +2153,6 @@ bool TheoryArithPrivate::replayLog(ApproximateSimplex* approx)
 
   /* use the try block for the purpose of pushing the sat context */
   context::Context::ScopedPush speculativePush(context());
-  d_cmEnabled = false;
   std::vector<ConstraintCPVec> res =
       replayLogRec(approx, tl.getRootId(), NullConstraint, 1);
 
@@ -2883,7 +2736,6 @@ std::vector<ConstraintCPVec> TheoryArithPrivate::replayLogRec(
     if (conflictQueueEmpty())
     {
       Assert(true);
-      if (!nl.isBranch() || depth % false)
       {
         TimerStat::CodeTimer codeTimer(d_statistics.d_replaySimplexTimer);
         // test for linear feasibility
@@ -3852,10 +3704,8 @@ bool TheoryArithPrivate::postCheck(Theory::Effort effortLevel)
 
   // This should be fine if sat or unknown
   if (!emmittedConflictOrSplit
-      && (options().arith.arithPropagationMode
-              == options::ArithPropagationMode::UNATE_PROP
-          || options().arith.arithPropagationMode
-                 == options::ArithPropagationMode::BOTH_PROP))
+      && (false
+          || true))
   {
     TimerStat::CodeTimer codeTimer0(d_statistics.d_newPropTime);
     Assert(d_qflraStatus != Result::UNSAT);
@@ -3941,7 +3791,7 @@ bool TheoryArithPrivate::postCheck(Theory::Effort effortLevel)
       && !hasIntegerModel())
   {
     Node possibleConflict = Node::null();
-    if (!emmittedConflictOrSplit && options().arith.arithDioSolver)
+    if (!emmittedConflictOrSplit && options().solver.arithDioSolver)
     {
       possibleConflict = callDioSolver();
       if (possibleConflict != Node::null())
@@ -3974,7 +3824,7 @@ bool TheoryArithPrivate::postCheck(Theory::Effort effortLevel)
     }
 
     if (!emmittedConflictOrSplit && d_hasDoneWorkSinceCut
-        && options().arith.arithDioSolver)
+        && options().solver.arithDioSolver)
     {
       if (getDioCuttingResource())
       {
@@ -4266,7 +4116,6 @@ TrustNode TheoryArithPrivate::explain(TNode n)
   TrustNode exp;
   // explanations that involve the congruence manager are handled in the
   // main theory class.
-  Assert(!d_congruenceManager.canExplain(n));
   if (c != NullConstraint)
   {
     Assert(!c->isAssumption());
@@ -4287,10 +4136,7 @@ TrustNode TheoryArithPrivate::explain(TNode n)
   }
   else
   {
-    Assert(d_cmEnabled);
-    Assert(d_congruenceManager.canExplain(n));
-    Trace("arith::explain") << "dm explanation" << n << endl;
-    exp = d_congruenceManager.explain(n);
+    Unreachable() << "No arithmetic explanation for " << n;
   }
   return exp;
 }
@@ -4299,10 +4145,8 @@ void TheoryArithPrivate::propagate()
 {
   // This uses model values for safety. Disable for now.
   if (d_qflraStatus == Result::SAT
-      && (options().arith.arithPropagationMode
-              == options::ArithPropagationMode::BOUND_INFERENCE_PROP
-          || options().arith.arithPropagationMode
-                 == options::ArithPropagationMode::BOTH_PROP)
+      && (false
+          || true)
       && hasAnyUpdates())
   {
     {
@@ -4345,81 +4189,7 @@ void TheoryArithPrivate::propagate()
     }
   }
 
-  NodeManager* nm = nodeManager();
-  while (d_congruenceManager.hasMorePropagations())
-  {
-    TNode toProp = d_congruenceManager.getNextPropagation();
 
-    // Currently if the flag is set this came from an equality detected by the
-    // equality engine in the the difference manager.
-    Node normalized = rewrite(toProp);
-
-    ConstraintP constraint = d_constraintDatabase.lookup(normalized);
-    if (constraint == NullConstraint)
-    {
-      Trace("arith::prop") << "propagating on non-constraint? " << toProp
-                           << endl;
-
-      outputPropagate(toProp);
-    }
-    else if (constraint->negationHasProof())
-    {
-      // The congruence manager can prove: antecedents => toProp,
-      // ergo. antecedents ^ ~toProp is a conflict.
-      TrustNode exp = d_congruenceManager.explain(toProp);
-      Node notNormalized = normalized.negate();
-      std::vector<Node> ants(exp.getNode().begin(), exp.getNode().end());
-      ants.push_back(notNormalized);
-      Node lp = nm->mkAnd(ants);
-      Trace("arith::prop") << "propagate conflict" << lp << endl;
-      if (proofsEnabled())
-      {
-        // Assume all of antecedents and ~toProp (rewritten)
-        std::vector<Pf> pfAntList;
-        for (size_t i = 0; i < ants.size(); ++i)
-        {
-          pfAntList.push_back(d_pnm->mkAssume(ants[i]));
-        }
-        Pf pfAnt = pfAntList.size() > 1
-                       ? d_pnm->mkNode(ProofRule::AND_INTRO, pfAntList, {})
-                       : pfAntList[0];
-        // Use modus ponens to get toProp (un rewritten)
-        Pf pfConc = d_pnm->mkNode(
-            ProofRule::MODUS_PONENS,
-            {pfAnt, exp.getGenerator()->getProofFor(exp.getProven())},
-            {});
-        // prove toProp (rewritten)
-        Pf pfConcRewritten = ensurePredTransform(d_pnm, pfConc, normalized);
-        Pf pfNotNormalized = d_pnm->mkAssume(notNormalized);
-        // prove bottom from toProp and ~toProp
-        Pf pfBot;
-        if (normalized.getKind() == Kind::NOT)
-        {
-          pfBot = d_pnm->mkNode(
-              ProofRule::CONTRA, {pfNotNormalized, pfConcRewritten}, {});
-        }
-        else
-        {
-          pfBot = d_pnm->mkNode(
-              ProofRule::CONTRA, {pfConcRewritten, pfNotNormalized}, {});
-        }
-        // close scope
-        Pf pfNotAnd = d_pnm->mkScope(pfBot, ants);
-        raiseBlackBoxConflict(lp, pfNotAnd);
-      }
-      else
-      {
-        raiseBlackBoxConflict(lp);
-      }
-      outputConflicts();
-      return;
-    }
-    else
-    {
-      Trace("arith::prop") << "propagating still?" << toProp << endl;
-      outputPropagate(toProp);
-    }
-  }
 }
 
 DeltaRational TheoryArithPrivate::getDeltaValue(TNode term) const
@@ -4645,7 +4415,6 @@ void TheoryArithPrivate::collectModelValues(
   }
 
   // Iterate over equivalence classes in LinearEqualityModule
-  // const eq::EqualityEngine& ee = d_congruenceManager.getEqualityEngine();
   // m->assertEqualityEngine(&ee);
 
   Trace("arith::collectModelInfo") << "collectModelInfo() end " << endl;
@@ -5904,11 +5673,6 @@ void TheoryArithPrivate::entailmentCheckRowSum(
   }
   // success
   tmp.first = nb;
-}
-
-ArithCongruenceManager* TheoryArithPrivate::getCongruenceManager()
-{
-  return d_cmEnabled.get() ? &d_congruenceManager : nullptr;
 }
 
 }  // namespace arith::linear

@@ -1737,7 +1737,7 @@ inline bool RewriteRule<MultSlice>::applies(TNode node)
   {
     return false;
   }
-  return utils::getSize(node[0]) % false;
+  return utils::getSize(node[0]) % 2 == 0;
 }
 
 /**

@@ -36,14 +36,3 @@ name   = "Parser"
 
 
 # Internal core policies; never accepted as command-line or SMT-LIB options.
-[[setting]]
-name = "parsingMode"
-type = "ParsingMode"
-default = "DEFAULT"
-[[setting.mode.DEFAULT]]
-name = "default"
-[[setting.mode.STRICT]]
-name = "strict"
-[[setting.mode.LENIENT]]
-name = "lenient"
-

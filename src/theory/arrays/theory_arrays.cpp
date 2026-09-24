@@ -1652,7 +1652,7 @@ void TheoryArrays::mergeArrays(TNode a, TNode b)
   }
 
   d_mergeInProgress = true;
-  bool optLinear = options().arrays.arraysOptimizeLinear;
+  bool optLinear = options().solver.arraysOptimizeLinear;
   bool weakEquiv = false;
 
   Node n;
@@ -1798,7 +1798,7 @@ void TheoryArrays::checkStore(TNode a)
 
   TNode brep = d_equalityEngine->getRepresentative(b);
 
-  if (!options().arrays.arraysOptimizeLinear || d_infoMap.isNonLinear(brep))
+  if (!options().solver.arraysOptimizeLinear || d_infoMap.isNonLinear(brep))
   {
     const CTNodeList* js = d_infoMap.getIndices(brep);
     size_t it = 0;
@@ -1866,7 +1866,7 @@ void TheoryArrays::checkRowForIndex(TNode i, TNode a)
     queueRowLemma(lem);
   }
 
-  if (!options().arrays.arraysOptimizeLinear || d_infoMap.isNonLinear(a))
+  if (!options().solver.arraysOptimizeLinear || d_infoMap.isNonLinear(a))
   {
     it = 0;
     for (; it < instores->size(); ++it)
@@ -1935,7 +1935,7 @@ void TheoryArrays::checkRowLemmas(TNode a, TNode b)
     }
   }
 
-  if (!options().arrays.arraysOptimizeLinear || d_infoMap.isNonLinear(b))
+  if (!options().solver.arraysOptimizeLinear || d_infoMap.isNonLinear(b))
   {
     for (it = 0; it < i_a->size(); ++it)
     {

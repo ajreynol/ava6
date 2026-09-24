@@ -65,12 +65,6 @@ class SetDefaults : protected EnvObj
    * Determine whether we will be using SyGuS.
    */
   /**
-   * Does options enable an input conversion, e.g. solve-bv-as-int?
-   * If this method returns true, then reason is updated with the name of the
-   * option.
-   */
-  bool usesInputConversion(const Options& opts, std::ostream& reason) const;
-  /**
    * Check if incompatible with incremental mode. Notice this method may modify
    * the options to ensure that we are compatible with incremental mode.
    *
@@ -84,49 +78,12 @@ class SetDefaults : protected EnvObj
                                    std::ostream& reason,
                                    std::ostream& suggest) const;
   /**
-   * Return true if proofs must be disabled. This is the case for any technique
-   * that answers "unsat" without showing a proof of unsatisfiabilty. The output
-   * stream reason is similar to above.
-   *
-   * Notice this method may modify the options to ensure that we are compatible
-   * with proofs.
-   */
-  bool incompatibleWithProofs(Options& opts, std::ostream& reason) const;
-  /**
-   * Check whether we should disable models. The output stream reason is similar
-   * to above.
-   */
-  bool incompatibleWithModels(const Options& opts, std::ostream& reason) const;
-  /**
-   * Check if incompatible with unsat cores. Notice this method may modify
-   * the options to ensure that we are compatible with unsat cores.
-   * The output stream reason is similar to above.
-   */
-  bool incompatibleWithUnsatCores(Options& opts, std::ostream& reason) const;
-  /**
-   * Return true if we are using "safe" unsat cores, which disables all
-   * techniques that may interfere with producing correct unsat cores.
-   */
-  bool safeUnsatCores(const Options& opts) const;
-  /**
-   * Check if incompatible with sygus. Notice this method may
-   * modify the options to ensure that we are compatible with sygus.
-   * The output stream reason is similar to above.
-   */
-  bool incompatibleWithSygus(const Options& opts, std::ostream& reason) const;
-  /**
    * Check if incompatible with quantified formulas. Notice this method may
    * modify the options to ensure that we are compatible with quantified logics.
    * The output stream reason is similar to above.
    */
   bool incompatibleWithQuantifiers(const Options& opts,
                                    std::ostream& reason) const;
-  /**
-   * Check if incompatible with separation logic. Notice this method may
-   * modify the options to ensure that we are compatible with separation logic.
-   * The output stream reason is similar to above.
-   */
-  bool incompatibleWithSeparationLogic(Options& opts) const;
   //------------------------- options setting, prior finalization of logic
   /**
    * Set defaults pre, which sets all options prior to finalizing the logic.

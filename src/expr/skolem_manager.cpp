@@ -421,7 +421,7 @@ TypeNode SkolemManager::getTypeFor(SkolemId id,
     case SkolemId::STRINGS_DEQ_DIFF:
     case SkolemId::STRINGS_STOI_NON_DIGIT:
     case SkolemId::BAGS_FOLD_CARD:
-    case SkolemId::SETS_FOLD_CARD:
+
     case SkolemId::BAGS_DISTINCT_ELEMENTS_SIZE:
     case SkolemId::BAGS_MAP_INDEX: return d_nm->integerType();
     // string skolems
@@ -510,7 +510,7 @@ TypeNode SkolemManager::getTypeFor(SkolemId id,
       return stype.getSetElementType();
     }
     case SkolemId::BAGS_FOLD_UNION_DISJOINT:
-    case SkolemId::SETS_FOLD_UNION:
+
     case SkolemId::BAGS_DISTINCT_ELEMENTS_UNION_DISJOINT:
     {
       Assert(cacheVals.size() > 0);
@@ -519,7 +519,7 @@ TypeNode SkolemManager::getTypeFor(SkolemId id,
     }
     case SkolemId::BAGS_DISTINCT_ELEMENTS:
     case SkolemId::BAGS_FOLD_ELEMENTS:
-    case SkolemId::SETS_FOLD_ELEMENTS:
+
     {
       Assert(cacheVals.size() > 0);
       TypeNode itype = d_nm->integerType();
@@ -529,7 +529,7 @@ TypeNode SkolemManager::getTypeFor(SkolemId id,
       return d_nm->mkFunctionType(itype, elementType);
     }
     case SkolemId::BAGS_FOLD_COMBINE:
-    case SkolemId::SETS_FOLD_COMBINE:
+
     {
       Assert(cacheVals.size() == 3);
       TypeNode itype = d_nm->integerType();
@@ -540,17 +540,6 @@ TypeNode SkolemManager::getTypeFor(SkolemId id,
       Assert(cacheVals[0].getType().isFunction());
       return cacheVals[0].getType().getArgTypes()[0];
     }
-    case SkolemId::HO_DEQ_DIFF:
-    {
-      const Rational& r = cacheVals[2].getConst<Rational>();
-      Assert(r.getNumerator().fitsUnsignedInt());
-      size_t i = r.getNumerator().toUnsignedInt();
-      Assert(cacheVals[0].getType().isFunction());
-      std::vector<TypeNode> argTypes = cacheVals[0].getType().getArgTypes();
-      Assert(i < argTypes.size());
-      return argTypes[i];
-    }
-    // fp skolems
     case SkolemId::FP_MIN_ZERO:
     case SkolemId::FP_MAX_ZERO:
     {
@@ -644,9 +633,9 @@ size_t SkolemManager::getNumIndicesForSkolemId(SkolemId id) const
     case SkolemId::TABLES_GROUP_PART:
     case SkolemId::RELATIONS_GROUP_PART:
     case SkolemId::SETS_CHOOSE:
-    case SkolemId::SETS_FOLD_CARD:
-    case SkolemId::SETS_FOLD_ELEMENTS:
-    case SkolemId::SETS_FOLD_UNION:
+
+
+
     case SkolemId::FP_MIN_ZERO:
     case SkolemId::FP_MAX_ZERO:
     case SkolemId::BV_TO_INT_UF:
@@ -670,7 +659,7 @@ size_t SkolemManager::getNumIndicesForSkolemId(SkolemId id) const
 
     // Number of skolem indices: 3
 
-    case SkolemId::HO_DEQ_DIFF:
+
     case SkolemId::WITNESS_STRING_LENGTH:
     case SkolemId::STRINGS_REPLACE_ALL_RESULT:
     case SkolemId::STRINGS_REPLACE_RE_ALL_RESULT:
@@ -678,7 +667,7 @@ size_t SkolemManager::getNumIndicesForSkolemId(SkolemId id) const
     case SkolemId::BAGS_FOLD_COMBINE:
     case SkolemId::BAGS_MAP_PREIMAGE_INJECTIVE:
     case SkolemId::BAGS_MAP_SUM:
-    case SkolemId::SETS_FOLD_COMBINE: return 3;
+ return 3;
 
     // Number of skolem indices: 5
     case SkolemId::BAGS_MAP_INDEX: return 5;

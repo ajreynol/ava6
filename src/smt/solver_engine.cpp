@@ -47,7 +47,6 @@
 #include "smt/listeners.h"
 #include "smt/logic_exception.h"
 #include "smt/model.h"
-#include "smt/model_core_builder.h"
 #include "smt/preprocessor.h"
 #include "smt/proof_manager.h"
 #include "smt/set_defaults.h"
@@ -62,6 +61,7 @@
 #include "theory/rewriter.h"
 #include "theory/smt_engine_subsolver.h"
 #include "theory/theory_engine.h"
+#include "theory/theory_model.h"
 #include "util/random.h"
 #include "util/rational.h"
 #include "util/resource_manager.h"
@@ -666,19 +666,7 @@ TheoryModel* SolverEngine::getAvailableModel(const char* c) const
     throw RecoverableModalException(ss.str().c_str());
   }
   // compute the model core if necessary and not done so already
-  const Options& opts = d_env->getOptions();
-  if (opts.smt.modelCoresMode != options::ModelCoresMode::NONE
-      && !m->isUsingModelCore())
-  {
-    // If we enabled model cores, we compute a model core for m based on our
-    // (expanded) assertions using the model core builder utility. Notice that
-    // we get the assertions using the getAssertionsInternal, which does not
-    // impact whether we are in "sat" mode
-    std::vector<Node> asserts = getAssertionsInternal();
-    d_smtSolver->getPreprocessor()->applySubstitutions(asserts);
-    ModelCoreBuilder mcb(*d_env.get());
-    mcb.setModelCore(asserts, m, opts.smt.modelCoresMode);
-  }
+  
 
   return m;
 }
@@ -994,7 +982,7 @@ Node SolverEngine::getValue(const Node& t, bool fromUser)
   bool bvalue;
   prop::PropEngine* pe = d_smtSolver->getPropEngine();
   if (expectedType.isBoolean() && d_state->getMode() == SmtMode::SAT
-      && d_env->getOptions().smt.modelCoresMode == options::ModelCoresMode::NONE
+      && true
       && pe->isSatLiteral(n) && pe->hasValue(n, bvalue))
   {
     checkModelAvailable("get-value");
@@ -1051,7 +1039,7 @@ Node SolverEngine::getValue(const Node& t, bool fromUser)
         smt::SetDefaults::disableChecking(subOptions);
         // ensure no infinite loop
         subOptions.write_smt().checkModelSubsolver = false;
-        subOptions.write_smt().modelVarElimUneval = false;
+        subOptions.solver.modelVarElimUneval = false;
         subOptions.write_smt().simplificationMode =
             options::SimplificationMode::NONE;
         // initialize the subsolver
@@ -1101,19 +1089,6 @@ std::vector<Node> SolverEngine::getModelDomainElements(TypeNode tn) const
   return m->getDomainElements(tn);
 }
 
-bool SolverEngine::isModelCoreSymbol(Node n)
-{
-  Assert(n.isVar());
-  const Options& opts = d_env->getOptions();
-  if (opts.smt.modelCoresMode == options::ModelCoresMode::NONE)
-  {
-    // if the model core mode is none, we are always a model core symbol
-    return true;
-  }
-  TheoryModel* tm = getAvailableModel("isModelCoreSymbol");
-  return tm->isModelCoreSymbol(n);
-}
-
 std::string SolverEngine::getModel(const std::vector<TypeNode>& declaredSorts,
                                    const std::vector<Node>& declaredFuns)
 {
@@ -1139,15 +1114,10 @@ std::string SolverEngine::getModel(const std::vector<TypeNode>& declaredSorts,
   {
     m.addDeclarationSort(tn, getModelDomainElements(tn));
   }
-  bool usingModelCores =
-      (opts.smt.modelCoresMode != options::ModelCoresMode::NONE);
+
   for (const Node& n : declaredFuns)
   {
-    if (usingModelCores && !tm->isModelCoreSymbol(n))
-    {
-      // skip if not in model core
-      continue;
-    }
+    
     Node value = tm->getValue(n);
     m.addDeclarationTerm(n, value);
   }
@@ -1843,7 +1813,7 @@ void SolverEngine::printStatisticsSafe(int fd) const
 
 void SolverEngine::printStatisticsDiff() const
 {
-  d_env->getStatisticsRegistry().printDiff(*d_env->getOptions().base.err);
+  d_env->getStatisticsRegistry().printDiff(*d_env->getOptions().io.err);
   d_env->getStatisticsRegistry().storeSnapshot();
 }
 

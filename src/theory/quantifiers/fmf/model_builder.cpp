@@ -52,7 +52,7 @@ void QModelBuilder::finishInit()
 
 bool QModelBuilder::optUseModel()
 {
-  return options().quantifiers.fmfMbqiMode != options::FmfMbqiMode::NONE
+  return options().solver.fmfMbqiMode != options::FmfMbqiMode::NONE
          || options().quantifiers.fmfBound || options().strings.stringExp;
 }
 

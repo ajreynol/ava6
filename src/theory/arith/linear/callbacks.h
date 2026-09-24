@@ -75,15 +75,6 @@ class RationalCallBack
   virtual Rational operator()() const = 0;
 };
 
-class SetupLiteralCallBack : public TNodeCallBack
-{
- private:
-  TheoryArithPrivate& d_arith;
-
- public:
-  SetupLiteralCallBack(TheoryArithPrivate& ta);
-  void operator()(TNode lit) override;
-};
 
 class DeltaComputeCallback : public RationalCallBack
 {
@@ -187,20 +178,6 @@ class FarkasConflictBuilder
   void reset();
 };
 
-class RaiseEqualityEngineConflict
-{
- private:
-  TheoryArithPrivate& d_ta;
-
- public:
-  RaiseEqualityEngineConflict(TheoryArithPrivate& ta);
-
-  /* If you are not an equality engine, don't use this!
-   *
-   * The proof should prove that `n` is a conflict.
-   * */
-  void raiseEEConflict(Node n, std::shared_ptr<ProofNode> pf) const;
-};
 
 class BoundCountingLookup
 {

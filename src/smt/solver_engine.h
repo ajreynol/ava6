@@ -364,11 +364,6 @@ class AVA6_EXPORT SolverEngine
   std::vector<Node> getModelDomainElements(TypeNode tn) const;
 
   /**
-   * @return true if v is a model core symbol
-   */
-  bool isModelCoreSymbol(Node v);
-
-  /**
    * Get a model (only if immediately preceded by an SAT or unknown query).
    * Only permitted if the model option is on.
    *

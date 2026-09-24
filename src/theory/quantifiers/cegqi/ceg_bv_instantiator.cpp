@@ -216,7 +216,7 @@ bool BvInstantiator::useModelValue(AVA6_UNUSED CegInstantiator* ci,
                                    AVA6_UNUSED Node pv,
                                    CegInstEffort effort)
 {
-  return effort < CEG_INST_EFFORT_FULL || options().quantifiers.cegqiFullEffort;
+  return effort < CEG_INST_EFFORT_FULL || options().solver.cegqiFullEffort;
 }
 
 bool BvInstantiator::processAssertions(CegInstantiator* ci,

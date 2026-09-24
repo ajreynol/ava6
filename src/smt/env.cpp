@@ -112,14 +112,13 @@ bool Env::isProofProducing() const { return d_proofNodeManager != nullptr; }
 bool Env::isSatProofProducing() const
 {
   return d_proofNodeManager != nullptr
-         && d_options.smt.proofMode != options::ProofMode::PP_ONLY;
+         && d_options.solver.proofMode != options::ProofMode::PP_ONLY;
 }
 
 bool Env::isTheoryProofProducing() const
 {
   return d_proofNodeManager != nullptr
-         && (d_options.smt.proofMode == options::ProofMode::FULL
-             || d_options.smt.proofMode == options::ProofMode::FULL_STRICT);
+         && d_options.solver.proofMode == options::ProofMode::FULL_STRICT;
 }
 
 theory::Rewriter* Env::getRewriter() { return d_rewriter.get(); }
@@ -165,7 +164,7 @@ std::ostream& Env::output(OutputTag tag) const
 {
   if (isOutputOn(tag))
   {
-    return *d_options.base.out;
+    return *d_options.io.out;
   }
   return ava6::internal::null_os;
 }
@@ -179,7 +178,7 @@ std::ostream& Env::verbose(int64_t level) const
 {
   if (isVerboseOn(level))
   {
-    return *d_options.base.err;
+    return *d_options.io.err;
   }
   return ava6::internal::null_os;
 }
@@ -277,7 +276,7 @@ theory::TheoryId Env::theoryOf(TypeNode typeNode) const
 theory::TheoryId Env::theoryOf(TNode node) const
 {
   theory::TheoryId tid = theory::Theory::theoryOf(
-      node, d_options.theory.theoryOfMode, d_uninterpretedSortOwner);
+      node, d_options.solver.theoryOfMode, d_uninterpretedSortOwner);
   // Special case: Boolean term skolems belong to THEORY_UF.
   if (tid == theory::TheoryId::THEORY_BOOL && isBooleanTermSkolem(node))
   {

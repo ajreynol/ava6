@@ -21,6 +21,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "options/solver_config.h"
 
 namespace ava6::internal {
 namespace options {
@@ -49,6 +50,9 @@ class AVA6_EXPORT Options
 
   Options();
   ~Options();
+
+  options::SolverConfig solver;
+  options::InputOutputConfig io;
 
   options::OptionsHandler& handler() const { return *d_handler; }
 

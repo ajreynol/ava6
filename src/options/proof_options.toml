@@ -103,8 +103,3 @@ name   = "Proof"
 
 
 # Internal core policies; never accepted as command-line or SMT-LIB options.
-[[setting]]
-name = "checkProofsComplete"
-type = "bool"
-default = "false"
-

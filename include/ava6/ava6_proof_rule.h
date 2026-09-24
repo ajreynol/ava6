@@ -1267,19 +1267,9 @@ enum ENUM(ProofRule)
    */
   EVALUE(FALSE_ELIM),
   /**
-   * \verbatim embed:rst:leading-asterisk
-   * **Equality -- Higher-order congruence**
-   *
-   * .. math::
-   *
-   *   \inferrule{f=g, t_1=s_1,\dots,t_n=s_n\mid k}{k(f, t_1,\dots, t_n) =
-   *   k(g, s_1,\dots, s_n)}
-   *
-   * The kind argument :math:`k` is optional and defaults to
-   * ``ava6::Kind::HO_APPLY``. Notice that this rule is only used when the
-   * application kind :math:`k` is either ``ava6::Kind::APPLY_UF`` or
-   * ``ava6::Kind::HO_APPLY``.
-   * \endverbatim
+   * Congruence for APPLY_UF with an operator-equality premise, followed by
+   * argument-equality premises. The argument is the APPLY_UF kind.
+   * Used when expanding ordinary first-order function definitions in proofs.
    */
   EVALUE(HO_CONG),
   /**
@@ -2963,7 +2953,7 @@ enum ENUM(ProofRewriteRule)
    *   ((\lambda x_1 \ldots x_n.\> t) \ t_1) = (\lambda x_2 \ldots x_n.\> t)\{x_1 \mapsto t_1\}
    *
    * In the former case, the left hand side may either be a term of kind
-   * `ava6::Kind::APPLY_UF` or `ava6::Kind::HO_APPLY`. The latter case is used
+   * `ava6::Kind::APPLY_UF`. The latter case is used
    * only if the term has kind `ava6::Kind::HO_APPLY`.
    *
    * In either case, the right hand side of the equality in the conclusion is
@@ -2992,7 +2982,7 @@ enum ENUM(ProofRewriteRule)
    *   ((\lambda x_1 \ldots x_n.\> t) \ t_1 \ldots t_n) = ((\lambda y_1 \ldots y_n.\> t') \ t_1 \ldots t_n)
    *
    * The terms may either be of kind
-   * `ava6::Kind::APPLY_UF` or `ava6::Kind::HO_APPLY`.
+   * `ava6::Kind::APPLY_UF`.
    * This rule ensures that the free variables of :math:`y_1, \ldots, y_n, t_1 \ldots t_n`
    * do not occur in binders within :math:`t'`, and
    * :math:`(\lambda x_1 \ldots x_n.\> t)` is alpha-equivalent to

@@ -224,7 +224,7 @@ int ModelEngine::checkModel()
 
   Trace("model-engine-debug") << "Do exhaustive instantiation..." << std::endl;
   // FMC uses two sub-effort levels.
-  options::FmfMbqiMode mode = options().quantifiers.fmfMbqiMode;
+  options::FmfMbqiMode mode = options().solver.fmfMbqiMode;
   int e_max = mode == options::FmfMbqiMode::FMC ? 2 : 1;
   for (int e = 0; e < e_max; e++)
   {

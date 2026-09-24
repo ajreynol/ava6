@@ -153,7 +153,7 @@ void TheoryUF::notifyFact(TNode atom,
 }
 //--------------------------------- end standard check
 
-TrustNode TheoryUF::ppRewrite(TNode node, std::vector<SkolemLemma>& lems)
+TrustNode TheoryUF::ppRewrite(TNode node, AVA6_UNUSED std::vector<SkolemLemma>& lems)
 {
   Trace("uf-exp-def") << "TheoryUF::ppRewrite: expanding definition : " << node
                       << std::endl;
@@ -165,7 +165,7 @@ TrustNode TheoryUF::ppRewrite(TNode node, std::vector<SkolemLemma>& lems)
     ss << "Cannot process term of abstract type " << node;
     throw LogicException(ss.str());
   }
-  if (false || node.getType().isFunction())
+  if (node.getType().isFunction())
   {
     {
       std::stringstream ss;
@@ -173,26 +173,25 @@ TrustNode TheoryUF::ppRewrite(TNode node, std::vector<SkolemLemma>& lems)
         ss << "Function terms";
       }
       ss << " are only supported with "
-            "higher-order logic. Try adding the logic prefix HO_.";
+            "first-order terms.";
       throw LogicException(ss.str());
     }
   }
   else if (k == Kind::APPLY_UF)
   {
-    if (!false && isHigherOrderType(node.getOperator().getType()))
+    if (isHigherOrderType(node.getOperator().getType()))
     {
       // check for higher-order
       // logic exception if higher-order is not enabled
       std::stringstream ss;
       ss << "UF received an application whose operator has higher-order type "
          << node
-         << ", which is only supported with higher-order logic. Try adding "
-            "the logic prefix HO_.";
+         << ", which is only supported with first-order terms. "
+            "";
       throw LogicException(ss.str());
     }
   }
-  else if ((k == Kind::BITVECTOR_UBV_TO_INT || k == Kind::INT_TO_BITVECTOR)
-           && options().uf.eagerArithBvConv)
+  else if ((k == Kind::BITVECTOR_UBV_TO_INT || k == Kind::INT_TO_BITVECTOR) && options().uf.eagerArithBvConv)
   {
     // eliminate if option specifies to eliminate eagerly
     Node ret = k == Kind::BITVECTOR_UBV_TO_INT ? arith::eliminateBv2Nat(node)
@@ -206,7 +205,6 @@ TrustNode TheoryUF::ppRewrite(TNode node, std::vector<SkolemLemma>& lems)
 void TheoryUF::preRegisterTerm(TNode node)
 {
   Trace("uf") << "TheoryUF::preRegisterTerm(" << node << ")" << std::endl;
-
 
   Kind k = node.getKind();
   switch (k)
@@ -253,7 +251,7 @@ void TheoryUF::preRegisterTerm(TNode node)
       {
         std::stringstream ss;
         ss << "Function terms are only supported with higher-order logic. Try "
-              "adding the logic prefix HO_.";
+              "";
         throw LogicException(ss.str());
       }
       break;
@@ -303,7 +301,6 @@ void TheoryUF::presolve()
 
   Trace("uf") << "uf: begin presolve()" << endl;
 
-
   Trace("uf") << "uf: end presolve()" << endl;
 }
 
@@ -313,7 +310,6 @@ void TheoryUF::ppStaticLearn(TNode n, std::vector<TrustNode>& learned)
 
   // Use the diamonds utility
   d_dpfgen.ppStaticLearn(n, learned);
-
 
 } /* TheoryUF::ppStaticLearn() */
 
@@ -340,13 +336,11 @@ EqualityStatus TheoryUF::getEqualityStatus(TNode a, TNode b)
 bool TheoryUF::areCareDisequal(TNode x, TNode y)
 {
   // check for disequality first, as an optimization
-  if (d_equalityEngine->hasTerm(x) && d_equalityEngine->hasTerm(y)
-      && d_equalityEngine->areDisequal(x, y, false))
+  if (d_equalityEngine->hasTerm(x) && d_equalityEngine->hasTerm(y) && d_equalityEngine->areDisequal(x, y, false))
   {
     return true;
   }
-  if (d_equalityEngine->isTriggerTerm(x, THEORY_UF)
-      && d_equalityEngine->isTriggerTerm(y, THEORY_UF))
+  if (d_equalityEngine->isTriggerTerm(x, THEORY_UF) && d_equalityEngine->isTriggerTerm(y, THEORY_UF))
   {
     TNode x_shared =
         d_equalityEngine->getTriggerTermRepresentative(x, THEORY_UF);
@@ -388,11 +382,10 @@ void TheoryUF::computeCareGraph()
 
   // note that if we are higher-order, we may still generate splits for
   // function arguments
-  if (d_state.getSharedTerms().empty() && !false)
+  if (d_state.getSharedTerms().empty())
   {
     return;
   }
-  NodeManager* nm = nodeManager();
   // Use term indexing. We build separate indices for APPLY_UF and HO_APPLY.
   // We maintain indices per operator for the former, and indices per
   // function type for the latter.
@@ -412,8 +405,7 @@ void TheoryUF::computeCareGraph()
       reps.push_back(d_equalityEngine->getRepresentative(j));
       // if doing higher-order, higher-order arguments must all be considered as
       // well
-      if (d_equalityEngine->isTriggerTerm(j, THEORY_UF)
-          || (false && j.getType().isFunction()))
+      if (d_equalityEngine->isTriggerTerm(j, THEORY_UF))
       {
         has_trigger_arg = true;
       }
@@ -430,7 +422,7 @@ void TheoryUF::computeCareGraph()
         arity[op] = reps.size();
         
       }
-      else if (false || k == Kind::BITVECTOR_UBV_TO_INT)
+      else if (k == Kind::BITVECTOR_UBV_TO_INT)
       {
         // add it to the typeIndex for the function type if HO_APPLY, or the
         // bitvector type if bv2nat. The latter ensures that we compute

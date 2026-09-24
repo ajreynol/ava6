@@ -240,14 +240,6 @@ class TheoryModel : protected EnvObj
   RepSet* getRepSetPtr() { return &d_rep_set; }
 
   //---------------------------- model cores
-  /** True if a model core has been computed for this model. */
-  bool isUsingModelCore() const;
-  /** set using model core */
-  void setUsingModelCore();
-  /** record model core symbol */
-  void recordModelCoreSymbol(Node sym);
-  /** Return whether symbol expr is in the model core. */
-  bool isModelCoreSymbol(Node sym) const;
   //---------------------------- end model cores
 
   //---------------------------- function values
@@ -337,9 +329,7 @@ class TheoryModel : protected EnvObj
   Node d_true;
   Node d_false;
   /** are we using model cores? */
-  bool d_using_model_core;
   /** symbols that are in the model core */
-  std::unordered_set<Node> d_model_core;
   /** Get model value function.
    *
    * This function is a helper function for getValue.

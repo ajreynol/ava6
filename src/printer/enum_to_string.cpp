@@ -41,7 +41,6 @@ const char* toString(ava6::SkolemId id)
     case ava6::SkolemId::ARITH_VTS_INFINITY: return "arith_vts_infinity";
     case ava6::SkolemId::ARITH_VTS_INFINITY_FREE:
       return "arith_vts_infinity_free";
-    case ava6::SkolemId::HO_DEQ_DIFF: return "ho_deq_diff";
     case ava6::SkolemId::QUANTIFIERS_SKOLEMIZE: return "quantifiers_skolemize";
     case ava6::SkolemId::WITNESS_STRING_LENGTH: return "witness_string_length";
     case ava6::SkolemId::WITNESS_INV_CONDITION: return "witness_inv_condition";
@@ -87,10 +86,6 @@ const char* toString(ava6::SkolemId id)
       return "relations_group_part_element";
     case ava6::SkolemId::SETS_CHOOSE: return "sets_choose";
     case ava6::SkolemId::SETS_DEQ_DIFF: return "sets_deq_diff";
-    case ava6::SkolemId::SETS_FOLD_CARD: return "sets_fold_card";
-    case ava6::SkolemId::SETS_FOLD_COMBINE: return "sets_fold_combine";
-    case ava6::SkolemId::SETS_FOLD_ELEMENTS: return "sets_fold_elements";
-    case ava6::SkolemId::SETS_FOLD_UNION: return "sets_fold_union";
     case ava6::SkolemId::SETS_MAP_DOWN_ELEMENT: return "sets_map_down_element";
     case ava6::SkolemId::BV_TO_INT_UF: return "bv_to_int_uf";
     case ava6::SkolemId::NONE: return "none";

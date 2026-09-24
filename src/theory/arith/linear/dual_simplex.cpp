@@ -91,9 +91,9 @@ Result::Status DualSimplexDecisionProcedure::dualFindModel(bool exactResult)
 
   uint32_t checkPeriod = 200;
 
-  uint32_t numDifferencePivots = options().arith.arithHeuristicPivots < 0
+  uint32_t numDifferencePivots = options().solver.arithHeuristicPivots < 0
                                      ? d_numVariables + 1
-                                     : options().arith.arithHeuristicPivots;
+                                     : options().solver.arithHeuristicPivots;
   // The signed to unsigned conversion is safe.
   if (numDifferencePivots > 0)
   {
@@ -174,7 +174,7 @@ bool DualSimplexDecisionProcedure::searchForFeasibleSolution(
     --remainingIterations;
 
     bool useVarOrderPivot =
-        d_pivotsInRound.count(x_i) >= options().arith.arithPivotThreshold;
+        d_pivotsInRound.count(x_i) >= options().solver.arithPivotThreshold;
     if (!useVarOrderPivot)
     {
       d_pivotsInRound.add(x_i);
@@ -182,7 +182,7 @@ bool DualSimplexDecisionProcedure::searchForFeasibleSolution(
 
     Trace("arith::update") << "pivots in rounds: " << d_pivotsInRound.count(x_i)
                            << " use " << useVarOrderPivot << " threshold "
-                           << options().arith.arithPivotThreshold << std::endl;
+                           << options().solver.arithPivotThreshold << std::endl;
 
     LinearEqualityModule::VarPreferenceFunction pf =
         useVarOrderPivot ? &LinearEqualityModule::minVarOrder

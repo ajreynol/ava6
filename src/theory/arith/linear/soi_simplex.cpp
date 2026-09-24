@@ -195,9 +195,11 @@ uint32_t SumOfInfeasibilitiesSPD::degeneratePivotsInARow() const
     // Degenerate is unreachable for its own reasons
     case Degenerate:
     case FocusShrank:
-    case AntiProductive: Unreachable(); return -1;
+    case AntiProductive: Unreachable();
+      SuppressWrongNoReturnWarning; return -1;
   }
   Unreachable();
+      SuppressWrongNoReturnWarning;
 }
 
 void SumOfInfeasibilitiesSPD::adjustFocusAndError(

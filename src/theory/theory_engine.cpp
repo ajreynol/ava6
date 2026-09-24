@@ -834,11 +834,11 @@ bool TheoryEngine::isLegalElimination(TNode x, TNode val)
   {
     return false;
   }
-  if (!options().smt.produceModels || options().smt.modelVarElimUneval)
+  if (!options().smt.produceModels || options().solver.modelVarElimUneval)
   {
     // Don't care about the model, or we allow variables to be eliminated by
     // unevaluatable terms, we can eliminate. Notice that when
-    // options().smt.modelVarElimUneval is true, val may contain unevaluatable
+    // options().solver.modelVarElimUneval is true, val may contain unevaluatable
     // kinds. This means that e.g. a Boolean variable may be eliminated based on
     // an equality (= b (forall ((x)) (P x))), where its model value is (forall
     // ((x)) (P x)).

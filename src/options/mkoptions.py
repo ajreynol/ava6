@@ -54,7 +54,7 @@ except ImportError:
 ### Allowed attributes for module/option
 
 MODULE_ATTR_REQ = ['id', 'name']
-MODULE_ATTR_ALL = MODULE_ATTR_REQ + ['option', 'setting']
+MODULE_ATTR_ALL = MODULE_ATTR_REQ + ['option']
 
 OPTION_ATTR_REQ = ['category', 'type']
 OPTION_ATTR_ALL = OPTION_ATTR_REQ + [
@@ -536,9 +536,6 @@ def generate_module_long_name_decl(module):
     for option in module.options:
         if option.name is None:
             continue
-        if getattr(option, 'internal', False):
-            res.append('static constexpr const char* {} = "internal:{}";'.format(
-                option.name, option.name))
         if option.long_name:
             res.append('static constexpr const char* {} = "{}";'.format(
                        option.name, option.long_name))
@@ -610,8 +607,6 @@ def generate_module_mode_impl(module):
             TPL_MODE_STREAM_OPERATOR.format(type=option.type,
                                             cases='\n    '.join(cases)))
 
-        if getattr(option, 'internal', False):
-            continue
         # Generate str-to-enum handler
         names = set()
         cases = []
@@ -1068,10 +1063,6 @@ def mkoptions_main():
         if 'option' in data:
             module.options = sorted(
                 [checker.check_option(a) for a in data['option']])
-        for setting in data.get('setting', []):
-            policy = Option(dict(setting, category='undocumented'))
-            policy.internal = True
-            module.options.append(policy)
         modules.append(module)
 
     # Generate code

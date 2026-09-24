@@ -740,7 +740,7 @@ void Smt2State::checkLogicAllowsFunctions()
         "Functions (of non-zero arity) cannot "
         "be declared in logic "
         + d_logic.getLogicString()
-        + ". Try including UF or adding the prefix HO_.");
+        + ". Include UF in the logic.");
   }
 }
 
@@ -1174,8 +1174,8 @@ Term Smt2State::applyParseOp(const ParseOp& p, std::vector<Term>& args)
           if (s.isFunction())
           {
             parseError(
-                "Cannot apply equality to functions unless logic is prefixed "
-                "by HO_.");
+                "Function equality is not supported "
+                "in Ava6.");
           }
         }
         if (s.isReal())

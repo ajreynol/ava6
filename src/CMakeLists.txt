@@ -40,6 +40,7 @@ libava6_add_sources(
   options/language.cpp
   options/language.h
   options/managed_streams.cpp
+  options/solver_config.h
   options/managed_streams.h
   options/option_exception.cpp
   options/option_exception.h
@@ -219,8 +220,6 @@ libava6_add_sources(
   smt/logic_exception.h
   smt/model.cpp
   smt/model.h
-  smt/model_core_builder.cpp
-  smt/model_core_builder.h
   smt/preprocessor.cpp
   smt/preprocessor.h
   smt/preprocess_proof_generator.cpp
@@ -296,8 +295,6 @@ libava6_add_sources(
   theory/arith/linear/bound_counts.h
   theory/arith/linear/callbacks.cpp
   theory/arith/linear/callbacks.h
-  theory/arith/linear/congruence_manager.cpp
-  theory/arith/linear/congruence_manager.h
   theory/arith/linear/constraint.cpp
   theory/arith/linear/constraint.h
   theory/arith/linear/constraint_forward.h

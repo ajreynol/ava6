@@ -38,7 +38,6 @@ TheoryModel::TheoryModel(Env& env, std::string name, bool enableFuncModels)
     : EnvObj(env),
       d_name(name),
       d_equalityEngine(nullptr),
-      d_using_model_core(false),
       d_enableFuncModels(enableFuncModels)
 {
   // must use function models when ufHo is enabled
@@ -79,8 +78,6 @@ void TheoryModel::reset()
   d_rep_set.clear();
   d_uf_terms.clear();
   d_uf_models.clear();
-  d_using_model_core = false;
-  d_model_core.clear();
 }
 
 void TheoryModel::setHeapModel(Node h, Node neq)
@@ -183,16 +180,6 @@ Node TheoryModel::simplify(TNode n) const
     return rewrite(subs.apply(n));
   }
   return n;
-}
-
-bool TheoryModel::isModelCoreSymbol(Node s) const
-{
-  if (!d_using_model_core)
-  {
-    return true;
-  }
-  Assert(s.isVar() && s.getKind() != Kind::BOUND_VARIABLE);
-  return d_model_core.find(s) != d_model_core.end();
 }
 
 size_t TheoryModel::getCardinality(const TypeNode& tn) const
@@ -569,7 +556,7 @@ void TheoryModel::assertSkeleton(TNode n)
 
 void TheoryModel::assignRepresentative(const Node& r,
                                        const Node& n,
-                                       bool isFinal)
+                                       AVA6_UNUSED bool isFinal)
 {
   Trace("model-builder-reps") << "Assign rep : " << r << " " << n << std::endl;
   AssertEqual(r.getType(), n.getType());
@@ -579,15 +566,6 @@ void TheoryModel::assignRepresentative(const Node& r,
   }
   d_rep_set.add(tn, n);
 }
-
-bool TheoryModel::isUsingModelCore() const { return d_using_model_core; }
-void TheoryModel::setUsingModelCore()
-{
-  d_using_model_core = true;
-  d_model_core.clear();
-}
-
-void TheoryModel::recordModelCoreSymbol(Node sym) { d_model_core.insert(sym); }
 
 void TheoryModel::setUnevaluatedKind(Kind k) { d_unevaluated_kinds.insert(k); }
 

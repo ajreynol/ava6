@@ -73,7 +73,7 @@ void ProofFinalCallback::initializeUpdate()
   d_pedanticFailureOut.str("");
   ++d_numFinalProofs;
   d_checkProofHoles =
-      options().base.statisticsInternal || options().proof.checkProofsComplete;
+      options().base.statisticsInternal || options().solver.checkProofsComplete;
 }
 
 void ProofFinalCallback::finalize(std::shared_ptr<ProofNode> pn)
@@ -174,7 +174,7 @@ void ProofFinalCallback::finalize(std::shared_ptr<ProofNode> pn)
       d_trustTheoryRewriteCount << trustTid;
     }
     // If the rule is not handled, and we are checking for complete proofs
-    if (!isHandled && options().proof.checkProofsComplete)
+    if (!isHandled && options().solver.checkProofsComplete)
     {
       // internal error if hardFailure is true
       std::stringstream ss;

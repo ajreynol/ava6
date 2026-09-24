@@ -4068,15 +4068,15 @@ DriverOptions::DriverOptions(const Solver& solver) : d_solver(solver) {}
 
 std::istream& DriverOptions::in() const
 {
-  return *d_solver.d_slv->getOptions().base.in;
+  return *d_solver.d_slv->getOptions().io.in;
 }
 std::ostream& DriverOptions::err() const
 {
-  return *d_solver.d_slv->getOptions().base.err;
+  return *d_solver.d_slv->getOptions().io.err;
 }
 std::ostream& DriverOptions::out() const
 {
-  return *d_solver.d_slv->getOptions().base.out;
+  return *d_solver.d_slv->getOptions().io.out;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -6410,7 +6410,7 @@ std::vector<Term> Solver::getUnsatCoreLemmas(void) const
       << "cannot get unsat core lemmas unless explicitly enabled "
          "(try --"
       << internal::options::smt::longName::produceUnsatCores << ")";
-  AVA6_API_CHECK(d_slv->getOptions().smt.unsatCoresMode
+  AVA6_API_CHECK(d_slv->getOptions().solver.unsatCoresMode
                  == internal::options::UnsatCoresMode::SAT_PROOF)
       << "cannot get unsat core lemmas unless SAT proofs are enabled";
   AVA6_API_RECOVERABLE_CHECK(d_slv->getSmtMode() == internal::SmtMode::UNSAT)
@@ -6560,25 +6560,6 @@ std::vector<Term> Solver::getModelDomainElements(const Sort& s) const
     res.push_back(Term(d_tm.d_nm, n));
   }
   return res;
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-bool Solver::isModelCoreSymbol(const Term& v) const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_RECOVERABLE_CHECK(d_slv->getOptions().smt.produceModels)
-      << "cannot check if model core symbol unless model generation is enabled "
-         "(try --"
-      << internal::options::smt::longName::produceModels << ")";
-  AVA6_API_RECOVERABLE_CHECK(d_slv->isSmtModeSat())
-      << "cannot check if model core symbol unless after a SAT or UNKNOWN "
-         "response.";
-  AVA6_API_SOLVER_CHECK_TERM(v);
-  AVA6_API_RECOVERABLE_CHECK(v.getKind() == Kind::CONSTANT)
-      << "expected a free constant as argument to isModelCoreSymbol.";
-  //////// all checks before this line
-  return d_slv->isModelCoreSymbol(v.getNode());
   ////////
   AVA6_API_TRY_CATCH_END;
 }

@@ -41,6 +41,8 @@ ${write_functions}$
   {
     if (this != &options)
     {
+      solver = options.solver;
+      io = options.io;
       // clang-format off
 ${holder_mem_copy}$
       // clang-format on

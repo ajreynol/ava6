@@ -27,7 +27,6 @@ const char* toString(InternalSkolemId id)
     case InternalSkolemId::SYGUS_ANY_CONSTANT: return "SYGUS_ANY_CONSTANT";
     case InternalSkolemId::QUANTIFIERS_SYNTH_FUN_EMBED:
       return "QUANTIFIERS_SYNTH_FUN_EMBED";
-    case InternalSkolemId::HO_TYPE_MATCH_PRED: return "HO_TYPE_MATCH_PRED";
     case InternalSkolemId::MBQI_INPUT: return "MBQI_INPUT";
     case InternalSkolemId::MBQI_CHOICE_FUN: return "MBQI_CHOICE_FUN";
     case InternalSkolemId::ABSTRACT_VALUE: return "ABSTRACT_VALUE";

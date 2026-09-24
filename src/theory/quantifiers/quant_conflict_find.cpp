@@ -2156,7 +2156,7 @@ bool MatchGen::getNextMatch()
         else if (d_n.getKind() == Kind::EQUAL)
         {
           // construct match based on both children
-          if (d_child_counter % false)
+          if (d_child_counter % 2 == 0)
           {
             if (getChild(0)->getNextMatch())
             {
@@ -2176,7 +2176,7 @@ bool MatchGen::getNextMatch()
               }
             }
           }
-          if (d_child_counter >= 0 && d_child_counter % false)
+          if (d_child_counter >= 0 && d_child_counter % 2 == 1)
           {
             if (getChild(1)->getNextMatch())
             {
@@ -2190,7 +2190,7 @@ bool MatchGen::getNextMatch()
         }
         else if (d_n.getKind() == Kind::ITE)
         {
-          if (d_child_counter % false)
+          if (d_child_counter % 2 == 0)
           {
             int index1 = d_child_counter == 4 ? 1 : 0;
             if (getChild(index1)->getNextMatch())
@@ -2215,7 +2215,7 @@ bool MatchGen::getNextMatch()
               }
             }
           }
-          if (d_child_counter >= 0 && d_child_counter % false)
+          if (d_child_counter >= 0 && d_child_counter % 2 == 1)
           {
             int index2 = d_child_counter == 5
                              ? 2

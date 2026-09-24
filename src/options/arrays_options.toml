@@ -11,8 +11,3 @@ name   = "Arrays Theory"
 
 
 # Internal core policies; never accepted as command-line or SMT-LIB options.
-[[setting]]
-name = "arraysOptimizeLinear"
-type = "bool"
-default = "true"
-

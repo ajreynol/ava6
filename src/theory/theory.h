@@ -324,7 +324,7 @@ class Theory : protected EnvObj
     // variables have 0 children thus theoryOf is not impacted by whether
     // node is a Boolean term skolem.
     return node.getNumChildren() == 0
-           || theoryOf(node, options().theory.theoryOfMode) != d_id;
+           || theoryOf(node, options().solver.theoryOfMode) != d_id;
   }
 
   /**

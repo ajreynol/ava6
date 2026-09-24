@@ -72,7 +72,6 @@ void NonlinearExtension::preRegisterTerm(TNode n)
 
 void NonlinearExtension::presolve()
 {
-  if (!options().arith.nlExtInitialSignLemmas)
   {
     return;
   }
@@ -125,7 +124,7 @@ void NonlinearExtension::getAssertions(std::vector<Node>& assertions)
     Node lit = assertion.d_assertion;
     
     // if using the bound inference utility
-    if (options().arith.nlRlvAssertBounds && bounds.add(lit, false))
+    if (options().solver.nlRlvAssertBounds && bounds.add(lit, false))
     {
       continue;
     }

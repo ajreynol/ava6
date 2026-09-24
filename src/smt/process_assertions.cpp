@@ -165,7 +165,7 @@ bool ProcessAssertions::apply(AssertionPipeline& ap)
     applyPass("real-to-int", ap);
   }
 
-  if (options().smt.ackermann)
+  if (options().solver.ackermann)
   {
     applyPass("ackermann", ap);
   }
@@ -179,7 +179,7 @@ bool ProcessAssertions::apply(AssertionPipeline& ap)
   
 
   // Unconstrained simplification
-  if (options().smt.unconstrainedSimp)
+  if (options().solver.unconstrainedSimp)
   {
     applyPass("rewrite", ap);
     applyPass("unconstrained-simplifier", ap);
@@ -257,7 +257,7 @@ bool ProcessAssertions::apply(AssertionPipeline& ap)
 
   
 
-  if (options().smt.repeatSimp)
+  if (options().solver.repeatSimp)
   {
     dumpAssertions("assertions::pre-repeat-simplify", ap);
     Trace("assertions::pre-repeat-simplify") << std::endl;
@@ -359,12 +359,12 @@ bool ProcessAssertions::simplifyAssertions(AssertionPipeline& ap)
     Trace("smt") << " assertions     : " << ap.size() << endl;
 
     // Unconstrained simplification
-    if (options().smt.unconstrainedSimp)
+    if (options().solver.unconstrainedSimp)
     {
       applyPass("unconstrained-simplifier", ap);
     }
 
-    if (options().smt.repeatSimp
+    if (options().solver.repeatSimp
         && options().smt.simplificationMode
                != options::SimplificationMode::NONE)
     {

@@ -463,8 +463,10 @@ class LinearEqualityModule
         // Not valid responses
         case Degenerate:
         case FocusShrank: Unreachable();
+      SuppressWrongNoReturnWarning;
       }
       Unreachable();
+      SuppressWrongNoReturnWarning;
     }
     else
     {

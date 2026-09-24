@@ -74,6 +74,7 @@ class AttemptSolutionSDP : public SimplexDecisionProcedure
   Result::Status findModel(AVA6_UNUSED bool exactResult) override
   {
     Unreachable();
+      SuppressWrongNoReturnWarning;
   }
 
  private:

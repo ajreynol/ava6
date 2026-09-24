@@ -153,7 +153,7 @@ Node QuantifiersPreprocess::preSkolemizeQuantifiers(
     }
     else if (polarity)
     {
-      if (options().quantifiers.preSkolemQuantNested)
+      if (options().solver.preSkolemQuantNested)
       {
         std::vector<Node> children;
         children.push_back(n[0]);
@@ -236,7 +236,7 @@ TrustNode QuantifiersPreprocess::preprocess(Node n, bool isInst) const
   Node prev = n;
   if (options().quantifiers.preSkolemQuant != options::PreSkolemQuantMode::OFF)
   {
-    if (!isInst || !options().quantifiers.preSkolemQuantNested)
+    if (!isInst || !options().solver.preSkolemQuantNested)
     {
       Trace("quantifiers-preprocess-debug")
           << "Pre-skolemize " << n << "..." << std::endl;
@@ -248,14 +248,7 @@ TrustNode QuantifiersPreprocess::preprocess(Node n, bool isInst) const
     }
   }
   // pull all quantifiers globally
-  if (options().quantifiers.prenexQuant == options::PrenexQuantMode::NORMAL)
-  {
-    Trace("quantifiers-prenex") << "Prenexing : " << n << std::endl;
-    std::map<Node, Node> visited;
-    n = computePrenexAgg(n, visited);
-    n = rewrite(n);
-    Trace("quantifiers-prenex") << "Prenexing returned : " << n << std::endl;
-  }
+  
   if (n != prev)
   {
     Trace("quantifiers-preprocess") << "Preprocess " << prev << std::endl;

@@ -49,10 +49,7 @@ bool isLemmaPropertyNeedsJustify(LemmaProperty p)
 {
   return (p & LemmaProperty::NEEDS_JUSTIFY) == LemmaProperty::NEEDS_JUSTIFY;
 }
-bool isLemmaPropertyInprocess(LemmaProperty p)
-{
-  return (p & LemmaProperty::INPROCESS) == LemmaProperty::INPROCESS;
-}
+
 bool isLemmaPropertyLocal(LemmaProperty p)
 {
   return (p & LemmaProperty::LOCAL) == LemmaProperty::LOCAL;
@@ -79,10 +76,7 @@ std::ostream& operator<<(std::ostream& out, LemmaProperty p)
     {
       out << " NEEDS_JUSTIFY";
     }
-    if (isLemmaPropertyInprocess(p))
-    {
-      out << " INPROCESS";
-    }
+    
     if (isLemmaPropertyLocal(p))
     {
       out << " LOCAL";

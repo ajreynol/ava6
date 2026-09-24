@@ -910,29 +910,7 @@ TEST_F(TestApiBlackSolver, getModelDomainElements)
 }
 
 
-TEST_F(TestApiBlackSolver, isModelCoreSymbol)
-{
-  d_solver->setOption("produce-models", "true");
-  d_solver->setOption("model-cores", "simple");
-  Term x = d_tm.mkConst(d_uninterpreted, "x");
-  Term y = d_tm.mkConst(d_uninterpreted, "y");
-  Term z = d_tm.mkConst(d_uninterpreted, "z");
-  Term zero = d_tm.mkInteger(0);
-  Term f = d_tm.mkTerm(Kind::NOT, {d_tm.mkTerm(Kind::EQUAL, {x, y})});
-  d_solver->assertFormula(f);
-  d_solver->checkSat();
-  ASSERT_TRUE(d_solver->isModelCoreSymbol(x));
-  ASSERT_TRUE(d_solver->isModelCoreSymbol(y));
-  ASSERT_FALSE(d_solver->isModelCoreSymbol(z));
-  ASSERT_THROW(d_solver->isModelCoreSymbol(zero), Ava6ApiException);
 
-  TermManager tm;
-  Solver slv(tm);
-  slv.setOption("produce-models", "true");
-  slv.checkSat();
-  ASSERT_THROW(slv.isModelCoreSymbol(d_tm.mkConst(d_uninterpreted, "x")),
-               Ava6ApiException);
-}
 
 TEST_F(TestApiBlackSolver, getModel)
 {

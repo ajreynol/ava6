@@ -67,7 +67,7 @@ EoPrinter::EoPrinter(Env& env,
   d_absType = nodeManager()->mkAbstractType(Kind::ABSTRACT_TYPE);
 }
 
-bool EoPrinter::isHandled(const Options& opts, const ProofNode* pfn)
+bool EoPrinter::isHandled(AVA6_UNUSED const Options& opts, const ProofNode* pfn)
 {
   const std::vector<Node> pargs = pfn->getArguments();
   switch (pfn->getRule())

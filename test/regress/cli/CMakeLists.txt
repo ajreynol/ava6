@@ -724,7 +724,6 @@ set(regress_0_tests
   regress0/issue5736.smt2
   regress0/issue5743.smt2
   regress0/issue5947.smt2
-  regress0/issue8834-model-core-nconst.smt2
   regress0/issue9121-theoryof-no-enabled.smt2
   regress0/ite_arith.smt2
   regress0/ite_real_int_type.smtv1.smt2
@@ -748,8 +747,6 @@ set(regress_0_tests
   regress0/logops.03.cvc.smt2
   regress0/logops.04.cvc.smt2
   regress0/logops.05.cvc.smt2
-  regress0/model-core.smt2
-  regress0/model-core-non-implied.smt2
   regress0/models-print-1.smt2
   regress0/models-print-2.smt2
   regress0/named-expr-use.smt2
@@ -2049,7 +2046,6 @@ set(regress_1_tests
   regress1/sets/lemmabug-ListElts317minimized.smt2
   regress1/sets/remove_check_free_31_6.smt2
   regress1/sets/sets-disequal.smt2
-  regress1/sets/set_filter1.smt2
   regress1/sets/sharingbug.smt2
   regress1/simplification_bug4.smt2
   regress1/strings/artemis-0512-nonterm.smt2

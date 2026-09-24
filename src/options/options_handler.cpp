@@ -116,7 +116,7 @@ Language OptionsHandler::stringToLanguage(const std::string& flag,
 {
   if (optarg == "help")
   {
-    *d_options->base.out << R"FOOBAR(
+    *d_options->io.out << R"FOOBAR(
 Languages currently supported as arguments to the -L / --lang option:
   auto                           attempt to automatically determine language
   smt | smtlib | smt2 |
@@ -246,7 +246,7 @@ void OptionsHandler::enableTraceTag(AVA6_UNUSED const std::string& flag,
   {
     if (optarg == "help")
     {
-      d_options->write_driver().showTraceTags = true;
+      d_options->io.showTraceTags = true;
       showTraceTags("", true);
       return;
     }
@@ -266,7 +266,7 @@ void OptionsHandler::enableOutputTag(AVA6_UNUSED const std::string& flag,
                                      const OutputTag optarg) const
 {
   const size_t tagid = static_cast<size_t>(optarg);
-  Assert(d_options->base.outputTagHolder.size() > tagid)
+  Assert(d_options->io.outputTagHolder.size() > tagid)
       << "Output tag is larger than the bitset that holds it.";
   d_options->write_base().outputTagHolder.set(tagid);
 }
@@ -298,7 +298,7 @@ void OptionsHandler::showConfiguration(AVA6_UNUSED const std::string& flag,
                                        const bool value) const
 {
   if (!value) return;
-  std::ostream& o = d_options->base.out;
+  std::ostream& o = d_options->io.out;
   print_config(o, "package", Configuration::getPackageName());
   print_config(o, "version", Configuration::getVersionString());
   if (Configuration::isGitBuild())
@@ -342,14 +342,14 @@ void OptionsHandler::showCopyright(AVA6_UNUSED const std::string& flag,
                                    const bool value) const
 {
   if (!value) return;
-  d_options->base.out << Configuration::copyright() << std::endl;
+  d_options->io.out << Configuration::copyright() << std::endl;
 }
 
 void OptionsHandler::showVersion(AVA6_UNUSED const std::string& flag,
                                  const bool value) const
 {
   if (!value) return;
-  d_options->base.out << Configuration::aboutAndCopyright() << std::endl;
+  d_options->io.out << Configuration::aboutAndCopyright() << std::endl;
 }
 
 void OptionsHandler::showTraceTags(AVA6_UNUSED const std::string& flag,
@@ -360,7 +360,7 @@ void OptionsHandler::showTraceTags(AVA6_UNUSED const std::string& flag,
   {
     throw OptionException("trace tags not available in non-tracing build");
   }
-  printTags(d_options->base.out, Configuration::getTraceTags());
+  printTags(d_options->io.out, Configuration::getTraceTags());
 }
 
 void OptionsHandler::strictParsing(AVA6_UNUSED const std::string& flag,
@@ -368,11 +368,11 @@ void OptionsHandler::strictParsing(AVA6_UNUSED const std::string& flag,
 {
   if (value)
   {
-    d_options->write_parser().parsingMode = options::ParsingMode::STRICT;
+    d_options->io.parsingMode = options::ParsingMode::STRICT;
   }
-  else if (d_options->parser.parsingMode == options::ParsingMode::STRICT)
+  else if (d_options->io.parsingMode == options::ParsingMode::STRICT)
   {
-    d_options->write_parser().parsingMode = options::ParsingMode::DEFAULT;
+    d_options->io.parsingMode = options::ParsingMode::DEFAULT;
   }
 }
 

@@ -25,7 +25,6 @@
 #include "smt/env.h"
 #include "theory/arith/arith_proof_utilities.h"
 #include "theory/arith/arith_utilities.h"
-#include "theory/arith/linear/congruence_manager.h"
 #include "theory/arith/linear/normal_form.h"
 #include "theory/arith/linear/partial_model.h"
 #include "theory/builtin/proof_checker.h"
@@ -1038,7 +1037,6 @@ ConstraintP Constraint::makeNegation(ArithVar v,
 
 ConstraintDatabase::ConstraintDatabase(Env& env,
                                        const ArithVariables& avars,
-                                       ArithCongruenceManager& cm,
                                        RaiseConflict raiseConflict,
                                        EagerProofGenerator* pfGen)
     : EnvObj(env),
@@ -1047,7 +1045,6 @@ ConstraintDatabase::ConstraintDatabase(Env& env,
       d_antecedents(context(), false),
       d_watches(new Watches(context(), userContext())),
       d_avariables(avars),
-      d_congruenceManager(cm),
       d_pfGen(pfGen),
       d_pnm(d_env.isTheoryProofProducing() ? d_env.getProofNodeManager()
                                            : nullptr),

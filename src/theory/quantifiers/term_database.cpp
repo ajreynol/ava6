@@ -582,7 +582,7 @@ bool TermDb::hasTermCurrent(const Node& n, bool useMode) const
   return false;
 }
 
-bool TermDb::isTermEligibleForInstantiation(TNode n, TNode f)
+bool TermDb::isTermEligibleForInstantiation(TNode n, AVA6_UNUSED TNode f)
 {
   
   // it cannot have instantiation constants, which originate from
@@ -649,7 +649,7 @@ void TermDb::setHasTerm(Node n)
 
 void TermDb::presolve() {}
 
-bool TermDb::reset(Theory::Effort effort)
+bool TermDb::reset(AVA6_UNUSED Theory::Effort effort)
 {
   d_op_nonred_count.clear();
   d_arg_reps.clear();

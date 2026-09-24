@@ -218,17 +218,6 @@ enum ENUM(SkolemId)
    */
   EVALUE(ARITH_VTS_INFINITY_FREE),
   /**
-   * The higher-order diff skolem, which is the witness k for the inference
-   * ``(=> (not (= A B)) (not (= (A k1 ... kn) (B k1 ... kn))))``.
-   *
-   * - Number of skolem indices: ``3``
-   *   - ``1:`` The first function of sort ``(-> T1 ... Tn T)``.
-   *   - ``2:`` The second function of sort ``(-> T1 ... Tn T)``.
-   *   - ``3:`` The argument index i.
-   * - Sort: ``Ti``
-   */
-  EVALUE(HO_DEQ_DIFF),
-  /**
    * The n^th skolem for the negation of universally quantified formula Q.
    *
    * - Number of skolem indices: ``2``
@@ -636,66 +625,6 @@ enum ENUM(SkolemId)
    * - Sort: ``E``
    */
   EVALUE(SETS_DEQ_DIFF),
-  /**
-   * An uninterpreted function for set.fold operator:
-   * To compute ``(set.fold f t A)``, we need to guess the cardinality n of
-   * set A using a skolem function with SETS_FOLD_CARD id.
-   *
-   * - Number of skolem indices: ``1``
-   *   - ``1:`` the set argument A.
-   * - Sort: ``Int``
-   */
-  EVALUE(SETS_FOLD_CARD),
-  /**
-   * An uninterpreted function for set.fold operator:
-   * To compute ``(set.fold f t A)``, we need a function that
-   * accumulates intermediate values. We call this function
-   * combine of type Int -> T2 where:
-   * combine(0) = t
-   * combine(i) = f(elements(i), combine(i - 1)) for 1 <= i <= n
-   * elements: a skolem function for (set.fold f t A)
-   *           see SETS_FOLD_ELEMENTS
-   * n: is the cardinality of A
-   * T2: is the type of initial value t
-   *
-   * - Number of skolem indices: ``3``
-   *   - ``1:`` the function f of type ``(-> T1 T2)``.
-   *   - ``2:`` the initial value t of type ``T2``.
-   *   - ``3:`` the set argument A of type ``(Set T1)``.
-   * - Sort: ``(-> Int T2)``
-   */
-  EVALUE(SETS_FOLD_COMBINE),
-  /**
-   * An uninterpreted function for set.fold operator:
-   * To compute ``(set.fold f t A)``, we need a function for
-   * elements of A. We call this function
-   * elements of type ``(-> Int T)`` where T is the type of
-   * elements of A.
-   * If the cardinality of A is n, then
-   * A is the union of {elements(i)} for 1 <= i <= n.
-   * See SETS_FOLD_UNION_DISJOINT.
-   *
-   * - Number of skolem indices: ``1``
-   *   - ``1:`` a set argument A of type ``(Set T)``.
-   * - Sort: ``(-> Int T)``
-   */
-  EVALUE(SETS_FOLD_ELEMENTS),
-  /**
-   * An uninterpreted function for set.fold operator:
-   * To compute ``(set.fold f t A)``, we need a function for
-   * elements of A which is given by elements defined in
-   * SETS_FOLD_ELEMENTS.
-   * We also need unionFn: ``(-> Int (Set E))`` to compute
-   * the union such that:
-   * unionFn(0) = set.empty
-   * unionFn(i) = union of {elements(i)} and unionFn (i-1)
-   * unionFn(n) = A
-   *
-   * - Number of skolem indices: ``1``
-   *   - ``1:`` a set argument A of type ``(Set E)``.
-   * - Sort: ``(-> Int (Set E))``
-   */
-  EVALUE(SETS_FOLD_UNION),
   /**
    * A skolem variable that is unique per terms ``(set.map f A)``, y which is an
    * element in ``(set.map f A)``. The skolem is constrained to be an element in

@@ -59,24 +59,6 @@ name   = "SMT Layer"
   help       = "use subsolver to compute values when applicable in calls to get-value and check-models"
 
 [[option]]
-  name       = "modelCoresMode"
-  category   = "regular"
-  long       = "model-cores=MODE"
-  type       = "ModelCoresMode"
-  default    = "NONE"
-  help       = "mode for producing model cores"
-  help_mode  = "Model cores modes."
-[[option.mode.NONE]]
-  name = "none"
-  help = "Do not compute model cores."
-[[option.mode.SIMPLE]]
-  name = "simple"
-  help = "Only include a subset of variables whose values are sufficient to show the input formula is satisfied by the given model."
-[[option.mode.NON_IMPLIED]]
-  name = "non-implied"
-  help = "Only include a subset of variables whose values, in addition to the values of variables whose values are implied, are sufficient to show the input formula is satisfied by the given model."
-
-[[option]]
   name       = "produceProofs"
   category   = "common"
   long       = "produce-proofs"
@@ -125,14 +107,6 @@ name   = "SMT Layer"
   help       = "turn on unsat assumptions generation"
 
 [[option]]
-  name       = "checkSynthSol"
-  category   = "common"
-  long       = "check-synth-sol"
-  type       = "bool"
-  default    = "false"
-  help       = "checks whether produced solutions to functions-to-synthesize satisfy the conjecture"
-
-[[option]]
   name       = "produceAssignments"
   category   = "regular"
   long       = "produce-assignments"
@@ -156,50 +130,4 @@ name   = "SMT Layer"
   type       = "bool"
   default    = "false"
   help       = "attempt to solve a pure real satisfiable problem as an integer problem (for non-linear)"
-
-[[setting]]
-name = "ackermann"
-type = "bool"
-default = "false"
-
-[[setting]]
-name = "modelVarElimUneval"
-type = "bool"
-default = "true"
-
-[[setting]]
-name = "proofMode"
-type = "ProofMode"
-default = "OFF"
-[[setting.mode.OFF]]
-name = "off"
-[[setting.mode.PP_ONLY]]
-name = "pp-only"
-[[setting.mode.SAT]]
-name = "sat-proof"
-[[setting.mode.FULL]]
-name = "full-proof"
-[[setting.mode.FULL_STRICT]]
-name = "full-proof-strict"
-
-[[setting]]
-name = "unsatCoresMode"
-type = "UnsatCoresMode"
-default = "OFF"
-[[setting.mode.OFF]]
-name = "off"
-[[setting.mode.SAT_PROOF]]
-name = "sat-proof"
-[[setting.mode.ASSUMPTIONS]]
-name = "assumptions"
-
-[[setting]]
-name = "unconstrainedSimp"
-type = "bool"
-default = "false"
-
-[[setting]]
-name = "repeatSimp"
-type = "bool"
-default = "false"
 

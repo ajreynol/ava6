@@ -2402,7 +2402,7 @@ bool QuantifiersRewriter::doOperation(Node q,
       return false;
     }
 
-    return d_opts.quantifiers.prenexQuant != options::PrenexQuantMode::NONE
+    return d_opts.solver.prenexQuant != options::PrenexQuantMode::NONE
            && d_opts.quantifiers.miniscopeQuant
                   != options::MiniscopeQuantMode::AGG
            && is_std;
@@ -2436,14 +2436,7 @@ Node QuantifiersRewriter::computeOperation(Node f,
   }
   else if (computeOption == COMPUTE_MINISCOPING)
   {
-    if (d_opts.quantifiers.prenexQuant == options::PrenexQuantMode::NORMAL)
-    {
-      if (!qa.d_qid_num.isNull())
-      {
-        // already processed this, return self
-        return f;
-      }
-    }
+    
     bool miniscopeConj = doMiniscopeConj(d_opts);
     bool miniscopeFv = doMiniscopeFv(d_opts);
     // return directly
@@ -2474,12 +2467,6 @@ Node QuantifiersRewriter::computeOperation(Node f,
   }
   else if (computeOption == COMPUTE_PRENEX)
   {
-    if (d_opts.quantifiers.prenexQuant == options::PrenexQuantMode::NORMAL)
-    {
-      // will rewrite at preprocess time
-      return f;
-    }
-    else
     {
       std::vector<Node> argsSet, nargsSet;
       n = computePrenex(f, n, argsSet, nargsSet, true, false);

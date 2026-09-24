@@ -38,8 +38,6 @@ class LinearSolver : protected EnvObj
                TheoryState& ts,
                InferenceManager& im,
                BranchAndBound& bab);
-  /** finish initialize */
-  void finishInit(eq::EqualityEngine* ee);
   /**
    * Does non-context dependent setup for a node connected to a theory.
    */
@@ -101,9 +99,6 @@ class LinearSolver : protected EnvObj
    * setModelUnsound should be called on the output channel of TheoryArith.
    */
   bool foundNonlinear() const;
-
-  /** get the congruence manager, if we are using one */
-  ArithCongruenceManager* getCongruenceManager();
 
   //======================
   bool outputTrustedLemma(TrustNode lemma, InferenceId id);

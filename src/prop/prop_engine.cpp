@@ -270,7 +270,7 @@ void PropEngine::assertInternal(theory::InferenceId id,
   if (isProofEnabled())
   {
     if (input
-        && options().smt.unsatCoresMode == options::UnsatCoresMode::ASSUMPTIONS)
+        && options().solver.unsatCoresMode == options::UnsatCoresMode::ASSUMPTIONS)
     {
       // use the proof CNF stream to ensure the literal
       d_ppm->ensureLiteral(node);
@@ -282,7 +282,7 @@ void PropEngine::assertInternal(theory::InferenceId id,
     }
   }
   else if (input
-           && options().smt.unsatCoresMode
+           && options().solver.unsatCoresMode
                   == options::UnsatCoresMode::ASSUMPTIONS)
   {
     d_cnfStream->ensureLiteral(node);
@@ -783,7 +783,7 @@ bool PropEngine::isProofEnabled() const { return d_ppm != nullptr; }
 
 void PropEngine::getUnsatCore(std::vector<Node>& core)
 {
-  if (options().smt.unsatCoresMode == options::UnsatCoresMode::ASSUMPTIONS)
+  if (options().solver.unsatCoresMode == options::UnsatCoresMode::ASSUMPTIONS)
   {
     Trace("unsat-core") << "PropEngine::getUnsatCore: via unsat assumptions"
                         << std::endl;

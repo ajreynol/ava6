@@ -27,10 +27,6 @@ LinearSolver::LinearSolver(Env& env,
 {
 }
 
-void LinearSolver::finishInit(eq::EqualityEngine* ee)
-{
-  d_internal.finishInit(ee);
-}
 void LinearSolver::preRegisterTerm(TNode n) { d_internal.preRegisterTerm(n); }
 void LinearSolver::propagate() { d_internal.propagate(); }
 
@@ -82,11 +78,6 @@ bool LinearSolver::foundNonlinear() const
 {
   return d_internal.foundNonlinear();
 }
-ArithCongruenceManager* LinearSolver::getCongruenceManager()
-{
-  return d_internal.getCongruenceManager();
-}
-
 bool LinearSolver::outputTrustedLemma(TrustNode lemma, InferenceId id)
 {
   return d_im.trustedLemma(lemma, id);

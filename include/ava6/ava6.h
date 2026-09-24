@@ -4826,22 +4826,6 @@ class AVA6_EXPORT Solver
   std::vector<Term> getModelDomainElements(const Sort& s) const;
 
   /**
-   * Determine if the model value of the given free constant was essential for
-   * showing satisfiability of the last `checkSat()` query based on the current
-   * model.
-   *
-   * For any free constant `v`, this will only return false if
-   * \verbatim embed:rst:inline :ref:`model-cores
-   * <lbl-option-model-cores>`\endverbatim
-   * has been set to true.
-   * @warning This function is experimental and may change in future versions.
-   *
-   * @param v The term in question.
-   * @return True if `v` is a model core symbol.
-   */
-  bool isModelCoreSymbol(const Term& v) const;
-
-  /**
    * Get the model
    *
    * SMT-LIB:

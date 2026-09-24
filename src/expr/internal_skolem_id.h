@@ -43,8 +43,6 @@ enum class InternalSkolemId
    * first order datatype variable for f.
    */
   QUANTIFIERS_SYNTH_FUN_EMBED,
-  /** Higher-order type match predicate, see HoTermDb */
-  HO_TYPE_MATCH_PRED,
   /** Input variables for MBQI */
   MBQI_INPUT,
   /** Choice functions for mbqi-enum */

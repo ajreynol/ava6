@@ -170,7 +170,11 @@ Node UfProofRuleChecker::checkInternal(ProofRule id,
   }
   if (id == ProofRule::HO_CONG)
   {
-    Kind k = Kind::APPLY_UF;
+    Kind k;
+    if (args.size() != 1 || !getKind(args[0], k) || k != Kind::APPLY_UF)
+    {
+      return Node::null();
+    }
     std::vector<Node> lchildren;
     std::vector<Node> rchildren;
     for (size_t i = 0, nchild = children.size(); i < nchild; ++i)

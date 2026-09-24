@@ -49,6 +49,7 @@
  */
 
 #include "ava6_private.h"
+#include "theory/arith/linear/error_set.h"
 
 #pragma once
 
@@ -133,7 +134,7 @@ class SimplexDecisionProcedure : protected EnvObj
    * cached here to allow for single runs with a different (lower) limit.
    */
   int64_t d_varOrderPivotLimit =
-      options().arith.arithStandardCheckVarOrderPivots;
+      options().solver.arithStandardCheckVarOrderPivots;
 
   ArithVar constructInfeasiblityFunction(TimerStat& timer);
   ArithVar constructInfeasiblityFunction(TimerStat& timer, ArithVar e);

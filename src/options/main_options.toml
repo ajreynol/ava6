@@ -144,8 +144,3 @@ name   = "Driver"
   help       = "print the \"success\" output required of SMT-LIBv2"
 
 # Internal core policies; never accepted as command-line or SMT-LIB options.
-[[setting]]
-name = "showTraceTags"
-type = "bool"
-default = "false"
-
