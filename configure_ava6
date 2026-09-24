@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: ./configure_ava6 {production|debug} [configure.sh arguments]
+
+production (aliases: prod, unrestricted): optimized build, tracing enabled
+debug: assertions, debug symbols, tracing, and unit tests
+
+AVA6_BUILD_ROOT overrides the build root (production: /tmp/$USER;
+debug: /dev/shm/$USER/cmake). AVA6_INSTALL_ROOT defaults to /tmp/$USER/install.
+Each root contains a separate CHECKOUT/BUILD_TYPE directory.
+AVA6_BIN_DIR defaults to ~/bin; the generated run_install.sh copies the
+installed ava6 executable there as ava6 or d-ava6 (with any checkout suffix).
+--name=DIR and --prefix=DIR override the individual build/install directories.
+EOF
+}
+
+case "${1:-}" in
+  production|prod|unrestricted) build_type=production ;;
+  debug) build_type=debug ;;
+  --help|-h) usage; exit 0 ;;
+  *) usage >&2; exit 2 ;;
+esac
+shift
+
+source_dir=$(pwd -P)
+if [[ ! -x "$source_dir/configure.sh" || ! -f "$source_dir/CMakeLists.txt" ]] \
+   || [[ "$(git rev-parse --show-toplevel 2>/dev/null)" != "$source_dir" ]]; then
+  echo 'configure_ava6: run from the ava6 checkout root' >&2
+  exit 1
+fi
+checkout=${source_dir##*/}
+case "$checkout" in
+  ava6) source_suffix= ;;
+  ava6-*) source_suffix=${checkout#ava6-}- ;;
+  *) echo 'configure_ava6: expected an ava6 or ava6-* checkout' >&2; exit 1 ;;
+esac
+
+local_user=${USER:-$(id -un)}
+if [[ $build_type == debug ]]; then
+  default_build_root="/dev/shm/$local_user/cmake"
+  binary_name="d-${source_suffix}ava6"
+  unit_testing=ON
+else
+  default_build_root="/tmp/$local_user"
+  binary_name="${source_suffix}ava6"
+  unit_testing=OFF
+fi
+build_dir="${AVA6_BUILD_ROOT:-$default_build_root}/$checkout/$build_type"
+install_dir="${AVA6_INSTALL_ROOT:-/tmp/$local_user/install}/$checkout/$build_type"
+bin_dir="${AVA6_BIN_DIR:-$HOME/bin}"
+
+extra_args=()
+for arg in "$@"; do
+  case "$arg" in
+    --name=*) build_dir=${arg#*=} ;;
+    --prefix=*|-DCMAKE_INSTALL_PREFIX=*|-DCMAKE_INSTALL_PREFIX:PATH=*)
+      install_dir=${arg#*=} ;;
+    *) extra_args+=("$arg") ;;
+  esac
+done
+# Helpers work from any directory, including when relative overrides are used.
+[[ $build_dir = /* ]] || build_dir="$source_dir/$build_dir"
+[[ $install_dir = /* ]] || install_dir="$source_dir/$install_dir"
+[[ $bin_dir = /* ]] || bin_dir="$source_dir/$bin_dir"
+
+# "unrestricted" is only a legacy build-name alias; ava6 has no solver profiles.
+configure_args=(
+  "$build_type" "--name=$build_dir" "--prefix=$install_dir" --auto-download
+  -DBUILD_SHARED_LIBS=OFF -DSTATIC_BINARY=OFF -DENABLE_TRACING=ON
+  "-DENABLE_UNIT_TESTING=$unit_testing"
+  "${extra_args[@]}"
+)
+printf 'Configuring %s in %s\n' "$build_type" "$build_dir"
+"$source_dir/configure.sh" "${configure_args[@]}"
+
+# Use CMake/CTest so the helpers also work with --ninja. Configuration arguments
+# belong above; only arguments supplied to a helper are forwarded by that helper.
+{
+  printf '#!/usr/bin/env bash\nset -euo pipefail\n'
+  printf 'build_dir=%q\ninstall_dir=%q\nbin_dir=%q\nbinary_name=%q\n' \
+    "$build_dir" "$install_dir" "$bin_dir" "$binary_name"
+  cat <<'EOF'
+cmake --build "$build_dir" --parallel "${AVA6_JOBS:-20}" "$@"
+cmake --install "$build_dir" --prefix "$install_dir"
+mkdir -p "$bin_dir"
+cp "$install_dir/bin/ava6" "$bin_dir/$binary_name"
+printf 'Installed %s\n' "$bin_dir/$binary_name"
+EOF
+} > "$build_dir/run_install.sh"
+
+{
+  printf '#!/usr/bin/env bash\nset -euo pipefail\n'
+  printf 'build_dir=%q\n' "$build_dir"
+  cat <<'EOF'
+# Arguments are CTest arguments; use AVA6_REGRESSION_ARGS for solver options.
+cmake --build "$build_dir" --target build-regress --parallel "${AVA6_JOBS:-20}"
+ctest --test-dir "$build_dir" --output-on-failure -L 'regress[0-2]' \
+  --parallel "${AVA6_JOBS:-20}" "$@"
+EOF
+} > "$build_dir/run_regress.sh"
+chmod +x "$build_dir/run_install.sh" "$build_dir/run_regress.sh"
+printf 'Helpers: %s/run_install.sh and %s/run_regress.sh\n' "$build_dir" "$build_dir"
