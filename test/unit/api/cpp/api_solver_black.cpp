@@ -284,7 +284,8 @@ TEST_F(TestApiBlackSolver, declareFun)
   ASSERT_NO_THROW(d_solver->declareFun("f3", {bvSort, d_int}, bvSort));
   ASSERT_THROW(d_solver->declareFun("f2", {}, funSort), Ava6ApiException);
   // functions as arguments is allowed
-  ASSERT_NO_THROW(d_solver->declareFun("f4", {bvSort, funSort}, bvSort));
+  ASSERT_THROW(d_solver->declareFun("f4", {bvSort, funSort}, bvSort),
+               Ava6ApiException);
   ASSERT_THROW(d_solver->declareFun("f5", {bvSort, bvSort}, funSort),
                Ava6ApiException);
 
@@ -320,7 +321,6 @@ TEST_F(TestApiBlackSolver, defineFun)
   Sort funSort = d_tm.mkFunctionSort({d_uninterpreted}, d_int);
   Term b1 = d_tm.mkVar(bvSort, "b1");
   Term b2 = d_tm.mkVar(d_int, "b2");
-  Term b3 = d_tm.mkVar(funSort, "b3");
   Term v1 = d_tm.mkConst(bvSort, "v1");
   Term v2 = d_tm.mkConst(funSort, "v2");
   ASSERT_NO_THROW(d_solver->defineFun("f", {}, bvSort, v1));
@@ -330,8 +330,6 @@ TEST_F(TestApiBlackSolver, defineFun)
   ASSERT_THROW(d_solver->defineFun("fff", {b1}, bvSort, v2), Ava6ApiException);
   ASSERT_THROW(d_solver->defineFun("ffff", {b1}, funSort, v2),
                Ava6ApiException);
-  // b3 has function sort, which is allowed as an argument
-  ASSERT_NO_THROW(d_solver->defineFun("fffff", {b1, b3}, bvSort, v1));
 
   TermManager tm;
   Solver slv(tm);
@@ -381,7 +379,6 @@ TEST_F(TestApiBlackSolver, defineFunRec)
   Term b1 = d_tm.mkVar(bvSort, "b1");
   Term b11 = d_tm.mkVar(bvSort, "b1");
   Term b2 = d_tm.mkVar(d_int, "b2");
-  Term b3 = d_tm.mkVar(funSort2, "b3");
   Term v1 = d_tm.mkConst(bvSort, "v1");
   Term v2 = d_tm.mkConst(d_int, "v2");
   Term v3 = d_tm.mkConst(funSort2, "v3");
@@ -397,8 +394,6 @@ TEST_F(TestApiBlackSolver, defineFunRec)
                Ava6ApiException);
   ASSERT_THROW(d_solver->defineFunRec("ffff", {b1}, funSort2, v3),
                Ava6ApiException);
-  // b3 has function sort, which is allowed as an argument
-  ASSERT_NO_THROW(d_solver->defineFunRec("fffff", {b1, b3}, bvSort, v1));
   ASSERT_THROW(d_solver->defineFunRec(f1, {b1}, v1), Ava6ApiException);
   ASSERT_THROW(d_solver->defineFunRec(f1, {b1, b11}, v2), Ava6ApiException);
   ASSERT_THROW(d_solver->defineFunRec(f1, {b1, b11}, v3), Ava6ApiException);

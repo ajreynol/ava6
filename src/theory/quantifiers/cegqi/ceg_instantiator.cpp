@@ -288,10 +288,7 @@ CegHandledStatus CegInstantiator::isCbqiQuant(Node q, bool cegqiAll)
   {
     return CEG_HANDLED;
   }
-  if (qa.d_sygus)
-  {
-    return CEG_UNHANDLED;
-  }
+
   Assert(!qa.d_quant_elim_partial);
   // if has an instantiation pattern, don't do it
   if (q.getNumChildren() == 3)

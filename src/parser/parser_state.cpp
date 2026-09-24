@@ -519,14 +519,10 @@ Term ParserState::applyTypeAscription(Term t, Sort s)
   }
   else if (k == Kind::APPLY_CONSTRUCTOR)
   {
-    // For nullable.null we do not have a kind.
-    // so we need to check the sort here.
-    {
-      std::vector<Term> children(t.begin(), t.end());
-      // apply type ascription to the operator and reconstruct
-      children[0] = applyTypeAscription(children[0], s);
-      t = d_tm.mkTerm(Kind::APPLY_CONSTRUCTOR, children);
-    }
+    std::vector<Term> children(t.begin(), t.end());
+    // Apply type ascription to the operator and reconstruct.
+    children[0] = applyTypeAscription(children[0], s);
+    t = d_tm.mkTerm(Kind::APPLY_CONSTRUCTOR, children);
   }
   Sort etype = t.getSort();
   if (etype.isDatatypeConstructor())

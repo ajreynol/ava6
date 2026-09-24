@@ -59,7 +59,6 @@ class DecisionManager
     //  other words, if these strategies did not go first, we might answer
     //  "sat" for problems that are unsat.
     STRAT_QUANT_CEGQI_FEASIBLE,
-    STRAT_QUANT_SYGUS_FEASIBLE,
     // placeholder for last model-sound required strategy
     STRAT_LAST_M_SOUND,
 
@@ -68,15 +67,8 @@ class DecisionManager
     //  other words, if these strategies did not go before other decisions, we
     //  might be non-terminating instead of answering "sat" with a solution
     //  within a given a bound.
-    STRAT_ORACLE_ARG_VALUE,
-    STRAT_UF_COMBINED_CARD,
-    STRAT_UF_CARD,
-    STRAT_DT_SYGUS_ENUM_ACTIVE,
-    STRAT_DT_SYGUS_ENUM_SIZE,
     STRAT_STRINGS_SUM_LENGTHS,
     STRAT_QUANT_BOUND_INT_SIZE,
-    STRAT_QUANT_CEGIS_UNIF_NUM_ENUMS,
-    STRAT_SEP_NEG_GUARD,
     // placeholder for last finite-model-complete required strategy
     STRAT_LAST_FM_COMPLETE,
 

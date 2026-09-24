@@ -112,11 +112,8 @@ void TheoryDatatypes::finishInit()
   d_equalityEngine->addFunctionKind(Kind::APPLY_CONSTRUCTOR);
   d_equalityEngine->addFunctionKind(Kind::APPLY_SELECTOR);
   d_equalityEngine->addFunctionKind(Kind::APPLY_TESTER);
-  // We could but don't do congruence for DT_SIZE and DT_HEIGHT_BOUND here.
   // It also could make sense in practice to do congruence for APPLY_UF, but
   // this is not done.
-  // Enable the sygus extension if we will introduce sygus datatypes. This
-  // is the case for sygus problems and when using sygus-inst.
 
   // testers are not relevant for model building
   d_valuation.setIrrelevantKind(Kind::APPLY_TESTER);
@@ -272,7 +269,6 @@ void TheoryDatatypes::notifyFact(TNode atom,
 {
   Trace("datatypes-debug") << "TheoryDatatypes::assertFact : " << fact
                            << ", isInternal = " << isInternal << std::endl;
-  // could be sygus-specific
 
   // add to tester if applicable
   Node t_arg;

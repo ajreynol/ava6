@@ -162,7 +162,7 @@ Node TheoryUfRewriter::rewriteViaRule(ProofRewriteRule id, const Node& n)
       {
         lambda = uf::FunctionConst::toLambda(n.getOperator());
       }
-      
+
       if (lambda.isNull())
       {
         return Node::null();
@@ -233,10 +233,8 @@ Node TheoryUfRewriter::rewriteViaRule(ProofRewriteRule id, const Node& n)
           // We compare against the original lambda, if it is different, then
           // we use the version (lambdaElimS) where shadowing is eliminated.
           Node lambdaElimS = ElimShadowNodeConverter::eliminateShadow(lambda);
-          // Note that a more comprehensive test here would be to check if the
-          // lambda rewrites at all and convert to HO_APPLY for uniformity.
-          // This is not necessary as we only need to be sure that the topmost
-          // variables are not shadowed. Moreover, we avoid "value
+          // We only need to ensure that the topmost variables are not
+          // shadowed. Moreover, we avoid "value
           // normalization" for lambdas in first-order logics by allowing beta
           // reduction to apply to non-rewritten lambdas. This makes solving
           // and proofs more complex, as it rewrites user provided define-fun
@@ -251,13 +249,13 @@ Node TheoryUfRewriter::rewriteViaRule(ProofRewriteRule id, const Node& n)
           }
         }
       }
-      
+
       if (lambda.isNull())
       {
         return Node::null();
       }
       Node body = lambda[1];
-      
+
       // get the free variables of the arguments
       std::unordered_set<Node> fvs;
       for (TNode a : args)
@@ -347,8 +345,6 @@ Node TheoryUfRewriter::rewriteViaRule(ProofRewriteRule id, const Node& n)
   }
   return Node::null();
 }
-
-bool TheoryUfRewriter::canUseAsApplyUfOperator(TNode n) { return n.isVar(); }
 
 Node TheoryUfRewriter::rewriteLambda(Node node)
 {
@@ -480,7 +476,7 @@ Node TheoryUfRewriter::canEliminateLambda(AVA6_UNUSED NodeManager* nm, const Nod
       if (matchesList)
       {
         Node ret = node[1].getOperator();
-        
+
         return ret;
       }
     }

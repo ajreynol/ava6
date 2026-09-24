@@ -37,15 +37,12 @@ enum class IncompleteId
   ARITH_NL,
   // the floating-point solver could not refine a conversion abstraction,
   // e.g. because model values for its arguments were unavailable
-  FP_ABSTRACTION_REFINEMENT,
   // incomplete due to lack of a complete quantifiers strategy
   QUANTIFIERS,
   // (refutation unsound) we failed to verify the correctness of a candidate
   // solution in SyGuS and blocked it to make progress
-  QUANTIFIERS_SYGUS_NO_VERIFY,
   // (refutation unsound) we are generalizing any-constants when blocking with
   // smart enumeration
-  QUANTIFIERS_SYGUS_SMART_BLOCK_ANY_CONSTANT,
   // incomplete due to counterexample-guided instantiation not being complete
   QUANTIFIERS_CEGQI,
   // incomplete due to bounded-quantifier model checking
@@ -56,14 +53,11 @@ enum class IncompleteId
   QUANTIFIERS_MAX_INST_ROUNDS,
   // we solved a negated synthesis conjecture and will terminate as a subsolver
   // with unknown
-  QUANTIFIERS_SYGUS_SOLVED,
   // we failed to construct a grammar for a function-to-synthesize
   QUANTIFIERS_SYGUS_NO_WF_GRAMMAR,
   // incomplete due to separation logic
-  SEP,
   // Higher order operators like sets.map were used in combination with set
   // cardinality constraints
-  SETS_HO_CARD,
   // relations were used in combination with set cardinality constraints
   SETS_RELS_CARD,
   // finite model finding used in combination with set cardinality constraints
@@ -76,7 +70,6 @@ enum class IncompleteId
   // when finite model finding is enabled, uninterpreted sorts have a
   // cardinality that depends on their interpretation in the current model).
   // HO extensionality axiom was disabled
-  UF_HO_EXT_DISABLED,
   // UF+cardinality solver was disabled
   // UF+cardinality solver used in an incomplete mode
 

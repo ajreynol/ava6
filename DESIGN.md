@@ -24,8 +24,7 @@ including `Grammar`, `SynthResult`, and synthesis queries, is deleted.
 Quantifier elimination, abduction, interpolation, oracle, and separation-logic
 queries are also deleted from the public solver API. Their parser commands and
 internal solver entry points are removed together. Ordinary quantified SMT
-solving remains supported. Future API experiments can remove the remaining
-compatibility metadata for excluded theories.
+solving remains supported.
 Term and sort construction belongs to `TermManager`. Every `Solver` requires
 an explicit term manager; the deprecated forwarding methods on `Solver` and
 its implicit thread-local term manager are removed.
@@ -72,7 +71,9 @@ input or solving.
 
 ## Options and internal policies
 
-`[[option]]` entries define the configurable interface. Expert options and
+`[[option]]` entries define the configurable interface. The category-summary
+command and no-support classifications are removed; all retained options are
+supported. Expert options and
 `[[setting]]` entries, including generator support, are removed. Fixed algorithm
 choices live in their implementations, with unused branches deleted.
 [solver_config.h](src/options/solver_config.h) holds only configuration derived
@@ -89,7 +90,10 @@ GMP and CaDiCaL are retained. CaDiCaL is the only SAT backend; Minisat and
 backend selection are removed. The central equality engine is the sole
 architecture: applicable theories share its facts and receive its notifications.
 There are no per-theory solving equality engines or master-engine forwarding.
-Model construction still has its own equality engine.
+Model construction still has its own equality engine. The retained regression
+`regress1/nl/nl_uf_lalt.smt2` currently exceeds a 120-second timeout with this
+architecture, both in Ava6 and in the upstream checkout with central equality
+selected. It remains in the suite as a known performance issue.
 Nonlinear arithmetic uses the retained extension solver and is still incomplete
 on some inputs. The rational implementation of real algebraic number storage is
 retained without libpoly.

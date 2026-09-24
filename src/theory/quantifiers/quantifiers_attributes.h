@@ -36,12 +36,6 @@ struct QuantElimPartialAttributeId
 typedef expr::Attribute<QuantElimPartialAttributeId, bool>
     QuantElimPartialAttribute;
 
-/** Attribute true for quantifiers that are SyGus conjectures */
-struct SygusAttributeId
-{
-};
-typedef expr::Attribute<SygusAttributeId, bool> SygusAttribute;
-
 /**
  * Attribute set to the name of the binary for quantifiers that are oracle
  * interfaces. In detail, an oracle interface is a quantified formula of the
@@ -69,40 +63,6 @@ struct QuantNameAttributeId
 };
 typedef expr::Attribute<QuantNameAttributeId, bool> QuantNameAttribute;
 
-/** Attribute for setting printing information for sygus variables
- *
- * For variable d of sygus datatype type, if
- * d.getAttribute(SygusPrintProxyAttribute) = t, then printing d will print t.
- */
-struct SygusPrintProxyAttributeId
-{
-};
-typedef expr::Attribute<SygusPrintProxyAttributeId, Node>
-    SygusPrintProxyAttribute;
-
-/** Attribute for specifying a "side condition" for a sygus conjecture
- *
- * A sygus conjecture of the form exists f. forall x. P[f,x] whose side
- * condition is C[f] has the semantics exists f. C[f] ^ forall x. P[f,x].
- */
-struct SygusSideConditionAttributeId
-{
-};
-typedef expr::Attribute<SygusSideConditionAttributeId, Node>
-    SygusSideConditionAttribute;
-
-/** Attribute for indicating that a sygus variable encodes a term
- *
- * This is used, e.g., for abduction where the formal argument list of the
- * abduct-to-synthesize corresponds to the free variables of the sygus
- * problem.
- */
-struct SygusVarToTermAttributeId
-{
-};
-typedef expr::Attribute<SygusVarToTermAttributeId, Node>
-    SygusVarToTermAttribute;
-
 /**
  * Attribute marked true for types that are used as abstraction types in
  * the finite model finding for function definitions algorithm.
@@ -120,7 +80,6 @@ struct QAttributes
  public:
   QAttributes()
       : d_hasPattern(false),
-        d_sygus(false),
         d_qinstLevel(-1),
         d_preserveStructure(false),
         d_quant_elim(false),
@@ -134,12 +93,8 @@ struct QAttributes
   /** if non-null, this quantified formula is a function definition for function
    * d_fundef_f */
   Node d_fundef_f;
-  /** is this formula marked as a sygus conjecture? */
-  bool d_sygus;
   /** the oracle, which stores an implementation */
   Node d_oracle;
-  /** side condition for sygus conjectures */
-  Node d_sygusSideCondition;
   /** stores the maximum instantiation level allowed for this quantified formula
    * (-1 means allow any) */
   int64_t d_qinstLevel;
@@ -178,7 +133,7 @@ struct QAttributes
    * Is this a standard quantifier? A standard quantifier is one that we can
    * perform destructive updates (variable elimination, miniscoping, etc).
    *
-   * A quantified formula is not standard if it is sygus, one for which
+   * A quantified formula is not standard if it is one for which
    * we are performing quantifier elimination, or is a function definition.
    */
   bool isStandard() const;
@@ -199,8 +154,6 @@ class QuantAttributes
    * This function applies an attribute
    * This can be called when we mark expressions with attributes, e.g. (! q
    * :attribute attr [nodeValues]),
-   * It can also be called internally in various ways (for SyGus, quantifier
-   * elimination, etc.)
    */
   static void setUserAttribute(const std::string& attr,
                                TNode q,
@@ -211,10 +164,6 @@ class QuantAttributes
   /** compute the attributes for q */
   void computeAttributes(Node q);
 
-  /** is sygus conjecture */
-  static bool checkSygusConjecture(Node q);
-  /** is sygus conjecture */
-  static bool checkSygusConjectureAnnotation(Node ipl);
   /** get fun def body */
   static Node getFunDefHead(Node q);
   /** get fun def body */
@@ -224,8 +173,6 @@ class QuantAttributes
 
   /** is function definition */
   bool isFunDef(Node q);
-  /** is sygus conjecture */
-  bool isSygus(Node q);
   /** is oracle interface */
   bool isOracleInterface(Node q);
   /** get instantiation level */

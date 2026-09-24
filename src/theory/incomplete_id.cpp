@@ -26,30 +26,19 @@ const char* toString(IncompleteId i)
     case IncompleteId::NONE: return "NONE";
     case IncompleteId::ARITH_NL_DISABLED: return "ARITH_NL_DISABLED";
     case IncompleteId::ARITH_NL: return "ARITH_NL";
-    case IncompleteId::FP_ABSTRACTION_REFINEMENT:
-      return "FP_ABSTRACTION_REFINEMENT";
     case IncompleteId::QUANTIFIERS: return "QUANTIFIERS";
-    case IncompleteId::QUANTIFIERS_SYGUS_NO_VERIFY:
-      return "QUANTIFIERS_SYGUS_NO_VERIFY";
-    case IncompleteId::QUANTIFIERS_SYGUS_SMART_BLOCK_ANY_CONSTANT:
-      return "QUANTIFIERS_SYGUS_SMART_BLOCK_ANY_CONSTANT";
     case IncompleteId::QUANTIFIERS_FMF: return "QUANTIFIERS_FMF";
     case IncompleteId::QUANTIFIERS_CEGQI: return "QUANTIFIERS_CEGQI";
     case IncompleteId::QUANTIFIERS_RECORDED_INST:
       return "QUANTIFIERS_RECORDED_INST";
     case IncompleteId::QUANTIFIERS_MAX_INST_ROUNDS:
       return "QUANTIFIERS_MAX_INST_ROUNDS";
-    case IncompleteId::QUANTIFIERS_SYGUS_SOLVED:
-      return "QUANTIFIERS_SYGUS_SOLVED";
     case IncompleteId::QUANTIFIERS_SYGUS_NO_WF_GRAMMAR:
       return "QUANTIFIERS_SYGUS_NO_WF_GRAMMAR";
-    case IncompleteId::SEP: return "SEP";
-    case IncompleteId::SETS_HO_CARD: return "SETS_HO_CARD";
     case IncompleteId::SETS_RELS_CARD: return "SETS_RELS_CARD";
     case IncompleteId::STRINGS_LOOP_SKIP: return "STRINGS_LOOP_SKIP";
     case IncompleteId::STRINGS_REGEXP_NO_SIMPLIFY:
       return "STRINGS_REGEXP_NO_SIMPLIFY";
-    case IncompleteId::UF_HO_EXT_DISABLED: return "UF_HO_EXT_DISABLED";
     case IncompleteId::UNPROCESSED_THEORY_CONFLICT:
       return "UNPROCESSED_THEORY_CONFLICT";
     case IncompleteId::STOP_SEARCH: return "STOP_SEARCH";

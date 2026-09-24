@@ -116,7 +116,6 @@ const static std::unordered_map<Kind, std::pair<internal::Kind, std::string>>
         KIND_ENUM(Kind::VARIABLE, internal::Kind::BOUND_VARIABLE),
         KIND_ENUM(Kind::SKOLEM, internal::Kind::SKOLEM),
         KIND_ENUM(Kind::SEXPR, internal::Kind::SEXPR),
-        KIND_ENUM(Kind::LAMBDA, internal::Kind::LAMBDA),
         KIND_ENUM(Kind::WITNESS, internal::Kind::WITNESS),
         /* Boolean ---------------------------------------------------------- */
         KIND_ENUM(Kind::CONST_BOOLEAN, internal::Kind::CONST_BOOLEAN),
@@ -5338,6 +5337,7 @@ Term TermManager::mkVar(const Sort& sort,
 {
   AVA6_API_TRY_CATCH_BEGIN;
   AVA6_API_TM_CHECK_SORT(sort);
+  AVA6_API_CHECK(!sort.isFunction()) << "Bound variables cannot have function sort";
   //////// all checks before this line
   return Term(d_nm, mkVarHelper(*sort.d_type, symbol));
   ////////
@@ -5849,7 +5849,6 @@ OptionInfo& OptionInfo::operator=(OptionInfo&& info)
 {
   name = std::move(info.name);
   aliases = std::move(info.aliases);
-  noSupports = std::move(info.noSupports);
   setByUser = std::move(info.setByUser);
   category = std::move(info.category);
   valueInfo = std::move(info.valueInfo);
@@ -5923,10 +5922,7 @@ std::string OptionInfo::toString() const
   {
     internal::container_to_stream(os, aliases, ", ", "", ", ");
   }
-  if (!noSupports.empty())
-  {
-    internal::container_to_stream(os, noSupports, ", ", "", ", ");
-  }
+
   auto printNum = [&os](const std::string& type, const auto& vi) {
     os << " | " << type << " | " << vi.currentValue << " | default "
        << vi.defaultValue;
@@ -6018,10 +6014,10 @@ OptionInfo Solver::getOptionInfo(const std::string& option) const
           [&info](const internal::options::OptionInfo::VoidInfo&) {
             return OptionInfo{info.name,
                               info.aliases,
-                              info.noSupports,
+
                               info.setByUser,
-                              
-                              
+
+
                               convertOptionCategory(info.category),
                               OptionInfo::VoidInfo{}};
           },
@@ -6029,10 +6025,10 @@ OptionInfo Solver::getOptionInfo(const std::string& option) const
             return OptionInfo{
                 info.name,
                 info.aliases,
-                info.noSupports,
+
                 info.setByUser,
-                
-                
+
+
                 convertOptionCategory(info.category),
                 OptionInfo::ValueInfo<bool>{vi.defaultValue, vi.currentValue}};
           },
@@ -6040,10 +6036,10 @@ OptionInfo Solver::getOptionInfo(const std::string& option) const
               const internal::options::OptionInfo::ValueInfo<std::string>& vi) {
             return OptionInfo{info.name,
                               info.aliases,
-                              info.noSupports,
+
                               info.setByUser,
-                              
-                              
+
+
                               convertOptionCategory(info.category),
                               OptionInfo::ValueInfo<std::string>{
                                   vi.defaultValue, vi.currentValue}};
@@ -6053,10 +6049,10 @@ OptionInfo Solver::getOptionInfo(const std::string& option) const
             return OptionInfo{
                 info.name,
                 info.aliases,
-                info.noSupports,
+
                 info.setByUser,
-                
-                
+
+
                 convertOptionCategory(info.category),
                 OptionInfo::NumberInfo<int64_t>{
                     vi.defaultValue, vi.currentValue, vi.minimum, vi.maximum}};
@@ -6066,10 +6062,10 @@ OptionInfo Solver::getOptionInfo(const std::string& option) const
             return OptionInfo{
                 info.name,
                 info.aliases,
-                info.noSupports,
+
                 info.setByUser,
-                
-                
+
+
                 convertOptionCategory(info.category),
                 OptionInfo::NumberInfo<uint64_t>{
                     vi.defaultValue, vi.currentValue, vi.minimum, vi.maximum}};
@@ -6078,10 +6074,10 @@ OptionInfo Solver::getOptionInfo(const std::string& option) const
             return OptionInfo{
                 info.name,
                 info.aliases,
-                info.noSupports,
+
                 info.setByUser,
-                
-                
+
+
                 convertOptionCategory(info.category),
                 OptionInfo::NumberInfo<double>{
                     vi.defaultValue, vi.currentValue, vi.minimum, vi.maximum}};
@@ -6089,10 +6085,10 @@ OptionInfo Solver::getOptionInfo(const std::string& option) const
           [&info](const internal::options::OptionInfo::ModeInfo& vi) {
             return OptionInfo{info.name,
                               info.aliases,
-                              info.noSupports,
+
                               info.setByUser,
-                              
-                              
+
+
                               convertOptionCategory(info.category),
                               OptionInfo::ModeInfo{
                                   vi.defaultValue, vi.currentValue, vi.modes}};

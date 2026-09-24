@@ -80,7 +80,7 @@ void TheoryUF::finishInit()
   // The kinds we are treating as function application in congruence
 
   d_equalityEngine->addFunctionKind(Kind::APPLY_UF, false, false);
-  
+
   // conversion kinds
   d_equalityEngine->addFunctionKind(Kind::INT_TO_BITVECTOR, true);
   d_equalityEngine->addFunctionKind(Kind::BITVECTOR_UBV_TO_INT, true);
@@ -111,7 +111,7 @@ void TheoryUF::postCheck(Effort level)
       }
     }
     d_distinct.check(level);
-    
+
   }
 }
 
@@ -156,9 +156,12 @@ TrustNode TheoryUF::ppRewrite(TNode node, AVA6_UNUSED std::vector<SkolemLemma>& 
   }
   else if (k == Kind::APPLY_UF)
   {
-    if (isHigherOrderType(node.getOperator().getType()))
+    for (const TypeNode& argType : node.getOperator().getType().getArgTypes())
     {
-      throw LogicException("Function arguments cannot have function types.");
+      if (argType.isFunction())
+      {
+        throw LogicException("Function arguments cannot have function types.");
+      }
     }
   }
   else if ((k == Kind::BITVECTOR_UBV_TO_INT || k == Kind::INT_TO_BITVECTOR) && options().uf.eagerArithBvConv)
@@ -168,7 +171,7 @@ TrustNode TheoryUF::ppRewrite(TNode node, AVA6_UNUSED std::vector<SkolemLemma>& 
                                                : arith::eliminateInt2Bv(node);
     return TrustNode::mkTrustRewrite(node, ret);
   }
-  
+
   return TrustNode::null();
 }
 
@@ -219,10 +222,7 @@ void TheoryUF::preRegisterTerm(TNode node)
       d_equalityEngine->addTerm(node);
       if (node.getType().isFunction())
       {
-        std::stringstream ss;
-        ss << "Function terms are only supported with higher-order logic. Try "
-              "";
-        throw LogicException(ss.str());
+        throw LogicException("Function-valued terms are not supported.");
       }
       break;
   }
@@ -303,66 +303,15 @@ EqualityStatus TheoryUF::getEqualityStatus(TNode a, TNode b)
   return EQUALITY_FALSE_IN_MODEL;
 }
 
-bool TheoryUF::areCareDisequal(TNode x, TNode y)
-{
-  // check for disequality first, as an optimization
-  if (d_equalityEngine->hasTerm(x) && d_equalityEngine->hasTerm(y) && d_equalityEngine->areDisequal(x, y, false))
-  {
-    return true;
-  }
-  if (d_equalityEngine->isTriggerTerm(x, THEORY_UF) && d_equalityEngine->isTriggerTerm(y, THEORY_UF))
-  {
-    TNode x_shared =
-        d_equalityEngine->getTriggerTermRepresentative(x, THEORY_UF);
-    TNode y_shared =
-        d_equalityEngine->getTriggerTermRepresentative(y, THEORY_UF);
-    EqualityStatus eqStatus = d_valuation.getEqualityStatus(x_shared, y_shared);
-    if (eqStatus == EQUALITY_FALSE || eqStatus == EQUALITY_FALSE_AND_PROPAGATED)
-    {
-      return true;
-    }
-    else if (eqStatus == EQUALITY_FALSE_IN_MODEL)
-    {
-      // if x or y is a lambda function, and they are neither entailed to
-      // be equal or disequal, then we return false. This ensures the pair
-      // (x,y) may be considered for the care graph.
-      
-      return true;
-    }
-  }
-  return false;
-}
-
-void TheoryUF::processCarePairArgs(TNode a, TNode b)
-{
-  // if a and b are already equal, we ignore this pair
-  if (d_state.areEqual(a, b))
-  {
-    return;
-  }
-  // otherwise, we add pairs for each of their arguments
-  addCarePairArgs(a, b);
-
-  // also split on functions
-  
-}
-
 void TheoryUF::computeCareGraph()
 {
-
-  // note that if we are higher-order, we may still generate splits for
-  // function arguments
   if (d_state.getSharedTerms().empty())
   {
     return;
   }
-  // Use term indexing. We build separate indices for APPLY_UF and HO_APPLY.
-  // We maintain indices per operator for the former, and indices per
-  // function type for the latter.
+  // Index applications by operator and bit-vector conversions by input type.
   Trace("uf::sharing") << "TheoryUf::computeCareGraph(): Build term indices..."
                        << std::endl;
-  // temporary keep set for higher-order indexing below
-  std::vector<Node> keep;
   std::map<Node, TNodeTrie> index;
   std::map<TypeNode, TNodeTrie> typeIndex;
   std::map<Node, size_t> arity;
@@ -373,8 +322,6 @@ void TheoryUF::computeCareGraph()
     for (const Node& j : app)
     {
       reps.push_back(d_equalityEngine->getRepresentative(j));
-      // if doing higher-order, higher-order arguments must all be considered as
-      // well
       if (d_equalityEngine->isTriggerTerm(j, THEORY_UF))
       {
         has_trigger_arg = true;
@@ -385,18 +332,9 @@ void TheoryUF::computeCareGraph()
       Trace("uf::sharing-terms")
           << "...add: " << app << " / " << reps << std::endl;
       Kind k = app.getKind();
-      if (k == Kind::APPLY_UF)
+      if (k == Kind::BITVECTOR_UBV_TO_INT)
       {
-        Node op = app.getOperator();
-        index[op].addTerm(app, reps);
-        arity[op] = reps.size();
-        
-      }
-      else if (k == Kind::BITVECTOR_UBV_TO_INT)
-      {
-        // add it to the typeIndex for the function type if HO_APPLY, or the
-        // bitvector type if bv2nat. The latter ensures that we compute
-        // care pairs based on bv2nat only for bitvectors of the same width.
+        // Compute care pairs only for bit-vectors of the same width.
         typeIndex[app[0].getType()].addTerm(app, reps);
       }
       else
@@ -418,13 +356,9 @@ void TheoryUF::computeCareGraph()
   }
   for (std::pair<const TypeNode, TNodeTrie>& tt : typeIndex)
   {
-    // functions for HO_APPLY which has arity 2, bitvectors for bv2nat which
-    // has arity one
-    size_t a = tt.first.isFunction() ? 2 : 1;
-    Trace("uf::sharing") << "TheoryUf::computeCareGraph(): Process ho index "
+    Trace("uf::sharing") << "TheoryUf::computeCareGraph(): Process bv index "
                          << tt.first << "..." << std::endl;
-    // the arity of HO_APPLY is always two
-    nodeTriePathPairProcess(&tt.second, a, d_cpacb);
+    nodeTriePathPairProcess(&tt.second, 1, d_cpacb);
   }
   Trace("uf::sharing") << "TheoryUf::computeCareGraph(): finished."
                        << std::endl;
@@ -435,28 +369,6 @@ void TheoryUF::eqNotifyMerge(TNode t1, TNode t2)
 
   // check if we have a conflict due to distinct
   d_distinct.eqNotifyMerge(t1, t2);
-}
-
-bool TheoryUF::isHigherOrderType(TypeNode tn)
-{
-  Assert(tn.isFunction());
-  std::map<TypeNode, bool>::iterator it = d_isHoType.find(tn);
-  if (it != d_isHoType.end())
-  {
-    return it->second;
-  }
-  bool ret = false;
-  const std::vector<TypeNode>& argTypes = tn.getArgTypes();
-  for (const TypeNode& tnc : argTypes)
-  {
-    if (tnc.isFunction())
-    {
-      ret = true;
-      break;
-    }
-  }
-  d_isHoType[tn] = ret;
-  return ret;
 }
 
 }  // namespace uf

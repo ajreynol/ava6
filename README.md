@@ -18,6 +18,7 @@ quantifier-elimination queries, abduction, interpolation, oracles,
 nonlinear coverings (`--nl-cov`), and libpoly
 are excluded. The C, Java, and Python APIs and documentation publishing setup
 are excluded. Expert command-line and SMT-LIB options are removed.
+All retained options are supported; there is no option-category summary command.
 The retained language is the default, with no safe/unrestricted modes or
 separate illegal-input checker.
 

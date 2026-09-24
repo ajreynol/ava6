@@ -31,7 +31,7 @@ void SetsProofRuleChecker::registerTo(ProofChecker* pc)
 
 Node SetsProofRuleChecker::checkInternal(ProofRule id,
                                          const std::vector<Node>& children,
-                                         const std::vector<Node>& args)
+                                         AVA6_UNUSED const std::vector<Node>& args)
 {
   NodeManager* nm = nodeManager();
   if (id == ProofRule::SETS_SINGLETON_INJ)
@@ -64,8 +64,8 @@ Node SetsProofRuleChecker::checkInternal(ProofRule id,
     Node bs = nm->mkNode(Kind::SET_MEMBER, k, b);
     return as.eqNode(bs).notNode();
   }
-  
-  
+
+
   // no rule
   return Node::null();
 }

@@ -106,22 +106,6 @@ struct ConstructorProperties
 };
 
 /**
- * The datatype size function expects any datatype and returns the integer type.
- */
-
-/**
- * The datatype bound predicate expects any datatype, a constant integer, and
- * returns the Boolean type.
- */
-
-/**
- * The type rule for sygus evaluation functions. DT_SYGUS_EVAL expects
- * (1) a term of SyGuS datatype type T, whose SyGuS variable list is (x1 ...
- * xn), (2) terms t1 ... tn whose types are the same as x1 ... xn. The returned
- * type is the builtin type associated with T.
- */
-
-/**
  * The type rule for match. Recall that a match term:
  *   (match l (((cons h t) h) (nil 0)))
  * is represented by the AST
@@ -193,13 +177,6 @@ class TupleProjectTypeRule
                               std::ostream* errOut);
 };
 
-
-/**
- * Lifting a function to nullable terms.
- * The type rule checks that all arguments of the function
- * are nullables, and their element types match the
- * types of the function arguments.
- */
 
 }  // namespace datatypes
 }  // namespace theory

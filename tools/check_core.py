@@ -96,7 +96,7 @@ def main():
                    '--sat-solver=minisat', '--sat-solver=cadical',
                    '--ee-mode=distributed', '--ee-mode=central',
                    '--dt-shared-sel', '--check-synth-sol', '--model-cores=simple',
-                   '--interactive', '-o=normalize']:
+                   '--interactive', '--help-option-categories', '--output=normalize']:
         result = run(args.binary, '(check-sat)', option)
         assert result.returncode != 0, (option, result.stdout)
     for text in ['(set-logic HO_ALL)',

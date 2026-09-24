@@ -67,9 +67,9 @@ TEST_F(TestApiBlackTerm, getKind)
   Term y = d_tm.mkVar(uSort, "y");
   ASSERT_NO_THROW(y.getKind());
 
-  Term f = d_tm.mkVar(funSort1, "f");
+  Term f = d_tm.mkConst(funSort1, "f");
   ASSERT_NO_THROW(f.getKind());
-  Term p = d_tm.mkVar(funSort2, "p");
+  Term p = d_tm.mkConst(funSort2, "p");
   ASSERT_NO_THROW(p.getKind());
 
   Term zero = d_tm.mkInteger(0);
@@ -111,10 +111,10 @@ TEST_F(TestApiBlackTerm, getSort)
   ASSERT_NO_THROW(y.getSort());
   ASSERT_EQ(y.getSort(), bvSort);
 
-  Term f = d_tm.mkVar(funSort1, "f");
+  Term f = d_tm.mkConst(funSort1, "f");
   ASSERT_NO_THROW(f.getSort());
   ASSERT_EQ(f.getSort(), funSort1);
-  Term p = d_tm.mkVar(funSort2, "p");
+  Term p = d_tm.mkConst(funSort2, "p");
   ASSERT_NO_THROW(p.getSort());
   ASSERT_EQ(p.getSort(), funSort2);
 
@@ -257,9 +257,9 @@ TEST_F(TestApiBlackTerm, notTerm)
   ASSERT_NO_THROW(b.notTerm());
   Term x = d_tm.mkVar(d_tm.mkBitVectorSort(8), "x");
   ASSERT_THROW(x.notTerm(), Ava6ApiException);
-  Term f = d_tm.mkVar(funSort1, "f");
+  Term f = d_tm.mkConst(funSort1, "f");
   ASSERT_THROW(f.notTerm(), Ava6ApiException);
-  Term p = d_tm.mkVar(funSort2, "p");
+  Term p = d_tm.mkConst(funSort2, "p");
   ASSERT_THROW(p.notTerm(), Ava6ApiException);
   Term zero = d_tm.mkInteger(0);
   ASSERT_THROW(zero.notTerm(), Ava6ApiException);
@@ -288,11 +288,11 @@ TEST_F(TestApiBlackTerm, andTerm)
   Term x = d_tm.mkVar(d_tm.mkBitVectorSort(8), "x");
   ASSERT_THROW(x.andTerm(b), Ava6ApiException);
   ASSERT_THROW(x.andTerm(x), Ava6ApiException);
-  Term f = d_tm.mkVar(funSort1, "f");
+  Term f = d_tm.mkConst(funSort1, "f");
   ASSERT_THROW(f.andTerm(b), Ava6ApiException);
   ASSERT_THROW(f.andTerm(x), Ava6ApiException);
   ASSERT_THROW(f.andTerm(f), Ava6ApiException);
-  Term p = d_tm.mkVar(funSort2, "p");
+  Term p = d_tm.mkConst(funSort2, "p");
   ASSERT_THROW(p.andTerm(b), Ava6ApiException);
   ASSERT_THROW(p.andTerm(x), Ava6ApiException);
   ASSERT_THROW(p.andTerm(f), Ava6ApiException);
@@ -354,11 +354,11 @@ TEST_F(TestApiBlackTerm, orTerm)
   Term x = d_tm.mkVar(d_tm.mkBitVectorSort(8), "x");
   ASSERT_THROW(x.orTerm(b), Ava6ApiException);
   ASSERT_THROW(x.orTerm(x), Ava6ApiException);
-  Term f = d_tm.mkVar(funSort1, "f");
+  Term f = d_tm.mkConst(funSort1, "f");
   ASSERT_THROW(f.orTerm(b), Ava6ApiException);
   ASSERT_THROW(f.orTerm(x), Ava6ApiException);
   ASSERT_THROW(f.orTerm(f), Ava6ApiException);
-  Term p = d_tm.mkVar(funSort2, "p");
+  Term p = d_tm.mkConst(funSort2, "p");
   ASSERT_THROW(p.orTerm(b), Ava6ApiException);
   ASSERT_THROW(p.orTerm(x), Ava6ApiException);
   ASSERT_THROW(p.orTerm(f), Ava6ApiException);
@@ -420,11 +420,11 @@ TEST_F(TestApiBlackTerm, xorTerm)
   Term x = d_tm.mkVar(d_tm.mkBitVectorSort(8), "x");
   ASSERT_THROW(x.xorTerm(b), Ava6ApiException);
   ASSERT_THROW(x.xorTerm(x), Ava6ApiException);
-  Term f = d_tm.mkVar(funSort1, "f");
+  Term f = d_tm.mkConst(funSort1, "f");
   ASSERT_THROW(f.xorTerm(b), Ava6ApiException);
   ASSERT_THROW(f.xorTerm(x), Ava6ApiException);
   ASSERT_THROW(f.xorTerm(f), Ava6ApiException);
-  Term p = d_tm.mkVar(funSort2, "p");
+  Term p = d_tm.mkConst(funSort2, "p");
   ASSERT_THROW(p.xorTerm(b), Ava6ApiException);
   ASSERT_THROW(p.xorTerm(x), Ava6ApiException);
   ASSERT_THROW(p.xorTerm(f), Ava6ApiException);
@@ -486,11 +486,11 @@ TEST_F(TestApiBlackTerm, eqTerm)
   Term x = d_tm.mkVar(d_tm.mkBitVectorSort(8), "x");
   ASSERT_THROW(x.eqTerm(b), Ava6ApiException);
   ASSERT_NO_THROW(x.eqTerm(x));
-  Term f = d_tm.mkVar(funSort1, "f");
+  Term f = d_tm.mkConst(funSort1, "f");
   ASSERT_THROW(f.eqTerm(b), Ava6ApiException);
   ASSERT_THROW(f.eqTerm(x), Ava6ApiException);
   ASSERT_NO_THROW(f.eqTerm(f));
-  Term p = d_tm.mkVar(funSort2, "p");
+  Term p = d_tm.mkConst(funSort2, "p");
   ASSERT_THROW(p.eqTerm(b), Ava6ApiException);
   ASSERT_THROW(p.eqTerm(x), Ava6ApiException);
   ASSERT_THROW(p.eqTerm(f), Ava6ApiException);
@@ -552,11 +552,11 @@ TEST_F(TestApiBlackTerm, impTerm)
   Term x = d_tm.mkVar(d_tm.mkBitVectorSort(8), "x");
   ASSERT_THROW(x.impTerm(b), Ava6ApiException);
   ASSERT_THROW(x.impTerm(x), Ava6ApiException);
-  Term f = d_tm.mkVar(funSort1, "f");
+  Term f = d_tm.mkConst(funSort1, "f");
   ASSERT_THROW(f.impTerm(b), Ava6ApiException);
   ASSERT_THROW(f.impTerm(x), Ava6ApiException);
   ASSERT_THROW(f.impTerm(f), Ava6ApiException);
-  Term p = d_tm.mkVar(funSort2, "p");
+  Term p = d_tm.mkConst(funSort2, "p");
   ASSERT_THROW(p.impTerm(b), Ava6ApiException);
   ASSERT_THROW(p.impTerm(x), Ava6ApiException);
   ASSERT_THROW(p.impTerm(f), Ava6ApiException);
@@ -622,10 +622,10 @@ TEST_F(TestApiBlackTerm, iteTerm)
   ASSERT_THROW(b.iteTerm(x, b), Ava6ApiException);
   ASSERT_THROW(x.iteTerm(x, x), Ava6ApiException);
   ASSERT_THROW(x.iteTerm(x, b), Ava6ApiException);
-  Term f = d_tm.mkVar(funSort1, "f");
+  Term f = d_tm.mkConst(funSort1, "f");
   ASSERT_THROW(f.iteTerm(b, b), Ava6ApiException);
   ASSERT_THROW(x.iteTerm(b, x), Ava6ApiException);
-  Term p = d_tm.mkVar(funSort2, "p");
+  Term p = d_tm.mkConst(funSort2, "p");
   ASSERT_THROW(p.iteTerm(b, b), Ava6ApiException);
   ASSERT_THROW(p.iteTerm(x, b), Ava6ApiException);
   Term zero = d_tm.mkInteger(0);

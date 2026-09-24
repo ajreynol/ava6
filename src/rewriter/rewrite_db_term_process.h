@@ -35,10 +35,9 @@ namespace rewriter {
  * (2) Constant bitvectors are lifted to CONST_BITVECTOR_SYMBOLIC.
  * (3) Indexed operators are lifted to APPLY_INDEXED_SYMBOLIC.
  * (4) Quantifier patterns are dropped.
- * (5) APPLY_UF is converted to HO_APPLY chains.
- * (6) Function constants are converted to lambdas.
- * (7) Annotations are applied to parametric datatype constructors.
- * (8) NONLINEAR_MULT is reverted to MULT.
+ * (5) Function constants are converted to lambdas.
+ * (6) Annotations are applied to parametric datatype constructors.
+ * (7) NONLINEAR_MULT is reverted to MULT.
  *
  * This node converter converts from the default representation of ava6 terms
  * to the representation of terms required by the DSL proof reconstruction

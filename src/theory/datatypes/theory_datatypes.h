@@ -145,10 +145,6 @@ class TheoryDatatypes : public Theory
   std::map<Node, std::vector<Node> > d_selector_apps_data;
   /** The conflict node */
   Node d_conflictNode;
-  /**
-   * User-context dependent cache for which terms we have called
-   * registerInitialLemmas(...) on.
-   */
   /** All the function terms that the theory has seen */
   context::CDList<TNode> d_functionTerms;
   /** uninterpreted constant to variable map */

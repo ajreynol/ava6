@@ -39,24 +39,6 @@ class UfTypeRule
 };
 
 /**
- * The type rule for cardinality constraint operators, which is indexed by a
- * type and an integer. Ensures that type is an uninterpreted sort and the
- * integer is positive, and returns the builtin type.
- */
-
-/**
- * The type rule for combined cardinality constraint operators, which is indexed
- * by an integer. Ensures that the integer is positive, and returns the builtin
- * type.
- */
-
-/**
- * Type rule for HO_APPLY terms. Ensures the first argument is a function type
- * (-> T1 ... Tn T), the second argument is T1, and returns (-> T2 ... Tn T) if
- * n > 1 or T otherwise.
- */
-
-/**
  * Type rule for lambdas. Ensures the first argument is a bound varible list
  * (x1 ... xn). Returns the function type (-> T1 ... Tn T) where T1...Tn are
  * the types of x1..xn and T is the type of the second argument.

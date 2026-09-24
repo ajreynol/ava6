@@ -226,7 +226,6 @@ OptionInfo getInfo(const Options& opts, const std::string& name)
       // clang-format on
       return OptionInfo{"",
                         {},
-                        {},
                         false,
                         OptionInfo::Category::UNDOCUMENTED,
                         OptionInfo::VoidInfo{}};

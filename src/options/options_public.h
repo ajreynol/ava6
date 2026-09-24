@@ -68,7 +68,6 @@ struct AVA6_EXPORT OptionInfo
 
   std::string name;
   std::vector<std::string> aliases;
-  std::vector<std::string> noSupports;
   bool setByUser;
   Category category;
 

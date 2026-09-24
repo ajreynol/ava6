@@ -205,7 +205,6 @@ enum class InferenceId
 
   // ---------------------------------- finite field theory
   // a catch-all, for now
-  FF_LEMMA,
   // ---------------------------------- end finite field theory
 
   // ---------------------------------- arrays theory
@@ -220,38 +219,6 @@ enum class InferenceId
   // ---------------------------------- end arrays theory
 
   // ---------------------------------- bags theory
-  BAGS_NON_NEGATIVE_COUNT,
-  BAGS_BAG_MAKE,
-  BAGS_BAG_MAKE_SPLIT,
-  BAGS_SKOLEM,
-  BAGS_DISEQUALITY,
-  BAGS_CG_SPLIT,
-  BAGS_EMPTY,
-  BAGS_UNION_DISJOINT,
-  BAGS_UNION_MAX,
-  BAGS_INTERSECTION_MIN,
-  BAGS_DIFFERENCE_SUBTRACT,
-  BAGS_DIFFERENCE_REMOVE,
-  BAGS_SETOF,
-  BAGS_MAP_DOWN,
-  BAGS_MAP_DOWN_INJECTIVE,
-  BAGS_MAP_UP1,
-  BAGS_MAP_UP2,
-  BAGS_FILTER_DOWN,
-  BAGS_FILTER_UP,
-  BAGS_FOLD,
-  BAGS_CARD,
-  BAGS_CARD_EMPTY,
-  TABLES_PRODUCT_UP,
-  TABLES_PRODUCT_DOWN,
-  TABLES_JOIN_DOWN,
-  TABLES_GROUP_NOT_EMPTY,
-  TABLES_GROUP_UP1,
-  TABLES_GROUP_UP2,
-  TABLES_GROUP_DOWN,
-  TABLES_GROUP_PART_COUNT,
-  TABLES_GROUP_SAME_PROJECTION,
-  TABLES_GROUP_SAME_PART,
   // ---------------------------------- end bags theory
 
   // ---------------------------------- bitvector theory
@@ -293,40 +260,27 @@ enum class InferenceId
   // a sygus symmetry breaking lemma (or ~is-C1( t1 ) V ... V ~is-Cn( tn ) )
   // where t1 ... tn are unique shared selector chains. For details see
   // Reynolds et al CAV 2019
-  DATATYPES_SYGUS_SYM_BREAK,
   // a conjecture-dependent symmetry breaking lemma, which may be used to
   // exclude constructors for variables that irrelevant for a synthesis
   // conjecture
-  DATATYPES_SYGUS_CDEP_SYM_BREAK,
   // an enumerator-specific symmetry breaking lemma, which are used e.g. for
   // excluding certain kinds of constructors
-  DATATYPES_SYGUS_ENUM_SYM_BREAK,
   // a simple static symmetry breaking lemma (see Reynolds et al CAV 2019)
-  DATATYPES_SYGUS_SIMPLE_SYM_BREAK,
   // (dt.size t) <= N, to implement fair enumeration when sygus-fair=dt-size
-  DATATYPES_SYGUS_FAIR_SIZE,
   // (dt.size t) <= N => (or ~is-C1( t1 ) V ... V ~is-Cn( tn ) ) if using
   // sygus-fair=direct
-  DATATYPES_SYGUS_FAIR_SIZE_CONFLICT,
   // used for implementing variable agnostic enumeration
-  DATATYPES_SYGUS_VAR_AGNOSTIC,
   // handles case the model value for a sygus term does not exist
-  DATATYPES_SYGUS_VALUE_CORRECTION,
   // s <= (dt.size t), where s is a term that must be less than the current
   // size bound based on our fairness strategy. For instance, s may be
   // (dt.size e) for (each) enumerator e when multiple enumerators are present.
-  DATATYPES_SYGUS_MT_BOUND,
   // (dt.size t) >= 0
-  DATATYPES_SYGUS_MT_POS,
   // ---------------------------------- end datatypes theory
 
   //-------------------------------------- floating point theory
   // a lemma sent during TheoryFp::ppRewrite
-  FP_PREPROCESS,
   // a lemma sent during TheoryFp::convertAndEquateTerm
-  FP_EQUATE_TERM,
   // a lemma sent during TheoryFp::registerTerm
-  FP_REGISTER_TERM,
   //-------------------------------------- end floating point theory
 
   //-------------------------------------- quantifiers theory
@@ -415,61 +369,33 @@ enum class InferenceId
   QUANTIFIERS_SYQI_EVAL_UNFOLD,
   //-------------------- sygus solver
   // G or ~G where G is the active guard for a sygus enumerator
-  QUANTIFIERS_SYGUS_ENUM_ACTIVE_GUARD_SPLIT,
   // manual exclusion of a current solution for an actively generated enumerator
-  QUANTIFIERS_SYGUS_ACTIVE_GEN_EXCLUDE_CURRENT,
   // manual exclusion of a current solution for sygus-stream
-  QUANTIFIERS_SYGUS_STREAM_EXCLUDE_CURRENT,
   // manual exclusion of a current solution for incremental sygus
-  QUANTIFIERS_SYGUS_INC_EXCLUDE_CURRENT,
   // manual exclusion of a current solution for a failed side condition
-  QUANTIFIERS_SYGUS_SC_EXCLUDE_CURRENT,
   // manual exclusion of a current solution for a failed verification
-  QUANTIFIERS_SYGUS_NO_VERIFY_EXCLUDE_CURRENT,
   // manual exclusion of a current solution for a repeated counterexample
-  QUANTIFIERS_SYGUS_REPEAT_CEX_EXCLUDE_CURRENT,
   // ~Q where Q is a PBE conjecture with conflicting examples
-  QUANTIFIERS_SYGUS_EXAMPLE_INFER_CONTRA,
   // infeasible determined by single-invocation solver
-  QUANTIFIERS_SYGUS_SI_INFEASIBLE,
   // unif+pi symmetry breaking between multiple enumerators
-  QUANTIFIERS_SYGUS_UNIF_PI_INTER_ENUM_SB,
   // unif+pi separation lemma
-  QUANTIFIERS_SYGUS_UNIF_PI_SEPARATION,
   // unif+pi lemma for fairness of size of enumerators
-  QUANTIFIERS_SYGUS_UNIF_PI_FAIR_SIZE,
   // unif+pi lemma for removing redundant operators
-  QUANTIFIERS_SYGUS_UNIF_PI_REM_OPS,
   // symmetry breaking for enumerators
-  QUANTIFIERS_SYGUS_UNIF_PI_ENUM_SB,
   // constraining terms to be in the domain of output
-  QUANTIFIERS_SYGUS_UNIF_PI_DOMAIN,
   // condition exclusion from sygus unif
-  QUANTIFIERS_SYGUS_UNIF_PI_COND_EXCLUDE,
   // refinement lemma from sygus unif
-  QUANTIFIERS_SYGUS_UNIF_PI_REFINEMENT,
   // symmetry breaking lemma from unsat core learning algorithm initialization
-  QUANTIFIERS_SYGUS_CEGIS_UCL_SYM_BREAK,
   // candidate exclusion lemma from unsat core learning algorithm
-  QUANTIFIERS_SYGUS_CEGIS_UCL_EXCLUDE,
   // candidate exclusion lemma from repair constants algorithm
-  QUANTIFIERS_SYGUS_REPAIR_CONST_EXCLUDE,
   // a counterexample-guided inductive synthesis refinement lemma
-  QUANTIFIERS_SYGUS_CEGIS_REFINE,
   // a cegis refinement lemma found by sampling
-  QUANTIFIERS_SYGUS_CEGIS_REFINE_SAMPLE,
   // a lemma based on refinement lemma evaluation
-  QUANTIFIERS_SYGUS_REFINE_EVAL,
   // an evaluation unfolding lemma
-  QUANTIFIERS_SYGUS_EVAL_UNFOLD,
   // candidate exclusion lemma from programming-by-examples
-  QUANTIFIERS_SYGUS_PBE_EXCLUDE,
   // a lemma generated while constructing a candidate solution for PBE
-  QUANTIFIERS_SYGUS_PBE_CONSTRUCT_SOL,
   // complete enumeration lemma
-  QUANTIFIERS_SYGUS_COMPLETE_ENUM,
   // infeasible due to side condition (e.g. for abduction)
-  QUANTIFIERS_SYGUS_SC_INFEASIBLE,
   // infeasible due to non-well-founded grammar
   QUANTIFIERS_SYGUS_NO_WF_GRAMMAR,
   //-------------------- dynamic splitting
@@ -486,9 +412,7 @@ enum class InferenceId
   // Q1 <=> Q2, where Q1 and Q2 are alpha equivalent
   QUANTIFIERS_REDUCE_ALPHA_EQ,
   // a higher-order match predicate lemma
-  QUANTIFIERS_HO_MATCH_PRED,
   // purification of non-variable higher-order function
-  QUANTIFIERS_HO_PURIFY,
   // reduction of quantifiers that don't have triggers that cover all variables
   QUANTIFIERS_PARTIAL_TRIGGER_REDUCE,
   // a purification lemma for a ground term appearing in a quantified formula,
@@ -504,32 +428,19 @@ enum class InferenceId
 
   // ---------------------------------- sep theory
   // ensures that pto is a function: (pto x y) ^ ~(pto z w) ^ x = z => y != w
-  SEP_PTO_NEG_PROP,
   // enforces injectiveness of pto: (pto x y) ^ (pto y w) ^ x = y => y = w
-  SEP_PTO_PROP,
   // introduces a label for a heap, of the form U => L, where U is an
   // unlabelled separation logic predicate and L is its labelled form
-  SEP_LABEL_INTRO,
   // introduces the set constraints for a label
-  SEP_LABEL_DEF,
   // lemma for sep.emp
-  SEP_EMP,
   // positive reduction for sep constraint
-  SEP_POS_REDUCTION,
   // negative reduction for sep constraint
-  SEP_NEG_REDUCTION,
   // model-based refinement for negated star/wand
-  SEP_REFINEMENT,
   // sep.nil is not in the heap
-  SEP_NIL_NOT_IN_HEAP,
   // a symmetry breaking lemma
-  SEP_SYM_BREAK,
   // finite witness data lemma
-  SEP_WITNESS_FINITE_DATA,
   // element distinctness lemma
-  SEP_DISTINCT_REF,
   // reference bound lemma
-  SEP_REF_BOUND,
   // ---------------------------------- end sep theory
 
   // ---------------------------------- sets theory
@@ -925,7 +836,6 @@ enum class InferenceId
 
   //-------------------------------------- uf theory
   // Clause from the uf symmetry breaker
-  UF_BREAK_SYMMETRY,
   // Lemma of the form
   // (~distinct(t1...tn) => ~blastDistinct(distinct(t1...tn))
   UF_NOT_DISTINCT_ELIM,
@@ -933,64 +843,6 @@ enum class InferenceId
   UF_DISTINCT_DEQ,
   // Lemma of the form (~distinct(t1...tn) or ti != tj) sent during last call
   UF_DISTINCT_DEQ_MODEL,
-  //-------------------- cardinality extension to UF
-  // The inferences below are described in Reynolds' thesis 2013.
-  // conflict of the form (card_T n) => (not (distinct t1 ... tn))
-  UF_CARD_CLIQUE,
-  // conflict of the form (not (card_T1 n1)) ^ ... (not (card_Tk nk)) ^ (card n)
-  // where n1 + ... + nk >= n, where (card n) is a combined cardinality
-  // constraint.
-  UF_CARD_COMBINED,
-  // (not (card_T n)) => (distinct t1 ... tn)
-  UF_CARD_ENFORCE_NEGATIVE,
-  // conflict of the form (not (card_T n)) ^ (card_T m) where n>m
-  UF_CARD_SIMPLE_CONFLICT,
-  // equality split requested by cardinality solver
-  //  (or (= t1 t2) (not (= t1 t2))
-  // to satisfy the cardinality constraints on the type of t1, t2.
-  UF_CARD_SPLIT,
-  //-------------------- end cardinality extension to UF
-  //-------------------- HO extension to UF
-  // A care graph split due to HO
-  UF_HO_CG_SPLIT,
-  // Encodes an n-ary application as a chain of binary HO_APPLY applications
-  //   (= (f t1 ... tn) (@ (@ ... (@ f t1) ...) tn))
-  UF_HO_APP_ENCODE,
-  // A lemma corresponding to the definition of a skolem k used to convert
-  // HO_APPLY terms to APPLY_UF terms. This is of the form:
-  //   (forall x1 ... xn) (@ (@ k x1) ... xn) = t
-  // where notice that t is a function whose free variables (if any) are
-  // x1 ... xn.
-  UF_HO_APP_CONV_SKOLEM,
-  // Adds an extensionality lemma to witness that disequal functions have
-  // different applications
-  //   (not (= (f sk1 .. skn) (g sk1 .. skn))
-  UF_HO_EXTENSIONALITY,
-  //-------------------- model-construction specific part
-  // These rules are necessary to ensure that we build models properly. For more
-  // details see Section 3.3 of Barbosa et al. CADE'19.
-  //
-  // Enforces that a regular APPLY_UF term in the model is equal to its HO_APPLY
-  // equivalent by adding the equality as a lemma
-  //   (= (f t1 ... tn) (@ (@ ... (@ f t1) ...) tn))
-  UF_HO_MODEL_APP_ENCODE,
-  // Adds an extensionality lemma to witness that disequal functions have
-  // different applications
-  //   (not (= (f sk1 .. skn) (g sk1 .. skn))
-  UF_HO_MODEL_EXTENSIONALITY,
-  // equivalence of lambda functions
-  //   f = g => forall x. reduce(lambda(f)(x)) = reduce(lambda(g)(x))
-  // This is applied when lamda functions f and g are in the same eq class.
-  UF_HO_LAMBDA_UNIV_EQ,
-  // equivalence of a lambda function and an ordinary function
-  //   f = h => h(t) = reduce(lambda(f)(t))
-  // This is applied when lamda function f and ordinary function h are in the
-  // same eq class.
-  UF_HO_LAMBDA_APP_REDUCE,
-  // Lazy lambda lifting
-  UF_HO_LAMBDA_LAZY_LIFT,
-  //-------------------- end model-construction specific part
-  //-------------------- end HO extension to UF
   //-------------------- UF arith/bv conversions solver
   // reductions of an arithmetic/bit-vector conversion term
   UF_ARITH_BV_CONV_REDUCTION,

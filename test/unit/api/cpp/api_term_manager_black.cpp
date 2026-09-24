@@ -176,6 +176,11 @@ TEST_F(TestApiBlackTermManager, mkFunctionSort)
   Sort funSort = d_tm.mkFunctionSort({d_tm.mkUninterpretedSort("u")},
                                      d_tm.getIntegerSort());
   // Function-valued arguments and results are excluded.
+  ASSERT_THROW(d_tm.mkPredicateSort({funSort}), Ava6ApiException);
+  ASSERT_THROW(d_tm.mkVar(funSort), Ava6ApiException);
+  Solver solver(d_tm);
+  ASSERT_THROW(solver.declareFun("higher_order", {funSort}, d_tm.getIntegerSort()),
+               Ava6ApiException);
   ASSERT_THROW(d_tm.mkFunctionSort({funSort}, d_tm.getIntegerSort()),
                Ava6ApiException);
   ASSERT_THROW(d_tm.mkFunctionSort({d_tm.getIntegerSort()}, funSort),
@@ -185,9 +190,9 @@ TEST_F(TestApiBlackTermManager, mkFunctionSort)
       d_tm.getIntegerSort()));
   Sort funSort2 = d_tm.mkFunctionSort({d_tm.mkUninterpretedSort("u")},
                                       d_tm.getIntegerSort());
-  // Function-valued arguments and results are excluded.
-  ASSERT_NO_THROW(d_tm.mkFunctionSort({funSort2, d_tm.mkUninterpretedSort("u")},
-                                      d_tm.getIntegerSort()));
+  ASSERT_THROW(d_tm.mkFunctionSort({funSort2, d_tm.mkUninterpretedSort("u")},
+                                  d_tm.getIntegerSort()),
+               Ava6ApiException);
   ASSERT_THROW(
       d_tm.mkFunctionSort(
           {d_tm.getIntegerSort(), d_tm.mkUninterpretedSort("u")}, funSort2),
@@ -220,7 +225,7 @@ TEST_F(TestApiBlackTermManager, mkPredicateSort)
   Sort funSort = d_tm.mkFunctionSort({d_tm.mkUninterpretedSort("u")},
                                      d_tm.getIntegerSort());
   // functions as arguments are allowed
-  ASSERT_NO_THROW(d_tm.mkPredicateSort({d_tm.getIntegerSort(), funSort}));
+  ASSERT_THROW(d_tm.mkPredicateSort({d_tm.getIntegerSort(), funSort}), Ava6ApiException);
 
   ASSERT_NO_THROW(d_tm.mkPredicateSort({d_tm.getIntegerSort()}));
 
@@ -304,7 +309,7 @@ TEST_F(TestApiBlackTermManager, mkTupleSort)
   ASSERT_NO_THROW(d_tm.mkTupleSort({d_tm.getIntegerSort()}));
   Sort funSort = d_tm.mkFunctionSort({d_tm.mkUninterpretedSort("u")},
                                      d_tm.getIntegerSort());
-  ASSERT_NO_THROW(d_tm.mkTupleSort({d_tm.getIntegerSort(), funSort}));
+  ASSERT_THROW(d_tm.mkTupleSort({d_tm.getIntegerSort(), funSort}), Ava6ApiException);
 
   ASSERT_NO_THROW(d_tm.mkTupleSort({d_tm.getIntegerSort()}));
   TermManager tm;
@@ -362,9 +367,9 @@ TEST_F(TestApiBlackTermManager, mkVar)
   Sort intSort = d_tm.getIntegerSort();
   Sort funSort = d_tm.mkFunctionSort({intSort}, boolSort);
   ASSERT_NO_THROW(d_tm.mkVar(boolSort));
-  ASSERT_NO_THROW(d_tm.mkVar(funSort));
+  ASSERT_THROW(d_tm.mkVar(funSort), Ava6ApiException);
   ASSERT_NO_THROW(d_tm.mkVar(boolSort, std::string("b")));
-  ASSERT_NO_THROW(d_tm.mkVar(funSort, ""));
+  ASSERT_THROW(d_tm.mkVar(funSort, ""), Ava6ApiException);
   ASSERT_THROW(d_tm.mkVar(Sort()), Ava6ApiException);
   ASSERT_THROW(d_tm.mkVar(Sort(), "a"), Ava6ApiException);
   ASSERT_NO_THROW(d_tm.mkVar(boolSort, "x"));

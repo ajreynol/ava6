@@ -333,7 +333,7 @@ class Ava6ApiUnsupportedExceptionStream
           << "a sort associated with the term manager this object is "       \
              "associated "                                                   \
              "with";                                                         \
-      AVA6_API_ARG_CHECK_EXPECTED(s.getTypeNode().isFirstClass(), s)         \
+      AVA6_API_ARG_CHECK_EXPECTED(s.getTypeNode().isFirstClass() && !s.isFunction(), s)         \
           << "first-class sort as domain sort";                              \
       i += 1;                                                                \
     }                                                                        \
@@ -542,7 +542,7 @@ class Ava6ApiUnsupportedExceptionStream
           d_nm == s.d_nm, "domain sort", sorts, i)                      \
           << "a sort associated with this term manager";                \
       AVA6_API_ARG_AT_INDEX_CHECK_EXPECTED(                             \
-          s.getTypeNode().isFirstClass(), "domain sort", sorts, i)      \
+          s.getTypeNode().isFirstClass() && !s.isFunction(), "domain sort", sorts, i)      \
           << "first-class sort as domain sort";                         \
       i += 1;                                                           \
     }                                                                   \
@@ -559,7 +559,7 @@ class Ava6ApiUnsupportedExceptionStream
     AVA6_API_ARG_CHECK_NOT_NULL(sort);                                        \
     AVA6_API_CHECK(d_nm == sort.d_nm) << "Given sort is not associated with " \
                                          "this term manager";                 \
-    AVA6_API_ARG_CHECK_EXPECTED(sort.getTypeNode().isFirstClass(), sort)      \
+    AVA6_API_ARG_CHECK_EXPECTED(sort.getTypeNode().isFirstClass() && !sort.isFunction(), sort)      \
         << "first-class sort as domain sort";                                 \
   } while (0)
 
@@ -727,7 +727,7 @@ class Ava6ApiUnsupportedExceptionStream
           d_tm.d_nm == s.d_nm, "domain sort", sorts, i)                       \
           << "a sort associated with the term manager of this solver object"; \
       AVA6_API_ARG_AT_INDEX_CHECK_EXPECTED(                                   \
-          s.getTypeNode().isFirstClass(), "domain sort", sorts, i)            \
+          s.getTypeNode().isFirstClass() && !s.isFunction(), "domain sort", sorts, i)            \
           << "first-class sort as domain sort";                               \
       i += 1;                                                                 \
     }                                                                         \
@@ -873,7 +873,7 @@ class Ava6ApiUnsupportedExceptionStream
           i)                                                                  \
           << "sort '" << domain_sorts[i] << "'";                              \
       AVA6_API_ARG_AT_INDEX_CHECK_EXPECTED(                                   \
-          domain_sorts[i].getTypeNode().isFirstClass(),                       \
+          domain_sorts[i].getTypeNode().isFirstClass() && !domain_sorts[i].isFunction(),                       \
           "domain sort",                                                      \
           domain_sorts,                                                       \
           i)                                                                  \

@@ -91,53 +91,6 @@ void printUsage(const std::string& binary, std::ostream& os, bool printRegular)
   os << optionsFootnote << std::endl;
 }
 
-void printUsageCategories(ava6::Solver& solver, std::ostream& os)
-{
-  std::stringstream ssCommon;
-  std::stringstream ssRegular;
-  std::stringstream ssRegularNoSupport;
-  for (const auto& name : options::getNames())
-  {
-    auto info = solver.getOptionInfo(name);
-    if (info.category == ava6::modes::OptionCategory::REGULAR)
-    {
-      if (info.noSupports.empty())
-      {
-        ssRegular << "- " << name << std::endl;
-      }
-      else
-      {
-        ssRegularNoSupport << "- " << name << " [";
-        bool firstTime = true;
-        for (std::string ns : info.noSupports)
-        {
-          if (!firstTime)
-          {
-            ssRegularNoSupport << ", ";
-          }
-          firstTime = false;
-          ssRegularNoSupport << ns;
-        }
-        ssRegularNoSupport << "]" << std::endl;
-      }
-    }
-    else if (info.category == ava6::modes::OptionCategory::COMMON)
-    {
-      ssCommon << "- " << name << std::endl;
-    }
-    else
-    {
-      Assert(info.category == ava6::modes::OptionCategory::UNDOCUMENTED);
-    }
-  }
-  os << "Common options:" << std::endl;
-  os << ssCommon.str();
-  os << "Regular options:" << std::endl;
-  os << ssRegular.str();
-  os << "Regular options with a no-support restriction:" << std::endl;
-  os << ssRegularNoSupport.str();
-}
-
 /**
  * This is a table of long options.  By policy, each short option
  * should have an equivalent long option (but the reverse isn't the

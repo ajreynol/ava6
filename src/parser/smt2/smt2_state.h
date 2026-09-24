@@ -370,8 +370,6 @@ class Smt2State : public ParserState
    * to a left- or right-associative chain.
    * - If the overall kind is SUB and args has size 1, then we return an
    * application of NEG.
-   * - If the overall expression is a partial application, then we process this
-   * as a chain of HO_APPLY terms.
    */
   Term applyParseOp(const ParseOp& p, std::vector<Term>& args);
   /**

@@ -1211,7 +1211,6 @@ set(regress_0_tests
   regress0/quantifiers/var-elim-ineq-simple.smt2
   regress0/quoted-symbols.smt2
   regress0/rec-fun-const-parse-bug.smt2
-  regress0/rels/rel_conflict_0.cvc.smt2
   regress0/reset-i.smt2
   regress0/seq/intseq.smt2
   regress0/seq/issue11924-semi-eval-unk.smt2
@@ -2016,7 +2015,6 @@ set(regress_1_tests
   regress1/quantifiers/ufdt-solve-model-built.smt2
   regress1/quantifiers/z3.620661-no-fv-trigger.smt2
   regress1/quantifiers/z3.855483_dio_nl.smt2
-  regress1/rels/strat.cvc.smt2
   regress1/seq/issue8148-2-const-mv.smt2
   regress1/sets/choose.cvc.smt2
   regress1/sets/choose1.smt2

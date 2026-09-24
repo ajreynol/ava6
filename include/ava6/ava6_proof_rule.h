@@ -1186,10 +1186,10 @@ enum ENUM(ProofRule)
    * It is also used for ``ava6::Kind::APPLY_UF``, where :math:`f` is an
    * uninterpreted function.
    *
-   * It is not used for kinds with variadic arity, or for kind
-   * ``ava6::Kind::HO_APPLY``, which respectively use the rules
-   * :cpp:enumerator:`NARY_CONG <ava6::ProofRule::NARY_CONG>` and
-   * :cpp:enumerator:`HO_CONG <ava6::ProofRule::HO_CONG>` below.
+   * Kinds with variadic arity use
+   * :cpp:enumerator:`NARY_CONG <ava6::ProofRule::NARY_CONG>`. Rewriting the
+   * operator of an application uses
+   * :cpp:enumerator:`HO_CONG <ava6::ProofRule::HO_CONG>`.
    * \endverbatim
    */
   EVALUE(CONG),
@@ -1946,8 +1946,8 @@ enum ENUM(ProofRule)
    * .. math::
    *
    *   \inferrule{F_1 \dots F_n \mid -}{F}
-   * 
-   * where :math:`F` is of the form 
+   *
+   * where :math:`F` is of the form
    * :math:`\left| t_1 \cdot t_n \right| \diamond \left| s_1 \cdot s_n \right|`.
    * If :math:`\diamond` is :math:`=`, then each :math:`F_i` is
    * :math:`\left| t_i \right| = \left| s_i \right|`.
@@ -2020,7 +2020,7 @@ enum ENUM(ProofRule)
    * .. math::
    *
    *   \inferrule{- \mid t}{F}
-   * 
+   *
    * where :math:`t` is an application of an extended arithmetic operator (e.g.
    * division, modulus, cosine, sqrt, is_int, to_int) and :math:`F` is the
    * reduction predicate for :math:`t`. In other words, :math:`F` is a
@@ -2543,7 +2543,7 @@ enum ENUM(ProofRewriteRule)
    *   \texttt{distinct}(t_1, t_2) = \neg (t_1 = t_2)
    *
    * if :math:`n = 2`, or
-   * 
+   *
    * .. math::
    *
    *   \texttt{distinct}(t_1, \ldots, t_n) = \bigwedge_{i=1}^n \bigwedge_{j=i+1}^n t_i \neq t_j
@@ -2782,17 +2782,7 @@ enum ENUM(ProofRewriteRule)
    *
    *   ((\lambda x_1 \ldots x_n.\> t) \ t_1 \ldots t_n) = t\{x_1 \mapsto t_1, \ldots, x_n \mapsto t_n\}
    *
-   * or alternatively
-   *
-   * .. math::
-   *
-   *   ((\lambda x_1 \ldots x_n.\> t) \ t_1) = (\lambda x_2 \ldots x_n.\> t)\{x_1 \mapsto t_1\}
-   *
-   * In the former case, the left hand side may either be a term of kind
-   * `ava6::Kind::APPLY_UF`. The latter case is used
-   * only if the term has kind `ava6::Kind::HO_APPLY`.
-   *
-   * In either case, the right hand side of the equality in the conclusion is
+   * The left hand side has kind `ava6::Kind::APPLY_UF`. The right hand side is
    * computed using standard substitution via ``Node::substitute``.
    *
    * \endverbatim
@@ -3032,7 +3022,7 @@ enum ENUM(ProofRewriteRule)
    * where :math:`x` is of a datatype type with constructors
    * :math:`C_1, \ldots, C_n`, where for each :math:`i = 1, \ldots, n`,
    * :math:`F_i` is :math:`F \{ x \mapsto C_i(X_i) \}`.
-   * 
+   *
    * \endverbatim
    */
   EVALUE(QUANT_DT_SPLIT),
@@ -3203,7 +3193,7 @@ enum ENUM(ProofRewriteRule)
    * .. math::
    *
    *   (t = s) = false
-   * 
+   *
    * where :math:`t` and :math:`s` have subterms that occur in the same
    * position (beneath constructor applications) that are distinct.
    *
@@ -3292,7 +3282,7 @@ enum ENUM(ProofRewriteRule)
    * .. math::
    *
    *   \texttt{match}(t ((p_1 c_1) \ldots (p_n c_n))) = \texttt{ite}(F_1, r_1, \texttt{ite}( \ldots, r_n))
-   * 
+   *
    * where for :math:`i=1, \ldots, n`, :math:`F_1` is a formula that holds iff
    * :math:`t` matches :math:`p_i` and :math:`r_i` is the result of a
    * substitution on :math:`c_i` based on this match.
@@ -3512,7 +3502,7 @@ enum ENUM(ProofRewriteRule)
    *
    * .. math::
    *
-   *    (s = \mathit{str}.\text{++}(t_1, \ldots, t_n)) = 
+   *    (s = \mathit{str}.\text{++}(t_1, \ldots, t_n)) =
    *    (s = \mathit{str}.\text{++}(t_1, \ldots t_i)) \wedge
    *    t_{i+1} = \epsilon \wedge \ldots \wedge t_n = \epsilon
    *

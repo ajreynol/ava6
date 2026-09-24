@@ -95,8 +95,6 @@ class DTypeConstructor
    * DType must be resolved.
    */
   Node getTester() const;
-  //-------------------------------------- sygus
-  //-------------------------------------- end sygus
 
   /**
    * Get the number of arguments (so far) of this DType constructor.

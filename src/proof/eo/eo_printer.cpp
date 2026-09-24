@@ -656,8 +656,6 @@ std::string EoPrinter::getRuleName(const ProofNode* pfn) const
   {
     // ENCODE_EQ_INTRO proves (= t (convert t)) from argument t,
     // where (convert t) is indistinguishable from t according to the proof.
-    // Similarly, HO_APP_ENCODE proves an equality between a term of kind
-    // Kind::HO_APPLY and Kind::APPLY_UF, which denotes the same term in Eunoia.
     // BV_EAGER_ATOM also is indistinguishable as the eager atom predicate is
     // ignored in the printer.
     return "refl";
@@ -908,6 +906,9 @@ void EoPrinter::print(EoPrintChannelOut& aout,
         std::stringstream outDecl;
         std::stringstream outDef;
         options::ioutils::applyCpcFormat(outDef, true);
+        // CPC uses proof-level definitions for sharing, not SMT-LIB let terms.
+        options::ioutils::applyDagThresh(outDecl, 0);
+        options::ioutils::applyDagThresh(outDef, 0);
         pb.printDeclarationsFrom(outDecl, outDef, definitions, assertions);
         out << outDecl.str();
         // [2] print the definitions
@@ -1268,7 +1269,7 @@ void EoPrinter::printStepPost(EoPrintChannel* out, const ProofNode* pn)
   // if we don't handle the rule, print trust
   if (!handled)
   {
-    
+
     out->printTrustStep(pn->getRule(),
                         conclusionPrint,
                         id,

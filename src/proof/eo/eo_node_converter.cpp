@@ -499,8 +499,7 @@ Node EoNodeConverter::getOperatorOfTerm(Node n)
       else if (dt.isParametric()
                && isAmbiguousDtConstructor(dt[index].getConstructor()))
       {
-        // ambiguous if nullable.null or a user provided ambiguous datatype
-        // constructor
+        // Qualify ambiguous parametric datatype constructors.
         opName << "as";
         indices.push_back(dt[index].getConstructor());
         // tn is the return type

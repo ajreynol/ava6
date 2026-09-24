@@ -57,9 +57,6 @@ class TheoryUF : public Theory
   }; /* class TheoryUF::NotifyClass */
 
  private:
-  /** The associated cardinality extension (or nullptr if it does not exist) */
-  /** the lambda lifting utility */
-  /** the higher-order solver extension (or nullptr if it does not exist) */
   /** the conversions solver */
   std::unique_ptr<ConversionsSolver> d_csolver;
   /** Diamonds proof generator */
@@ -71,7 +68,6 @@ class TheoryUF : public Theory
   /** All the function terms that the theory has seen */
   context::CDList<TNode> d_functionsTerms;
 
-  /** Symmetry analyzer */
 
   /** called when two equivalance classes have merged */
   void eqNotifyMerge(TNode t1, TNode t2);
@@ -123,25 +119,11 @@ class TheoryUF : public Theory
   std::string identify() const override { return "THEORY_UF"; }
 
  private:
-  /** Called when preregistering terms of kind APPLY_UF or HO_APPLY */
+  /** Called when preregistering function applications */
   void preRegisterFunctionTerm(TNode node);
   /** Explain why this literal is true by building an explanation */
   void explain(TNode literal, Node& exp);
 
-  /** Overrides to ensure that pairs of lambdas are not considered disequal. */
-  bool areCareDisequal(TNode x, TNode y) override;
-  /**
-   * Overrides to use the theory state instead of the equality engine, since
-   * for higher-order, some terms that do not occur in the equality engine are
-   * considered.
-   */
-  void processCarePairArgs(TNode a, TNode b) override;
-  /**
-   * Is t a higher order type? A higher-order type is a function type having
-   * an argument type that is also a function type. This is used for checking
-   * logic exceptions.
-   */
-  bool isHigherOrderType(TypeNode tn);
   TheoryUfRewriter d_rewriter;
   /** Proof rule checker */
   UfProofRuleChecker d_checker;
@@ -153,8 +135,6 @@ class TheoryUF : public Theory
   DistinctExtension d_distinct;
   /** The notify class */
   NotifyClass d_notify;
-  /** Cache for isHigherOrderType */
-  std::map<TypeNode, bool> d_isHoType;
   /** The care pair argument callback, used for theory combination */
   CarePairArgumentCallback d_cpacb;
 }; /* class TheoryUF */

@@ -44,17 +44,6 @@ class TheoryUfRewriter : public TheoryRewriter
    * cannot be rewritten.
    */
   Node rewriteViaRule(ProofRewriteRule id, const Node& n) override;
-  // conversion between HO_APPLY AND APPLY_UF
-  /** returns true if this node can be used as an operator of an APPLY_UF node.
-   * In higher-order logic, terms can have function types and not just
-   * variables. Currently, we want only free variables to be used as operators
-   * of APPLY_UF nodes. This is motivated by E-matching, ite-lifting among other
-   * things.  For example: f: Int -> Int, g : Int -> Int forall x : ( Int -> Int
-   * ), y : Int. (x y) = (f 0) Then, f and g can be used as APPLY_UF operators,
-   * but (ite C f g), (lambda x1. (f x1)) as well as the variable x above are
-   * not.
-   */
-  static bool canUseAsApplyUfOperator(TNode n);
   /**
    * Can we eliminate the lambda n? This is true if n is of the form
    * (LAMBDA x (APPLY_UF f x)), which is equivalent to f.

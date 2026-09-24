@@ -54,7 +54,7 @@ using PreserveStructureAttribute =
 
 bool QAttributes::isStandard() const
 {
-  return !d_sygus && !d_preserveStructure && !isFunDef() && !isOracleInterface()
+  return !d_preserveStructure && !isFunDef() && !isOracleInterface()
          && !d_isQuantBounded;
 }
 
@@ -167,32 +167,6 @@ Node QuantAttributes::getFunDefBody(Node q)
   return Node::null();
 }
 
-bool QuantAttributes::checkSygusConjecture(Node q)
-{
-  return (q.getKind() == Kind::FORALL && q.getNumChildren() == 3)
-             ? checkSygusConjectureAnnotation(q[2])
-             : false;
-}
-
-bool QuantAttributes::checkSygusConjectureAnnotation(Node ipl)
-{
-  if (!ipl.isNull())
-  {
-    for (unsigned i = 0; i < ipl.getNumChildren(); i++)
-    {
-      if (ipl[i].getKind() == Kind::INST_ATTRIBUTE)
-      {
-        Node avar = ipl[i][0];
-        if (avar.getAttribute(SygusAttribute()))
-        {
-          return true;
-        }
-      }
-    }
-  }
-  return false;
-}
-
 bool QuantAttributes::hasPattern(Node q)
 {
   Assert(q.getKind() == Kind::FORALL);
@@ -274,14 +248,7 @@ void QuantAttributes::computeQuantAttributes(Node q, QAttributes& qa)
           // get operator directly from pattern
           qa.d_fundef_f = q[2][i][0].getOperator();
         }
-        if (avar.getAttribute(SygusAttribute()))
-        {
-          // not necessarily nested existential
-          // Assert( q[1].getKind()==NOT );
-          // Assert( q[1][0].getKind()==FORALL );
-          Trace("quant-attr") << "Attribute : sygus : " << q << std::endl;
-          qa.d_sygus = true;
-        }
+
         // oracles are specified by a distinguished variable kind
         if (avar.getKind() == Kind::ORACLE)
         {
@@ -289,14 +256,7 @@ void QuantAttributes::computeQuantAttributes(Node q, QAttributes& qa)
           Trace("quant-attr")
               << "Attribute : oracle interface : " << q << std::endl;
         }
-        if (avar.hasAttribute(SygusSideConditionAttribute()))
-        {
-          qa.d_sygusSideCondition =
-              avar.getAttribute(SygusSideConditionAttribute());
-          Trace("quant-attr")
-              << "Attribute : sygus side condition : "
-              << qa.d_sygusSideCondition << " : " << q << std::endl;
-        }
+
         if (avar.getAttribute(QuantNameAttribute()))
         {
           // only set the name if there is a value
@@ -375,16 +335,6 @@ bool QuantAttributes::isFunDef(Node q)
     return false;
   }
   return it->second.isFunDef();
-}
-
-bool QuantAttributes::isSygus(Node q)
-{
-  std::map<Node, QAttributes>::iterator it = d_qattr.find(q);
-  if (it == d_qattr.end())
-  {
-    return false;
-  }
-  return it->second.d_sygus;
 }
 
 bool QuantAttributes::isOracleInterface(Node q)
