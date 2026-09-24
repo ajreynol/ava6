@@ -20,7 +20,6 @@
 #include "theory/decision_manager.h"
 #include "theory/quantifiers/bv_inverter.h"
 #include "theory/quantifiers/cegqi/ceg_instantiator.h"
-#include "theory/quantifiers/cegqi/nested_qe.h"
 #include "theory/quantifiers/instantiate.h"
 #include "theory/quantifiers/quant_module.h"
 #include "util/statistics_stats.h"
@@ -181,14 +180,6 @@ class InstStrategyCegqi : public QuantifiersModule
   {
     return d_added_cbqi_lemma.find(q) != d_added_cbqi_lemma.end();
   }
-  /**
-   * Return true if q can be processed with nested quantifier elimination.
-   * This may add a lemma on the output channel of quantifiers engine if so.
-   *
-   * @param q The quantified formula to process
-   * @param isPreregister Whether this method is being called at preregister.
-   */
-  bool processNestedQe(Node q, bool isPreregister);
   /** process functions */
   void process(Node q, int e);
   /**
@@ -200,10 +191,6 @@ class InstStrategyCegqi : public QuantifiersModule
   Node getCounterexampleLiteral(Node q);
   /** map from universal quantifiers to their counterexample literals */
   std::map<Node, Node> d_ce_lit;
-  /** For lemmas from the nested qe module */
-  std::shared_ptr<TrustProofGenerator> d_nqetpg;
-  /** The nested quantifier elimination utility */
-  std::unique_ptr<NestedQe> d_nestedQe;
 };
 
 }  // namespace quantifiers

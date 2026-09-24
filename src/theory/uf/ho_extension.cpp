@@ -316,14 +316,12 @@ unsigned HoExtension::checkExtensionality(TheoryModel* m)
                  << isCollectModel << "..." << std::endl;
   std::map<TypeNode, std::vector<Node> > func_eqcs;
   eq::EqClassesIterator eqcs_i = eq::EqClassesIterator(ee);
-  bool hasFunctions = false;
   while (!eqcs_i.isFinished())
   {
     Node eqc = (*eqcs_i);
     TypeNode tn = eqc.getType();
     if (tn.isFunction() && d_lambdaEqc.find(eqc) == d_lambdaEqc.end())
     {
-      hasFunctions = true;
       std::vector<TypeNode> argTypes = tn.getArgTypes();
       // We classify a function here to determine whether we need to apply
       // extensionality eagerly during solving. We apply extensionality

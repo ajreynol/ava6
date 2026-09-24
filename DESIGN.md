@@ -1,4 +1,10 @@
-# Baseline design
+# Ava6 design
+
+Ava6 is an experimental fork built by reducing cvc5 to a fixed SMT core.
+Its initial algorithms and proof infrastructure are inherited from cvc5;
+the smaller feature boundary provides a baseline for subsequent experiments.
+The import revision and attribution are recorded in [README.md](README.md)
+and [AUTHORS](AUTHORS).
 
 The experiment starts with the existing solver architecture. The parser still
 constructs public `Term` objects through the C++ API. Moving it to internal
@@ -14,10 +20,16 @@ solver directories or generated internal kinds.
 
 The C++ API remains useful for SMT solving and parser integration. Some legacy
 public declarations and enums are retained to avoid an unrelated API redesign.
-Their removed solving/construction entry points reject calls; compatibility
-metadata is not an implementation of the excluded theories or synthesis solver.
-Shared datatype/grammar representations are still part of this inherited API
-boundary. Future API experiments can remove that compatibility surface.
+Remaining constructors for excluded theories reject calls. The SyGuS API,
+including `Grammar`, `SynthResult`, and synthesis queries, is deleted.
+Quantifier elimination, abduction, interpolation, oracle, and separation-logic
+queries are also deleted from the public solver API. Their parser commands and
+internal solver entry points are removed together. Ordinary quantified SMT
+solving remains supported. Future API experiments can remove the remaining
+compatibility metadata for excluded theories.
+Term and sort construction belongs to `TermManager`. Every `Solver` requires
+an explicit term manager; the deprecated forwarding methods on `Solver` and
+its implicit thread-local term manager are removed.
 
 CPC printing uses the existing `proof/eo` implementation. Alethe and DOT printers
 and the expert CPC signature are removed. Internal proof Nodes and debug traces

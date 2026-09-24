@@ -4133,15 +4133,6 @@ std::vector<TrustNode> TheoryArithPrivate::branchIntegerVariable(
   return lems;
 }
 
-std::vector<ArithVar> TheoryArithPrivate::cutAllBounded() const
-{
-  vector<ArithVar> lemmas;
-  ArithVar max = d_partialModel.getNumberOfVariables();
-
-  
-  return lemmas;
-}
-
 /** Returns true if the roundRobinBranching() issues a lemma. */
 std::vector<TrustNode> TheoryArithPrivate::roundRobinBranch()
 {

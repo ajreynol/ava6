@@ -33,8 +33,6 @@ enum class Language
   LANG_SMTLIB_V2_6 = 0,
   /** A custom SMTLIB v2.6-derived output format for TPTP output */
   LANG_SMTLIB_V2_6_TPTP,
-  /** The SyGuS language version 2.0 */
-  LANG_SYGUS_V2,
 
   /** The AST (output) language */
   LANG_AST,
@@ -52,12 +50,6 @@ inline bool isLangSmt2(Language lang)
 {
   return lang == Language::LANG_SMTLIB_V2_6
          || lang == Language::LANG_SMTLIB_V2_6_TPTP;
-}
-
-/** Is the language a variant of the SyGuS input language? */
-inline bool isLangSygus(Language lang)
-{
-  return lang == Language::LANG_SYGUS_V2;
 }
 
 Language toLanguage(const std::string& language) AVA6_EXPORT;

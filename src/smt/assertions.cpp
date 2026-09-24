@@ -51,7 +51,7 @@ void Assertions::refresh()
   size_t numGlobalDefs = d_globalDefineFunLemmas.size();
   for (size_t i = d_globalDefineFunLemmasIndex.get(); i < numGlobalDefs; i++)
   {
-    addFormula(d_globalDefineFunLemmas[i], true, false);
+    addFormula(d_globalDefineFunLemmas[i], true);
   }
   d_globalDefineFunLemmasIndex = numGlobalDefs;
 }
@@ -65,15 +65,14 @@ void Assertions::setAssumptions(const std::vector<Node>& assumptions)
   {
     // Ensure expr is type-checked at this point.
     ensureBoolean(n);
-    addFormula(n, false, false);
+    addFormula(n, false);
   }
 }
 
 void Assertions::assertFormula(const Node& n)
 {
   ensureBoolean(n);
-  bool maybeHasFv = language::isLangSygus(options().base.inputLanguage);
-  addFormula(n, false, maybeHasFv);
+  addFormula(n, false);
 }
 
 std::vector<Node>& Assertions::getAssumptions() { return d_assumptions; }
@@ -98,7 +97,7 @@ std::unordered_set<Node> Assertions::getCurrentAssertionListDefitions() const
   return defSet;
 }
 
-void Assertions::addFormula(TNode n, bool isFunDef, bool maybeHasFv)
+void Assertions::addFormula(TNode n, bool isFunDef)
 {
   // add to assertion list
   d_assertionList.push_back(n);
@@ -190,32 +189,6 @@ void Assertions::addFormula(TNode n, bool isFunDef, bool maybeHasFv)
     }
   }
 
-  // Ensure that it does not contain free variables
-  if (maybeHasFv)
-  {
-    // Note that API users and the smt2 parser may generate assertions with
-    // shadowed variables, which are resolved during rewriting. Hence we do not
-    // check for this here.
-    if (expr::hasFreeVar(n))
-    {
-      std::stringstream se;
-      if (isFunDef)
-      {
-        se << "Cannot process function definition with free variable.";
-      }
-      else
-      {
-        se << "Cannot process assertion with free variable.";
-        if (language::isLangSygus(options().base.inputLanguage))
-        {
-          // Common misuse of SyGuS is to use top-level assert instead of
-          // constraint when defining the synthesis conjecture.
-          se << " Perhaps you meant `constraint` instead of `assert`?";
-        }
-      }
-      throw ModalException(se.str().c_str());
-    }
-  }
 }
 
 void Assertions::addDefineFunDefinition(Node n, bool global)
@@ -224,16 +197,11 @@ void Assertions::addDefineFunDefinition(Node n, bool global)
   {
     // Global definitions are asserted at check-sat-time because we have to
     // make sure that they are always present
-    Assert(!language::isLangSygus(options().base.inputLanguage));
     d_globalDefineFunLemmas.emplace_back(n);
   }
   else
   {
-    // We don't permit functions-to-synthesize within recursive function
-    // definitions currently. Thus, we should check for free variables if the
-    // input language is SyGuS.
-    bool maybeHasFv = language::isLangSygus(options().base.inputLanguage);
-    addFormula(n, true, maybeHasFv);
+    addFormula(n, true);
   }
 }
 

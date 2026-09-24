@@ -25,7 +25,7 @@ namespace ava6::internal {
 NonClosedNodeConverter::NonClosedNodeConverter(Env& env)
     : EnvObj(env), NodeConverter(nodeManager())
 {
-  getNonClosedKinds(env, d_nonClosedKinds);
+  getNonClosedKinds(d_nonClosedKinds);
 }
 
 NonClosedNodeConverter::~NonClosedNodeConverter() {}
@@ -84,7 +84,7 @@ Node NonClosedNodeConverter::postConvert(Node n)
 bool NonClosedNodeConverter::isClosed(Env& env, const Node& n)
 {
   std::unordered_set<Kind, kind::KindHashFunction> ncks;
-  getNonClosedKinds(env, ncks);
+  getNonClosedKinds(ncks);
   // additional kinds that *might* be non-closed
   ncks.insert(Kind::STORE_ALL);
   ncks.insert(Kind::CONST_SEQUENCE);
@@ -101,7 +101,7 @@ bool NonClosedNodeConverter::isClosed(Env& env, const Node& n)
 }
 
 void NonClosedNodeConverter::getNonClosedKinds(
-    const Env& env, std::unordered_set<Kind, kind::KindHashFunction>& ncks)
+    std::unordered_set<Kind, kind::KindHashFunction>& ncks)
 {
   // some kinds may appear in model values that cannot be asserted
   {

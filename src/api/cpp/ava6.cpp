@@ -24,7 +24,7 @@
  * Our Integer implementation, e.g., is such a special case since we support
  * two different back end implementations (GMP, CLN). Be aware that they do
  * not fully agree on what is (in)valid input, which requires extra checks for
- * consistent behavior (see Solver::mkRealOrIntegerFromStrHelper for example).
+ * consistent behavior (see TermManager::mkRealOrIntegerFromStrHelper for example).
  */
 
 #include <ava6/ava6.h>
@@ -51,7 +51,6 @@
 #include "expr/plugin.h"
 #include "expr/sequence.h"
 #include "expr/skolem_manager.h"
-#include "expr/sygus_grammar.h"
 #include "expr/type_node.h"
 #include "options/base_options.h"
 #include "options/expr_options.h"
@@ -79,7 +78,6 @@
 #include "util/statistics_stats.h"
 #include "util/statistics_value.h"
 #include "util/string.h"
-#include "util/synth_result.h"
 #include "util/uninterpreted_sort_value.h"
 #include "util/utility.h"
 
@@ -1094,68 +1092,6 @@ std::ostream& operator<<(std::ostream& out, const Result& r)
 namespace std {
 
 size_t hash<ava6::Result>::operator()(const ava6::Result& result) const
-{
-  return std::hash<std::string>{}(result.toString());
-}
-}  // namespace std
-
-namespace ava6 {
-
-/* -------------------------------------------------------------------------- */
-/* SynthResult */
-/* -------------------------------------------------------------------------- */
-
-SynthResult::SynthResult(const internal::SynthResult& r)
-    : d_result(new internal::SynthResult(r))
-{
-}
-
-SynthResult::SynthResult() : d_result(new internal::SynthResult()) {}
-
-bool SynthResult::isNull() const
-{
-  return d_result->getStatus() == internal::SynthResult::NONE;
-}
-
-bool SynthResult::hasSolution(void) const
-{
-  return d_result->getStatus() == internal::SynthResult::SOLUTION;
-}
-
-bool SynthResult::hasNoSolution() const
-{
-  return d_result->getStatus() == internal::SynthResult::NO_SOLUTION;
-}
-
-bool SynthResult::isUnknown() const
-{
-  return d_result->getStatus() == internal::SynthResult::UNKNOWN;
-}
-
-bool SynthResult::operator==(const SynthResult& r) const
-{
-  return *d_result == *r.d_result;
-}
-
-bool SynthResult::operator!=(const SynthResult& r) const
-{
-  return *d_result != *r.d_result;
-}
-
-std::string SynthResult::toString(void) const { return d_result->toString(); }
-
-std::ostream& operator<<(std::ostream& out, const SynthResult& sr)
-{
-  out << sr.toString();
-  return out;
-}
-
-}  // namespace ava6
-
-namespace std {
-
-size_t hash<ava6::SynthResult>::operator()(
-    const ava6::SynthResult& result) const
 {
   return std::hash<std::string>{}(result.toString());
 }
@@ -3621,11 +3557,11 @@ bool DatatypeDecl::isResolved() const
     return true;
   }
   // We are resolved if a constructor is resolved. Note that since
-  // internal::DType objects are copied in Solver::mkDatatypeSorts, the
+  // internal::DType objects are copied in TermManager::mkDatatypeSorts, the
   // constructors of d_dtype are passed to NodeManager but not d_type itself.
   // Thus, we must check whether our constructors are resolved.
   // This is a workaround; a clearer implementation would avoid the
-  // copying of DType in Solver::mkDatatypeSorts.
+  // copying of DType in TermManager::mkDatatypeSorts.
   const std::vector<std::shared_ptr<internal::DTypeConstructor>>& cons =
       d_dtype->getConstructors();
   for (const std::shared_ptr<internal::DTypeConstructor>& c : cons)
@@ -4362,148 +4298,6 @@ std::ostream& operator<<(std::ostream& out, const Datatype& dtype)
 }
 
 /* -------------------------------------------------------------------------- */
-/* Grammar                                                                    */
-/* -------------------------------------------------------------------------- */
-
-Grammar::Grammar() : d_nm(nullptr) {}
-
-Grammar::Grammar(NodeManagerSharedPtr nm,
-                 const std::vector<Term>& sygusVars,
-                 const std::vector<Term>& ntSymbols)
-    : d_nm(std::move(nm)),
-      d_grammar(std::make_shared<internal::SygusGrammar>(
-          Term::termVectorToNodes(sygusVars),
-          Term::termVectorToNodes(ntSymbols)))
-{
-}
-
-Grammar::~Grammar() { d_grammar.reset(); }
-
-bool Grammar::isNull() const { return d_grammar == nullptr; }
-
-bool contains(const std::vector<internal::Node>& ns, const internal::Node& n)
-{
-  return std::find(ns.cbegin(), ns.cend(), n) != ns.cend();
-}
-
-void Grammar::addRule(const Term& ntSymbol, const Term& rule)
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_CHECK(!d_grammar->isResolved())
-      << "Grammar cannot be modified after passing "
-         "it as an argument to synthFun";
-  AVA6_API_CHECK_TERM(ntSymbol);
-  AVA6_API_CHECK_TERM(rule);
-  AVA6_API_ARG_CHECK_EXPECTED(
-      contains(d_grammar->getNtSyms(), *ntSymbol.d_node), ntSymbol)
-      << "ntSymbol to be one of the non-terminal symbols given in the "
-         "predeclaration";
-  AVA6_API_CHECK(
-      ntSymbol.d_node->getType().isInstanceOf(rule.d_node->getType()))
-      << "expected ntSymbol and rule to have the same sort";
-  //////// all checks before this line
-  d_grammar->addRule(*ntSymbol.d_node, *rule.d_node);
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-void Grammar::addRules(const Term& ntSymbol, const std::vector<Term>& rules)
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_CHECK(!d_grammar->isResolved())
-      << "Grammar cannot be modified after passing "
-         "it as an argument to synthFun";
-  AVA6_API_CHECK_TERM(ntSymbol);
-  AVA6_API_CHECK_TERMS_WITH_SORT(rules, ntSymbol.getSort());
-  AVA6_API_ARG_CHECK_EXPECTED(
-      contains(d_grammar->getNtSyms(), *ntSymbol.d_node), ntSymbol)
-      << "ntSymbol to be one of the non-terminal symbols given in the "
-         "predeclaration";
-  //////// all checks before this line
-  d_grammar->addRules(*ntSymbol.d_node, Term::termVectorToNodes(rules));
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-void Grammar::addAnyConstant(const Term& ntSymbol)
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_CHECK(!d_grammar->isResolved())
-      << "Grammar cannot be modified after passing "
-         "it as an argument to synthFun";
-  AVA6_API_CHECK_TERM(ntSymbol);
-  AVA6_API_ARG_CHECK_EXPECTED(
-      contains(d_grammar->getNtSyms(), *ntSymbol.d_node), ntSymbol)
-      << "ntSymbol to be one of the non-terminal symbols given in the "
-         "predeclaration";
-  //////// all checks before this line
-  d_grammar->addAnyConstant(*ntSymbol.d_node, ntSymbol.d_node->getType());
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-void Grammar::addAnyVariable(const Term& ntSymbol)
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_CHECK(!d_grammar->isResolved())
-      << "Grammar cannot be modified after passing "
-         "it as an argument to synthFun";
-  AVA6_API_CHECK_TERM(ntSymbol);
-  AVA6_API_ARG_CHECK_EXPECTED(
-      contains(d_grammar->getNtSyms(), *ntSymbol.d_node), ntSymbol)
-      << "ntSymbol to be one of the non-terminal symbols given in the "
-         "predeclaration";
-  //////// all checks before this line
-  d_grammar->addAnyVariable(*ntSymbol.d_node);
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-std::string Grammar::toString() const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  //////// all checks before this line
-  return d_grammar == nullptr || !d_grammar->hasRules() ? ""
-                                                        : d_grammar->toString();
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-Sort Grammar::resolve()
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  //////// all checks before this line
-  return Sort(d_nm, d_grammar->resolve());
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-std::ostream& operator<<(std::ostream& out, const Grammar& grammar)
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  return out << grammar.toString();
-  AVA6_API_TRY_CATCH_END;
-}
-
-bool Grammar::operator==(const Grammar& grammar) const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  //////// all checks before this line
-  return d_grammar == grammar.d_grammar;
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-bool Grammar::operator!=(const Grammar& grammar) const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  //////// all checks before this line
-  return d_grammar != grammar.d_grammar;
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-/* -------------------------------------------------------------------------- */
 /* Options                                                                    */
 /* -------------------------------------------------------------------------- */
 
@@ -4950,12 +4744,6 @@ void TermManager::resetStatistics()
   });
 }
 
-TermManager* TermManager::currentTM()
-{
-  thread_local static TermManager tm;
-  return &tm;
-}
-
 void TermManager::checkMkTerm(Kind kind, uint32_t nchildren) const
 {
   AVA6_API_KIND_CHECK(kind);
@@ -5339,12 +5127,12 @@ Sort TermManager::mkBitVectorSort(uint32_t size)
   AVA6_API_TRY_CATCH_END;
 }
 
-Sort TermManager::mkFiniteFieldSort(const std::string& modulus, uint32_t base)
+Sort TermManager::mkFiniteFieldSort(const std::string&, uint32_t)
 {
   throw Ava6ApiException("This feature is not supported by the core solver");
 }
 
-Sort TermManager::mkFloatingPointSort(uint32_t exp, uint32_t sig)
+Sort TermManager::mkFloatingPointSort(uint32_t, uint32_t)
 {
   throw Ava6ApiException("This feature is not supported by the core solver");
 }
@@ -5483,7 +5271,7 @@ Sort TermManager::mkSetSort(const Sort& elemSort)
   AVA6_API_TRY_CATCH_END;
 }
 
-Sort TermManager::mkBagSort(const Sort& elemSort)
+Sort TermManager::mkBagSort(const Sort&)
 {
   throw Ava6ApiException("This feature is not supported by the core solver");
 }
@@ -5555,7 +5343,7 @@ Sort TermManager::mkTupleSort(const std::vector<Sort>& sorts)
   AVA6_API_TRY_CATCH_END;
 }
 
-Sort TermManager::mkNullableSort(const Sort& sort)
+Sort TermManager::mkNullableSort(const Sort&)
 {
   throw Ava6ApiException("This constructor is not part of the core SMT language");
 }
@@ -5834,7 +5622,7 @@ Term TermManager::mkEmptySet(const Sort& sort)
   AVA6_API_TRY_CATCH_END;
 }
 
-Term TermManager::mkEmptyBag(const Sort& sort)
+Term TermManager::mkEmptyBag(const Sort&)
 {
   throw Ava6ApiException("This feature is not supported by the core solver");
 }
@@ -5844,7 +5632,7 @@ Term TermManager::mkSepEmp()
   throw Ava6ApiException("Separation logic is not supported by the core solver");
 }
 
-Term TermManager::mkSepNil(const Sort& sort)
+Term TermManager::mkSepNil(const Sort&)
 {
   throw Ava6ApiException("This feature is not supported by the core solver");
 }
@@ -5934,66 +5722,66 @@ Term TermManager::mkBitVector(uint32_t size,
   AVA6_API_TRY_CATCH_END;
 }
 
-Term TermManager::mkFiniteFieldElem(const std::string& value,
-                                    const Sort& sort,
-                                    uint32_t base)
+Term TermManager::mkFiniteFieldElem(const std::string&,
+                                    const Sort&,
+                                    uint32_t)
 {
   throw Ava6ApiException("This feature is not supported by the core solver");
 }
 
-Term TermManager::mkConstArray(const Sort& sort, const Term& val)
+Term TermManager::mkConstArray(const Sort&, const Term&)
 {
   throw Ava6ApiException("This constructor is not part of the core SMT language");
 }
 
-Term TermManager::mkFloatingPointPosInf(uint32_t exp, uint32_t sig)
+Term TermManager::mkFloatingPointPosInf(uint32_t, uint32_t)
 {
   throw Ava6ApiException("This feature is not supported by the core solver");
 }
 
-Term TermManager::mkFloatingPointNegInf(uint32_t exp, uint32_t sig)
+Term TermManager::mkFloatingPointNegInf(uint32_t, uint32_t)
 {
   throw Ava6ApiException("This feature is not supported by the core solver");
 }
 
-Term TermManager::mkFloatingPointNaN(uint32_t exp, uint32_t sig)
+Term TermManager::mkFloatingPointNaN(uint32_t, uint32_t)
 {
   throw Ava6ApiException("This feature is not supported by the core solver");
 }
 
-Term TermManager::mkFloatingPointPosZero(uint32_t exp, uint32_t sig)
+Term TermManager::mkFloatingPointPosZero(uint32_t, uint32_t)
 {
   throw Ava6ApiException("This feature is not supported by the core solver");
 }
 
-Term TermManager::mkFloatingPointNegZero(uint32_t exp, uint32_t sig)
+Term TermManager::mkFloatingPointNegZero(uint32_t, uint32_t)
 {
   throw Ava6ApiException("This feature is not supported by the core solver");
 }
 
-Term TermManager::mkRoundingMode(RoundingMode rm)
+Term TermManager::mkRoundingMode(RoundingMode)
 {
   throw Ava6ApiException("This feature is not supported by the core solver");
 }
 
-Term TermManager::mkFloatingPoint(uint32_t exp, uint32_t sig, const Term& val)
+Term TermManager::mkFloatingPoint(uint32_t, uint32_t, const Term&)
 {
   throw Ava6ApiException("This feature is not supported by the core solver");
 }
 
-Term TermManager::mkFloatingPoint(const Term& sign,
-                                  const Term& exp,
-                                  const Term& sig)
+Term TermManager::mkFloatingPoint(const Term&,
+                                  const Term&,
+                                  const Term&)
 {
   throw Ava6ApiException("This feature is not supported by the core solver");
 }
 
-Term TermManager::mkCardinalityConstraint(const Sort& sort, uint32_t upperBound)
+Term TermManager::mkCardinalityConstraint(const Sort&, uint32_t)
 {
   throw Ava6ApiException("This constructor is not part of the core SMT language");
 }
 
-Term TermManager::mkNullableLift(Kind kind, const std::vector<Term>& args)
+Term TermManager::mkNullableLift(Kind, const std::vector<Term>&)
 {
   throw Ava6ApiException("This constructor is not part of the core SMT language");
 }
@@ -6047,27 +5835,27 @@ Term TermManager::mkTuple(const std::vector<Term>& terms)
   AVA6_API_TRY_CATCH_END;
 }
 
-Term TermManager::mkNullableSome(const Term& term)
+Term TermManager::mkNullableSome(const Term&)
 {
   throw Ava6ApiException("This constructor is not part of the core SMT language");
 }
 
-Term TermManager::mkNullableNull(const Sort& sort)
+Term TermManager::mkNullableNull(const Sort&)
 {
   throw Ava6ApiException("This constructor is not part of the core SMT language");
 }
 
-Term TermManager::mkNullableVal(const Term& term)
+Term TermManager::mkNullableVal(const Term&)
 {
   throw Ava6ApiException("This constructor is not part of the core SMT language");
 }
 
-Term TermManager::mkNullableIsNull(const Term& term)
+Term TermManager::mkNullableIsNull(const Term&)
 {
   throw Ava6ApiException("This constructor is not part of the core SMT language");
 }
 
-Term TermManager::mkNullableIsSome(const Term& term)
+Term TermManager::mkNullableIsSome(const Term&)
 {
   throw Ava6ApiException("This constructor is not part of the core SMT language");
 }
@@ -6135,23 +5923,10 @@ Solver::Solver(TermManager& tm)
 {
 }
 
-Solver::Solver()
-    : Solver(*TermManager::currentTM(), std::make_unique<internal::Options>())
-{
-}
-
 Solver::~Solver() {}
 
 /* Helpers and private functions                                              */
 /* -------------------------------------------------------------------------- */
-
-Term Solver::synthFunHelper(const std::string& symbol,
-                            const std::vector<Term>& boundVars,
-                            const Sort& sort,
-                            Grammar* grammar) const
-{
-  throw Ava6ApiException("Synthesis is not supported by the core solver");
-}
 
 void Solver::ensureWellFormedTerm(const Term& t) const
 {
@@ -6186,345 +5961,6 @@ void Solver::printStatisticsSafe(int fd) const
   d_slv->printStatisticsSafe(fd);
 }
 
-/* Deprecated Functions                                                       */
-/* -------------------------------------------------------------------------- */
-
-Sort Solver::getBooleanSort(void) const { return d_tm.getBooleanSort(); }
-
-Sort Solver::getIntegerSort(void) const { return d_tm.getIntegerSort(); }
-
-Sort Solver::getRealSort(void) const { return d_tm.getRealSort(); }
-
-Sort Solver::getRegExpSort(void) const { return d_tm.getRegExpSort(); }
-
-Sort Solver::getStringSort(void) const { return d_tm.getStringSort(); }
-
-Sort Solver::getRoundingModeSort(void) const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Sort Solver::mkArraySort(const Sort& indexSort, const Sort& elemSort) const
-{
-  return d_tm.mkArraySort(indexSort, elemSort);
-}
-
-Sort Solver::mkBitVectorSort(uint32_t size) const
-{
-  return d_tm.mkBitVectorSort(size);
-}
-
-Sort Solver::mkFiniteFieldSort(const std::string& modulus, uint32_t base) const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Sort Solver::mkFloatingPointSort(uint32_t exp, uint32_t sig) const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Sort Solver::mkDatatypeSort(const DatatypeDecl& dtypedecl) const
-{
-  return d_tm.mkDatatypeSort(dtypedecl);
-}
-
-std::vector<Sort> Solver::mkDatatypeSorts(
-    const std::vector<DatatypeDecl>& dtypedecls) const
-{
-  return d_tm.mkDatatypeSorts(dtypedecls);
-}
-
-Sort Solver::mkFunctionSort(const std::vector<Sort>& sorts,
-                            const Sort& codomain) const
-{
-  return d_tm.mkFunctionSort(sorts, codomain);
-}
-
-Sort Solver::mkParamSort(const std::optional<std::string>& symbol) const
-{
-  return d_tm.mkParamSort(symbol);
-}
-
-Sort Solver::mkPredicateSort(const std::vector<Sort>& sorts) const
-{
-  return d_tm.mkPredicateSort(sorts);
-}
-
-Sort Solver::mkRecordSort(
-    const std::vector<std::pair<std::string, Sort>>& fields) const
-{
-  return d_tm.mkRecordSort(fields);
-}
-
-Sort Solver::mkSetSort(const Sort& elemSort) const
-{
-  return d_tm.mkSetSort(elemSort);
-}
-
-Sort Solver::mkBagSort(const Sort& elemSort) const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Sort Solver::mkSequenceSort(const Sort& elemSort) const
-{
-  return d_tm.mkSequenceSort(elemSort);
-}
-
-Sort Solver::mkAbstractSort(SortKind k) const { return d_tm.mkAbstractSort(k); }
-
-Sort Solver::mkUninterpretedSort(const std::optional<std::string>& symbol) const
-{
-  return d_tm.mkUninterpretedSort(symbol);
-}
-
-Sort Solver::mkUnresolvedDatatypeSort(const std::string& symbol,
-                                      size_t arity) const
-{
-  return d_tm.mkUnresolvedDatatypeSort(symbol, arity);
-}
-
-Sort Solver::mkUninterpretedSortConstructorSort(
-    size_t arity, const std::optional<std::string>& symbol) const
-{
-  return d_tm.mkUninterpretedSortConstructorSort(arity, symbol);
-}
-
-Sort Solver::mkTupleSort(const std::vector<Sort>& sorts) const
-{
-  return d_tm.mkTupleSort(sorts);
-}
-
-Sort Solver::mkNullableSort(const Sort& sort) const
-{
-  return d_tm.mkNullableSort(sort);
-}
-
-Term Solver::mkTrue(void) const { return d_tm.mkTrue(); }
-
-Term Solver::mkFalse(void) const { return d_tm.mkFalse(); }
-
-Term Solver::mkBoolean(bool val) const { return d_tm.mkBoolean(val); }
-
-Term Solver::mkPi() const { return d_tm.mkPi(); }
-
-Term Solver::mkInteger(const std::string& s) const { return d_tm.mkInteger(s); }
-
-Term Solver::mkInteger(int64_t val) const { return d_tm.mkInteger(val); }
-
-Term Solver::mkReal(const std::string& s) const { return d_tm.mkReal(s); }
-
-Term Solver::mkReal(int64_t val) const { return d_tm.mkReal(val); }
-
-Term Solver::mkReal(int64_t num, int64_t den) const
-{
-  return d_tm.mkReal(num, den);
-}
-
-Term Solver::mkRegexpAll() const { return d_tm.mkRegexpAll(); }
-
-Term Solver::mkRegexpNone() const { return d_tm.mkRegexpNone(); }
-
-Term Solver::mkRegexpAllchar() const { return d_tm.mkRegexpAllchar(); }
-
-Term Solver::mkEmptySet(const Sort& sort) const
-{
-  return d_tm.mkEmptySet(sort);
-}
-
-Term Solver::mkEmptyBag(const Sort& sort) const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term Solver::mkSepEmp() const {
-  throw Ava6ApiException("Separation logic is not supported by the core solver");
-}
-
-Term Solver::mkSepNil(const Sort& sort) const {
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term Solver::mkString(const std::string& s, bool useEscSequences) const
-{
-  return d_tm.mkString(s, useEscSequences);
-}
-
-Term Solver::mkString(const std::wstring& s) const { return d_tm.mkString(s); }
-
-Term Solver::mkEmptySequence(const Sort& sort) const
-{
-  return d_tm.mkEmptySequence(sort);
-}
-
-Term Solver::mkUniverseSet(const Sort& sort) const
-{
-  return d_tm.mkUniverseSet(sort);
-}
-
-Term Solver::mkBitVector(uint32_t size, uint64_t val) const
-{
-  return d_tm.mkBitVector(size, val);
-}
-
-Term Solver::mkBitVector(uint32_t size,
-                         const std::string& s,
-                         uint32_t base) const
-{
-  return d_tm.mkBitVector(size, s, base);
-}
-
-Term Solver::mkFiniteFieldElem(const std::string& value,
-                               const Sort& sort,
-                               uint32_t base) const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term Solver::mkConstArray(const Sort& sort, const Term& val) const
-{
-  return d_tm.mkConstArray(sort, val);
-}
-
-Term Solver::mkFloatingPointPosInf(uint32_t exp, uint32_t sig) const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term Solver::mkFloatingPointNegInf(uint32_t exp, uint32_t sig) const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term Solver::mkFloatingPointNaN(uint32_t exp, uint32_t sig) const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term Solver::mkFloatingPointPosZero(uint32_t exp, uint32_t sig) const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term Solver::mkFloatingPointNegZero(uint32_t exp, uint32_t sig) const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term Solver::mkRoundingMode(RoundingMode rm) const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term Solver::mkFloatingPoint(uint32_t exp, uint32_t sig, const Term& val) const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term Solver::mkFloatingPoint(const Term& sign,
-                             const Term& exp,
-                             const Term& sig) const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term Solver::mkCardinalityConstraint(const Sort& sort,
-                                     uint32_t upperBound) const
-{
-  return d_tm.mkCardinalityConstraint(sort, upperBound);
-}
-
-Term Solver::mkNullableLift(Kind kind, const std::vector<Term>& args) const
-{
-  return d_tm.mkNullableLift(kind, args);
-}
-
-Term Solver::mkConst(const Sort& sort,
-                     const std::optional<std::string>& symbol) const
-{
-  return d_tm.mkConst(sort, symbol);
-}
-
-Term Solver::mkVar(const Sort& sort,
-                   const std::optional<std::string>& symbol) const
-{
-  return d_tm.mkVar(sort, symbol);
-}
-
-DatatypeConstructorDecl Solver::mkDatatypeConstructorDecl(
-    const std::string& name)
-{
-  return d_tm.mkDatatypeConstructorDecl(name);
-}
-
-DatatypeDecl Solver::mkDatatypeDecl(const std::string& name, bool isCoDatatype)
-{
-  return d_tm.mkDatatypeDecl(name, isCoDatatype);
-}
-
-DatatypeDecl Solver::mkDatatypeDecl(const std::string& name,
-                                    const std::vector<Sort>& params,
-                                    bool isCoDatatype)
-{
-  return d_tm.mkDatatypeDecl(name, params, isCoDatatype);
-}
-
-Term Solver::mkTerm(Kind kind, const std::vector<Term>& children) const
-{
-  return d_tm.mkTerm(kind, children);
-}
-
-Term Solver::mkTerm(const Op& op, const std::vector<Term>& children) const
-{
-  return d_tm.mkTerm(op, children);
-}
-
-Term Solver::mkTuple(const std::vector<Term>& terms) const
-{
-  return d_tm.mkTuple(terms);
-}
-
-Term Solver::mkNullableSome(const Term& term) const
-{
-  return d_tm.mkNullableSome(term);
-}
-
-Term Solver::mkNullableNull(const Sort& sort) const
-{
-  return d_tm.mkNullableNull(sort);
-}
-
-Term Solver::mkNullableVal(const Term& term) const
-{
-  return d_tm.mkNullableVal(term);
-}
-
-Term Solver::mkNullableIsNull(const Term& term) const
-{
-  return d_tm.mkNullableIsNull(term);
-}
-
-Term Solver::mkNullableIsSome(const Term& term) const
-{
-  return d_tm.mkNullableIsSome(term);
-}
-
-Op Solver::mkOp(Kind kind, const std::vector<uint32_t>& args) const
-{
-  return d_tm.mkOp(kind, args);
-}
-
-Op Solver::mkOp(Kind kind, const std::initializer_list<uint32_t>& args) const
-{
-  return d_tm.mkOp(kind, args);
-}
-
-Op Solver::mkOp(Kind kind, const std::string& arg) const
-{
-  return d_tm.mkOp(kind, arg);
-}
-
 /* Non-SMT-LIB commands                                                       */
 /* -------------------------------------------------------------------------- */
 
@@ -6547,7 +5983,7 @@ void Solver::assertFormula(const Term& term) const
 {
   AVA6_API_TRY_CATCH_BEGIN;
   AVA6_API_SOLVER_CHECK_TERM(term);
-  AVA6_API_SOLVER_CHECK_TERM_WITH_SORT(term, getBooleanSort());
+  AVA6_API_SOLVER_CHECK_TERM_WITH_SORT(term, d_tm.getBooleanSort());
   ensureWellFormedTerm(term);
   //////// all checks before this line
   d_slv->assertFormula(*term.d_node);
@@ -6577,7 +6013,7 @@ Result Solver::checkSatAssuming(const Term& assumption) const
       << "cannot make multiple queries unless incremental solving is enabled "
          "(try --"
       << internal::options::base::longName::incrementalSolving << ")";
-  AVA6_API_SOLVER_CHECK_TERM_WITH_SORT(assumption, getBooleanSort());
+  AVA6_API_SOLVER_CHECK_TERM_WITH_SORT(assumption, d_tm.getBooleanSort());
   ensureWellFormedTerm(assumption);
   //////// all checks before this line
   return d_slv->checkSat(*assumption.d_node);
@@ -6593,7 +6029,7 @@ Result Solver::checkSatAssuming(const std::vector<Term>& assumptions) const
       << "cannot make multiple queries unless incremental solving is enabled "
          "(try --"
       << internal::options::base::longName::incrementalSolving << ")";
-  AVA6_API_SOLVER_CHECK_TERMS_WITH_SORT(assumptions, getBooleanSort());
+  AVA6_API_SOLVER_CHECK_TERMS_WITH_SORT(assumptions, d_tm.getBooleanSort());
   ensureWellFormedTerms(assumptions);
   //////// all checks before this line
   for (const Term& term : assumptions)
@@ -7513,41 +6949,6 @@ std::string Solver::getModel(const std::vector<Sort>& sorts,
   AVA6_API_TRY_CATCH_END;
 }
 
-Term Solver::getQuantifierElimination(const Term& q) const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_SOLVER_CHECK_TERM(q);
-  //////// all checks before this line
-  return Term(d_tm.d_nm, d_slv->getQuantifierElimination(q.getNode(), true));
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-Term Solver::getQuantifierEliminationDisjunct(const Term& q) const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_SOLVER_CHECK_TERM(q);
-  //////// all checks before this line
-  return Term(d_tm.d_nm, d_slv->getQuantifierElimination(q.getNode(), false));
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-void Solver::declareSepHeap(const Sort& locSort, const Sort& dataSort) const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term Solver::getValueSepHeap() const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term Solver::getValueSepNil() const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
 Term Solver::declarePool(const std::string& symbol,
                          const Sort& sort,
                          const std::vector<Term>& initValue) const
@@ -7564,15 +6965,6 @@ Term Solver::declarePool(const std::string& symbol,
   return Term(d_tm.d_nm, pool);
   ////////
   AVA6_API_TRY_CATCH_END;
-}
-
-Term Solver::declareOracleFun(
-    const std::string& symbol,
-    const std::vector<Sort>& sorts,
-    const Sort& sort,
-    std::function<Term(const std::vector<Term>&)> fn) const
-{
-  throw Ava6ApiException("This command is not supported by the core solver");
 }
 
 void Solver::addPlugin(Plugin& p)
@@ -7597,36 +6989,6 @@ void Solver::pop(uint32_t nscopes) const
   }
   ////////
   AVA6_API_TRY_CATCH_END;
-}
-
-Term Solver::getInterpolant(const Term& conj) const
-{
-  throw Ava6ApiException("This command is not supported by the core solver");
-}
-
-Term Solver::getInterpolant(const Term& conj, Grammar& grammar) const
-{
-  throw Ava6ApiException("This command is not supported by the core solver");
-}
-
-Term Solver::getInterpolantNext() const
-{
-  throw Ava6ApiException("This command is not supported by the core solver");
-}
-
-Term Solver::getAbduct(const Term& conj) const
-{
-  throw Ava6ApiException("This command is not supported by the core solver");
-}
-
-Term Solver::getAbduct(const Term& conj, Grammar& grammar) const
-{
-  throw Ava6ApiException("This command is not supported by the core solver");
-}
-
-Term Solver::getAbductNext() const
-{
-  throw Ava6ApiException("This command is not supported by the core solver");
 }
 
 void Solver::blockModel(modes::BlockModelsMode mode) const
@@ -7797,99 +7159,9 @@ void Solver::setOption(const std::string& option,
   }
   //////// all checks before this line
   // mark that the option originated from the user here
-  d_slv->setOption(option, value, true);
+  d_slv->setOption(option, value);
   ////////
   AVA6_API_TRY_CATCH_END;
-}
-
-Term Solver::declareSygusVar(const std::string& symbol, const Sort& sort) const
-{
-  throw Ava6ApiException("This command is not supported by the core solver");
-}
-
-Grammar Solver::mkGrammar(const std::vector<Term>& boundVars,
-                          const std::vector<Term>& ntSymbols) const
-{
-  throw Ava6ApiException("Synthesis is not supported by the core solver");
-}
-
-Term Solver::synthFun(const std::string& symbol,
-                      const std::vector<Term>& boundVars,
-                      const Sort& sort) const
-{
-  throw Ava6ApiException("Synthesis is not supported by the core solver");
-}
-
-Term Solver::synthFun(const std::string& symbol,
-                      const std::vector<Term>& boundVars,
-                      Sort sort,
-                      Grammar& grammar) const
-{
-  throw Ava6ApiException("Synthesis is not supported by the core solver");
-}
-
-void Solver::addSygusConstraint(const Term& term) const
-{
-  throw Ava6ApiException("This command is not supported by the core solver");
-}
-
-std::vector<Term> Solver::getSygusConstraints() const
-{
-  throw Ava6ApiException("This command is not supported by the core solver");
-}
-
-void Solver::addSygusAssume(const Term& term) const
-{
-  throw Ava6ApiException("This command is not supported by the core solver");
-}
-
-std::vector<Term> Solver::getSygusAssumptions() const
-{
-  throw Ava6ApiException("This command is not supported by the core solver");
-}
-
-void Solver::addSygusInvConstraint(const Term& inv,
-                                   const Term& pre,
-                                   const Term& trans,
-                                   const Term& post) const
-{
-  throw Ava6ApiException("This command is not supported by the core solver");
-}
-
-SynthResult Solver::checkSynth() const
-{
-  throw Ava6ApiException("This command is not supported by the core solver");
-}
-
-SynthResult Solver::checkSynthNext() const
-{
-  throw Ava6ApiException("This command is not supported by the core solver");
-}
-
-Term Solver::getSynthSolution(const Term& term) const
-{
-  throw Ava6ApiException("This command is not supported by the core solver");
-}
-
-std::vector<Term> Solver::getSynthSolutions(
-    const std::vector<Term>& terms) const
-{
-  throw Ava6ApiException("This command is not supported by the core solver");
-}
-
-Term Solver::findSynth(modes::FindSynthTarget fst) const
-{
-  throw Ava6ApiException("This command is not supported by the core solver");
-}
-
-Term Solver::findSynth(modes::FindSynthTarget fst, Grammar& grammar) const
-{
-  throw Ava6ApiException("This command is not supported by the core solver");
-}
-
-Term Solver::findSynthNext() const
-{
-  throw Ava6ApiException("This command is not supported by the core solver");
 }
 
 Statistics Solver::getStatistics() const
@@ -8364,15 +7636,6 @@ size_t hash<ava6::Proof>::operator()(const ava6::Proof& proof) const
     return 0;
   }
   return std::hash<ava6::internal::ProofNode>{}(*proof.d_proofNode);
-}
-
-size_t hash<ava6::Grammar>::operator()(const ava6::Grammar& grammar) const
-{
-  if (grammar.isNull())
-  {
-    return 0;
-  }
-  return std::hash<ava6::internal::SygusGrammar>{}(*grammar.d_grammar);
 }
 
 }  // namespace std

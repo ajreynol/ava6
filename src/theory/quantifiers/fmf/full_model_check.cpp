@@ -389,7 +389,7 @@ void FullModelChecker::finishInit() { d_model = d_fm.get(); }
 bool FullModelChecker::preProcessBuildModel(TheoryModel* m)
 {
   // standard pre-process
-  if (!preProcessBuildModelStd(m))
+  if (!preProcessBuildModelStd())
   {
     return false;
   }

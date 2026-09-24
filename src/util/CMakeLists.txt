@@ -63,8 +63,6 @@ libava6_add_sources(
   statistics_value.h
   string.cpp
   string.h
-  synth_result.cpp
-  synth_result.h
   uninterpreted_sort_value.cpp
   uninterpreted_sort_value.h
   utility.cpp

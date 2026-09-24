@@ -142,15 +142,6 @@ class QuantifiersRewriter : public TheoryRewriter
                       const std::vector<Node>& args,
                       Node& var,
                       CDProof* cdp = nullptr) const;
-  /** variable eliminate for string equalities
-   *
-   * If this returns a non-null value ret, then var is updated to a member of
-   * args, lit is equivalent to ( var = ret ).
-   */
-  Node getVarElimEqString(Node lit,
-                          const std::vector<Node>& args,
-                          Node& var,
-                          CDProof* cdp = nullptr) const;
   /** get variable elimination
    *
    * If there exists an n with some polarity in body, and entails a literal that

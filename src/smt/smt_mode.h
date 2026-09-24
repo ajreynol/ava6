@@ -36,14 +36,6 @@ enum class SmtMode
   SAT_UNKNOWN,
   // immediately after a check-sat returning "unsat"
   UNSAT,
-  // immediately after a successful call to get-abduct
-  ABDUCT,
-  // immediately after a successful call to get-interpolant
-  INTERPOL,
-  // immediately after a successful call to check-synth or check-synth-next
-  SYNTH,
-  // immediately after a successful call to find-synth or find-synth-next
-  FIND_SYNTH
 };
 /**
  * Writes a SmtMode to a stream.

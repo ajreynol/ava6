@@ -100,7 +100,6 @@ class Smt2State : public ParserState
   modes::LearnedLitType getLearnedLitType(const std::string& mode);
   /** Parse proof component */
   modes::ProofComponent getProofComponent(const std::string& pc);
-  /** Parse find synth target */
 
 
   bool isTheoryEnabled(internal::theory::TheoryId theory) const;
@@ -210,16 +209,6 @@ class Smt2State : public ParserState
   void reset() override;
 
   /**
-   * Creates a command that adds an invariant constraint.
-   *
-   * @param names Name of four symbols corresponding to the
-   *              function-to-synthesize, precondition, postcondition,
-   *              transition relation.
-   * @return The command that adds an invariant constraint
-   */
-
-
-  /**
    * Sets the logic for the current benchmark. Declares any logic and
    * theory symbols.
    *
@@ -231,23 +220,6 @@ class Smt2State : public ParserState
    * Get the logic.
    */
   const internal::LogicInfo& getLogic() const { return d_logic; }
-
-  /**
-   * Create a Sygus grammar.
-   * @param boundVars the parameters to corresponding synth-fun/synth-inv
-   * @param ntSymbols the pre-declaration of the non-terminal symbols
-   * @return a pointer to the grammar
-   */
-
-
-  /** Are we using a sygus language?  */
-
-
-  /**
-   * Are we using SyGuS grammars? This is true if the input is the SyGuS
-   * language or if produce-abducts or produce-interpolants is true. Enables
-   * grammar-specific token `Constant`.
-   */
 
   /**
    * Are we using fresh binders? If this returns true, then every binder
@@ -476,7 +448,6 @@ class Smt2State : public ParserState
    */
   static bool isConstBv(const Term& t);
 
-  /** Are we parsing a sygus file? */
   /** are we using fresh binders? */
   bool d_freshBinders;
   /** Has the logic been set (either by forcing it or a set-logic command)? */
@@ -496,10 +467,6 @@ class Smt2State : public ParserState
   std::unordered_map<std::string, Kind> d_closureKindMap;
   /** The last named term and its name */
   std::pair<Term, std::string> d_lastNamedTerm;
-  /**
-   * A list of sygus grammar objects. We keep track of them here to ensure that
-   * they don't get deleted before the commands using them get invoked.
-   */
 };
 
 }  // namespace parser

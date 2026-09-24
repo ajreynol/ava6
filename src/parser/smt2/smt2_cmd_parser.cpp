@@ -70,8 +70,6 @@ Smt2CmdParser::Smt2CmdParser(Smt2Lexer& lex,
     d_table["declare-pool"] = Token::DECLARE_POOL_TOK;
     d_table["get-difficulty"] = Token::GET_DIFFICULTY_TOK;
     d_table["get-learned-literals"] = Token::GET_LEARNED_LITERALS_TOK;
-    d_table["get-qe-disjunct"] = Token::GET_QE_DISJUNCT_TOK;
-    d_table["get-qe"] = Token::GET_QE_TOK;
     d_table["include"] = Token::INCLUDE_TOK;
     d_table["simplify"] = Token::SIMPLIFY_TOK;
   }
@@ -123,9 +121,6 @@ std::unique_ptr<Cmd> Smt2CmdParser::parseNextCommand()
       }
     }
     break;
-    // sygus assume/constraint
-    // (assume <term>)
-    // (constraint <term>)
     case Token::BLOCK_MODEL_TOK:
     {
       std::string key = d_tparser.parseKeyword();
@@ -158,7 +153,6 @@ std::unique_ptr<Cmd> Smt2CmdParser::parseNextCommand()
       cmd.reset(new CheckSatAssumingCommand(terms));
     }
     break;
-    // (check-synth)
     case Token::DECLARE_CODATATYPE_TOK:
     case Token::DECLARE_DATATYPE_TOK:
     {
@@ -234,7 +228,6 @@ std::unique_ptr<Cmd> Smt2CmdParser::parseNextCommand()
       {
         d_state.checkLogicAllowsFunctions();
       }
-      // Note that we previously disallowed declare-fun in sygus here.
       // we allow overloading for function declarations
       cmd.reset(new DeclareFunctionCommand(name, sorts, t));
     }
@@ -275,7 +268,6 @@ std::unique_ptr<Cmd> Smt2CmdParser::parseNextCommand()
       cmd.reset(new EmptyCommand());
     }
     break;
-    // (declare-var <symbol> <sort>)
     case Token::DEFINE_CONST_TOK:
     {
       d_state.checkThatLogicIsSet();
@@ -487,7 +479,6 @@ std::unique_ptr<Cmd> Smt2CmdParser::parseNextCommand()
       cmd.reset(new GetInfoCommand(key));
     }
     break;
-    // (get-interpolant <symbol> <term> <grammar>?)
     case Token::GET_LEARNED_LITERALS_TOK:
     {
       // optional keyword
@@ -529,18 +520,6 @@ std::unique_ptr<Cmd> Smt2CmdParser::parseNextCommand()
       }
       d_state.checkThatLogicIsSet();
       cmd.reset(new GetProofCommand(pc));
-    }
-    break;
-    // quantifier elimination commands
-    // (get-qe <term>)
-    // (get-qe-disjunct <term>)
-    case Token::GET_QE_TOK:
-    case Token::GET_QE_DISJUNCT_TOK:
-    {
-      d_state.checkThatLogicIsSet();
-      Term t = d_tparser.parseTerm();
-      bool isFull = (tok == Token::GET_QE_TOK);
-      cmd.reset(new GetQuantifierEliminationCommand(t, isFull));
     }
     break;
     // (get-timeout-core)
@@ -740,8 +719,6 @@ std::unique_ptr<Cmd> Smt2CmdParser::parseNextCommand()
       cmd.reset(new SimplifyCommand(t));
     }
     break;
-    // (synth-fun <symbol> (<sorted_var>*) <sort> <grammar>?)
-    // (synth-inv <symbol> (<sorted_var>*) <grammar>?)
     case Token::EOF_TOK:
       d_lex.parseError("Expected SMT-LIBv2 command", true);
       break;

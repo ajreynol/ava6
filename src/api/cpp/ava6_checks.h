@@ -881,20 +881,6 @@ class Ava6ApiUnsupportedExceptionStream
     }                                                                         \
   } while (0)
 
-/**
- * Grammar checks for member functions of class Solver.
- * Check if given grammar is not null and associated with the term manager of
- * this solver.
- */
-#define AVA6_API_SOLVER_CHECK_GRAMMAR(grammar)     \
-  do                                               \
-  {                                                \
-    AVA6_API_ARG_CHECK_NOT_NULL(grammar);          \
-    AVA6_API_CHECK(d_tm.d_nm == grammar.d_nm)      \
-        << "Given grammar is not associated with " \
-           "the term manager of this solver";      \
-  } while (0)
-
 /* Datatype checks. --------------------------------------------------------- */
 
 /**

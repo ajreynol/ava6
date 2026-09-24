@@ -48,9 +48,9 @@ class NonClosedNodeConverter : protected EnvObj, public NodeConverter
   static bool isClosed(Env& env, const Node& n);
 
  private:
-  /** Get the non-closed kinds, based on the options */
+  /** Get the non-closed kinds */
   static void getNonClosedKinds(
-      const Env& env, std::unordered_set<Kind, kind::KindHashFunction>& ncks);
+      std::unordered_set<Kind, kind::KindHashFunction>& ncks);
   /** Kinds that cannot appear in queries */
   std::unordered_set<Kind, kind::KindHashFunction> d_nonClosedKinds;
   /** The skolems we introduced */

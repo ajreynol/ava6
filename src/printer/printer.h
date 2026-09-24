@@ -190,42 +190,6 @@ class AVA6_EXPORT Printer
   /** Print query command */
   virtual void toStreamCmdQuery(std::ostream& out, Node n) const;
 
-  /** Print declare-var command */
-  virtual void toStreamCmdDeclareVar(std::ostream& out,
-                                     const std::string& id,
-                                     TypeNode type) const;
-
-  /** Print synth-fun command */
-  virtual void toStreamCmdSynthFun(std::ostream& out,
-                                   const std::string& id,
-                                   const std::vector<Node>& vars,
-                                   TypeNode rangeType,
-                                   TypeNode sygusType) const;
-
-  /** Print constraint command */
-  virtual void toStreamCmdConstraint(std::ostream& out, Node n) const;
-
-  /** Print assume command */
-  virtual void toStreamCmdAssume(std::ostream& out, Node n) const;
-
-  /** Print inv-constraint command */
-  virtual void toStreamCmdInvConstraint(
-      std::ostream& out, Node inv, Node pre, Node trans, Node post) const;
-
-  /** Print check-synth command */
-  virtual void toStreamCmdCheckSynth(std::ostream& out) const;
-
-  /** Print check-synth-next command */
-  virtual void toStreamCmdCheckSynthNext(std::ostream& out) const;
-
-  /** Print find-synth command */
-  virtual void toStreamCmdFindSynth(std::ostream& out,
-                                    modes::FindSynthTarget fst,
-                                    TypeNode sygusType) const;
-
-  /** Print find-synth-next command */
-  virtual void toStreamCmdFindSynthNext(std::ostream& out) const;
-
   /** Print simplify command */
   virtual void toStreamCmdSimplify(std::ostream& out, Node n) const;
 
@@ -257,29 +221,6 @@ class AVA6_EXPORT Printer
 
   /** Print get-instantiations command */
   void toStreamCmdGetInstantiations(std::ostream& out) const;
-
-  /** Print get-interpolant command */
-  virtual void toStreamCmdGetInterpol(std::ostream& out,
-                                      const std::string& name,
-                                      Node conj,
-                                      TypeNode sygusType) const;
-
-  /** Print get-interpolant-next command */
-  virtual void toStreamCmdGetInterpolNext(std::ostream& out) const;
-
-  /** Print get-abduct command */
-  virtual void toStreamCmdGetAbduct(std::ostream& out,
-                                    const std::string& name,
-                                    Node conj,
-                                    TypeNode sygusType) const;
-
-  /** Print get-abduct-next command */
-  virtual void toStreamCmdGetAbductNext(std::ostream& out) const;
-
-  /** Print get-quantifier-elimination command */
-  virtual void toStreamCmdGetQuantifierElimination(std::ostream& out,
-                                                   Node n,
-                                                   bool doFull) const;
 
   /** Print get-unsat-assumptions command */
   virtual void toStreamCmdGetUnsatAssumptions(std::ostream& out) const;

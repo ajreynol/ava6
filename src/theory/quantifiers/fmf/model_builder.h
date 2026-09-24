@@ -34,7 +34,7 @@ class QModelBuilder : public TheoryEngineModelBuilder
  protected:
   // must call preProcessBuildModelStd
   bool preProcessBuildModel(TheoryModel* m) override;
-  bool preProcessBuildModelStd(TheoryModel* m);
+  bool preProcessBuildModelStd();
   /** number of lemmas generated while building model */
   unsigned d_addedLemmas;
   unsigned d_triedLemmas;

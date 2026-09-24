@@ -1216,7 +1216,6 @@ set(regress_0_tests
   regress0/quantifiers/issue8227-subs-shadow.smt2
   regress0/quantifiers/issue8609-subtype-assert.smt2
   regress0/quantifiers/issue8821-enum-interleave-types.smt2
-  regress0/quantifiers/issue8923-qe-push-pop.smt2
   regress0/quantifiers/issue9640-vts-iff.smt2
   regress0/quantifiers/mbqi-simple.smt2
   regress0/quantifiers/merge-shadow.smt2
@@ -1231,7 +1230,6 @@ set(regress_0_tests
   regress0/quantifiers/pure_dt_cbqi.smt2
   regress0/quantifiers/qarray-sel-over-store.smt2
   regress0/quantifiers/qcf-rel-dom-opt.smt2
-  regress0/quantifiers/qe-closed-str-re.smt2
   regress0/quantifiers/quant-model-simplification.smt2
   regress0/quantifiers/quant-qid-decl.smt2
   regress0/quantifiers/rew-to-scala.smt2
@@ -2057,21 +2055,13 @@ set(regress_1_tests
   regress1/quantifiers/issue4290-cegqi-r.smt2
   regress1/quantifiers/issue4400-2-already-conf.smt2
   regress1/quantifiers/issue4412-cegqi-type.smt2
-  regress1/quantifiers/issue4813-qe-quant.smt2
   regress1/quantifiers/issue5019-cegqi-i.smt2
   regress1/quantifiers/issue5288-vts-real-int.smt2
-  regress1/quantifiers/issue5373-1-qe-inc.smt2
   regress1/quantifiers/issue5373-2.smt2
   regress1/quantifiers/issue5470-aext.smt2
   regress1/quantifiers/issue5482-rtf-no-fv.smt2
-  regress1/quantifiers/issue5484-qe.smt2
-  regress1/quantifiers/issue5484b-qe.smt2
-  regress1/quantifiers/issue5506-qe.smt2
-  regress1/quantifiers/issue5507-qe.smt2
-  regress1/quantifiers/issue5658-qe.smt2
   regress1/quantifiers/issue5735-subtypes.smt2
   regress1/quantifiers/issue5735-2-subtypes.smt2
-  regress1/quantifiers/issue5899-qe.smt2
   regress1/quantifiers/issue6642-em-types.smt2
   regress1/quantifiers/issue6699-nc-shadow.smt2
   regress1/quantifiers/issue6775-vts-int.smt2
@@ -2099,10 +2089,6 @@ set(regress_1_tests
   regress1/quantifiers/psyco-001-bv.smt2
   regress1/quantifiers/psyco-196.smt2
   regress1/quantifiers/qbv-subcall.smt2
-  regress1/quantifiers/qe.smt2
-  regress1/quantifiers/qe-no-skolem.smt2
-  regress1/quantifiers/qe-partial.smt2
-  regress1/quantifiers/qe-subtypes.smt2
   regress1/quantifiers/qid.smt2
   regress1/quantifiers/qid-debug-inst.smt2
   regress1/quantifiers/quick-sort-q-rew.smt2

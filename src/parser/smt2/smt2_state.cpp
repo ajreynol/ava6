@@ -584,7 +584,6 @@ void Smt2State::setLogic(std::string name)
   d_logicSet = true;
   d_logic = name;
 
-  // if sygus is enabled, we must enable UF, datatypes, and integer arithmetic
   
 
   // Core theory belongs to every logic

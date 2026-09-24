@@ -142,19 +142,14 @@ ostream& operator<<(ostream& out, enum Result::Status s)
 ostream& operator<<(ostream& out, const Result& r)
 {
   Language language = options::ioutils::getOutputLanguage(out);
-  switch (language)
+  if (language::isLangSmt2(language))
   {
-    case Language::LANG_SYGUS_V2: r.toStreamSmt2(out); break;
-    default:
-      if (language::isLangSmt2(language))
-      {
-        r.toStreamSmt2(out);
-      }
-      else
-      {
-        r.toStreamDefault(out);
-      }
-  };
+    r.toStreamSmt2(out);
+  }
+  else
+  {
+    r.toStreamDefault(out);
+  }
   return out;
 }
 

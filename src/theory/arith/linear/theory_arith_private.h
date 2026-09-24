@@ -749,7 +749,6 @@ class TheoryArithPrivate : protected EnvObj
 
   /** Counts the number of fullCheck calls to arithmetic. */
   uint32_t d_fullCheckCounter;
-  std::vector<ArithVar> cutAllBounded() const;
   std::vector<TrustNode> branchIntegerVariable(ArithVar x) const;
   void branchVector(const std::vector<ArithVar>& lemmas);
 

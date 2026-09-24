@@ -819,23 +819,9 @@ bool QuantifiersEngine::getNameForQuant(Node q, Node& name, bool req) const
   return d_qreg.getNameForQuant(q, name, req);
 }
 
-bool QuantifiersEngine::getSynthSolutions(
-    std::map<Node, std::map<Node, Node> >& sol_map)
-{
-  return false;
-}
 void QuantifiersEngine::declarePool(Node p, const std::vector<Node>& initValue)
 {
   d_treg.declarePool(p, initValue);
-}
-
-void QuantifiersEngine::declareOracleFun(Node f)
-{
-  Unreachable() << "Oracles have been removed";
-}
-std::vector<Node> QuantifiersEngine::getOracleFuns() const
-{
-  return {};
 }
 
 }  // namespace theory

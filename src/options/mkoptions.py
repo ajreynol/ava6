@@ -9,15 +9,14 @@
 # #############################################################################
 ##
 """
-    Generate option handling code and documentation in one pass. The generated
+    Generate Ava6 option handling code and command-line help. The generated
     files are only written to the destination file if the contents of the file
     has changed (in order to avoid global re-compilation if only single option
     files changed).
 
-    mkoptions.py <src> <build> <dst> <toml>+
+    mkoptions.py <src> <dst> <toml>+
 
       <src>     base source directory of all toml files
-      <build>   build directory to write the generated sphinx docs
       <dst>     base destination directory for all generated files
       <toml>+   one or more *_options.toml files
 
@@ -769,8 +768,6 @@ def generate_cli_help(modules):
             if option.category == 'undocumented':
                 continue
             msg = option.help
-            if option.category == 'expert':
-                msg += ' (EXPERTS only)'
             opts = _cli_help_format_options(option)
             if opts:
                 if option.alternate:
@@ -784,152 +781,6 @@ def generate_cli_help(modules):
                     if option.category == 'regular':
                         regular.extend(res)
     return '\n'.join(common), '\n'.join(others), '\n'.join(regular)
-
-
-################################################################################
-# sphinx command line documentation @ docs/options_generated.rst
-
-
-def _sphinx_help_add(module, option, common, others):
-    """Analyze an option and add it to either common or others."""
-    if option.category == 'common':
-        common.append(option)
-    else:
-        if module.name not in others:
-            others[module.name] = []
-        others[module.name].append(option)
-
-
-def _sphinx_help_render_option(res, opt):
-    """Render an option to be displayed with sphinx."""
-    names = []
-    if opt.short:
-        names.append(opt.short)
-    names.append(opt.long_name)
-    if opt.alias:
-        names.extend(opt.alias)
-
-    data = {
-        'names': ' | '.join(names),
-        'alternate': '',
-        'type': '',
-        'default': '',
-    }
-
-    if opt.alternate:
-        data['alternate'] = ' (also ``--no-*``)'
-
-    if opt.type == 'bool':
-        data['type'] = 'type ``bool``'
-    elif opt.type == 'std::string':
-        data['type'] = 'type ``string``'
-    elif is_numeric_cpp_type(opt.type):
-        data['type'] = 'type ``{}``'.format(opt.type)
-        if opt.minimum and opt.maximum:
-            data['type'] += ', ``{} <= {} <= {}``'.format(
-                opt.minimum, opt.long_opt, opt.maximum)
-        elif opt.minimum:
-            data['type'] += ', ``{} <= {}``'.format(opt.minimum, opt.long_opt)
-        elif opt.maximum:
-            data['type'] += ', ``{} <= {}``'.format(opt.long_opt, opt.maximum)
-    elif opt.mode:
-        data['type'] = '``' + ' | '.join(opt.mode_name.values()) + '``'
-    else:
-        data['type'] = 'custom ``{}``'.format(opt.type)
-
-    if opt.default:
-        if opt.mode:
-            data['default'] = ', default ``{}``'.format(
-                opt.mode_name[opt.default])
-        else:
-            data['default'] = ', default ``{}``'.format(opt.default)
-
-    desc = '``{names}`` [{type}{default}]{alternate}'.format(**data)
-
-    res.append('.. _lbl-option-{}:'.format(opt.long_name))
-    res.append('')
-    if opt.category == 'expert':
-        res.append('.. rst-class:: expert-option simple')
-        res.append('')
-        desc += '''
-    .. rst-class:: float-right
-
-    **[experts only]**
-'''
-
-    res.append(desc)
-    res.append('    ' + opt.help.replace("*", "\\*"))
-
-    if opt.mode:
-        res.append('    ')
-        res.append('    ' + opt.help_mode)
-        res.append('    ')
-        for m in opt.mode.keys():
-            if opt.mode_help[m]:
-                res.append('    :``{}``: {}'.format(opt.mode_name[m], opt.mode_help[m]))
-    res.append('    ')
-
-
-def generate_sphinx_help(modules):
-    """Render the command line help for sphinx."""
-    common = []
-    others = {}
-    for module, option in all_options(modules, False):
-        if option.category == 'undocumented':
-            continue
-        if not option.long and not option.short:
-            continue
-        _sphinx_help_add(module, option, common, others)
-
-    res = []
-    res.append('Most Commonly-Used ava6 Options')
-    res.append('===============================')
-    for opt in common:
-        _sphinx_help_render_option(res, opt)
-
-    res.append('')
-    res.append('Additional ava6 Options')
-    res.append('=======================')
-    for module in others:
-        res.append('')
-        res.append('{} Module'.format(module))
-        res.append('-' * (len(module) + 8))
-        for opt in others[module]:
-            _sphinx_help_render_option(res, opt)
-
-    return '\n'.join(res)
-
-
-################################################################################
-# sphinx documentation for --output @ docs/output_tags_generated.rst
-
-
-def generate_sphinx_output_tags(modules, src_dir, build_dir):
-    """Render help for the --output option for sphinx."""
-    base = next(filter(lambda m: m.id == 'base', modules))
-    opt = next(filter(lambda o: o.long == 'output=TAG', base.options))
-
-    # The programoutput extension has weird semantics about the cwd:
-    # https://sphinxcontrib-programoutput.readthedocs.io/en/latest/#usage
-    cwd = '/' + os.path.relpath(build_dir, src_dir)
-
-    res = []
-    for name, info in opt.mode.items():
-        info = info[0]
-        if 'description' not in info:
-            continue
-        res.append(opt.mode_name[name])
-        res.append('~' * len(res[-1]))
-        res.append('')
-        res.append(info['description'])
-        if 'example-file' in info:
-            res.append('')
-            res.append('.. command-output:: bin/ava6 -o {} ../test/regress/cli/{}'.format(info['name'], info['example-file']))
-            res.append('  :cwd: {}'.format(cwd))
-        res.append('')
-        res.append('')
-
-    return '\n'.join(res)
 
 
 ################################################################################
@@ -1004,16 +855,10 @@ def codegen_module(module, dst_dir, tpls):
 # main code generation
 
 
-def codegen_all_modules(modules, src_dir, build_dir, dst_dir, tpls):
+def codegen_all_modules(modules, dst_dir, tpls):
     """Generate code for all option modules."""
     short, cmdline_opts, parseinternal = generate_parsing(modules)
     help_common, help_others, help_regular = generate_cli_help(modules)
-
-    if os.path.isdir('{}/docs/'.format(build_dir)):
-        write_file('{}/docs/'.format(build_dir), 'options_generated.rst',
-                   generate_sphinx_help(modules))
-        write_file('{}/docs/'.format(build_dir), 'output_tags_generated.rst',
-                   generate_sphinx_output_tags(modules, src_dir, build_dir))
 
     data = {
         # options/io_utils.h
@@ -1168,22 +1013,21 @@ class Checker:
 
 def usage():
     """Print the command-line usage"""
-    print('mkoptions.py <src> <build> <dst> <toml>+')
+    print('mkoptions.py <src> <dst> <toml>+')
     print('')
     print('  <src>     base source directory of all toml files')
-    print('  <build>   build directory to write the generated sphinx docs')
     print('  <dst>     base destination directory for all generated files')
     print('  <toml>+   one or more *_options.toml files')
     print('')
 
 
 def mkoptions_main():
-    if len(sys.argv) < 5:
+    if len(sys.argv) < 4:
         usage()
         die('missing arguments')
 
     # Load command line arguments
-    _, src_dir, build_dir, dst_dir, *filenames = sys.argv
+    _, src_dir, dst_dir, *filenames = sys.argv
 
     # Check if given directories exist.
     for d in [src_dir, dst_dir]:
@@ -1233,7 +1077,7 @@ def mkoptions_main():
     # Generate code
     for module in modules:
         codegen_module(module, dst_dir, module_tpls)
-    codegen_all_modules(modules, src_dir, build_dir, dst_dir, global_tpls)
+    codegen_all_modules(modules, dst_dir, global_tpls)
 
     # Generate output file to signal cmake when this script was run last
     open(os.path.join(dst_dir, 'options/options.stamp'), 'w').write('')

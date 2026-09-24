@@ -444,24 +444,14 @@ class NodeManager
    */
   TypeNode sExprType();
 
-  /** Make the type of floating-point with <code>exp</code> bit exponent and
-      <code>sig</code> bit significand */
-  TypeNode mkFloatingPointType(unsigned exp, unsigned sig);
-
   /** Make the type of bitvectors of size <code>size</code> */
   TypeNode mkBitVectorType(unsigned size);
-
-  /** Make the type of finite field elements modulo <code>modulus</code> */
-  TypeNode mkFiniteFieldType(const Integer& modulus);
 
   /** Make the type of arrays with the given parameterization */
   static TypeNode mkArrayType(TypeNode indexType, TypeNode constituentType);
 
   /** Make the type of set with the given parameterization */
   TypeNode mkSetType(TypeNode elementType);
-
-  /** Make the type of bags with the given parameterization */
-  TypeNode mkBagType(TypeNode elementType);
 
   /** Make the type of sequences with the given parameterization */
   TypeNode mkSequenceType(TypeNode elementType);

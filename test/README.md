@@ -1,4 +1,7 @@
-# Tests for the core baseline
+# Ava6 tests
+
+These tests come from the cvc5 snapshot recorded in the root README, with
+selection and updates for Ava6's retained SMT language and C++ API.
 
 The imported regression selection excludes benchmarks marked
 `REQUIRES: unrestricted-mode` or `REQUIRES: no-safe-mode`, SyGuS inputs,
@@ -6,6 +9,9 @@ benchmarks using removed expert options, and benchmarks for removed theories
 and solving commands. Exclusion removes the benchmark files as well as their
 CMake registrations. C++ unit/API suites retain applicable test cases; the
 other language API suites are absent.
+Inputs using quantifier-elimination queries are also omitted. The compact core
+check verifies that the parser rejects synthesis, quantifier-elimination,
+abduction, and interpolation commands.
 
 `cmake --build build --target build-tests` builds the registered tests.
 `ctest --test-dir build --output-on-failure -L unit` runs unit tests.

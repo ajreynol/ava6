@@ -163,8 +163,6 @@ class RegExpSolver : protected EnvObj
    * explanation is nf_exp.
    */
   bool checkPDerivative(Node x, Node r, Node atom, std::vector<Node>& nf_exp);
-  ava6::internal::String getHeadConst(Node x);
-  bool deriveRegExp(Node x, Node r, Node atom, std::vector<Node>& ant);
   Node getNormalSymRegExp(Node r, std::vector<Node>& nf_exp);
   /** regular expression operation module */
   RegExpOpr d_regexp_opr;

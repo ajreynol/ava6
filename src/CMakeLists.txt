@@ -290,8 +290,6 @@ libava6_add_sources(
   smt/model_core_builder.h
   smt/model_blocker.cpp
   smt/model_blocker.h
-  smt/quant_elim_solver.cpp
-  smt/quant_elim_solver.h
   smt/preprocessor.cpp
   smt/preprocessor.h
   smt/preprocess_proof_generator.cpp
@@ -641,8 +639,6 @@ libava6_add_sources(
   theory/quantifiers/cegqi/inst_strategy_cegqi.h
   theory/quantifiers/cegqi/instantiator.cpp
   theory/quantifiers/cegqi/instantiator.h
-  theory/quantifiers/cegqi/nested_qe.cpp
-  theory/quantifiers/cegqi/nested_qe.h
   theory/quantifiers/cegqi/vts_term_cache.cpp
   theory/quantifiers/cegqi/vts_term_cache.h
   theory/quantifiers/dynamic_rewrite.cpp
@@ -1012,14 +1008,6 @@ libava6_add_sources(
   theory/valuation.h
 )
 
-# suppress deprecated warnings to not error in CI
-set_source_files_properties(api/cpp/ava6.cpp
-  PROPERTIES COMPILE_OPTIONS
-  "-Wno-deprecated-declarations;-Wno-error=deprecated-declarations")
-set_source_files_properties(api/cpp/ava6_parser.cpp
-  PROPERTIES COMPILE_OPTIONS
-  "-Wno-deprecated-declarations;-Wno-error=deprecated-declarations")
-
 #-----------------------------------------------------------------------------#
 # Add required include paths for this and all subdirectories.
 
@@ -1064,15 +1052,6 @@ libava6_add_sources(GENERATED ${options_gen_cpp_files} ${options_gen_h_files})
 
 list_prepend(options_toml_files "${CMAKE_CURRENT_LIST_DIR}/" abs_toml_files)
 
-set(options_gen_doc_files "")
-if (BUILD_DOCS)
-  list(
-    APPEND
-      options_gen_doc_files
-      "${PROJECT_BINARY_DIR}/docs/options_generated.rst"
-  )
-endif()
-
 # The mkoptions.py script only updates its output files if their content would
 # actually change. This mechanism makes sure that running the script does not
 # automatically trigger a full rebuild, but only a rebuild of those parts that
@@ -1092,11 +1071,10 @@ add_custom_command(
     ${Python_EXECUTABLE}
     ${CMAKE_CURRENT_LIST_DIR}/options/mkoptions.py
     ${CMAKE_CURRENT_LIST_DIR}
-    ${PROJECT_BINARY_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${abs_toml_files}
   BYPRODUCTS
-    ${options_gen_cpp_files} ${options_gen_h_files} ${options_gen_doc_files}
+    ${options_gen_cpp_files} ${options_gen_h_files}
   DEPENDS
     options/mkoptions.py
     ${options_toml_files}

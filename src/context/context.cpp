@@ -297,7 +297,7 @@ std::ostream& operator<<(std::ostream& out, const Context& context)
 {
   static const std::string separator(79, '-');
 
-  uint32_t level = context.d_scopeList.size() - 1;
+  [[maybe_unused]] uint32_t level = context.d_scopeList.size() - 1;
   typedef std::vector<Scope*>::const_reverse_iterator const_reverse_iterator;
   for (const_reverse_iterator i = context.d_scopeList.rbegin();
        i != context.d_scopeList.rend();

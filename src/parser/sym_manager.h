@@ -179,11 +179,6 @@ class AVA6_EXPORT SymManager
    */
   std::vector<ava6::Term> getDeclaredTerms() const;
   /**
-   * @return The functions we have declared that should be printed in a response
-   * to check-synth.
-   */
-  std::vector<ava6::Term> getFunctionsToSynthesize() const;
-  /**
    * Add declared sort to the list of model declarations.
    */
   void addModelDeclarationSort(ava6::Sort s);
@@ -191,12 +186,6 @@ class AVA6_EXPORT SymManager
    * Add declared term to the list of model declarations.
    */
   void addModelDeclarationTerm(ava6::Term t);
-  /**
-   * Add a function to synthesize. This ensures the solution for f is printed
-   * in a successful response to check-synth.
-   */
-  void addFunctionToSynthesize(ava6::Term f);
-
   //---------------------------- end named expressions
   /**
    * Get the scope level of the symbol table.
@@ -234,18 +223,6 @@ class AVA6_EXPORT SymManager
   void setTermSortOverload(bool flag);
   /** Get term sort overloading flag. */
   bool getTermSortOverload() const;
-  /**
-   * Set the last abduct or interpolant to synthesize had the given name. This
-   * is required since e.g. get-abduct-next must know the name of the
-   * abduct-to-synthesize to print its result. For example, the sequence:
-   *   (get-abduct A <conjecture>)
-   *   (get-abduct-next)
-   * The latter command must know the symbol "A".
-   */
-  void setLastSynthName(const std::string& name);
-  /** Get the name of the last abduct or interpolant to synthesize */
-  const std::string& getLastSynthName() const;
-
   /**
    * Force the logic to the given string. Note that this information is
    * context-independent.

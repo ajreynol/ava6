@@ -40,11 +40,6 @@ unique_ptr<Printer> Printer::makePrinter(Language lang)
     case Language::LANG_SMTLIB_V2_6:
       return unique_ptr<Printer>(new printer::smt2::Smt2Printer);
 
-    case Language::LANG_SYGUS_V2:
-      // sygus version 2.0 does not have discrepancies with smt2, hence we use
-      // a normal smt2 variant here.
-      return unique_ptr<Printer>(new printer::smt2::Smt2Printer);
-
     case Language::LANG_AST:
       return unique_ptr<Printer>(new printer::ast::AstPrinter());
 
@@ -384,62 +379,6 @@ void Printer::toStreamCmdQuery(std::ostream& out, AVA6_UNUSED Node n) const
   printUnknownCommand(out, "query");
 }
 
-void Printer::toStreamCmdDeclareVar(std::ostream& out,
-                                    AVA6_UNUSED const std::string& id,
-                                    AVA6_UNUSED TypeNode type) const
-{
-  printUnknownCommand(out, "declare-var");
-}
-
-void Printer::toStreamCmdSynthFun(std::ostream& out,
-                                  AVA6_UNUSED const std::string& id,
-                                  AVA6_UNUSED const std::vector<Node>& vars,
-                                  AVA6_UNUSED TypeNode rangeType,
-                                  AVA6_UNUSED TypeNode sygusType) const
-{
-  printUnknownCommand(out, "synth-fun");
-}
-
-void Printer::toStreamCmdConstraint(std::ostream& out, AVA6_UNUSED Node n) const
-{
-  printUnknownCommand(out, "constraint");
-}
-
-void Printer::toStreamCmdAssume(std::ostream& out, AVA6_UNUSED Node n) const
-{
-  printUnknownCommand(out, "assume");
-}
-
-void Printer::toStreamCmdInvConstraint(std::ostream& out,
-                                       AVA6_UNUSED Node inv,
-                                       AVA6_UNUSED Node pre,
-                                       AVA6_UNUSED Node trans,
-                                       AVA6_UNUSED Node post) const
-{
-  printUnknownCommand(out, "inv-constraint");
-}
-
-void Printer::toStreamCmdCheckSynth(std::ostream& out) const
-{
-  printUnknownCommand(out, "check-synth");
-}
-void Printer::toStreamCmdCheckSynthNext(std::ostream& out) const
-{
-  printUnknownCommand(out, "check-synth-next");
-}
-
-void Printer::toStreamCmdFindSynth(std::ostream& out,
-                                   AVA6_UNUSED modes::FindSynthTarget fst,
-                                   AVA6_UNUSED TypeNode sygusType) const
-{
-  printUnknownCommand(out, "find-synth");
-}
-
-void Printer::toStreamCmdFindSynthNext(std::ostream& out) const
-{
-  printUnknownCommand(out, "find-synth-next");
-}
-
 void Printer::toStreamCmdSimplify(std::ostream& out, AVA6_UNUSED Node n) const
 {
   printUnknownCommand(out, "simplify");
@@ -488,39 +427,6 @@ void Printer::toStreamCmdGetProof(std::ostream& out,
 void Printer::toStreamCmdGetInstantiations(std::ostream& out) const
 {
   printUnknownCommand(out, "get-instantiations");
-}
-
-void Printer::toStreamCmdGetInterpol(std::ostream& out,
-                                     AVA6_UNUSED const std::string& name,
-                                     AVA6_UNUSED Node conj,
-                                     AVA6_UNUSED TypeNode sygusType) const
-{
-  printUnknownCommand(out, "get-interpolant");
-}
-
-void Printer::toStreamCmdGetInterpolNext(std::ostream& out) const
-{
-  printUnknownCommand(out, "get-interpolant-next");
-}
-
-void Printer::toStreamCmdGetAbduct(std::ostream& out,
-                                   AVA6_UNUSED const std::string& name,
-                                   AVA6_UNUSED Node conj,
-                                   AVA6_UNUSED TypeNode sygusType) const
-{
-  printUnknownCommand(out, "get-abduct");
-}
-
-void Printer::toStreamCmdGetAbductNext(std::ostream& out) const
-{
-  printUnknownCommand(out, "get-abduct-next");
-}
-
-void Printer::toStreamCmdGetQuantifierElimination(std::ostream& out,
-                                                  AVA6_UNUSED Node n,
-                                                  AVA6_UNUSED bool doFull) const
-{
-  printUnknownCommand(out, "get-quantifier-elimination");
 }
 
 void Printer::toStreamCmdGetUnsatAssumptions(std::ostream& out) const

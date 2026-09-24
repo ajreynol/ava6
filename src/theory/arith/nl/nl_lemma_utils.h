@@ -13,7 +13,6 @@
 #ifndef AVA6__THEORY__ARITH__NL__NL_LEMMA_UTILS_H
 #define AVA6__THEORY__ARITH__NL__NL_LEMMA_UTILS_H
 
-#include <tuple>
 #include <vector>
 
 #include "expr/node.h"
@@ -25,18 +24,11 @@ namespace arith {
 namespace nl {
 
 class NlModel;
-class NonlinearExtension;
 
 /**
  * The data structure for a single lemma to process by the non-linear solver,
  * including the lemma itself and whether it should be preprocessed (see
  * OutputChannel::lemma).
- *
- * This also includes data structures that encapsulate the side effect of adding
- * this lemma in the non-linear solver. This is used to specify how the state of
- * the non-linear solver should update. This includes:
- * - A set of secant points to record (for transcendental secant plane
- * inferences).
  */
 class NlLemma : public SimpleTheoryLemma
 {
@@ -49,21 +41,6 @@ class NlLemma : public SimpleTheoryLemma
   {
   }
   ~NlLemma() {}
-
-  TrustNode processLemma(LemmaProperty& p) override;
-
-  /** secant points to add
-   *
-   * A member (tf, d, c) in this vector indicates that point c should be added
-   * to the list of secant points for an application of a transcendental
-   * function tf for Taylor degree d. This is used for incremental linearization
-   * for underapproximation (resp. overapproximations) of convex (resp.
-   * concave) regions of transcendental functions. For details, see
-   * Cimatti et al., CADE 2017.
-   */
-  std::vector<std::tuple<Node, unsigned, Node> > d_secantPoint;
-
-  NonlinearExtension* d_nlext;
 };
 /**
  * Writes a non-linear lemma to a stream.

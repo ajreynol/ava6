@@ -9,7 +9,7 @@
  *
  * Black box testing of the lifetime guarantees of the C++ API.
  *
- * API wrapper objects (Sort, Op, Term, Datatype, Grammar, Proof, ...) keep
+ * API wrapper objects (Sort, Op, Term, Datatype, Proof, ...) keep
  * the internal node manager alive while they are in use. They must therefore
  * remain usable after the TermManager and/or Solver that created them have
  * been destroyed.

@@ -37,18 +37,6 @@ void InferenceManager::addPendingLemma(std::unique_ptr<SimpleTheoryLemma> lemma,
   {
     return;
   }
-  if (isEntailedFalse(*lemma))
-  {
-    if (isWaiting)
-    {
-      d_waitingLem.clear();
-    }
-    else
-    {
-      d_pendingLem.clear();
-      d_theoryState.notifyInConflict();
-    }
-  }
   if (isWaiting)
   {
     d_waitingLem.emplace_back(std::move(lemma));
@@ -107,12 +95,6 @@ bool InferenceManager::cacheLemma(TNode lem, LemmaProperty p)
 {
   Node rewritten = rewrite(lem);
   return TheoryInferenceManager::cacheLemma(rewritten, p);
-}
-
-bool InferenceManager::isEntailedFalse(const SimpleTheoryLemma& lem)
-{
-  
-  return false;
 }
 
 bool InferenceManager::propagateLit(TNode lit)

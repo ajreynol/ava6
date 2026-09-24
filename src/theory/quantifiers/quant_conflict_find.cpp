@@ -1522,7 +1522,6 @@ void MatchGen::determineVariableOrder(std::vector<size_t>& bvars)
     // unbound variables go first
     Trace("qcf-qregister-vo")
         << "Variable order for " << d_n << " : " << std::endl;
-    size_t nqvars = d_qi->d_vars.size();
     do
     {
       int min_score0 = -1;

@@ -1056,7 +1056,6 @@ bool SetDefaults::incompatibleWithIncremental(const LogicInfo& logic,
   // disable modes not supported by incremental
   SET_AND_NOTIFY(smt, sortInference, false, "incremental solving");
   SET_AND_NOTIFY(quantifiers, globalNegate, false, "incremental solving");
-  SET_AND_NOTIFY(quantifiers, cegqiNestedQE, false, "incremental solving");
   SET_AND_NOTIFY(arith, arithMLTrick, false, "incremental solving");
   return false;
 }
@@ -1376,11 +1375,6 @@ void SetDefaults::setDefaultsQuantifiers(const LogicInfo& logic,
                                          options::InstWhenMode::LAST_CALL,
                                          "cegqi pure logic");
     }
-    else
-    {
-      // only supported in pure arithmetic or pure BV
-      SET_AND_NOTIFY(quantifiers, cegqiNestedQE, false, "cegqi non-pure logic");
-    }
     if (opts.quantifiers.globalNegate)
     {
       SET_AND_NOTIFY_IF_NOT_USER_VAL_SYM(quantifiers,
@@ -1393,14 +1387,6 @@ void SetDefaults::setDefaultsQuantifiers(const LogicInfo& logic,
   if (opts.quantifiers.cbqiModeWasSetByUser || false)
   {
     SET_AND_NOTIFY(quantifiers, conflictBasedInst, true, "cbqi option");
-  }
-  if (opts.quantifiers.cegqiNestedQE)
-  {
-    SET_AND_NOTIFY(quantifiers, prenexQuantUser, true, "cegqiNestedQE");
-    SET_AND_NOTIFY_IF_NOT_USER_VAL_SYM(quantifiers,
-                                       preSkolemQuant,
-                                       options::PreSkolemQuantMode::ON,
-                                       "cegqiNestedQE");
   }
   // for induction techniques
   

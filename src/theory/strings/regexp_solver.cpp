@@ -585,45 +585,7 @@ bool RegExpSolver::checkPDerivative(Node x,
         break;
     }
   }
-  else
-  {
-    if (deriveRegExp(x, r, atom, nf_exp))
-    {
-      d_im.markInactive(atom, ExtReducedId::STRINGS_REGEXP_PDERIVATIVE);
-      return false;
-    }
-  }
   return true;
-}
-
-ava6::internal::String RegExpSolver::getHeadConst(Node x)
-{
-  if (x.isConst())
-  {
-    return x.getConst<String>();
-  }
-  else if (x.getKind() == Kind::STRING_CONCAT)
-  {
-    if (x[0].isConst())
-    {
-      return x[0].getConst<String>();
-    }
-  }
-  return d_emptyString.getConst<String>();
-}
-
-bool RegExpSolver::deriveRegExp(Node x,
-                                Node r,
-                                Node atom,
-                                std::vector<Node>& ant)
-{
-  Assert(x != d_emptyString);
-  Trace("regexp-derive") << "RegExpSolver::deriveRegExp: x=" << x
-                         << ", r= " << r << std::endl;
-  ava6::internal::String s = getHeadConst(x);
-  // only allow RE_DERIVE for concrete constant regular expressions
-  
-  return false;
 }
 
 Node RegExpSolver::getNormalSymRegExp(Node r, std::vector<Node>& nf_exp)

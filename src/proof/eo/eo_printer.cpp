@@ -195,7 +195,7 @@ bool EoPrinter::isHandled(const Options& opts, const ProofNode* pfn)
     {
       ProofRewriteRule id;
       rewriter::getRewriteRule(pfn->getArguments()[0], id);
-      return isHandledTheoryRewrite(opts, id, pfn->getArguments()[1]);
+      return isHandledTheoryRewrite(id, pfn->getArguments()[1]);
     }
     break;
     case ProofRule::ARITH_REDUCTION:
@@ -292,8 +292,7 @@ bool EoPrinter::isHandled(const Options& opts, const ProofNode* pfn)
   return false;
 }
 
-bool EoPrinter::isHandledTheoryRewrite(const Options& opts,
-                                       ProofRewriteRule id,
+bool EoPrinter::isHandledTheoryRewrite(ProofRewriteRule id,
                                        const Node& n)
 {
   switch (id)

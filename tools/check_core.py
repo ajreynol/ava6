@@ -81,6 +81,20 @@ def main():
         result = run(args.binary, text + '\n(check-sat)')
         assert result.returncode != 0 or '(error ' in result.stdout or 'unsupported' in result.stdout.splitlines(), (text, result.stdout)
     print('PASS removed features/options are rejected')
+    for command in [
+            '(declare-var x Int)', '(synth-fun f () Int)',
+            '(synth-inv inv ((x Int)))', '(constraint true)', '(assume true)',
+            '(inv-constraint inv pre trans post)', '(check-synth)',
+            '(check-synth-next)', '(find-synth :enum)', '(find-synth-next)',
+            '(get-qe (exists ((x Int)) (= x 0)))',
+            '(get-qe-disjunct (exists ((x Int)) (= x 0)))',
+            '(get-abduct A true)', '(get-abduct-next)',
+            '(get-interpolant I true)', '(get-interpolant-next)']:
+        result = run(args.binary, '(set-logic ALL)\n' + command)
+        assert result.returncode != 0, (command, result.stdout, result.stderr)
+        assert 'command' in (result.stdout + result.stderr).lower(), (
+            command, result.stdout, result.stderr)
+    print('PASS removed commands are rejected by the parser')
     assert not any((ROOT / 'src/theory' / t).exists() for t in ('fp', 'ff', 'bags', 'sep'))
     assert not any((ROOT / 'test/regress/cli' / d).exists() for d in ('regress3', 'regress4'))
     manifest = (ROOT / 'test/regress/cli/CMakeLists.txt').read_text()

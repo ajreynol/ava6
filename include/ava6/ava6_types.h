@@ -491,7 +491,7 @@ AVA6_EXPORT const char* ava6_modes_proof_format_to_string(
     Ava6ProofFormat format);
 #else
 /**
- * Serialize a FindSynthTarget to given stream.
+ * Serialize a ProofFormat to given stream.
  * @param out    The output stream
  * @param format The proof format.
  * @return The output stream
@@ -506,100 +506,6 @@ AVA6_EXPORT std::string to_string(ava6::modes::ProofFormat format);
 namespace ava6::modes {
 #endif
 
-/* -------------------------------------------------------------------------- */
-/* FindSynthTarget                                                            */
-/* -------------------------------------------------------------------------- */
-
-#ifdef AVA6_API_USE_C_ENUMS
-#undef EVALUE
-#define EVALUE(name) AVA6_FIND_SYNTH_TARGET_##name
-#endif
-
-/**
- * Find synthesis targets, used as an argument to Solver::findSynth. These
- * specify various kinds of terms that can be found by this method.
- */
-enum ENUM(FindSynthTarget)
-{
-  /**
-   * Find the next term in the enumeration of the target grammar.
-   */
-  EVALUE(ENUM) = 0,
-  /**
-   * Find a pair of terms (t,s) in the target grammar which are equivalent
-   * but do not rewrite to the same term in the given rewriter
-   * (--sygus-rewrite=MODE). If so, the equality (= t s) is returned by
-   * findSynth.
-   *
-   * This can be used to synthesize rewrite rules. Note if the rewriter is set
-   * to none (--sygus-rewrite=none), this indicates a possible rewrite when
-   * implementing a rewriter from scratch.
-   */
-  EVALUE(REWRITE),
-  /**
-   * Find a term t in the target grammar which rewrites to a term s that is
-   * not equivalent to it. If so, the equality (= t s) is returned by
-   * findSynth.
-   *
-   * This can be used to test the correctness of the given rewriter. Any
-   * returned rewrite indicates an unsoundness in the given rewriter.
-   */
-  EVALUE(REWRITE_UNSOUND),
-  /**
-   * Find a rewrite between pairs of terms (t,s) that are matchable with terms
-   * in the input assertions where t and s are equivalent but do not rewrite
-   * to the same term in the given rewriter (--sygus-rewrite=MODE).
-   *
-   * This can be used to synthesize rewrite rules that apply to the current
-   * problem.
-   */
-  EVALUE(REWRITE_INPUT),
-  /**
-   * Find a query over the given grammar. If the given grammar generates terms
-   * that are not Boolean, we consider equalities over terms from the given
-   * grammar.
-   *
-   * The algorithm for determining which queries to generate is configured by
-   * --sygus-query-gen=MODE. Queries that are internally solved can be
-   * filtered by the option --sygus-query-gen-filter-solved.
-   */
-  EVALUE(QUERY),
-#ifdef AVA6_API_USE_C_ENUMS
-  // must be last entry
-  EVALUE(LAST),
-#endif
-};
-
-#ifdef AVA6_API_USE_C_ENUMS
-#ifndef DOXYGEN_SKIP
-typedef enum ENUM(FindSynthTarget) ENUM(FindSynthTarget);
-#endif
-#endif
-
-#ifdef AVA6_API_USE_C_ENUMS
-/**
- * Get a string representation of a Ava6FindSynthTarget.
- * @param target The synthesis find target.
- * @return The string representation.
- */
-AVA6_EXPORT const char* ava6_modes_find_synth_target_to_string(
-    Ava6FindSynthTarget target);
-#else
-/**
- * Serialize a FindSynthTarget to given stream.
- * @param out    The output stream
- * @param target The synthesis find target.
- * @return The output stream
- */
-AVA6_EXPORT std::ostream& operator<<(std::ostream& out, FindSynthTarget target);
-}
-
-namespace std {
-AVA6_EXPORT std::string to_string(ava6::modes::FindSynthTarget target);
-}
-
-namespace ava6::modes {
-#endif
 /* -------------------------------------------------------------------------- */
 /* OptionCategory                                                             */
 /* -------------------------------------------------------------------------- */
@@ -671,8 +577,6 @@ enum ENUM(InputLanguage)
 {
   /** The SMT-LIB version 2.6 language */
   EVALUE(SMT_LIB_2_6) = 0,
-  /** The SyGuS version 2.1 language. */
-  EVALUE(SYGUS_2_1),
   /** No language given. */
   EVALUE(UNKNOWN),
 #ifdef AVA6_API_USE_C_ENUMS

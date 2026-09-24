@@ -234,19 +234,6 @@ Node BvInstantiator::processAssertionInternal(CegInstantiator* ci, Node lit)
   return ret;
 }
 
-bool BvInstantiator::processAssertion(CegInstantiator* ci,
-                                      SolvedForm& sf,
-                                      Node pv,
-                                      Node lit,
-                                      Node alit,
-                                      CegInstEffort effort)
-{
-  // if option enabled, use approach for word-level inversion for BV
-  // instantiation
-  
-  return false;
-}
-
 bool BvInstantiator::useModelValue(AVA6_UNUSED CegInstantiator* ci,
                                    AVA6_UNUSED SolvedForm& sf,
                                    AVA6_UNUSED Node pv,

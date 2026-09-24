@@ -407,8 +407,6 @@ class DioSolver : protected EnvObj
 
  private:
   Node trailIndexToEquality(TrailIndex i) const;
-  void addTrailElementAsLemma(TrailIndex i);
-
  public:
   /** These fields are designed to be accessible to TheoryArith methods. */
   class Statistics

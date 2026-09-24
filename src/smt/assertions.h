@@ -116,13 +116,8 @@ class Assertions : protected EnvObj
    * even be simplified.
    * The arguments isInput and isAssumption are used for bookkeeping for unsat
    * cores.
-   * The argument maybeHasFv should be set to true if the assertion may have
-   * free variables. By construction, assertions from the smt2 parser are
-   * guaranteed not to have free variables. However, other cases such as
-   * assertions from the SyGuS parser may have free variables (say if the
-   * input contains an assert or define-fun-rec command).
    */
-  void addFormula(TNode n, bool isFunDef, bool maybeHasFv);
+  void addFormula(TNode n, bool isFunDef);
   /**
    * The assertion list (before any conversion) for supporting getAssertions().
    */

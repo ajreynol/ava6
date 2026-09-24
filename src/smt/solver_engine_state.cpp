@@ -95,62 +95,6 @@ void SolverEngineState::notifyCheckSatResult(const Result& r,
   d_statusSolver = solver;
 }
 
-void SolverEngineState::notifyCheckSynthResult(const SynthResult& r)
-{
-  d_queryMade = true;
-  if (r.getStatus() == SynthResult::SOLUTION)
-  {
-    // successfully generated a synthesis solution, update to synth state
-    d_smtMode = SmtMode::SYNTH;
-  }
-  else
-  {
-    // failed, we revert to the assert state
-    d_smtMode = SmtMode::ASSERT;
-  }
-}
-
-void SolverEngineState::notifyGetAbduct(bool success)
-{
-  if (success)
-  {
-    // successfully generated an abduct, update to abduct state
-    d_smtMode = SmtMode::ABDUCT;
-  }
-  else
-  {
-    // failed, we revert to the assert state
-    d_smtMode = SmtMode::ASSERT;
-  }
-}
-
-void SolverEngineState::notifyGetInterpol(bool success)
-{
-  if (success)
-  {
-    // successfully generated an interpolant, update to interpol state
-    d_smtMode = SmtMode::INTERPOL;
-  }
-  else
-  {
-    // failed, we revert to the assert state
-    d_smtMode = SmtMode::ASSERT;
-  }
-}
-
-void SolverEngineState::notifyFindSynth(bool success)
-{
-  if (success)
-  {
-    d_smtMode = SmtMode::FIND_SYNTH;
-  }
-  else
-  {
-    // failed, we revert to the assert state
-    d_smtMode = SmtMode::ASSERT;
-  }
-}
-
 void SolverEngineState::markFinishInit()
 {
   // set the flag to remember that we are fully initialized

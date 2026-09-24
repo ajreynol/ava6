@@ -89,20 +89,15 @@ class PfManager : protected EnvObj
   PfManager(Env& env);
   ~PfManager();
   /**
-   * Print the proof on the given output stream in the given format.
+   * Print the proof in CPC format on the given output stream.
    *
    * @param out The output stream.
    * @param fp The proof to print.
-   * @param mode The format (e.g. cpc, alethe) to print.
    * @param scopeMode The expected form of fp (see ProofScopeMode).
-   * @param assertionNames The named assertions of the input.
    */
   void printProof(std::ostream& out,
                   std::shared_ptr<ProofNode> fp,
-                  options::ProofFormatMode mode,
-                  ProofScopeMode scopeMode,
-                  const std::map<Node, std::string>& assertionNames =
-                      std::map<Node, std::string>());
+                  ProofScopeMode scopeMode);
 
   /**
    * Translate difficulty map. This takes a mapping dmap from preprocessed

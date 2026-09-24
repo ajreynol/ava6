@@ -257,11 +257,6 @@ Node EoNodeConverter::postConvert(Node n)
     args.insert(args.end(), n.begin(), n.end());
     return mkInternalApp("@list", args, tn);
   }
-  else if (k == Kind::APPLY_INDEXED_SYMBOLIC)
-  {
-    Kind okind = n.getOperator().getConst<GenericOp>().getKind();
-    
-  }
   else if (k == Kind::BITVECTOR_EAGER_ATOM)
   {
     // For now, we explicity remove the application.

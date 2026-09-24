@@ -71,8 +71,7 @@ void CommandExecutor::storeOptionsAsOriginal()
 void CommandExecutor::setOptionInternal(const std::string& key,
                                         const std::string& value)
 {
-  // set option, marked not from user.
-  d_solver->d_slv->setOption(key, value, false);
+  d_solver->d_slv->setOption(key, value);
 }
 
 void CommandExecutor::printStatistics(std::ostream& out) const

@@ -644,11 +644,6 @@ bool TypeNode::isFloatingPoint() const
   return false;
 }
 
-bool TypeNode::isFloatingPoint(unsigned exp, unsigned sig) const
-{
-  return false;
-}
-
 bool TypeNode::isBitVector() const { return getKind() == Kind::BITVECTOR_TYPE; }
 
 bool TypeNode::isDatatype() const

@@ -13,21 +13,11 @@
 #include "theory/arith/nl/nl_lemma_utils.h"
 
 #include "theory/arith/nl/nl_model.h"
-#include "theory/arith/nl/nonlinear_extension.h"
 
 namespace ava6::internal {
 namespace theory {
 namespace arith {
 namespace nl {
-
-TrustNode NlLemma::processLemma(LemmaProperty& p)
-{
-  if (d_nlext != nullptr)
-  {
-    d_nlext->processSideEffect(*this);
-  }
-  return SimpleTheoryLemma::processLemma(p);
-}
 
 std::ostream& operator<<(std::ostream& out, NlLemma& n)
 {

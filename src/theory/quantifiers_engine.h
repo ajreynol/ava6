@@ -127,27 +127,8 @@ class QuantifiersEngine : protected EnvObj
    */
   void getSkolemTermVectors(std::map<Node, std::vector<Node> >& sks) const;
 
-  /** get synth solutions
-   *
-   * This method returns true if there is a synthesis solution available. This
-   * is the case if the last call to check satisfiability originated in a
-   * check-synth call, and the synthesis engine module of this class
-   * successfully found a solution for all active synthesis conjectures.
-   *
-   * This method adds entries to sol_map that map functions-to-synthesize with
-   * their solutions, for all active conjectures. This should be called
-   * immediately after the solver answers unsat for sygus input.
-   *
-   * For details on what is added to sol_map, see
-   * SynthConjecture::getSynthSolutions.
-   */
-  bool getSynthSolutions(std::map<Node, std::map<Node, Node> >& sol_map);
   /** Declare pool */
   void declarePool(Node p, const std::vector<Node>& initValue);
-  /** Declare oracle fun */
-  void declareOracleFun(Node f);
-  /** Get the list of all declared oracle functions */
-  std::vector<Node> getOracleFuns() const;
   //----------end user interface for instantiations
  private:
   /**

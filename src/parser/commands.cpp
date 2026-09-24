@@ -193,12 +193,6 @@ std::vector<internal::TypeNode> Cmd::sortVectorToTypeNodes(
   return ava6::Sort::sortVectorToTypeNodes(sorts);
 }
 
-internal::TypeNode Cmd::grammarToTypeNode(ava6::Grammar* grammar)
-{
-  return grammar == nullptr ? internal::TypeNode::null()
-                            : sortToTypeNode(grammar->resolve());
-}
-
 std::ostream& operator<<(std::ostream& out, const Cmd& c)
 {
   out << c.toString();
@@ -443,107 +437,6 @@ void CheckSatAssumingCommand::toStream(std::ostream& out) const
 }
 
 /* -------------------------------------------------------------------------- */
-/* class DeclareSygusVarCommand */
-/* -------------------------------------------------------------------------- */
-
-
-
-
-
-
-
-
-
-
-
-/* -------------------------------------------------------------------------- */
-/* class SynthFunCommand                                                      */
-/* -------------------------------------------------------------------------- */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* -------------------------------------------------------------------------- */
-/* class SygusConstraintCommand */
-/* -------------------------------------------------------------------------- */
-
-
-
-
-
-
-
-
-
-
-
-/* -------------------------------------------------------------------------- */
-/* class SygusInvConstraintCommand */
-/* -------------------------------------------------------------------------- */
-
-
-
-
-
-
-
-
-
-
-
-
-/* -------------------------------------------------------------------------- */
-/* class CheckSynthCommand                                                    */
-/* -------------------------------------------------------------------------- */
-
-
-
-
-
-
-
-
-
-
-/* -------------------------------------------------------------------------- */
-/* class FindSynthCommand                                                    */
-/* -------------------------------------------------------------------------- */
-
-
-
-
-
-
-
-
-
-
-/* -------------------------------------------------------------------------- */
-/* class FindSynthNextCommand */
-/* -------------------------------------------------------------------------- */
-
-
-
-
-
-
-
-
-
-
-
-/* -------------------------------------------------------------------------- */
 /* class ResetCommand                                                         */
 /* -------------------------------------------------------------------------- */
 
@@ -727,7 +620,7 @@ void DeclarePoolCommand::invoke(ava6::Solver* solver, SymManager* sm)
     return;
   }
   // Notice that the pool is already declared by the parser so that it the
-  // symbol is bound eagerly. This is analogous to DeclareSygusVarCommand.
+  // symbol is bound eagerly.
   // Hence, we do nothing here.
   d_commandStatus = CommandSuccess::instance();
 }
@@ -1459,139 +1352,6 @@ std::string GetInstantiationsCommand::getCommandName() const
 void GetInstantiationsCommand::toStream(std::ostream& out) const
 {
   internal::Printer::getPrinter(out)->toStreamCmdGetInstantiations(out);
-}
-
-/* -------------------------------------------------------------------------- */
-/* class GetInterpolCommand                                                   */
-/* -------------------------------------------------------------------------- */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* -------------------------------------------------------------------------- */
-/* class GetInterpolNextCommand */
-/* -------------------------------------------------------------------------- */
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* -------------------------------------------------------------------------- */
-/* class GetAbductCommand                                                     */
-/* -------------------------------------------------------------------------- */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* -------------------------------------------------------------------------- */
-/* class GetAbductNextCommand */
-/* -------------------------------------------------------------------------- */
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* -------------------------------------------------------------------------- */
-/* class GetQuantifierEliminationCommand                                      */
-/* -------------------------------------------------------------------------- */
-
-GetQuantifierEliminationCommand::GetQuantifierEliminationCommand()
-    : d_term(), d_doFull(true)
-{
-}
-GetQuantifierEliminationCommand::GetQuantifierEliminationCommand(
-    const ava6::Term& term, bool doFull)
-    : d_term(term), d_doFull(doFull)
-{
-}
-
-ava6::Term GetQuantifierEliminationCommand::getTerm() const { return d_term; }
-bool GetQuantifierEliminationCommand::getDoFull() const { return d_doFull; }
-void GetQuantifierEliminationCommand::invoke(ava6::Solver* solver,
-                                             AVA6_UNUSED SymManager* sm)
-{
-  try
-  {
-    if (d_doFull)
-    {
-      d_result = solver->getQuantifierElimination(d_term);
-    }
-    else
-    {
-      d_result = solver->getQuantifierEliminationDisjunct(d_term);
-    }
-    d_commandStatus = CommandSuccess::instance();
-  }
-  catch (exception& e)
-  {
-    d_commandStatus = new CommandFailure(e.what());
-  }
-}
-
-ava6::Term GetQuantifierEliminationCommand::getResult() const
-{
-  return d_result;
-}
-void GetQuantifierEliminationCommand::printResult(
-    AVA6_UNUSED ava6::Solver* solver, std::ostream& out) const
-{
-  out << d_result << endl;
-}
-
-std::string GetQuantifierEliminationCommand::getCommandName() const
-{
-  return d_doFull ? "get-qe" : "get-qe-disjunct";
-}
-
-void GetQuantifierEliminationCommand::toStream(std::ostream& out) const
-{
-  internal::Printer::getPrinter(out)->toStreamCmdGetQuantifierElimination(
-      out, termToNode(d_term), d_doFull);
 }
 
 /* -------------------------------------------------------------------------- */

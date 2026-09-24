@@ -160,7 +160,7 @@ std::string to_string(ava6::modes::ProofComponent pc)
 }  // namespace std
 
 namespace ava6::modes {
-std::ostream& operator<<(std::ostream& out, ProofFormat format)
+std::ostream& operator<<(std::ostream& out, ProofFormat)
 {
   return out << "cpc";
 }
@@ -171,31 +171,6 @@ std::string to_string(ava6::modes::ProofFormat format)
 {
   std::stringstream ss;
   ss << format;
-  return ss.str();
-}
-}  // namespace std
-
-namespace ava6::modes {
-std::ostream& operator<<(std::ostream& out, FindSynthTarget target)
-{
-  switch (target)
-  {
-    case FindSynthTarget::ENUM: out << "enum"; break;
-    case FindSynthTarget::REWRITE: out << "rewrite"; break;
-    case FindSynthTarget::REWRITE_UNSOUND: out << "rewrite_unsound"; break;
-    case FindSynthTarget::REWRITE_INPUT: out << "rewrite_input"; break;
-    case FindSynthTarget::QUERY: out << "query"; break;
-    default: out << "?";
-  }
-  return out;
-}
-}  // namespace ava6::modes
-
-namespace std {
-std::string to_string(ava6::modes::FindSynthTarget target)
-{
-  std::stringstream ss;
-  ss << target;
   return ss.str();
 }
 }  // namespace std
@@ -230,7 +205,6 @@ std::ostream& operator<<(std::ostream& out, InputLanguage lang)
   switch (lang)
   {
     case InputLanguage::SMT_LIB_2_6: out << "smt_lib_2_6"; break;
-    case InputLanguage::SYGUS_2_1: out << "sygus_2_1"; break;
     case InputLanguage::UNKNOWN: out << "unknown"; break;
     default: out << "?";
   }

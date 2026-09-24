@@ -1150,68 +1150,6 @@ TEST_F(TestApiBlackSolver, getModel3)
   ASSERT_THROW(d_solver->getModel(sorts, terms), Ava6ApiException);
 }
 
-TEST_F(TestApiBlackSolver, getQuantifierElimination)
-{
-  Term x = d_tm.mkVar(d_bool, "x");
-  Term forall =
-      d_tm.mkTerm(Kind::FORALL,
-                  {d_tm.mkTerm(Kind::VARIABLE_LIST, {x}),
-                   d_tm.mkTerm(Kind::OR, {x, d_tm.mkTerm(Kind::NOT, {x})})});
-  ASSERT_THROW(d_solver->getQuantifierElimination(Term()), Ava6ApiException);
-  ASSERT_THROW(d_solver->getQuantifierElimination(d_tm.mkBoolean(false)),
-               Ava6ApiException);
-  ASSERT_NO_THROW(d_solver->getQuantifierElimination(forall));
-
-  TermManager tm;
-  Solver slv(tm);
-  slv.checkSat();
-  ASSERT_THROW(slv.getQuantifierElimination(forall), Ava6ApiException);
-}
-
-TEST_F(TestApiBlackSolver, getQuantifierEliminationDisjunct)
-{
-  Term x = d_tm.mkVar(d_bool, "x");
-  Term forall =
-      d_tm.mkTerm(Kind::FORALL,
-                  {d_tm.mkTerm(Kind::VARIABLE_LIST, {x}),
-                   d_tm.mkTerm(Kind::OR, {x, d_tm.mkTerm(Kind::NOT, {x})})});
-  ASSERT_THROW(d_solver->getQuantifierEliminationDisjunct(Term()),
-               Ava6ApiException);
-  ASSERT_THROW(
-      d_solver->getQuantifierEliminationDisjunct(d_tm.mkBoolean(false)),
-      Ava6ApiException);
-  ASSERT_NO_THROW(d_solver->getQuantifierEliminationDisjunct(forall));
-
-  TermManager tm;
-  Solver slv(tm);
-  slv.checkSat();
-  ASSERT_THROW(slv.getQuantifierEliminationDisjunct(forall), Ava6ApiException);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 TEST_F(TestApiBlackSolver, push1)
 {
   d_solver->setOption("incremental", "true");

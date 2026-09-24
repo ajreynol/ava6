@@ -95,10 +95,6 @@ InteractiveShell::InteractiveShell(main::CommandExecutor* cexec,
   {
     d_lang = modes::InputLanguage::SMT_LIB_2_6;
   }
-  else if (langs == "LANG_SYGUS_V2")
-  {
-    d_lang = modes::InputLanguage::SYGUS_2_1;
-  }
   else
   {
     throw Exception("internal error: unhandled language " + langs);

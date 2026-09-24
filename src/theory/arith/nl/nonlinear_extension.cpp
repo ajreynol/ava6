@@ -70,11 +70,6 @@ void NonlinearExtension::preRegisterTerm(TNode n)
   }
 }
 
-void NonlinearExtension::processSideEffect(const NlLemma& se)
-{
-  // Core nonlinear lemmas have no transcendental side effects.
-}
-
 void NonlinearExtension::presolve()
 {
   if (!options().arith.nlExtInitialSignLemmas)

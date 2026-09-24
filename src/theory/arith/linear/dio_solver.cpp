@@ -793,7 +793,6 @@ std::pair<DioSolver::SubIndex, DioSolver::TrailIndex> DioSolver::decomposeIndex(
   TrailIndex ci = d_trail.size();
   d_trail.push_back(Constraint(newSI, Polynomial::mkZero(nm)));
   // no longer reference av safely!
-  addTrailElementAsLemma(ci);
 
   Trace("arith::dio") << "Decompose ci(" << ci << ":"
                       << d_trail[ci].d_eq.getNode() << ") for "
@@ -943,11 +942,6 @@ void DioSolver::subAndReduceCurrentFByIndex(DioSolver::SubIndex subIndex)
   {
     d_currentF.resize(writeIter);
   }
-}
-
-void DioSolver::addTrailElementAsLemma(TrailIndex i)
-{
-  
 }
 
 Node DioSolver::trailIndexToEquality(TrailIndex i) const

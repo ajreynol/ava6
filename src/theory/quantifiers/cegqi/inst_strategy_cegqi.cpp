@@ -62,16 +62,6 @@ InstStrategyCegqi::InstStrategyCegqi(Env& env,
       d_freeDeltaLb(userContext(), false)
 {
   d_check_vts_lemma_lc = false;
-  if (options().quantifiers.cegqiNestedQE)
-  {
-    // initialize the trust proof generator if necessary
-    if (d_env.isTheoryProofProducing())
-    {
-      d_nqetpg.reset(new TrustProofGenerator(
-          env, TrustId::QUANTIFIERS_NESTED_QE_LEMMA, {}));
-    }
-    d_nestedQe.reset(new NestedQe(d_env));
-  }
 }
 
 InstStrategyCegqi::~InstStrategyCegqi() {}
@@ -378,11 +368,6 @@ void InstStrategyCegqi::preRegisterQuantifier(Node q)
 {
   if (doCbqi(q))
   {
-    if (processNestedQe(q, true))
-    {
-      // will process using nested quantifier elimination
-      return;
-    }
     // register the cbqi lemma
     if (registerCbqiLemma(q))
     {
@@ -465,13 +450,6 @@ bool InstStrategyCegqi::doCbqi(Node q)
 
 void InstStrategyCegqi::process(Node q, int e)
 {
-  // If we are doing nested quantifier elimination, check if q was already
-  // processed.
-  if (processNestedQe(q, false))
-  {
-    // don't need to process this, since it has been reduced
-    return;
-  }
   // run the check
   if (e == 0)
   {
@@ -567,36 +545,6 @@ CegInstantiator* InstStrategyCegqi::getInstantiator(Node q)
     return d_cinst[q].get();
   }
   return it->second.get();
-}
-
-bool InstStrategyCegqi::processNestedQe(Node q, bool isPreregister)
-{
-  if (d_nestedQe != nullptr)
-  {
-    if (isPreregister)
-    {
-      // If at preregister, we are done if we have nested quantification.
-      // We will process nested quantification.
-      return NestedQe::hasNestedQuantification(q);
-    }
-    // if not a preregister, we process, which may trigger quantifier
-    // elimination in subsolvers.
-    std::vector<Node> lems;
-    if (d_nestedQe->process(q, lems))
-    {
-      // add lemmas to process
-      for (const Node& lem : lems)
-      {
-        d_qim.addPendingLemma(lem,
-                              InferenceId::QUANTIFIERS_CEGQI_NESTED_QE,
-                              LemmaProperty::NONE,
-                              d_nqetpg.get());
-      }
-      // don't need to process this, since it has been reduced
-      return true;
-    }
-  }
-  return false;
 }
 
 }  // namespace quantifiers

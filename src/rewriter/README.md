@@ -2,6 +2,8 @@
 
 This document describes the syntax of the RARE language, which stands for
 **r**ewrites, **a**utomatically **re**constructed.
+Ava6 retains cvc5's RARE rewrite infrastructure for its core theories and CPC
+proofs. This document describes that inherited rule language.
 
 ``` dsl
    <rule> ::= (define-rule       <symbol> (<par>*) [<defs>]        <expr> <expr>)

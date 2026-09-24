@@ -1,4 +1,16 @@
-The authors, designers, and main contributors to cvc5 are listed below.
+Ava6 is an independent experimental fork of cvc5, reduced to a fixed SMT core
+for experiments in solving, proofs, parsing, and APIs. See README.md for the
+import revision and DESIGN.md for the scope of this fork. Ava6-specific changes
+and their contributors are recorded in this repository's Git history.
+
+Upstream cvc5 attribution
+========================
+
+The following list is preserved from the cvc5 checkout used for the initial
+import. It credits the authors, designers, and main contributors to the
+inherited code. The affiliations and Current/Alumni categories describe that
+upstream snapshot.
+
 cvc5's copyright is held by these individuals and the affiliated
 institutions at the time of their contributions (note that some authors have
 had more than one affiliated institution).  See the file COPYING for details on
@@ -42,11 +54,12 @@ Alumni:
   Andres Noetzli, Stanford University
   Ying Sheng, Stanford University
 
-Other contributors to the cvc5 codebase are listed in the THANKS file.
+Upstream cvc5 also credits other contributors in its THANKS file, which was
+not included in this source import.
 
 cvc5 is the fifth in the CVC series of tools (CVC, CVC Lite, CVC3, CVC4) but
 does not directly incorporate code from any previous version prior to CVC4.
 Information about authors of previous CVC tools is included with their
 distributions.
 
-cvc5 contains MiniSAT code by Niklas Een and Niklas Sorensson.
+Ava6 retains the MiniSAT code included in cvc5, by Niklas Een and Niklas Sorensson.

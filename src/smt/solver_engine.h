@@ -28,7 +28,6 @@
 #include "smt/smt_mode.h"
 #include "theory/logic_info.h"
 #include "util/result.h"
-#include "util/synth_result.h"
 
 namespace ava6 {
 
@@ -64,11 +63,6 @@ class ExpandDefs;
 /** Subsolvers */
 class SmtSolver;
 class SmtDriver;
-class SygusSolver;
-class AbductionSolver;
-class InterpolationSolver;
-class QuantElimSolver;
-class FindSynthSolver;
 
 struct SolverEngineStatistics;
 class PfManager;
@@ -127,8 +121,8 @@ class AVA6_EXPORT SolverEngine
    */
   bool isFullyInited() const;
   /**
-   * @return True if a call to check-sat or check-synth has been made and
-   * completed. Other calls (e.g., get-interpolant, get-abduct, get-qe) do not
+   * @return True if a call to check-sat has been made and
+   * completed. Other commands do not
    * impact this, since they are handled independently via subsolvers.
    */
   bool isQueryMade() const;
@@ -185,21 +179,14 @@ class AVA6_EXPORT SolverEngine
    * Set an aspect of the current SMT execution environment.
    * @param key The option to set
    * @param value The value to set
-   * @param fromUser Whether this option was set by the user. This impacts
-   * whether the option originates from the public API.
    * @throw OptionException, ModalException
    */
   void setOption(const std::string& key,
-                 const std::string& value,
-                 bool fromUser = false);
+                 const std::string& value);
 
   /** Set is internal subsolver.
    *
-   * This function is called on SolverEngine objects that are created
-   * internally.  It is used to mark that this SolverEngine should not
-   * perform preprocessing passes that rephrase the input, such as
-   * --sygus-rr-synth-input or
-   * --sygus-abduct.
+   * This function marks solver engines created internally.
    */
   void setIsInternalSubsolver();
   /** Is this an internal subsolver? */
@@ -363,101 +350,6 @@ class AVA6_EXPORT SolverEngine
    */
   std::vector<Node> getUnsatAssumptions(void);
 
-  /*---------------------------- sygus commands  ---------------------------*/
-
-  /**
-   * Add sygus variable declaration.
-   *
-   * Declared SyGuS variables may be used in SyGuS constraints, in which they
-   * are assumed to be universally quantified.
-   *
-   * In SyGuS semantics, declared functions are treated in the same manner as
-   * declared variables, i.e. as universally quantified (function) variables
-   * which can occur in the SyGuS constraints that compose the conjecture to
-   * which a function is being synthesized. Thus declared functions should use
-   * this method as well.
-   */
-  void declareSygusVar(Node var);
-
-  /**
-   * Add a function-to-synthesize declaration.
-   *
-   * The given sygusType may not correspond to the actual function type of func
-   * but to a datatype encoding the syntax restrictions for the
-   * function-to-synthesize. In this case this information is stored to be used
-   * during solving.
-   *
-   * vars contains the arguments of the function-to-synthesize. These variables
-   * are also stored to be used during solving.
-   */
-  void declareSynthFun(Node func,
-                       TypeNode sygusType,
-                       const std::vector<Node>& vars);
-  /**
-   * Same as above, without a sygus type.
-   */
-  void declareSynthFun(Node func, const std::vector<Node>& vars);
-
-  /**
-   * Add a regular sygus constraint or assumption.
-   * @param n The formula
-   * @param isAssume True if n is an assumption.
-   */
-  void assertSygusConstraint(Node n, bool isAssume = false);
-
-  /** @return sygus constraints .*/
-  std::vector<Node> getSygusConstraints();
-
-  /** @return sygus assumptions .*/
-  std::vector<Node> getSygusAssumptions();
-
-  /**
-   * Add an invariant constraint.
-   *
-   * Invariant constraints are not explicitly declared: they are given in terms
-   * of the invariant-to-synthesize, the pre condition, transition relation and
-   * post condition. The actual constraint is built based on the inputs of these
-   * place holder predicates :
-   *
-   * PRE(x) -> INV(x)
-   * INV() ^ TRANS(x, x') -> INV(x')
-   * INV(x) -> POST(x)
-   *
-   * The regular and primed variables are retrieved from the declaration of the
-   * invariant-to-synthesize.
-   */
-  void assertSygusInvConstraint(Node inv, Node pre, Node trans, Node post);
-  /**
-   * Assert a synthesis conjecture to the current context and call
-   * check().  Returns sat, unsat, or unknown result.
-   *
-   * The actual synthesis conjecture is built based on the previously
-   * communicated information to this module (universal variables, defined
-   * functions, functions-to-synthesize, and which constraints compose it). The
-   * built conjecture is a higher-order formula of the form
-   *
-   * exists f1...fn . forall v1...vm . F
-   *
-   * in which f1...fn are the functions-to-synthesize, v1...vm are the declared
-   * universal variables and F is the set of declared constraints.
-   *
-   * @param isNext Whether we are asking for the next synthesis solution (if
-   * using incremental).
-   *
-   * @throw Exception
-   */
-  SynthResult checkSynth(bool isNext = false);
-  /**
-   * Find synth for the given target and grammar.
-   */
-  Node findSynth(modes::FindSynthTarget fst, const TypeNode& gtn);
-  /**
-   * Find synth for the given target and grammar.
-   */
-  Node findSynthNext();
-
-  /*------------------------- end of sygus commands ------------------------*/
-
   /**
    * Declare pool whose initial value is the terms in initValue. A pool is
    * a variable of type (Set T) that is used in quantifier annotations and does
@@ -470,15 +362,6 @@ class AVA6_EXPORT SolverEngine
    */
   void declarePool(const Node& p, const std::vector<Node>& initValue);
 
-  /**
-   * Add an oracle function to the state, also adds an oracle interface
-   * defining it.
-   *
-   * @param var The oracle function symbol
-   * @param fn The method for the oracle
-   */
-  void declareOracleFun(
-      Node var, std::function<std::vector<Node>(const std::vector<Node>&)> fn);
   /**
    * Adds plugin to the theory engine of this solver engine.
    *
@@ -555,124 +438,6 @@ class AVA6_EXPORT SolverEngine
    * (list, num, etc.) is determined by printInstMode.
    */
   void printInstantiations(std::ostream& out);
-
-  /**
-   * Get synth solution.
-   *
-   * This method returns true if we are in a state immediately preceded by
-   * a successful call to checkSynth.
-   *
-   * This method adds entries to solMap that map functions-to-synthesize with
-   * their solutions, for all active conjectures. This should be called
-   * immediately after the solver answers unsat for sygus input.
-   *
-   * Specifically, given a sygus conjecture of the form
-   *   exists x1...xn. forall y1...yn. P( x1...xn, y1...yn )
-   * where x1...xn are second order bound variables, we map each xi to
-   * lambda term in solMap such that
-   *    forall y1...yn. P( solMap[x1]...solMap[xn], y1...yn )
-   * is a valid formula.
-   */
-  bool getSynthSolutions(std::map<Node, Node>& solMap);
-  /**
-   * Same as above, but used for getting synthesis solutions from a "subsolver"
-   * that has been initialized to assert the synthesis conjecture as a
-   * normal assertion.
-   *
-   * This method returns true if we are in a state immediately preceded by
-   * a successful call to checkSat, where this SolverEngine has an asserted
-   * synthesis conjecture.
-   */
-  bool getSubsolverSynthSolutions(std::map<Node, Node>& solMap);
-
-  /**
-   * Do quantifier elimination.
-   *
-   * This function takes as input a quantified formula q
-   * of the form:
-   *   Q x1...xn. P( x1...xn, y1...yn )
-   * where P( x1...xn, y1...yn ) is a quantifier-free
-   * formula in a logic that supports quantifier elimination.
-   * Currently, the only logics supported by quantifier
-   * elimination is LRA and LIA.
-   *
-   * This function returns a formula ret such that, given
-   * the current set of formulas A asserted to this SolverEngine :
-   *
-   * If doFull = true, then
-   *   - ( A ^ q ) and ( A ^ ret ) are equivalent
-   *   - ret is quantifier-free formula containing
-   *     only free variables in y1...yn.
-   *
-   * If doFull = false, then
-   *   - (A ^ q) => (A ^ ret) if Q is forall or
-   *     (A ^ ret) => (A ^ q) if Q is exists,
-   *   - ret is quantifier-free formula containing
-   *     only free variables in y1...yn,
-   *   - If Q is exists, let A^Q_n be the formula
-   *       A ^ ~ret^Q_1 ^ ... ^ ~ret^Q_n
-   *     where for each i=1,...n, formula ret^Q_i
-   *     is the result of calling doQuantifierElimination
-   *     for q with the set of assertions A^Q_{i-1}.
-   *     Similarly, if Q is forall, then let A^Q_n be
-   *       A ^ ret^Q_1 ^ ... ^ ret^Q_n
-   *     where ret^Q_i is the same as above.
-   *     In either case, we have that ret^Q_j will
-   *     eventually be true or false, for some finite j.
-   *
-   * The former feature is quantifier elimination, and
-   * is run on invocations of the smt2 extended command get-qe.
-   * The latter feature is referred to as partial quantifier
-   * elimination, and is run on invocations of the smt2
-   * extended command get-qe-disjunct, which can be used
-   * for incrementally computing the result of a
-   * quantifier elimination.
-   */
-  Node getQuantifierElimination(Node q, bool doFull);
-
-  /**
-   * This method asks this SMT engine to find an interpolant with respect to
-   * the current assertion stack (call it A) and the conjecture (call it B). If
-   * this method returns true, then interpolant is set to a formula I such that
-   * A ^ ~I and I ^ ~B are both unsatisfiable.
-   *
-   * The argument grammarType is a sygus datatype type that encodes the syntax
-   * restrictions on the shapes of possible solutions.
-   *
-   * This method invokes a separate copy of the SMT engine for solving the
-   * corresponding sygus problem for generating such a solution.
-   */
-  Node getInterpolant(const Node& conj, const TypeNode& grammarType);
-
-  /**
-   * Get next interpolant. This can only be called immediately after a
-   * successful call to getInterpolant or getInterpolantNext.
-   *
-   * Returns the interpolant if one exists, or the null node otherwise.
-   */
-  Node getInterpolantNext();
-
-  /**
-   * This method asks this SMT engine to find an abduct with respect to the
-   * current assertion stack (call it A) and the conjecture (call it B).
-   * If this method returns true, then abd is set to a formula C such that
-   * A ^ C is satisfiable, and A ^ ~B ^ C is unsatisfiable.
-   *
-   * The argument grammarType is a sygus datatype type that encodes the syntax
-   * restrictions on the shape of possible solutions.
-   *
-   * This method invokes a separate copy of the SMT engine for solving the
-   * corresponding sygus problem for generating such a solution.
-   */
-  Node getAbduct(const Node& conj, const TypeNode& grammarType);
-
-  /**
-   * Get next abduct. This can only be called immediately after a successful
-   * call to getAbduct or getAbductNext.
-   *
-   * Returns the abduct if one exists, or the null node otherwise.
-   */
-  Node getAbductNext();
 
   /**
    * Get list of quantified formulas that were instantiated on the last call
@@ -940,17 +705,6 @@ class AVA6_EXPORT SolverEngine
   void checkModel(bool hardFailure = true);
 
   /**
-   * Check that a solution to an interpolation problem is indeed a solution.
-   *
-   * The check is made by determining that the assertions imply the solution of
-   * the interpolation problem (interpol), and the solution implies the goal
-   * (conj). If these criteria are not met, an internal error is thrown.
-   */
-  void checkInterpol(Node interpol,
-                     const std::vector<Node>& easserts,
-                     const Node& conj);
-
-  /**
    * This is called by the destructor, just before destroying the
    * PropEngine, TheoryEngine, and DecisionEngine (in that order).  It
    * is important because there are destruction ordering issues
@@ -1128,13 +882,7 @@ class AVA6_EXPORT SolverEngine
    */
   std::unique_ptr<smt::TimeoutCoreManager> d_tcm;
 
-  /** The solver for sygus queries */
-  /** The solver for find-synth queries */
 
-  /** The solver for abduction queries */
-  /** The solver for interpolation queries */
-  /** The solver for quantifier elimination queries */
-  std::unique_ptr<smt::QuantElimSolver> d_quantElimSolver;
 
   /**
    * The logic set by the user. The actual logic, which may extend the user's

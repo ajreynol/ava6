@@ -192,23 +192,11 @@ TypeNode NodeManager::mkBitVectorType(unsigned size)
                                                   BitVectorSize(size));
 }
 
-TypeNode NodeManager::mkFiniteFieldType(const Integer& modulus)
-{
-  Unreachable() << "Removed theory";
-}
-
 TypeNode NodeManager::sExprType()
 {
   return mkConstInternal<TypeNode, TypeConstant>(Kind::TYPE_CONSTANT,
                                                  SEXPR_TYPE);
 }
-
-TypeNode NodeManager::mkFloatingPointType(unsigned exp, unsigned sig)
-{
-  Unreachable() << "Removed theory";
-}
-
-
 
 NodeManager::~NodeManager()
 {
@@ -563,11 +551,6 @@ TypeNode NodeManager::getType(TNode n, bool check, std::ostream* errOut)
   Assert(!check || n.getAttribute(tca));
   // should be the last type computed in the above loop
   return typeNode;
-}
-
-TypeNode NodeManager::mkBagType(TypeNode elementType)
-{
-  Unreachable() << "Removed theory";
 }
 
 TypeNode NodeManager::mkSequenceType(TypeNode elementType)

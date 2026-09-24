@@ -42,7 +42,6 @@ class Smt2Lexer : public Lexer
   const char* tokenStr() const override;
   /** Are we in strict mode? */
   bool isStrict() const;
-  /** Are we parsing sygus? */
 
  private:
   /**
@@ -115,7 +114,6 @@ class Smt2Lexer : public Lexer
   std::vector<char> d_token;
   /** Is strict parsing enabled */
   bool d_isStrict;
-  /** Is sygus enabled */
   /** The character classes. */
   std::array<uint8_t, 256> d_charClass{};  // value-initialized to 0
 };

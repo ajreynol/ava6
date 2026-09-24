@@ -1196,10 +1196,6 @@ Node QuantifiersRewriter::getVarElimEq(Node lit,
   {
     slv = getVarElimEqBv(lit, args, var, cdp);
   }
-  else if (tt.isStringLike())
-  {
-    slv = getVarElimEqString(lit, args, var, cdp);
-  }
   return slv;
 }
 
@@ -1319,61 +1315,6 @@ Node QuantifiersRewriter::getVarElimEqBv(Node lit,
           }
         }
         return slv;
-      }
-    }
-  }
-
-  return Node::null();
-}
-
-Node QuantifiersRewriter::getVarElimEqString(Node lit,
-                                             const std::vector<Node>& args,
-                                             Node& var,
-                                             CDProof* cdp) const
-{
-  Assert(lit.getKind() == Kind::EQUAL);
-  // The reasoning below involves equality entailment as
-  // (= (str.++ s x t) r) entails (= x (str.substr r (str.len s) _)),
-  // but these equalities are not equivalent.
-  {
-    return Node::null();
-  }
-  NodeManager* nm = nodeManager();
-  for (unsigned i = 0; i < 2; i++)
-  {
-    if (lit[i].getKind() == Kind::STRING_CONCAT)
-    {
-      TypeNode stype = lit[i].getType();
-      for (unsigned j = 0, nchildren = lit[i].getNumChildren(); j < nchildren;
-           j++)
-      {
-        if (std::find(args.begin(), args.end(), lit[i][j]) != args.end())
-        {
-          var = lit[i][j];
-          Node slv = lit[1 - i];
-          std::vector<Node> preL(lit[i].begin(), lit[i].begin() + j);
-          std::vector<Node> postL(lit[i].begin() + j + 1, lit[i].end());
-          Node tpre = strings::utils::mkConcat(preL, stype);
-          Node tpost = strings::utils::mkConcat(postL, stype);
-          Node slvL = nm->mkNode(Kind::STRING_LENGTH, slv);
-          Node tpreL = nm->mkNode(Kind::STRING_LENGTH, tpre);
-          Node tpostL = nm->mkNode(Kind::STRING_LENGTH, tpost);
-          slv = nm->mkNode(
-              Kind::STRING_SUBSTR,
-              slv,
-              tpreL,
-              nm->mkNode(
-                  Kind::SUB, slvL, nm->mkNode(Kind::ADD, tpreL, tpostL)));
-          // forall x. r ++ x ++ t = s => P( x )
-          //   is equivalent to
-          // r ++ s' ++ t = s => P( s' ) where
-          // s' = substr( s, |r|, |s|-(|t|+|r|) ).
-          // We apply this only if r,t,s do not contain free variables.
-          if (!expr::hasFreeVar(slv))
-          {
-            return slv;
-          }
-        }
       }
     }
   }

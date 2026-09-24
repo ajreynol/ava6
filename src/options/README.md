@@ -1,3 +1,9 @@
+# Ava6 options
+
+Ava6 retains cvc5's TOML option generator, with public options and private
+settings for the retained core algorithms. Expert options are removed. See
+[DESIGN.md](../../DESIGN.md) for the feature boundary.
+
 Specifying Modules
 ==================
 
@@ -28,7 +34,7 @@ Specifying Options
 Options can be defined within a module file with the `[[option]]` tag, the
 required attributes for an option are:
 
-* `category` (string): one of `common`, `regular`, `expert`, or `undocumented`
+* `category` (string): one of `common`, `regular`, or `undocumented`
 * `type` (string): the C++ type of the option value, see below for more details.
 
 Optional attributes are:
@@ -66,10 +72,20 @@ Option categories
 
 Every option has one of the following categories that influences where and how an option is visible:
 
-* `common`: Used for the most common options. All `common` options are shown at the very top in both the online documentation and the output of `--help` on the command line.
+* `common`: The most common options, shown first in command-line `--help`.
 * `regular`: This should be used for most options.
-* `expert`: This is for options that should be used with care only. A warning is shown in both the online documentation and the command line help.
-* `undocumented`: Such an option is skipped entirely in both the online documentation and the command line help. This should only be used when users don't have a (reasonable) use case for this option (e.g., because it stores data that is added via another option like for `output` and `outputTagHolder`).
+* `undocumented`: Omitted from command-line help, for values populated through
+  other options, such as `outputTagHolder`.
+
+Private settings
+----------------
+
+Use `[[setting]]` for internal core policies. Settings declare `name`, `type`,
+and `default`, with `[[setting.mode.NAME]]` entries for enum values. They have
+no public category, command-line spelling, or help text, and are absent from
+`set-option`, `get-option`, and public option enumeration. Remove settings
+when their algorithms are removed; see the root design notes before adding
+new ones.
 
 Option types
 ------------

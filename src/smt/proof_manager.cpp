@@ -292,9 +292,7 @@ void PfManager::checkFinalProof(std::shared_ptr<ProofNode> pfn)
 
 void PfManager::printProof(std::ostream& out,
                            std::shared_ptr<ProofNode> fp,
-                           options::ProofFormatMode mode,
-                           ProofScopeMode scopeMode,
-                           const std::map<Node, std::string>& assertionNames)
+                           ProofScopeMode scopeMode)
 {
   proof::EoNodeConverter atp(nodeManager());
   proof::EoPrinter eop(d_env, atp, d_rewriteDb.get());

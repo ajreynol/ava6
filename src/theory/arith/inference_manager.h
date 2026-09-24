@@ -109,11 +109,6 @@ class InferenceManager : public InferenceManagerBuffered
   virtual bool cacheLemma(TNode lem, LemmaProperty p) override;
 
  private:
-  /**
-   * Checks whether the lemma is entailed to be false. In this case, it is a
-   * conflict.
-   */
-  bool isEntailedFalse(const SimpleTheoryLemma& lem);
   /** The waiting lemmas. */
   std::vector<std::unique_ptr<SimpleTheoryLemma>> d_waitingLem;
   /** Whether we are tracking the set of propagated literals */

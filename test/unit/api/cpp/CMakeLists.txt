@@ -31,11 +31,7 @@ ava6_add_unit_test_black(api_term_black api/cpp)
 ava6_add_unit_test_white(api_term_white api/cpp)
 ava6_add_unit_test_black(api_term_manager_black api/cpp)
 
-# do not issue deprecation warnings when using deprecated functions
-set_source_files_properties(input_parser_black.cpp
-  PROPERTIES COMPILE_OPTIONS
-  "-Wno-deprecated-declarations;-Wno-error=deprecated-declarations")
-# tests to cover deprecated functions for API coverage build in nightlies
+# Tests that deliberately exercise deprecated enum conversion functions.
 set_source_files_properties(api_deprecated_black.cpp
   PROPERTIES COMPILE_OPTIONS
   "-Wno-deprecated-declarations;-Wno-error=deprecated-declarations")

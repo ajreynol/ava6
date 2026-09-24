@@ -21,7 +21,6 @@
 #include "smt/env_obj.h"
 #include "smt/smt_mode.h"
 #include "util/result.h"
-#include "util/synth_result.h"
 
 namespace ava6::internal {
 
@@ -85,40 +84,6 @@ class SolverEngineState : protected EnvObj
    */
   void notifyCheckSatResult(const Result& r, SolverEngine* solver = nullptr);
   /**
-   * Notify that the result of the last check-synth or check-synth-next was r.
-   * @param r The result of the check-synth or check-synth-next call.
-   */
-  void notifyCheckSynthResult(const SynthResult& r);
-  /**
-   * Notify that we finished an abduction query, where success is whether the
-   * command was successful. This is managed independently of the above
-   * calls for notifying check-sat. In other words, if a get-abduct command
-   * is issued to an SolverEngine, it may use a satisfiability call (if desired)
-   * to solve the abduction query. This method is called *in addition* to
-   * the above calls to notifyCheckSat / notifyCheckSatResult in this case.
-   * In particular, it is called after these two methods are completed.
-   * This overwrites the SMT mode to the "ABDUCT" mode if the call to abduction
-   * was successful.
-   */
-  void notifyGetAbduct(bool success);
-  /**
-   * Notify that we finished an interpolation query, where success is whether
-   * the command was successful. This is managed independently of the above
-   * calls for notifying check-sat. In other words, if a get-interpolant command
-   * is issued to an SolverEngine, it may use a satisfiability call (if desired)
-   * to solve the interpolation query. This method is called *in addition* to
-   * the above calls to notifyCheckSat / notifyCheckSatResult in this case.
-   * In particular, it is called after these two methods are completed.
-   * This overwrites the SMT mode to the "INTERPOL" mode if the call to
-   * interpolation was successful.
-   */
-  void notifyGetInterpol(bool success);
-  /**
-   * Notify that we finished a find-synth or find-synth-next query, where
-   * success is whether the command was successful.
-   */
-  void notifyFindSynth(bool success);
-  /**
    * Set that we are in a fully initialized state.
    */
   void markFinishInit();
@@ -132,8 +97,8 @@ class SolverEngineState : protected EnvObj
    */
   bool isFullyInited() const;
   /**
-   * @return True if a call to check-sat or check-synth has been made and
-   * completed. Other calls (e.g., get-interpolant, get-abduct, get-qe) do not
+   * @return True if a call to check-sat has been made and
+   * completed. Other commands do not
    * impact this, since they are handled independently via subsolvers.
    */
   bool isQueryMade() const;

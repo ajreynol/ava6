@@ -51,7 +51,6 @@
 #include "smt/model_core_builder.h"
 #include "smt/preprocessor.h"
 #include "smt/proof_manager.h"
-#include "smt/quant_elim_solver.h"
 #include "smt/set_defaults.h"
 #include "smt/smt_driver.h"
 #include "smt/smt_solver.h"
@@ -59,7 +58,6 @@
 #include "smt/solver_engine_stats.h"
 #include "smt/timeout_core_manager.h"
 #include "smt/unsat_core_manager.h"
-#include "theory/datatypes/sygus_datatype_utils.h"
 #include "theory/quantifiers/instantiation_list.h"
 #include "theory/quantifiers/quantifiers_attributes.h"
 #include "theory/quantifiers_engine.h"
@@ -97,7 +95,6 @@ SolverEngine::SolverEngine(NodeManager* nm, const Options* optr)
       d_expDef(nullptr),
       d_pfManager(nullptr),
       d_ucManager(nullptr),
-      d_quantElimSolver(nullptr),
       d_userLogicSet(false),
       d_isInternalSubsolver(false),
       d_stats(nullptr)
@@ -112,10 +109,6 @@ SolverEngine::SolverEngine(NodeManager* nm, const Options* optr)
   d_expDef.reset(new ExpandDefs(*d_env.get()));
   // make the context manager
   d_ctxManager.reset(new ContextManager(*d_env.get(), *d_state));
-  // make the SyGuS solver
-  // make the quantifier elimination solver
-  d_quantElimSolver.reset(
-      new QuantElimSolver(*d_env.get(), *d_smtSolver, d_ctxManager.get()));
 }
 
 bool SolverEngine::isFullyInited() const { return d_state->isFullyInited(); }
@@ -243,7 +236,6 @@ SolverEngine::~SolverEngine()
     d_ucManager.reset(nullptr);
     d_tcm.reset(nullptr);
 
-    d_quantElimSolver.reset(nullptr);
     d_smtDriver.reset(nullptr);
     d_smtSolver.reset(nullptr);
 
@@ -955,72 +947,6 @@ void SolverEngine::assertFormulaInternal(const Node& formula)
   d_smtSolver->getAssertions().assertFormula(f);
 }
 
-/*
-   --------------------------------------------------------------------------
-    Handling SyGuS commands
-   --------------------------------------------------------------------------
-*/
-
-void SolverEngine::declareSygusVar(Node var)
-{
-  throw ModalException("This command is not supported by the core solver");
-}
-
-void SolverEngine::declareSynthFun(Node func,
-                                   TypeNode sygusType,
-                                   const std::vector<Node>& vars)
-{
-  throw ModalException("This command is not supported by the core solver");
-}
-void SolverEngine::declareSynthFun(Node func, const std::vector<Node>& vars)
-{
-  throw ModalException("This command is not supported by the core solver");
-}
-
-void SolverEngine::assertSygusConstraint(Node n, bool isAssume)
-{
-  throw ModalException("This command is not supported by the core solver");
-}
-
-std::vector<Node> SolverEngine::getSygusConstraints()
-{
-  throw ModalException("This command is not supported by the core solver");
-}
-
-std::vector<Node> SolverEngine::getSygusAssumptions()
-{
-  throw ModalException("This command is not supported by the core solver");
-}
-
-void SolverEngine::assertSygusInvConstraint(Node inv,
-                                            Node pre,
-                                            Node trans,
-                                            Node post)
-{
-  throw ModalException("This command is not supported by the core solver");
-}
-
-SynthResult SolverEngine::checkSynth(bool isNext)
-{
-  throw ModalException("This command is not supported by the core solver");
-}
-
-Node SolverEngine::findSynth(modes::FindSynthTarget fst, const TypeNode& gtn)
-{
-  throw ModalException("This command is not supported by the core solver");
-}
-
-Node SolverEngine::findSynthNext()
-{
-  throw ModalException("This command is not supported by the core solver");
-}
-
-/*
-   --------------------------------------------------------------------------
-    End of Handling SyGuS commands
-   --------------------------------------------------------------------------
-*/
-
 void SolverEngine::declarePool(const Node& p,
                                const std::vector<Node>& initValue)
 {
@@ -1028,12 +954,6 @@ void SolverEngine::declarePool(const Node& p,
   beginCall();
   QuantifiersEngine* qe = getAvailableQuantifiersEngine("declareTermPool");
   qe->declarePool(p, initValue);
-}
-
-void SolverEngine::declareOracleFun(
-    Node var, std::function<std::vector<Node>(const std::vector<Node>&)> fn)
-{
-  throw ModalException("Oracles are not supported by the core solver");
 }
 
 void SolverEngine::addPlugin(Plugin* p)
@@ -1435,14 +1355,9 @@ void SolverEngine::printProof(std::ostream& out,
     return ssolver->printProof(out, fp, proofFormat, assertionNames);
   }
   out << "(" << std::endl;
-  // we print in the format based on the proof mode
-  options::ProofFormatMode mode = options::ProofFormatMode::CPC;
-
   d_pfManager->printProof(out,
                           fp,
-                          mode,
-                          ProofScopeMode::DEFINITIONS_AND_ASSERTIONS,
-                          assertionNames);
+                          ProofScopeMode::DEFINITIONS_AND_ASSERTIONS);
   out << ")" << std::endl;
 }
 
@@ -1826,9 +1741,8 @@ std::vector<std::shared_ptr<ProofNode>> SolverEngine::getProof(
 void SolverEngine::proofToString(std::ostream& out,
                                  std::shared_ptr<ProofNode> fp)
 {
-  options::ProofFormatMode format_mode = getOptions().proof.proofFormatMode;
   d_pfManager->printProof(
-      out, fp, format_mode, ProofScopeMode::DEFINITIONS_AND_ASSERTIONS);
+      out, fp, ProofScopeMode::DEFINITIONS_AND_ASSERTIONS);
 }
 
 void SolverEngine::printInstantiations(std::ostream& out)
@@ -1941,46 +1855,6 @@ void SolverEngine::getInstantiationTermVectors(
       getAvailableQuantifiersEngine("getInstantiationTermVectors");
   // get the list of all instantiations
   qe->getInstantiationTermVectors(insts);
-}
-
-bool SolverEngine::getSynthSolutions(std::map<Node, Node>& solMap)
-{
-  throw ModalException("This command is not supported by the core solver");
-}
-
-bool SolverEngine::getSubsolverSynthSolutions(std::map<Node, Node>& solMap)
-{
-  throw ModalException("This command is not supported by the core solver");
-}
-
-Node SolverEngine::getQuantifierElimination(Node q, bool doFull)
-{
-  Assert(d_state->getStatusSolver() == nullptr);
-  beginCall(true);
-  Node result = d_quantElimSolver->getQuantifierElimination(
-      q, doFull, d_isInternalSubsolver);
-  endCall();
-  return result;
-}
-
-Node SolverEngine::getInterpolant(const Node& conj, const TypeNode& grammarType)
-{
-  throw ModalException("This command is not supported by the core solver");
-}
-
-Node SolverEngine::getInterpolantNext()
-{
-  throw ModalException("This command is not supported by the core solver");
-}
-
-Node SolverEngine::getAbduct(const Node& conj, const TypeNode& grammarType)
-{
-  throw ModalException("This command is not supported by the core solver");
-}
-
-Node SolverEngine::getAbductNext()
-{
-  throw ModalException("This command is not supported by the core solver");
 }
 
 void SolverEngine::getInstantiatedQuantifiedFormulas(std::vector<Node>& qs)
@@ -2106,8 +1980,7 @@ void SolverEngine::printStatisticsDiff() const
 }
 
 void SolverEngine::setOption(const std::string& key,
-                             const std::string& value,
-                             bool fromUser)
+                             const std::string& value)
 {
   Trace("smt") << "SMT setOption(" << key << ", " << value << ")" << endl;
   options::set(getOptions(), key, value);

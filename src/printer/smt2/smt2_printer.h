@@ -135,45 +135,6 @@ class Smt2Printer : public ava6::internal::Printer
   /** Print query command */
   void toStreamCmdQuery(std::ostream& out, Node n) const override;
 
-  /** Print declare-var command */
-  void toStreamCmdDeclareVar(std::ostream& out,
-                             const std::string& id,
-                             TypeNode type) const override;
-
-  /** Print synth-fun command */
-  void toStreamCmdSynthFun(std::ostream& out,
-                           const std::string& id,
-                           const std::vector<Node>& vars,
-                           TypeNode rangeType,
-                           TypeNode sygusType) const override;
-
-  /** Print constraint command */
-  void toStreamCmdConstraint(std::ostream& out, Node n) const override;
-
-  /** Print assume command */
-  void toStreamCmdAssume(std::ostream& out, Node n) const override;
-
-  /** Print inv-constraint command */
-  void toStreamCmdInvConstraint(std::ostream& out,
-                                Node inv,
-                                Node pre,
-                                Node trans,
-                                Node post) const override;
-
-  /** Print check-synth command */
-  void toStreamCmdCheckSynth(std::ostream& out) const override;
-
-  /** Print check-synth-next command */
-  void toStreamCmdCheckSynthNext(std::ostream& out) const override;
-
-  /** Print find-synth command */
-  void toStreamCmdFindSynth(std::ostream& out,
-                            modes::FindSynthTarget fst,
-                            TypeNode sygusType) const override;
-
-  /** Print find-synth-next command */
-  void toStreamCmdFindSynthNext(std::ostream& out) const override;
-
   /** Print simplify command */
   void toStreamCmdSimplify(std::ostream& out, Node nodes) const override;
 
@@ -202,29 +163,6 @@ class Smt2Printer : public ava6::internal::Printer
   /** Print get-proof command */
   void toStreamCmdGetProof(std::ostream& out,
                            modes::ProofComponent c) const override;
-
-  /** Print get-interpolant command */
-  void toStreamCmdGetInterpol(std::ostream& out,
-                              const std::string& name,
-                              Node conj,
-                              TypeNode sygusType) const override;
-
-  /** Print get-interpolant-next command */
-  void toStreamCmdGetInterpolNext(std::ostream& out) const override;
-
-  /** Print get-abduct command */
-  void toStreamCmdGetAbduct(std::ostream& out,
-                            const std::string& name,
-                            Node conj,
-                            TypeNode sygusType) const override;
-
-  /** Print get-abduct-next command */
-  void toStreamCmdGetAbductNext(std::ostream& out) const override;
-
-  /** Print get-quantifier-elimination command */
-  void toStreamCmdGetQuantifierElimination(std::ostream& out,
-                                           Node n,
-                                           bool doFull) const override;
 
   /** Print get-unsat-assumptions command */
   void toStreamCmdGetUnsatAssumptions(std::ostream& out) const override;
@@ -312,11 +250,6 @@ class Smt2Printer : public ava6::internal::Printer
    * makes a difference for printing sequences.
    */
   static std::string smtKindStringOf(const Node& n);
-  /**
-   * Get the string corresponding to the sygus datatype t printed as a grammar.
-   */
-  static std::string sygusGrammarString(const TypeNode& t);
-
  private:
   /**
    * Base print method.

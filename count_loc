@@ -1,0 +1,141 @@
+#!/usr/bin/env python3
+"""Count physical C++ lines without installing cloc or any Python packages."""
+
+import argparse
+from collections import defaultdict
+import json
+from pathlib import Path
+import re
+import sys
+
+
+ROOT = Path(__file__).resolve().parent
+EXTENSIONS = {'.cpp', '.cc', '.cxx', '.h', '.hh', '.hpp', '.hxx', '.ipp', '.tpp'}
+EXCLUDED = {'.git', '.agents', '.codex', 'deps', '__pycache__'}
+RAW_STRING = re.compile(r'R"([^\s()\\]{0,16})\(')
+FIELDS = ('files', 'blank', 'comment', 'code')
+
+
+def count_lines(text):
+    """Classify each physical line; mixed code/comment lines count as code.
+
+    Strings, character literals, raw strings, and continued // comments are
+    recognized so that comment delimiters inside literals stay code. Blank
+    lines count as blank even inside multiline comments or raw strings.
+    """
+    counts = dict.fromkeys(FIELDS, 0)
+    counts['files'] = 1
+    state = 'code'
+    raw_end = ''
+    for line in text.splitlines(keepends=True):
+        has_code = False
+        i = 0
+        while i < len(line):
+            if state == 'block':
+                end = line.find('*/', i)
+                if end < 0:
+                    break
+                state = 'code'
+                i = end + 2
+            elif state == 'line':
+                state = 'line' if line.rstrip('\r\n').endswith('\\') else 'code'
+                break
+            elif state == 'raw':
+                has_code = True
+                end = line.find(raw_end, i)
+                if end < 0:
+                    break
+                state = 'code'
+                i = end + len(raw_end)
+            elif state in ('"', "'"):
+                has_code = True
+                if line[i] == '\\':
+                    i += 2
+                elif line[i] == state:
+                    state = 'code'
+                    i += 1
+                else:
+                    i += 1
+            elif line.startswith('/*', i):
+                state = 'block'
+                i += 2
+            elif line.startswith('//', i):
+                state = 'line'
+                i += 2
+            elif line[i].isspace():
+                i += 1
+            else:
+                has_code = True
+                raw = RAW_STRING.match(line, i) if line[i] == 'R' else None
+                if raw:
+                    raw_end = ')' + raw.group(1) + '"'
+                    state = 'raw'
+                    i = raw.end()
+                elif line[i] in ('"', "'"):
+                    # An apostrophe between digits can be a numeric separator.
+                    if not (line[i] == "'" and re.search(r'\b\d[\w.]*$', line[:i])
+                            and i + 1 < len(line) and line[i + 1].isalnum()):
+                        state = line[i]
+                    i += 1
+                else:
+                    i += 1
+        key = 'blank' if not line.strip() else 'code' if has_code else 'comment'
+        counts[key] += 1
+    return counts
+
+
+def source_files(paths):
+    seen = set()
+    for path in paths:
+        if not path.exists():
+            raise ValueError(f'path does not exist: {path}')
+        candidates = [path] if path.is_file() else path.rglob('*')
+        for candidate in candidates:
+            if candidate.suffix.lower() not in EXTENSIONS or not candidate.is_file():
+                continue
+            relative = candidate.relative_to(path) if path.is_dir() else Path(candidate.name)
+            if any(part in EXCLUDED or part.startswith('build')
+                   for part in relative.parts[:-1]):
+                continue
+            resolved = candidate.resolve()
+            if resolved not in seen:
+                seen.add(resolved)
+                yield resolved
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('paths', nargs='*', type=Path,
+                        help='files/directories; default: repository src, include, test')
+    parser.add_argument('--by-file', action='store_true', help='show each file')
+    parser.add_argument('--json', action='store_true', help='emit machine-readable counts')
+    args = parser.parse_args()
+    groups = defaultdict(lambda: dict.fromkeys(FIELDS, 0))
+    totals = dict.fromkeys(FIELDS, 0)
+    paths = args.paths or [ROOT / name for name in ('src', 'include', 'test')]
+    try:
+        for path in source_files(paths):
+            counts = count_lines(path.read_text(encoding='utf-8', errors='replace'))
+            try:
+                relative = path.relative_to(ROOT)
+                group = str(relative) if args.by_file else relative.parts[0]
+            except ValueError:
+                group = str(path) if args.by_file else 'external'
+            for field in FIELDS:
+                groups[group][field] += counts[field]
+                totals[field] += counts[field]
+    except (OSError, ValueError) as error:
+        parser.exit(1, f'count_loc: {error}\n')
+    if args.json:
+        print(json.dumps({'groups': dict(sorted(groups.items())), 'total': totals}, indent=2))
+    else:
+        width = max([5, *(len(name) for name in groups)])
+        print(f'{"Scope":<{width}} {"Files":>8} {"Blank":>10} {"Comment":>10} {"Code":>10}')
+        for name, counts in [*sorted(groups.items()), ('TOTAL', totals)]:
+            print(f'{name:<{width}}' + ''.join(f' {counts[field]:>{8 if field == "files" else 10},}'
+                                            for field in FIELDS))
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

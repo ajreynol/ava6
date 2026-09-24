@@ -155,8 +155,6 @@ class AVA6_EXPORT Cmd
   /** Helper to convert a vector of Sorts to internal TypeNodes. */
   static std::vector<internal::TypeNode> sortVectorToTypeNodes(
       const std::vector<ava6::Sort>& sorts);
-  /** Helper to convert a Grammar to an internal internal::TypeNode */
-  static internal::TypeNode grammarToTypeNode(ava6::Grammar* grammar);
 }; /* class Command */
 
 /**
@@ -435,44 +433,6 @@ class AVA6_EXPORT CheckSatAssumingCommand : public Cmd
   ava6::Result d_result;
 }; /* class CheckSatAssumingCommand */
 
-/* ------------------- sygus commands  ------------------ */
-
-/** Declares a sygus universal variable */
-
-
-/** Declares a sygus function-to-synthesize
- *
- * This command is also used for the special case in which we are declaring an
- * invariant-to-synthesize
- */
-
-
-/** Declares a sygus constraint */
-
-
-/** Declares a sygus invariant constraint
- *
- * Invarint constraints are declared in a somewhat implicit manner in the SyGuS
- * language: they are declared in terms of the previously declared
- * invariant-to-synthesize, precondition, transition relation and condition.
- *
- * The actual constraint must be built such that the invariant is not stronger
- * than the precondition, not weaker than the postcondition and inductive
- * w.r.t. the transition relation.
- */
-
-
-/** Declares a synthesis conjecture */
-
-
-/** Find synth command */
-
-
-/** Find synth next command */
-
-
-/* ------------------- sygus commands  ------------------ */
-
 // this is TRANSFORM in the CVC presentation language
 class AVA6_EXPORT SimplifyCommand : public Cmd
 {
@@ -618,58 +578,6 @@ class AVA6_EXPORT GetInstantiationsCommand : public Cmd
  protected:
   ava6::Solver* d_solver;
 }; /* class GetInstantiationsCommand */
-
-/** The command (get-interpolant s B (G)?)
- *
- * This command asks for an interpolant from the current set of assertions and
- * conjecture (goal) B.
- *
- * The symbol s is the name for the interpolation predicate. If we successfully
- * find a predicate P, then the output response of this command is: (define-fun
- * s () Bool P)
- */
- /* class GetInterpolCommand */
-
-/** The command (get-interpolant-next) */
-
-
-/** The command (get-abduct s B (G)?)
- *
- * This command asks for an abduct from the current set of assertions and
- * conjecture (goal) given by the argument B.
- *
- * The symbol s is the name for the abduction predicate. If we successfully
- * find a predicate P, then the output response of this command is:
- *   (define-fun s () Bool P)
- *
- * A grammar G can be optionally provided to indicate the syntactic restrictions
- * on the possible solutions returned.
- */
- /* class GetAbductCommand */
-
-/** The command (get-abduct-next) */
-
-
-class AVA6_EXPORT GetQuantifierEliminationCommand : public Cmd
-{
- protected:
-  ava6::Term d_term;
-  bool d_doFull;
-  ava6::Term d_result;
-
- public:
-  GetQuantifierEliminationCommand();
-  GetQuantifierEliminationCommand(const ava6::Term& term, bool doFull);
-
-  ava6::Term getTerm() const;
-  bool getDoFull() const;
-  void invoke(ava6::Solver* solver, parser::SymManager* sm) override;
-  ava6::Term getResult() const;
-  void printResult(ava6::Solver* solver, std::ostream& out) const override;
-
-  std::string getCommandName() const override;
-  void toStream(std::ostream& out) const override;
-}; /* class GetQuantifierEliminationCommand */
 
 class AVA6_EXPORT GetUnsatAssumptionsCommand : public Cmd
 {

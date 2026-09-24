@@ -116,9 +116,6 @@ class NonlinearExtension : EnvObj
   /** Does this class need a call to check(...) at last call effort? */
   bool hasNlTerms() const { return d_hasNlTerms; }
 
-  /** Process side effect se */
-  void processSideEffect(const NlLemma& se);
-
  private:
   /** Model-based refinement
    *

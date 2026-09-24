@@ -40,9 +40,7 @@ class SymManager::Implementation
         d_namedAsserts(&d_context),
         d_declareSorts(&d_context),
         d_declareTerms(&d_context),
-        d_funToSynth(&d_context),
-        d_hasPushedScope(&d_context, false),
-        d_lastSynthName(&d_context)
+        d_hasPushedScope(&d_context, false)
   {
     // use an outermost push, to be able to clear all definitions
     d_context.push();
@@ -70,14 +68,10 @@ class SymManager::Implementation
   std::vector<ava6::Sort> getDeclaredSorts() const;
   /** get model declare terms */
   std::vector<ava6::Term> getDeclaredTerms() const;
-  /** get functions to synthesize */
-  std::vector<ava6::Term> getFunctionsToSynthesize() const;
   /** Add declared sort to the list of model declarations. */
   void addModelDeclarationSort(ava6::Sort s);
   /** Add declared term to the list of model declarations. */
   void addModelDeclarationTerm(ava6::Term t);
-  /** Add function to the list of functions to synthesize. */
-  void addFunctionToSynthesize(ava6::Term t);
   /** reset */
   void reset();
   /** reset assertions */
@@ -88,11 +82,6 @@ class SymManager::Implementation
   void popScope();
   /** Have we pushed a scope (e.g. let or quantifier) in the current context? */
   bool hasPushedScope() const;
-  /** Set the last abduct-to-synthesize had the given name. */
-  void setLastSynthName(const std::string& name);
-  /** Get the name of the last abduct-to-synthesize */
-  const std::string& getLastSynthName() const;
-
  private:
   /**
    * The declaration scope that is "owned" by this symbol manager.
@@ -108,14 +97,10 @@ class SymManager::Implementation
   SortList d_declareSorts;
   /** Declared terms (for model printing) */
   TermList d_declareTerms;
-  /** Functions to synthesize (for response to check-synth) */
-  TermList d_funToSynth;
   /**
    * Have we pushed a scope (e.g. a let or quantifier) in the current context?
    */
   CDO<bool> d_hasPushedScope;
-  /** The last abduct or interpolant to synthesize name */
-  CDO<std::string> d_lastSynthName;
 };
 
 NamingResult SymManager::Implementation::setExpressionName(
@@ -211,12 +196,6 @@ std::vector<ava6::Term> SymManager::Implementation::getDeclaredTerms() const
   return declareTerms;
 }
 
-std::vector<ava6::Term> SymManager::Implementation::getFunctionsToSynthesize()
-    const
-{
-  return std::vector<ava6::Term>(d_funToSynth.begin(), d_funToSynth.end());
-}
-
 void SymManager::Implementation::addModelDeclarationSort(ava6::Sort s)
 {
   Trace("sym-manager") << "SymManager: addModelDeclarationSort " << s
@@ -229,13 +208,6 @@ void SymManager::Implementation::addModelDeclarationTerm(ava6::Term t)
   Trace("sym-manager") << "SymManager: addModelDeclarationTerm " << t
                        << std::endl;
   d_declareTerms.push_back(t);
-}
-
-void SymManager::Implementation::addFunctionToSynthesize(ava6::Term f)
-{
-  Trace("sym-manager") << "SymManager: addFunctionToSynthesize " << f
-                       << std::endl;
-  d_funToSynth.push_back(f);
 }
 
 void SymManager::Implementation::pushScope(bool isUserContext)
@@ -268,16 +240,6 @@ void SymManager::Implementation::popScope()
 bool SymManager::Implementation::hasPushedScope() const
 {
   return d_hasPushedScope.get();
-}
-
-void SymManager::Implementation::setLastSynthName(const std::string& name)
-{
-  d_lastSynthName = name;
-}
-
-const std::string& SymManager::Implementation::getLastSynthName() const
-{
-  return d_lastSynthName.get();
 }
 
 void SymManager::Implementation::reset()
@@ -472,11 +434,6 @@ std::vector<ava6::Term> SymManager::getDeclaredTerms() const
   return d_implementation->getDeclaredTerms();
 }
 
-std::vector<ava6::Term> SymManager::getFunctionsToSynthesize() const
-{
-  return d_implementation->getFunctionsToSynthesize();
-}
-
 void SymManager::addModelDeclarationSort(ava6::Sort s)
 {
   d_implementation->addModelDeclarationSort(s);
@@ -485,11 +442,6 @@ void SymManager::addModelDeclarationSort(ava6::Sort s)
 void SymManager::addModelDeclarationTerm(ava6::Term t)
 {
   d_implementation->addModelDeclarationTerm(t);
-}
-
-void SymManager::addFunctionToSynthesize(ava6::Term f)
-{
-  d_implementation->addFunctionToSynthesize(f);
 }
 
 size_t SymManager::scopeLevel() const
@@ -534,16 +486,6 @@ bool SymManager::getFreshDeclarations() const { return d_freshDeclarations; }
 
 void SymManager::setTermSortOverload(bool flag) { d_termSortOverload = flag; }
 bool SymManager::getTermSortOverload() const { return d_termSortOverload; }
-
-void SymManager::setLastSynthName(const std::string& name)
-{
-  d_implementation->setLastSynthName(name);
-}
-
-const std::string& SymManager::getLastSynthName() const
-{
-  return d_implementation->getLastSynthName();
-}
 
 void SymManager::reset() { d_implementation->reset(); }
 

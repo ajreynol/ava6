@@ -503,10 +503,6 @@ name   = "Quantifiers"
   default    = "true"
   help       = "only process innermost quantified formulas in counterexample-based quantifier instantiation"
 
-[[setting]]
-  name       = "cegqiNestedQE"
-  type       = "bool"
-  default    = "false"
 
 # CEGQI for arithmetic
 

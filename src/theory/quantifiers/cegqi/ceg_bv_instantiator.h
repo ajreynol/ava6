@@ -65,17 +65,6 @@ class BvInstantiator : public Instantiator
                            Node pv,
                            Node lit,
                            CegInstEffort effort) override;
-  /** process assertion
-   *
-   * Computes a solved form for pv in lit based on Figure 1 of Niemetz et al,
-   * CAV 2018.
-   */
-  bool processAssertion(CegInstantiator* ci,
-                        SolvedForm& sf,
-                        Node pv,
-                        Node lit,
-                        Node alit,
-                        CegInstEffort effort) override;
   /** process assertions
    *
    * This is called after processAssertion has been called on all currently

@@ -56,12 +56,12 @@ bool QModelBuilder::optUseModel()
          || options().quantifiers.fmfBound || options().strings.stringExp;
 }
 
-bool QModelBuilder::preProcessBuildModel(TheoryModel* m)
+bool QModelBuilder::preProcessBuildModel(TheoryModel*)
 {
-  return preProcessBuildModelStd(m);
+  return preProcessBuildModelStd();
 }
 
-bool QModelBuilder::preProcessBuildModelStd(TheoryModel* m)
+bool QModelBuilder::preProcessBuildModelStd()
 {
   d_addedLemmas = 0;
   d_triedLemmas = 0;

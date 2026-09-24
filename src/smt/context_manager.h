@@ -21,7 +21,6 @@
 #include "smt/env_obj.h"
 #include "smt/smt_mode.h"
 #include "util/result.h"
-#include "util/synth_result.h"
 
 namespace ava6::internal {
 namespace smt {

@@ -643,10 +643,6 @@ class AVA6_EXPORT TypeNode
   /** Is this a floating-point type */
   bool isFloatingPoint() const;
 
-  /** Is this a floating-point type of with <code>exp</code> exponent bits
-      and <code>sig</code> significand bits */
-  bool isFloatingPoint(unsigned exp, unsigned sig) const;
-
   /** Is this a bit-vector type */
   bool isBitVector() const;
 
