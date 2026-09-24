@@ -121,4 +121,4 @@ class CombinationEngine : protected EnvObj
 }  // namespace theory
 }  // namespace ava6::internal
 
-#endif /* AVA6__THEORY__COMBINATION_DISTRIBUTED__H */
+#endif /* AVA6__THEORY__COMBINATION_ENGINE__H */

@@ -28,6 +28,10 @@ solving remains supported.
 Term and sort construction belongs to `TermManager`. Every `Solver` requires
 an explicit term manager; the deprecated forwarding methods on `Solver` and
 its implicit thread-local term manager are removed.
+The plugin API and its internal adapters, SAT callbacks, and theory-engine
+module infrastructure are removed. The retained theories communicate directly
+with the theory engine. Quantifier reasoning modules remain part of the
+quantifiers engine.
 
 CPC printing uses the existing `proof/eo` implementation. Alethe and DOT printers
 and the expert CPC signature are removed. Internal proof Nodes and debug traces
@@ -98,6 +102,16 @@ Model construction still has its own equality engine. The benchmark
 architecture, both in Ava6 and in the upstream checkout with central equality
 selected. Its input is retained for manual investigation, but it is omitted
 from automatic regression runs.
+The fixed algorithms use concrete implementations: BV solving owns its
+bitblaster directly, and propositional solving constructs CaDiCaL without a
+solver factory or interchangeable SAT interface. CNF conversion keeps a small
+clause-sink interface for its unit tests. Linear arithmetic retains dual and
+sum-of-infeasibilities simplex; the unused feasibility-correction simplex is
+deleted. A single SMT driver manages preprocessing and incremental queries,
+without retry strategies or global-negation result handling. Care-graph
+combination lives in `CombinationEngine` without a strategy subclass. The
+central equality engine is assigned directly to participating theories, and
+the model manager owns its separate, independently resettable equality engine.
 Nonlinear arithmetic uses the retained extension solver and is still incomplete
 on some inputs. The rational implementation of real algebraic number storage is
 retained without libpoly.

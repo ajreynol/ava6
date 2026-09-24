@@ -68,9 +68,9 @@ class TheoryProxy : protected EnvObj, public Registrar
   /** Finish initialize */
   void finishInit(CadicalSolver* ss, CnfStream* cs);
 
-  /** Presolve, which calls presolve for the modules managed by this class */
+  /** Prepare the decision and theory engines for a query. */
   void presolve();
-  /** Postsolve, which calls postsolve for the modules managed by this class */
+  /** Reset the theory engine's interrupt state after a query. */
   void postsolve();
 
   /**
