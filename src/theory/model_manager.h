@@ -18,7 +18,7 @@
 #include <memory>
 
 #include "smt/env_obj.h"
-#include "theory/ee_manager.h"
+#include "theory/uf/equality_engine.h"
 #include "theory/logic_info.h"
 
 namespace ava6::internal {
@@ -31,31 +31,19 @@ namespace theory {
 class TheoryEngineModelBuilder;
 class TheoryModel;
 
-/**
- * A base class for managing models. Its main feature is to implement a
- * buildModel command. Overall, its behavior is specific to the kind of equality
- * engine management mode we are using. In particular, the prepare model
- * method is a manager-specific way for setting up the equality engine of the
- * model in preparation for model building.
- */
+/** Owns the model and its equality engine, and coordinates model construction. */
 class ModelManager : protected EnvObj
 {
  public:
-  ModelManager(Env& env, TheoryEngine& te, EqEngineManager& eem);
+  ModelManager(Env& env, TheoryEngine& te);
   ~ModelManager();
-  /**
-   * Finish initializing this class, which allocates the model, the model
-   * builder as well as the equality engine of the model. The equality engine
-   * to use is determined by the method initializeModelEqEngine.
-   *
-   * @param notify The object that wants to be notified for callbacks occurring
-   */
-  void finishInit(eq::EqualityEngineNotify* notify);
+  /** Allocate the model builder and the model's equality engine. */
+  void finishInit();
   /** Reset model, called during full effort check before the model is built */
   void resetModel();
   /**
    * Build the model. If we have yet to build the model on this round, this
-   * method calls the (manager-specific) prepareModel method and then calls
+   * method calls prepareModel and then calls
    * finishBuildModel.
    *
    * @return true if model building was successful.
@@ -75,7 +63,7 @@ class ModelManager : protected EnvObj
   TheoryModel* getModel();
   //------------------------ finer grained control over model building
   /**
-   * Prepare model, which is the manager-specific method for setting up the
+   * Prepare the model by setting up the
    * equality engine of the model. This should assert all relevant information
    * about the model into the equality engine of d_model.
    *
@@ -91,13 +79,7 @@ class ModelManager : protected EnvObj
    */
   bool finishBuildModel() const;
   //------------------------ end finer grained control over model building
- protected:
-  /**
-   * Initialize model equality engine. This is called at the end of finish
-   * init, after we have created a model object but before we have assigned it
-   * an equality engine.
-   */
-  void initializeModelEqEngine(eq::EqualityEngineNotify* notify);
+ private:
   /**
    * Collect model Boolean variables.
    * This asserts the values of all boolean variables to the equality engine of
@@ -109,17 +91,13 @@ class ModelManager : protected EnvObj
 
   /** Reference to the theory engine */
   TheoryEngine& d_te;
-  /** The equality engine manager */
-  EqEngineManager& d_eem;
   /**
    * A dummy context for the model equality engine, so we can clear it
    * independently of search context.
    */
   context::Context d_modelEeContext;
-  /** Pointer to the equality engine of the model */
-  eq::EqualityEngine* d_modelEqualityEngine;
-  /** The equality engine of the model, if we allocated it */
-  std::unique_ptr<eq::EqualityEngine> d_modelEqualityEngineAlloc;
+  /** Independently resettable equality engine used for model construction. */
+  std::unique_ptr<eq::EqualityEngine> d_modelEqualityEngine;
   /** The model object we have allocated (if one exists) */
   std::unique_ptr<TheoryModel> d_model;
   /** The model builder object we are using */

@@ -62,8 +62,6 @@ libava6_add_sources(
   node_value.cpp
   node_value.h
   oracle.h
-  plugin.cpp
-  plugin.h
   sequence.cpp
   sequence.h
   node_visitor.h

@@ -18,7 +18,7 @@
 #include "context/cdinsert_hashmap.h"
 #include "expr/node.h"
 #include "prop/cnf_stream.h"
-#include "prop/sat_solver.h"
+#include "prop/cadical/cadical.h"
 #include "prop/sat_solver_types.h"
 
 namespace ava6::internal {
@@ -33,7 +33,7 @@ class JustifyCache
  public:
   /** Constructor */
   JustifyCache(context::Context* c,
-               prop::CDCLTSatSolver* ss,
+               prop::CadicalSolver* ss,
                prop::CnfStream* cs);
   /**
    * Returns the value TRUE/FALSE for n, or UNKNOWN otherwise.
@@ -61,7 +61,7 @@ class JustifyCache
   /** Mapping from non-negated nodes to their SAT value */
   context::CDInsertHashMap<Node, prop::SatValue> d_justified;
   /** Pointer to the SAT solver */
-  prop::CDCLTSatSolver* d_satSolver;
+  prop::CadicalSolver* d_satSolver;
   /** Pointer to the CNF stream */
   prop::CnfStream* d_cnfStream;
 };

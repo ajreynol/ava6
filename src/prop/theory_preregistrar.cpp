@@ -15,7 +15,7 @@
 #include "options/prop_options.h"
 #include "prop/cnf_stream.h"
 #include "prop/prop_engine.h"
-#include "prop/sat_solver.h"
+#include "prop/cadical/cadical.h"
 #include "theory/theory_engine.h"
 
 namespace ava6::internal {
@@ -46,9 +46,7 @@ class TheoryPreregistrarNotify : public context::ContextNotifyObj
 /* -------------------------------------------------------------------------- */
 
 TheoryPreregistrar::TheoryPreregistrar(Env& env,
-                                       TheoryEngine* te,
-                                       AVA6_UNUSED CDCLTSatSolver* ss,
-                                       AVA6_UNUSED CnfStream* cs)
+                                       TheoryEngine* te)
     : EnvObj(env),
       d_theoryEngine(te),
       d_notify(new TheoryPreregistrarNotify(env, *this))

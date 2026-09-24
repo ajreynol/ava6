@@ -25,7 +25,7 @@ namespace ava6::internal {
 namespace smt {
 
 SmtDriver::SmtDriver(Env& env, SmtSolver& smt, ContextManager* ctx)
-    : EnvObj(env), d_smt(smt), d_ctx(ctx), d_ap(env)
+    : EnvObj(env), d_smt(smt), d_ctx(ctx), d_ap(env), d_assertionListIndex(userContext(), 0)
 {
   // set up proofs, this is done after options are finalized, so the
   // preprocess proof has been setup
@@ -48,11 +48,7 @@ Result SmtDriver::checkSat(const std::vector<Node>& assumptions)
   Result result;
   try
   {
-    // then, initialize the assertions
     as.setAssumptions(assumptions);
-
-
-    // make the check, where notice smt engine should be fully inited by now
 
     Trace("smt") << "SmtSolver::check()" << std::endl;
 
@@ -67,26 +63,8 @@ Result SmtDriver::checkSat(const std::vector<Node>& assumptions)
     }
     else
     {
-      bool checkAgain = true;
-      do
-      {
-        // get the next assertions, store in d_ap
-        getNextAssertionsInternal(d_ap);
-        // check sat based on the driver strategy
-        result = checkSatNext(d_ap);
-        // if we were asked to check again
-        if (result.getStatus() == Result::UNKNOWN
-            && result.getUnknownExplanation()
-                   == UnknownExplanation::REQUIRES_CHECK_AGAIN)
-        {
-          // finish init to construct new theory/prop engine
-          d_smt.finishInit();
-        }
-        else
-        {
-          checkAgain = false;
-        }
-      } while (checkAgain);
+      getNextAssertions(d_ap);
+      result = checkSatInternal(d_ap);
     }
   }
   catch (const LogicException& e)
@@ -113,19 +91,10 @@ Result SmtDriver::checkSat(const std::vector<Node>& assumptions)
   return result;
 }
 
-void SmtDriver::getNextAssertionsInternal(preprocessing::AssertionPipeline& ap)
-{
-  ap.clear();
-  // must first refresh the assertions, in the case global declarations is true
-  d_smt.getAssertions().refresh();
-  // get the next assertions based on the implementation of this driver
-  getNextAssertions(ap);
-}
-
 void SmtDriver::refreshAssertions()
 {
   // get the next assertions, store in d_ap
-  getNextAssertionsInternal(d_ap);
+  getNextAssertions(d_ap);
   // preprocess
   d_smt.preprocess(d_ap);
   // assert to internal
@@ -145,14 +114,7 @@ void SmtDriver::notifyPopPre() { d_smt.popPropContext(); }
 
 void SmtDriver::notifyPostSolve() { d_smt.resetTrail(); }
 
-SmtDriverSingleCall::SmtDriverSingleCall(Env& env,
-                                         SmtSolver& smt,
-                                         ContextManager* ctx)
-    : SmtDriver(env, smt, ctx), d_assertionListIndex(userContext(), 0)
-{
-}
-
-Result SmtDriverSingleCall::checkSatNext(preprocessing::AssertionPipeline& ap)
+Result SmtDriver::checkSatInternal(preprocessing::AssertionPipeline& ap)
 {
   // preprocess
   d_smt.preprocess(ap);
@@ -164,43 +126,15 @@ Result SmtDriverSingleCall::checkSatNext(preprocessing::AssertionPipeline& ap)
 
   // assert to internal
   d_smt.assertToInternal(ap);
-  // get result
-  Result result = d_smt.checkSatInternal();
-  // handle preprocessing-specific modifications to result
-  if (ap.isNegated())
-  {
-    Trace("smt") << "SmtSolver::process global negate " << result << std::endl;
-    if (result.getStatus() == Result::UNSAT)
-    {
-      result = Result(Result::SAT);
-    }
-    else if (result.getStatus() == Result::SAT)
-    {
-      // Only can answer unsat if the theory is satisfaction complete. In
-      // other words, a "sat" result for a closed formula indicates that the
-      // formula is true in *all* models.
-      // This includes linear arithmetic and bitvectors, which are the primary
-      // targets for the global negate option. Other logics are possible
-      // here but not considered.
-      LogicInfo logic = logicInfo();
-      if ((logic.isPure(theory::THEORY_ARITH) && logic.isLinear())
-          || logic.isPure(theory::THEORY_BV))
-      {
-        result = Result(Result::UNSAT);
-      }
-      else
-      {
-        result = Result(Result::UNKNOWN, UnknownExplanation::UNKNOWN_REASON);
-      }
-    }
-    Trace("smt") << "SmtSolver::global negate returned " << result << std::endl;
-  }
-  return result;
+  return d_smt.checkSatInternal();
 }
 
-void SmtDriverSingleCall::getNextAssertions(
+void SmtDriver::getNextAssertions(
     preprocessing::AssertionPipeline& ap)
 {
+  ap.clear();
+  // Refresh global declarations before collecting pending assertions.
+  d_smt.getAssertions().refresh();
   Assertions& as = d_smt.getAssertions();
   const context::CDList<Node>& al = as.getAssertionList();
   size_t alsize = al.size();

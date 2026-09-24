@@ -28,8 +28,7 @@
 #include "prop/cnf_stream.h"
 #include "prop/proof_cnf_stream.h"
 #include "prop/prop_proof_manager.h"
-#include "prop/sat_solver.h"
-#include "prop/sat_solver_factory.h"
+#include "prop/cadical/cadical.h"
 #include "prop/theory_proxy.h"
 #include "smt/env.h"
 #include "theory/output_channel.h"
@@ -78,8 +77,7 @@ PropEngine::PropEngine(Env& env, TheoryEngine* te)
   // make the theory proxy first
   d_theoryProxy = new TheoryProxy(d_env, this, d_theoryEngine, d_skdm.get());
 
-  d_satSolver = SatSolverFactory::createCDCLTSatSolver(
-      env, statisticsRegistry(), env.getResourceManager(), d_theoryProxy, "");
+  d_satSolver = new CadicalSolver(env, *d_theoryProxy);
 
   // create CnfStream with new SAT solver
   d_cnfStream = new CnfStream(env,
@@ -97,7 +95,6 @@ PropEngine::PropEngine(Env& env, TheoryEngine* te)
     PropPfManager* ppm =
         new PropPfManager(env, d_satSolver, *d_cnfStream, d_assumptions);
     d_ppm.reset(ppm);
-    d_satSolver->attachProofManager(ppm);
   }
 }
 
@@ -390,11 +387,6 @@ std::vector<Node> PropEngine::getPropDecisions() const
   return decisions;
 }
 
-std::vector<Node> PropEngine::getPropOrderHeap() const
-{
-  return d_satSolver->getOrderHeap();
-}
-
 bool PropEngine::isFixed(TNode lit) const
 {
   if (isSatLiteral(lit))
@@ -496,7 +488,7 @@ Result PropEngine::checkSat()
     result = SAT_VALUE_UNKNOWN;
   }
 
-  d_theoryProxy->postsolve(result);
+  d_theoryProxy->postsolve();
 
   if (wasInterrupted)
   {

@@ -39,7 +39,6 @@ TheoryBV::TheoryBV(Env& env,
       d_im(env, *this, d_state, "theory::bv::"),
       d_notify(d_im),
       d_invalidateModelCache(context(), true),
-      d_inPostCheck(false),
       d_stats(statisticsRegistry(), "theory::bv::"),
       d_checker(nodeManager())
 {
@@ -75,7 +74,6 @@ void TheoryBV::finishInit()
   // kind are treated as variables)
   getValuation().setSemiEvaluatedKind(Kind::BITVECTOR_ACKERMANNIZE_UDIV);
   getValuation().setSemiEvaluatedKind(Kind::BITVECTOR_ACKERMANNIZE_UREM);
-  d_internal->finishInit();
 
   eq::EqualityEngine* ee = getEqualityEngine();
   if (ee)
@@ -117,8 +115,6 @@ void TheoryBV::finishInit()
 
 void TheoryBV::preRegisterTerm(TNode node)
 {
-  d_internal->preRegisterTerm(node);
-
   eq::EqualityEngine* ee = getEqualityEngine();
   if (ee)
   {
@@ -133,14 +129,9 @@ void TheoryBV::preRegisterTerm(TNode node)
   }
 }
 
-bool TheoryBV::preCheck(Effort e) { return d_internal->preCheck(e); }
-
-void TheoryBV::postCheck(Effort e)
+void TheoryBV::postCheck(AVA6_UNUSED Effort e)
 {
-  d_inPostCheck = true;
   d_invalidateModelCache = true;
-  d_internal->postCheck(e);
-  d_inPostCheck = false;
 }
 
 bool TheoryBV::preNotifyFact(
@@ -149,27 +140,10 @@ bool TheoryBV::preNotifyFact(
   return d_internal->preNotifyFact(atom, pol, fact, isPrereg, isInternal);
 }
 
-void TheoryBV::notifyFact(TNode atom, bool pol, TNode fact, bool isInternal)
-{
-  d_internal->notifyFact(atom, pol, fact, isInternal);
-}
-
-bool TheoryBV::needsCheckLastEffort()
-{
-  return d_internal->needsCheckLastEffort();
-}
-
-void TheoryBV::computeRelevantTerms(std::set<Node>& termSet)
-{
-  return d_internal->computeRelevantTerms(termSet);
-}
-
 bool TheoryBV::collectModelValues(TheoryModel* m, const std::set<Node>& termSet)
 {
   return d_internal->collectModelValues(m, termSet);
 }
-
-void TheoryBV::propagate(Effort e) { return d_internal->propagate(e); }
 
 bool TheoryBV::ppAssert(TrustNode tin, TrustSubstitutionMap& outSubstitutions)
 {
@@ -211,7 +185,7 @@ TrustNode TheoryBV::ppRewrite(TNode t,
     return TrustNode::mkTrustRewrite(t, res, nullptr);
   }
 
-  return d_internal->ppRewrite(t);
+  return TrustNode::null();
 }
 
 TrustNode TheoryBV::ppStaticRewrite(TNode atom)
@@ -234,36 +208,18 @@ TrustNode TheoryBV::ppStaticRewrite(TNode atom)
   return TrustNode::null();
 }
 
-void TheoryBV::presolve() { d_internal->presolve(); }
-
 EqualityStatus TheoryBV::getEqualityStatus(TNode a, TNode b)
 {
-  EqualityStatus status = d_internal->getEqualityStatus(a, b);
-
-  if (status == EqualityStatus::EQUALITY_UNKNOWN)
+  Node value_a = getValue(a);
+  Node value_b = getValue(b);
+  if (value_a.isNull() || value_b.isNull())
   {
-    Node value_a = getValue(a);
-    Node value_b = getValue(b);
-
-    if (value_a.isNull() || value_b.isNull())
-    {
-      return status;
-    }
-
-    if (value_a == value_b)
-    {
-      Trace("theory-bv") << EQUALITY_TRUE_IN_MODEL << std::endl;
-      return EQUALITY_TRUE_IN_MODEL;
-    }
-    Trace("theory-bv") << EQUALITY_FALSE_IN_MODEL << std::endl;
-    return EQUALITY_FALSE_IN_MODEL;
+    return EqualityStatus::EQUALITY_UNKNOWN;
   }
-  return status;
+  return value_a == value_b ? EQUALITY_TRUE_IN_MODEL : EQUALITY_FALSE_IN_MODEL;
 }
 
 TrustNode TheoryBV::explain(TNode node) { return d_internal->explain(node); }
-
-void TheoryBV::notifySharedTerm(TNode t) { d_internal->notifySharedTerm(t); }
 
 void TheoryBV::ppStaticLearn(TNode in, std::vector<TrustNode>& learned)
 {
@@ -308,13 +264,10 @@ void TheoryBV::ppStaticLearn(TNode in, std::vector<TrustNode>& learned)
     }
   }
 
-  d_internal->ppStaticLearn(in, learned);
 }
 
 Node TheoryBV::getValue(TNode node)
 {
-  Assert(d_inPostCheck || d_internal->isModelConsistent());
-
   if (d_invalidateModelCache.get())
   {
     d_modelCache.clear();

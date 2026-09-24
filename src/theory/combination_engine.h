@@ -7,7 +7,7 @@
  * directory for licensing information.
  * ****************************************************************************
  *
- * Abstract interface for theory combination.
+ * Care-graph theory combination with the central equality engine.
  */
 
 #include "ava6_private.h"
@@ -36,8 +36,7 @@ class SharedSolver;
 /**
  * Manager for doing theory combination. This class is responsible for:
  * (1) Initializing the various components of theory combination (equality
- * engine manager, model manager, shared solver) based on the equality engine
- * mode, and
+ * engine manager, model manager, shared solver), and
  * (2) Implementing the main combination method (combineTheories).
  */
 class CombinationEngine : protected EnvObj
@@ -46,13 +45,11 @@ class CombinationEngine : protected EnvObj
   CombinationEngine(Env& env,
                     TheoryEngine& te,
                     const std::vector<Theory*>& paraTheories);
-  virtual ~CombinationEngine();
+  ~CombinationEngine();
 
   /** Finish initialization */
   void finishInit();
 
-  /** Get equality engine theory information for theory with identifier tid. */
-  const EeTheoryInfo* getEeTheoryInfo(TheoryId tid) const;
   //-------------------------- model
   /**
    * Reset the model maintained by this class. This resets all local information
@@ -64,7 +61,7 @@ class CombinationEngine : protected EnvObj
    *
    * @return true if model building was successful.
    */
-  virtual bool buildModel() = 0;
+  bool buildModel();
   /**
    * Post process the model maintained by this class. This is called after
    * a successful call to buildModel. This does any theory-specific
@@ -84,30 +81,19 @@ class CombinationEngine : protected EnvObj
    */
   SharedSolver* getSharedSolver();
   /**
-   * Called at the beginning of full effort
-   */
-  virtual void resetRound();
-  /**
    * Combine theories, called after FULL effort passes with no lemmas
    * and before LAST_CALL effort is run. This adds necessary lemmas for
    * theory combination (e.g. splitting lemmas) to the parent TheoryEngine.
    */
-  virtual void combineTheories() = 0;
+  void combineTheories();
 
- protected:
+ private:
   /** Is proof enabled? */
   bool isProofEnabled() const;
-  /**
-   * Get model equality engine notify. Return the notification object for
-   * who listens to the model's equality engine (if any).
-   */
-  virtual eq::EqualityEngineNotify* getModelEqualityEngineNotify();
   /** Reference to the theory engine */
   TheoryEngine& d_te;
   /** Valuation for the engine */
   Valuation d_valuation;
-  /** Logic info of theory engine (cached) */
-  const LogicInfo& d_logicInfo;
   /** List of parametric theories of theory engine */
   const std::vector<Theory*> d_paraTheories;
   /**

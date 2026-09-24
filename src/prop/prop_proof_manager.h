@@ -31,7 +31,7 @@ namespace ava6::internal {
 
 namespace prop {
 
-class CDCLTSatSolver;
+class CadicalSolver;
 class CnfStream;
 
 /**
@@ -52,7 +52,7 @@ class PropPfManager : protected EnvObj
    * @param assumptions Reference to assumptions of parent prop engine
    */
   PropPfManager(Env& env,
-                CDCLTSatSolver* satSolver,
+                CadicalSolver* satSolver,
                 CnfStream& cnfProof,
                 const context::CDList<Node>& assumptions);
 
@@ -199,7 +199,7 @@ class PropPfManager : protected EnvObj
   /**
    * The SAT solver of this prop engine, which should provide a refutation
    * proof when requested */
-  CDCLTSatSolver* d_satSolver;
+  CadicalSolver* d_satSolver;
   /** Assertions corresponding to the leaves of the prop engine's proof.
    *
    * These are kept in a context-dependent manner since the prop engine's proof

@@ -171,14 +171,10 @@ class AssertionPipeline : protected EnvObj
   bool isRefutationUnsound() const { return d_isRefutationUnsound; }
   /** Is model unsound? */
   bool isModelUnsound() const { return d_isModelUnsound; }
-  /** Is negated? */
-  bool isNegated() const { return d_isNegated; }
   /** mark refutation unsound */
   void markRefutationUnsound();
   /** mark model unsound */
   void markModelUnsound();
-  /** mark negated */
-  void markNegated();
   //------------------------------------ for proofs
   /**
    * Enable proofs for this assertions pipeline. This must be called
@@ -228,8 +224,6 @@ class AssertionPipeline : protected EnvObj
   bool d_isRefutationUnsound;
   /** Is model unsound? */
   bool d_isModelUnsound;
-  /** Is negated? */
-  bool d_isNegated;
   /**
    * Maintains proofs for eliminating top-level AND from inputs to this class.
    */

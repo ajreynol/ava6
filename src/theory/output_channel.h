@@ -45,17 +45,10 @@ class OutputChannel
   friend class internal::TheoryEngine;
 
  public:
-  /** Default constructor */
-  OutputChannel();
   /** Constructor for use by theory */
   OutputChannel(StatisticsRegistry& sr,
                 TheoryEngine* engine,
                 theory::TheoryId theory);
-  /** Constructor for use by non-theory */
-  OutputChannel(StatisticsRegistry& sr,
-                TheoryEngine* engine,
-                const std::string& name,
-                size_t id = 0);
   virtual ~OutputChannel() {}
 
   /**
@@ -156,11 +149,6 @@ class OutputChannel
    * is marked as used.
    */
   virtual void markUsed();
-  /**
-   * Get the theory identifier
-   */
-  TheoryId getId() const;
-
  protected:
   /**
    * Statistics for a particular theory.

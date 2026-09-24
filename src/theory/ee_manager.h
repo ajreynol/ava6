@@ -15,7 +15,6 @@
 #ifndef AVA6__THEORY__EE_MANAGER__H
 #define AVA6__THEORY__EE_MANAGER__H
 
-#include <map>
 #include <memory>
 
 #include "smt/env_obj.h"
@@ -31,12 +30,6 @@ namespace theory {
 
 class SharedSolver;
 
-struct EeTheoryInfo
-{
-  EeTheoryInfo() : d_usedEe(nullptr) {}
-  /** Equality engine that is used (if it exists) */
-  eq::EqualityEngine* d_usedEe;
-};
 
 
 
@@ -44,12 +37,8 @@ struct EeTheoryInfo
  * The (central) equality engine manager. This encapsulates an architecture
  * in which all applicable theories use a single central equality engine.
  *
- * This class is not responsible for actually initializing equality engines in
- * theories (since this class does not have access to the internals of Theory).
- * Instead, it is only responsible for the construction of the equality
- * engine objects themselves. TheoryEngine is responsible for querying this
- * class during finishInit() to determine the equality engines to pass to each
- * theories based on getEeTheoryInfo.
+ * Initializes each theory's equality-engine pointer and registers its
+ * callbacks on the central equality engine before Theory::finishInit().
  *
  * Quantifiers receive notifications from this same central equality engine.
  *
@@ -74,14 +63,9 @@ class EqEngineManager : protected EnvObj
    * Return true if the theory with the given id uses the central equality engine.
    */
   static bool usesCentralEqualityEngine(TheoryId id);
-  const EeTheoryInfo* getEeTheoryInfo(TheoryId tid) const;
-  eq::EqualityEngine* allocateEqualityEngine(EeSetupInfo& esi,
-                                           context::Context* c);
-
  private:
   TheoryEngine& d_te;
   SharedSolver& d_sharedSolver;
-  std::map<TheoryId, EeTheoryInfo> d_einfo;
   /**
    * Notify class for central equality engine. This class dispatches
    * notifications from the central equality engine to the appropriate

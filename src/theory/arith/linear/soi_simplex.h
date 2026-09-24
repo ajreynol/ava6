@@ -231,7 +231,7 @@ class SumOfInfeasibilitiesSPD : public SimplexDecisionProcedure
                const std::string& name,
                uint32_t& pivots);
   } d_statistics;
-}; /* class FCSimplexDecisionProcedure */
+}; /* class SumOfInfeasibilitiesSPD */
 
 }  // namespace arith::linear
 }  // namespace theory

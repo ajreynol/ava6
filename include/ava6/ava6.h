@@ -69,7 +69,6 @@ class Solver;
 class Statistics;
 struct APIStatistics;
 class Term;
-class PluginInternal;
 
 using NodeManagerSharedPtr = std::shared_ptr<internal::NodeManager>;
 
@@ -1029,7 +1028,6 @@ class AVA6_EXPORT Term
   friend class Proof;
   friend class TermManager;
   friend class Solver;
-  friend class PluginInternal;
   friend struct std::hash<Term>;
 
  public:
@@ -3209,48 +3207,6 @@ AVA6_EXPORT std::ostream& operator<<(std::ostream& out,
                                      const Statistics& stats);
 
 /* -------------------------------------------------------------------------- */
-/* Plugin                                                                     */
-/* -------------------------------------------------------------------------- */
-
-/**
- * A ava6 plugin.
- */
-class AVA6_EXPORT Plugin
-{
-  friend class Solver;
-
- public:
-  Plugin(TermManager& tm);
-  virtual ~Plugin() = default;
-  /**
-   * Call to check, return vector of lemmas to add to the SAT solver.
-   * This method is called periodically, roughly at every SAT decision.
-   *
-   * @return The vector of lemmas to add to the SAT solver.
-   */
-  virtual std::vector<Term> check();
-  /**
-   * Notify SAT clause, called when `clause` is learned by the SAT solver.
-   * @param clause The learned clause.
-   */
-  virtual void notifySatClause(const Term& clause);
-  /**
-   * Notify theory lemma, called when `lemma` is sent by a theory solver.
-   * @param lemma The theory lemma.
-   */
-  virtual void notifyTheoryLemma(const Term& lemma);
-  /**
-   * Get the name of the plugin (for debugging).
-   * @return The name of the plugin.
-   */
-  virtual std::string getName() = 0;
-
- private:
-  /** Converter to external */
-  std::shared_ptr<ava6::PluginInternal> d_pExtToInt;
-};
-
-/* -------------------------------------------------------------------------- */
 /* Proof                                                                      */
 /* -------------------------------------------------------------------------- */
 
@@ -3362,7 +3318,6 @@ class AVA6_EXPORT TermManager
   friend class Term;
   friend class DatatypeConstructorDecl;
   friend class DatatypeDecl;
-  friend class Plugin;
   friend class Solver;
 
  public:
@@ -4003,7 +3958,6 @@ class AVA6_EXPORT Solver
   friend class DatatypeConstructorDecl;
   friend class DatatypeSelector;
   friend class DriverOptions;
-  friend class Plugin;
   friend class Op;
   friend class parser::Cmd;
   friend class Proof;
@@ -4534,13 +4488,6 @@ class AVA6_EXPORT Solver
   std::string getModel(const std::vector<Sort>& sorts,
                        const std::vector<Term>& consts) const;
 
-  /**
-   * Add plugin to this solver. Its callbacks will be called throughout the
-   * lifetime of this solver.
-   * @warning This function is experimental and may change in future versions.
-   * @param p The plugin to add to this solver.
-   */
-  void addPlugin(Plugin& p);
   /**
    * Pop (a) level(s) from the assertion stack.
    *

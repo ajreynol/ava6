@@ -31,7 +31,6 @@
 #include "theory/output_channel.h"
 #include "theory/rewriter.h"
 #include "theory/theory.h"
-#include "theory/theory_engine_module.h"
 #include "theory/theory_engine_statistics.h"
 #include "theory/theory_preprocessor.h"
 #include "theory/trust_substitutions.h"
@@ -45,7 +44,6 @@ namespace ava6::internal {
 class Env;
 class ResourceManager;
 class TheoryEngineProofGenerator;
-class Plugin;
 class ProofChecker;
 
 /**
@@ -85,7 +83,6 @@ namespace theory {
 
 class CombinationEngine;
 class DecisionManager;
-class PluginModule;
 class Rewriter;
 class SharedSolver;
 class TheoryModel;
@@ -297,7 +294,7 @@ class TheoryEngine : protected EnvObj
   /**
    * Resets the internal state.
    */
-  void postsolve(prop::SatValue result);
+  void postsolve();
 
   /**
    * Calls notifyRestart() on all active theories.
@@ -645,16 +642,6 @@ class TheoryEngine : protected EnvObj
    * check()
    */
   context::CDO<bool> d_factsAsserted;
-
-  /**
-   * The splitter produces partitions when the compute-partitions option is
-   * used.
-   */
-  /** The list of modules */
-  std::vector<theory::TheoryEngineModule*> d_modules;
-  /** Conflict processor */
-  /** User plugin modules */
-  std::vector<std::unique_ptr<theory::PluginModule>> d_userPlugins;
 
 }; /* class TheoryEngine */
 

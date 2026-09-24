@@ -26,8 +26,6 @@ class TheoryEngine;
 
 namespace prop {
 
-class CDCLTSatSolver;
-class CnfStream;
 class TheoryPreregistrarNotify;
 
 /**
@@ -40,9 +38,7 @@ class TheoryPreregistrar : protected EnvObj
 
  public:
   TheoryPreregistrar(Env& env,
-                     TheoryEngine* te,
-                     CDCLTSatSolver* ss,
-                     CnfStream* cs);
+                     TheoryEngine* te);
   virtual ~TheoryPreregistrar();
   /** Do we need to be informed of activated skolem definitions? */
   virtual bool needsActiveSkolemDefs() const;

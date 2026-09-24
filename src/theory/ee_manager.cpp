@@ -59,17 +59,21 @@ void EqEngineManager::initializeTheories()
   }
   for (TheoryId id = THEORY_FIRST; id != THEORY_LAST; ++id)
   {
-    EeTheoryInfo& eet = d_einfo[id];
     Theory* t = d_te.theoryOf(id);
     EeSetupInfo esi;
-    if (t == nullptr || !t->needsEqualityEngine(esi))
+    if (t == nullptr)
+    {
+      continue;
+    }
+    bool needsEe = t->needsEqualityEngine(esi);
+    t->setEqualityEngine(needsEe ? &d_centralEqualityEngine : nullptr);
+    if (!needsEe)
     {
       continue;
     }
     // Quantifiers use the same engine as the other theories. Their new-class
     // notifications are dispatched through the master notify object above.
     Assert(esi.d_useMaster || usesCentralEqualityEngine(id));
-    eet.d_usedEe = &d_centralEqualityEngine;
     if (esi.d_useMaster || !linfo.isTheoryEnabled(id))
     {
       continue;
@@ -206,29 +210,6 @@ void EqEngineManager::eqNotifyConstantTermMerge(TNode t1, TNode t2)
                        << conflict << std::endl;
   d_sharedSolver.sendConflict(conflict, InferenceId::EQ_CONSTANT_MERGE);
   return;
-}
-
-const EeTheoryInfo* EqEngineManager::getEeTheoryInfo(TheoryId tid) const
-{
-  std::map<TheoryId, EeTheoryInfo>::const_iterator it = d_einfo.find(tid);
-  if (it != d_einfo.end())
-  {
-    return &it->second;
-  }
-  return nullptr;
-}
-
-eq::EqualityEngine* EqEngineManager::allocateEqualityEngine(EeSetupInfo& esi,
-                                                            context::Context* c)
-{
-  if (esi.d_notify != nullptr)
-  {
-    return new eq::EqualityEngine(
-        d_env, c, *esi.d_notify, esi.d_name, esi.d_constantsAreTriggers);
-  }
-  // the theory doesn't care about explicit notifications
-  return new eq::EqualityEngine(
-      d_env, c, esi.d_name, esi.d_constantsAreTriggers);
 }
 
 }  // namespace theory

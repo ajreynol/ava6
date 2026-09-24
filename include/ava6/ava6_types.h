@@ -59,8 +59,6 @@ enum ENUM(UnknownExplanation)
   EVALUE(UNSUPPORTED),
   /** Other reason. */
   EVALUE(OTHER),
-  /** Requires another satisfiability check */
-  EVALUE(REQUIRES_CHECK_AGAIN),
   /** No specific reason given. */
   EVALUE(UNKNOWN_REASON),
 #ifdef AVA6_API_USE_C_ENUMS

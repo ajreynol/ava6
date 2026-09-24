@@ -22,7 +22,6 @@
 #include "expr/node.h"
 #include "prop/cnf_stream.h"
 #include "prop/registrar.h"
-#include "prop/sat_solver.h"
 #include "prop/sat_solver_types.h"
 #include "theory/bv/bitblast/bitblast_strategies_template.h"
 #include "theory/rewriter.h"
@@ -71,7 +70,6 @@ class TBitblaster
   TermBBStrategy d_termBBStrategies[static_cast<uint32_t>(Kind::LAST_KIND)];
   AtomBBStrategy d_atomBBStrategies[static_cast<uint32_t>(Kind::LAST_KIND)];
   virtual Node getModelFromSatSolver(TNode node, bool fullModel) = 0;
-  virtual prop::SatSolver* getSatSolver() = 0;
 
  public:
   TBitblaster();

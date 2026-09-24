@@ -34,7 +34,6 @@ namespace ava6::internal {
 
 class NodeManager;
 class StatisticsRegistry;
-class Plugin;
 class ProofNodeManager;
 class Printer;
 class ResourceManager;
@@ -266,15 +265,6 @@ class Env
   theory::TheoryId theoryOf(TNode node) const;
 
   /**
-   * Add plugin to this environment. Any theory engine that uses this
-   * environment will use these plugins. These plugins should not be added
-   * after having fully initialized the solver engine for this environment.
-   */
-  void addPlugin(Plugin* p);
-  /** Get plugins */
-  const std::vector<Plugin*>& getPlugins() const;
-
-  /**
    * Register Boolean term skolem. This registers that k is a Boolean variable
    * that should be treated as a theory atom. This impacts theoryOf, where
    * Boolean term skolems belong to THEORY_UF, not THEORY_BOOL.
@@ -293,21 +283,6 @@ class Env
    * @return true if k is a Boolean term skolem.
    */
   bool isBooleanTermSkolem(const Node& k) const;
-  /**
-   * Get sharable formula. This returns an equivalent version of the given
-   * lemma n that can be shared externally. In particular, if the option
-   * pluginShareSkolems is false, we require that the returned formula does not
-   * have any internally generated symbols, i.e. skolems. We additionally
-   * exclude terms that have internally generated symbols (e.g. DUMMY_SKOLEM
-   * or INST_CONSTANT). If n cannot be converted to a suitable formula, we
-   * return the null node.
-   *
-   * @param n The candidate formula to share.
-   * @return A tranformed version of n that is its represenation in a sharable
-   * form. If n cannot be tranformed, this returns null.
-   */
-  Node getSharableFormula(const Node& n) const;
-
  private:
   /* Private initialization ------------------------------------------------- */
 
@@ -378,11 +353,6 @@ class Env
   std::unique_ptr<ResourceManager> d_resourceManager;
   /** The theory that owns the uninterpreted sort. */
   theory::TheoryId d_uninterpretedSortOwner;
-  /**
-   * List of plugins, to be used in any theory engine that uses this
-   * environment
-   */
-  std::vector<Plugin*> d_plugins;
   /**
    * The set of skolems introduced for Boolean term elimination. This is a set
    * of purification skolems of Boolean type. These variables are important

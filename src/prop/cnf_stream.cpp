@@ -17,7 +17,7 @@
 #include "expr/node.h"
 #include "options/bv_options.h"
 #include "printer/printer.h"
-#include "proof/clause_id.h"
+#include "prop/sat_clause_sink.h"
 #include "prop/prop_engine.h"
 #include "prop/theory_proxy.h"
 #include "smt/env.h"
@@ -28,7 +28,7 @@ namespace ava6::internal {
 namespace prop {
 
 CnfStream::CnfStream(Env& env,
-                     SatSolver* satSolver,
+                     SatClauseSink* satSolver,
                      Registrar* registrar,
                      context::Context* c,
                      FormulaLitPolicy flpol,
@@ -65,9 +65,7 @@ bool CnfStream::assertClause(TNode node, SatClause& c)
     }
   }
 
-  ClauseId clauseId = d_satSolver->addClause(cl, d_removable);
-
-  return clauseId != ClauseIdUndef;
+  return d_satSolver->addClause(cl, d_removable);
 }
 
 bool CnfStream::assertClause(TNode node, SatLiteral a)
@@ -157,8 +155,7 @@ void CnfStream::ensureLiteral(TNode n)
 
 SatLiteral CnfStream::newLiteral(TNode node,
                                  bool isTheoryAtom,
-                                 bool notifyTheory,
-                                 bool canEliminate)
+                                 bool notifyTheory)
 {
   Trace("cnf") << d_name << "::newLiteral(" << node << ", " << isTheoryAtom
                << ")\n"
@@ -193,7 +190,7 @@ SatLiteral CnfStream::newLiteral(TNode node,
     else
     {
       Trace("cnf") << d_name << "::newLiteral: new var\n";
-      lit = SatLiteral(d_satSolver->newVar(isTheoryAtom, canEliminate));
+      lit = SatLiteral(d_satSolver->newVar(isTheoryAtom));
       d_stats.d_numAtoms++;
     }
     d_nodeToLiteralMap.insert(node, lit);
@@ -240,11 +237,6 @@ const CnfStream::NodeToLiteralMap& CnfStream::getTranslationCache() const
   return d_nodeToLiteralMap;
 }
 
-const CnfStream::LiteralToNodeMap& CnfStream::getNodeCache() const
-{
-  return d_literalToNodeMap;
-}
-
 void CnfStream::getBooleanVariables(std::vector<TNode>& outputVariables) const
 {
   outputVariables.insert(outputVariables.end(),
@@ -264,7 +256,6 @@ SatLiteral CnfStream::convertAtom(TNode node)
   Assert(!hasLiteral(node)) << "atom already mapped!";
 
   bool theoryLiteral = false;
-  bool canEliminate = true;
   bool preRegister = false;
 
   // Is this a variable add it to the list. We distinguish whether a Boolean
@@ -291,12 +282,11 @@ SatLiteral CnfStream::convertAtom(TNode node)
   else
   {
     theoryLiteral = true;
-    canEliminate = false;
     preRegister = true;
   }
 
   // Make a new literal (variables are not considered theory literals)
-  SatLiteral lit = newLiteral(node, theoryLiteral, preRegister, canEliminate);
+  SatLiteral lit = newLiteral(node, theoryLiteral, preRegister);
   // Return the resulting literal
   return lit;
 }

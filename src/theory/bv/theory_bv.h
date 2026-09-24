@@ -29,7 +29,7 @@ class ProofRuleChecker;
 namespace theory {
 namespace bv {
 
-class BVSolver;
+class BVSolverBitblastInternal;
 
 class TheoryBV : public Theory
 {
@@ -57,8 +57,6 @@ class TheoryBV : public Theory
 
   void preRegisterTerm(TNode n) override;
 
-  bool preCheck(Effort e) override;
-
   void postCheck(Effort e) override;
 
   bool preNotifyFact(TNode atom,
@@ -67,15 +65,7 @@ class TheoryBV : public Theory
                      bool isPrereg,
                      bool isInternal) override;
 
-  void notifyFact(TNode atom, bool pol, TNode fact, bool isInternal) override;
-
-  bool needsCheckLastEffort() override;
-
-  void propagate(Effort e) override;
-
   TrustNode explain(TNode n) override;
-
-  void computeRelevantTerms(std::set<Node>& termSet) override;
 
   /** Collect model values in m based on the relevant terms given by termSet */
   bool collectModelValues(TheoryModel* m,
@@ -91,8 +81,6 @@ class TheoryBV : public Theory
 
   void ppStaticLearn(TNode in, std::vector<TrustNode>& learned) override;
 
-  void presolve() override;
-
   EqualityStatus getEqualityStatus(TNode a, TNode b) override;
 
   /**
@@ -107,18 +95,9 @@ class TheoryBV : public Theory
    */
   Node getValue(TNode node);
 
-  /**
-   * Mark the model value cache used by getValue() as stale. Must be called
-   * whenever the underlying model may have changed (e.g. between solve calls of
-   * the abstraction refinement loop).
-   */
-  void invalidateModelCache() { d_invalidateModelCache = true; }
-
  private:
-  void notifySharedTerm(TNode t) override;
-
   /** Internal BV solver. */
-  std::unique_ptr<BVSolver> d_internal;
+  std::unique_ptr<BVSolverBitblastInternal> d_internal;
 
   /** The preprocess assertion utility */
   BvPpAssert d_ppAssert;
@@ -137,8 +116,6 @@ class TheoryBV : public Theory
 
   /** Flag indicating whether `d_modelCache` should be invalidated. */
   context::CDO<bool> d_invalidateModelCache;
-
-  bool d_inPostCheck;
 
   /**
    * Cache for getValue() calls.

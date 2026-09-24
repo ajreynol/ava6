@@ -21,8 +21,7 @@
 #include "proof/theory_proof_step_buffer.h"
 #include "prop/cnf_stream.h"
 #include "prop/prop_proof_manager.h"
-#include "prop/sat_solver.h"
-#include "prop/sat_solver_factory.h"
+#include "prop/cadical/cadical.h"
 #include "smt/env.h"
 #include "smt/logic_exception.h"
 #include "util/resource_manager.h"
@@ -32,7 +31,7 @@ namespace ava6::internal {
 namespace prop {
 
 PropPfManager::PropPfManager(Env& env,
-                             CDCLTSatSolver* satSolver,
+                             CadicalSolver* satSolver,
                              CnfStream& cnf,
                              const context::CDList<Node>& assumptions)
     : EnvObj(env),

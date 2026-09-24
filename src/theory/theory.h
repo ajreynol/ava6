@@ -46,6 +46,7 @@ namespace theory {
 
 class CarePairArgumentCallback;
 class DecisionManager;
+class EqEngineManager;
 struct EeSetupInfo;
 class OutputChannel;
 class QuantifiersEngine;
@@ -97,6 +98,7 @@ class Theory : protected EnvObj
 {
   friend class CarePairArgumentCallback;
   friend class internal::TheoryEngine;
+  friend class EqEngineManager;
 
  protected:
   /** Name of this theory instance. Along with the TheoryId this should

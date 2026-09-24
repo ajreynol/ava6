@@ -42,17 +42,6 @@ OutputChannel::OutputChannel(StatisticsRegistry& sr,
 {
 }
 
-OutputChannel::OutputChannel(StatisticsRegistry& sr,
-                             TheoryEngine* engine,
-                             const std::string& name,
-                             size_t id)
-    : d_engine(engine),
-      d_name(name),
-      d_statistics(sr, name + "::"),
-      d_theory(static_cast<TheoryId>(THEORY_NONE + id))
-{
-}
-
 void OutputChannel::safePoint(Resource r)
 {
   spendResource(r);
@@ -145,8 +134,6 @@ void OutputChannel::trustedLemma(TrustNode plem,
 }
 
 void OutputChannel::markUsed() { d_engine->d_outputChannelUsed = true; }
-
-TheoryId OutputChannel::getId() const { return d_theory; }
 
 }  // namespace theory
 }  // namespace ava6::internal

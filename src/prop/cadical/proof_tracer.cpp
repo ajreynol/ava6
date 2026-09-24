@@ -17,6 +17,7 @@
 #include <unordered_set>
 
 #include "proof/proof_node.h"
+#include "proof/proof_node_manager.h"
 #include "prop/cadical/cadical.h"
 #include "prop/cadical/cdclt_propagator.h"
 

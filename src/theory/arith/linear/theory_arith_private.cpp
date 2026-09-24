@@ -125,8 +125,6 @@ TheoryArithPrivate::TheoryArithPrivate(Env& env,
       d_blackBoxConflictPf(context(), std::shared_ptr<ProofNode>(nullptr)),
       d_dualSimplex(
           env, d_linEq, d_errorSet, RaiseConflict(*this), TempVarMalloc(*this)),
-      d_fcSimplex(
-          env, d_linEq, d_errorSet, RaiseConflict(*this), TempVarMalloc(*this)),
       d_soiSimplex(
           env, d_linEq, d_errorSet, RaiseConflict(*this), TempVarMalloc(*this)),
 
@@ -2115,8 +2113,7 @@ bool TheoryArithPrivate::postCheck(Theory::Effort effortLevel)
   }
   d_statistics.d_avgUnknownsInARow << d_unknownsInARow;
 
-  size_t nPivots = false ? d_fcSimplex.getPivots()
-                                         : d_dualSimplex.getPivots();
+  size_t nPivots = d_dualSimplex.getPivots();
   for (std::size_t i = 0; i < nPivots; ++i)
   {
     d_containing.spendResource(Resource::ArithPivotStep);

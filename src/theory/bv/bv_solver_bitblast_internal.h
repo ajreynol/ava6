@@ -8,7 +8,7 @@
  * ****************************************************************************
  *
  * Bit-blast solver that sends bit-blast lemmas directly to the internal
- * MiniSat.
+ * CaDiCaL.
  */
 
 #include "ava6_private.h"
@@ -19,7 +19,8 @@
 #include "proof/eager_proof_generator.h"
 #include "smt/env_obj.h"
 #include "theory/bv/bitblast/proof_bitblaster.h"
-#include "theory/bv/bv_solver.h"
+#include "theory/theory_state.h"
+#include "theory/theory_inference_manager.h"
 
 namespace ava6::internal {
 namespace theory {
@@ -27,12 +28,12 @@ namespace bv {
 
 /**
  * Bit-blasting solver that sends bit-blasting lemmas directly to the
- * internal MiniSat. It is also ablo to handle atoms of kind
+ * internal CaDiCaL. It is also able to handle atoms of kind
  * BITVECTOR_EAGER_ATOM.
  *
- * Sends lemmas atom <=> bb(atom) to MiniSat on preNotifyFact().
+ * Sends lemmas atom <=> bb(atom) to CaDiCaL on preNotifyFact().
  */
-class BVSolverBitblastInternal : public BVSolver
+class BVSolverBitblastInternal : protected EnvObj
 {
  public:
   BVSolverBitblastInternal(Env& env,
@@ -40,26 +41,25 @@ class BVSolverBitblastInternal : public BVSolver
                            TheoryInferenceManager& inferMgr);
   ~BVSolverBitblastInternal() = default;
 
-  bool needsEqualityEngine(EeSetupInfo& esi) override;
-
-  void preRegisterTerm(AVA6_UNUSED TNode n) override {}
+  bool needsEqualityEngine(EeSetupInfo& esi);
 
   bool preNotifyFact(TNode atom,
                      bool pol,
                      TNode fact,
                      bool isPrereg,
-                     bool isInternal) override;
+                     bool isInternal);
 
-  TrustNode explain(TNode n) override;
-
-  std::string identify() const override { return "BVSolverBitblastInternal"; };
+  TrustNode explain(TNode n);
 
   bool collectModelValues(TheoryModel* m,
-                          const std::set<Node>& termSet) override;
+                          const std::set<Node>& termSet);
 
-  Node getValue(TNode node, bool initialize) override;
+  Node getValue(TNode node, bool initialize);
 
  private:
+  TheoryState& d_state;
+  TheoryInferenceManager& d_im;
+
   /**
    * Sends a bit-blasting lemma fact <=> d_bitblaster.bbAtom(fact) to the
    * inference manager.

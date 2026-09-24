@@ -35,7 +35,6 @@
 #include "theory/arith/linear/dio_solver.h"
 #include "theory/arith/linear/dual_simplex.h"
 #include "theory/arith/linear/error_set.h"
-#include "theory/arith/linear/fc_simplex.h"
 #include "theory/arith/linear/infer_bounds.h"
 #include "theory/arith/linear/linear_equality.h"
 #include "theory/arith/linear/matrix.h"
@@ -394,7 +393,6 @@ class TheoryArithPrivate : protected EnvObj
 
   /** This implements the Simplex decision procedure. */
   DualSimplexDecisionProcedure d_dualSimplex;
-  FCSimplexDecisionProcedure d_fcSimplex;
   SumOfInfeasibilitiesSPD d_soiSimplex;
 
   bool solveRealRelaxation(Theory::Effort effortLevel);

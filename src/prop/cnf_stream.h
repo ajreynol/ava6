@@ -40,7 +40,7 @@ namespace prop {
 
 class ProofCnfStream;
 class PropEngine;
-class SatSolver;
+class SatClauseSink;
 
 /** A policy for how literals for formulas are handled in cnf_stream */
 enum class FormulaLitPolicy : uint32_t
@@ -92,7 +92,7 @@ class CnfStream : protected EnvObj
    * even for non-theory literals.
    */
   CnfStream(Env& env,
-            SatSolver* satSolver,
+            SatClauseSink* satSolver,
             Registrar* registrar,
             context::Context* c,
             FormulaLitPolicy flpol = FormulaLitPolicy::INTERNAL,
@@ -152,9 +152,6 @@ class CnfStream : protected EnvObj
 
   /** Retrieves map from nodes to literals. */
   const CnfStream::NodeToLiteralMap& getTranslationCache() const;
-
-  /** Retrieves map from literals to nodes. */
-  const CnfStream::LiteralToNodeMap& getNodeCache() const;
 
   /**
    * Dump dimacs of the given clauses to the given output stream.
@@ -291,14 +288,11 @@ class CnfStream : protected EnvObj
    * @param isTheoryAtom is this a theory atom that needs to be asserted to
    * theory.
    * @param notifyTheory whether to notify the theory of the atom
-   * @param canEliminate whether the sat solver can safely eliminate this
-   * variable.
    * @return the literal corresponding to the formula
    */
   SatLiteral newLiteral(TNode node,
                         bool isTheoryAtom = false,
-                        bool notifyTheory = false,
-                        bool canEliminate = true);
+                        bool notifyTheory = false);
 
   /**
    * Constructs a new literal for an atom and returns it.  Calls
@@ -311,7 +305,7 @@ class CnfStream : protected EnvObj
   SatLiteral convertAtom(TNode node);
 
   /** The SAT solver we will be using */
-  SatSolver* d_satSolver;
+  SatClauseSink* d_satSolver;
 
   /** Boolean variables that we translated */
   context::CDList<TNode> d_booleanVariables;

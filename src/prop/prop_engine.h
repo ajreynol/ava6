@@ -46,7 +46,7 @@ class DecisionEngine;
 namespace prop {
 
 class CnfStream;
-class CDCLTSatSolver;
+class CadicalSolver;
 class ProofCnfStream;
 class PropPfManager;
 class TheoryProxy;
@@ -178,16 +178,6 @@ class PropEngine : protected EnvObj
    * @return List of decisions made by the SAT solver.
    */
   std::vector<Node> getPropDecisions() const;
-
-  /**
-   * Get the order heap from the SAT solver.
-   * order_heap is a priority queue of variables ordered with
-   * respect to the variable activity. The order heap is made available here
-   * in order to make partitions based on the literals contained in the heap.
-   *
-   * @return List of Nodes from the SAT variables order heap.
-   */
-  std::vector<Node> getPropOrderHeap() const;
 
   /**
    * Return whether lit has a fixed SAT assignment (i.e., implied by input
@@ -418,7 +408,7 @@ class PropEngine : protected EnvObj
   TheoryProxy* d_theoryProxy;
 
   /** The SAT solver proxy */
-  CDCLTSatSolver* d_satSolver;
+  CadicalSolver* d_satSolver;
 
   /** List of all of the assertions that need to be made */
   std::vector<Node> d_assertionList;

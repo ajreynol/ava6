@@ -47,7 +47,6 @@
 #include "expr/node_algorithm.h"
 #include "expr/node_builder.h"
 #include "expr/node_manager.h"
-#include "expr/plugin.h"
 #include "expr/sequence.h"
 #include "expr/skolem_manager.h"
 #include "expr/type_node.h"
@@ -781,44 +780,6 @@ uint32_t maxArity(Kind k)
 }
 
 }  // namespace
-
-/**
- * Class that acts as a converter from an external to an internal plugin.
- */
-class PluginInternal : public internal::Plugin
-{
- public:
-  PluginInternal(NodeManagerSharedPtr nm, ava6::Plugin& e)
-      : internal::Plugin(nm.get()), d_nm(std::move(nm)), d_external(e)
-  {
-  }
-  /** Check method */
-  std::vector<internal::Node> check() override
-  {
-    std::vector<Term> lemsExt = d_external.check();
-    return Term::termVectorToNodes(lemsExt);
-  }
-  /** Notify SAT clause method */
-  void notifySatClause(const internal::Node& n) override
-  {
-    Term t = Term(d_nm, n);
-    return d_external.notifySatClause(t);
-  }
-  /** Notify theory lemma method */
-  void notifyTheoryLemma(const internal::Node& n) override
-  {
-    Term t = Term(d_nm, n);
-    return d_external.notifyTheoryLemma(t);
-  }
-  /** Get name */
-  std::string getName() override { return d_external.getName(); }
-
- private:
-  /** Reference to the node manager */
-  NodeManagerSharedPtr d_nm;
-  /** Reference to the external (user-provided) plugin */
-  ava6::Plugin& d_external;
-};
 
 std::string kindToString(Kind k)
 {
@@ -4317,19 +4278,6 @@ bool Proof::operator!=(const Proof& p) const
 }
 
 /* -------------------------------------------------------------------------- */
-/* Plugin                                                                     */
-/* -------------------------------------------------------------------------- */
-
-Plugin::Plugin(TermManager& tm)
-    : d_pExtToInt(new PluginInternal(tm.d_nm, *this))
-{
-}
-
-std::vector<Term> Plugin::check() { return {}; }
-void Plugin::notifySatClause(AVA6_UNUSED const Term& clause) {}
-void Plugin::notifyTheoryLemma(AVA6_UNUSED const Term& lemma) {}
-
-/* -------------------------------------------------------------------------- */
 /* TermManager                                                                */
 /* -------------------------------------------------------------------------- */
 
@@ -6338,13 +6286,6 @@ std::string Solver::getModel(const std::vector<Sort>& sorts,
   return d_slv->getModel(Sort::sortVectorToTypeNodes(sorts),
                          Term::termVectorToNodes(vars));
   ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-void Solver::addPlugin(Plugin& p)
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  d_slv->addPlugin(p.d_pExtToInt.get());
   AVA6_API_TRY_CATCH_END;
 }
 

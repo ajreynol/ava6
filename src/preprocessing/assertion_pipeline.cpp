@@ -30,8 +30,7 @@ AssertionPipeline::AssertionPipeline(Env& env)
       d_pppg(nullptr),
       d_conflict(false),
       d_isRefutationUnsound(false),
-      d_isModelUnsound(false),
-      d_isNegated(false)
+      d_isModelUnsound(false)
 {
   d_false = nodeManager()->mkConst(false);
 }
@@ -41,7 +40,6 @@ void AssertionPipeline::clear()
   d_conflict = false;
   d_isRefutationUnsound = false;
   d_isModelUnsound = false;
-  d_isNegated = false;
   d_nodes.clear();
   d_iteSkolemMap.clear();
   d_substsIndices.clear();
@@ -290,19 +288,6 @@ void AssertionPipeline::markRefutationUnsound()
 }
 
 void AssertionPipeline::markModelUnsound() { d_isModelUnsound = true; }
-
-void AssertionPipeline::markNegated()
-{
-  if (d_isRefutationUnsound || d_isModelUnsound)
-  {
-    // disallow unintuitive uses of global negation.
-    std::stringstream ss;
-    ss << "Cannot negate the preprocessed assertions when already marked as "
-          "refutation or model unsound.";
-    throw LogicException(ss.str());
-  }
-  d_isNegated = true;
-}
 
 }  // namespace preprocessing
 }  // namespace ava6::internal

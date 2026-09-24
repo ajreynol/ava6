@@ -21,7 +21,6 @@
 #include "expr/node.h"
 #include "expr/node_algorithm.h"
 #include "expr/non_closed_node_converter.h"
-#include "expr/plugin.h"
 #include "expr/skolem_manager.h"
 #include "expr/subtype_elim_node_converter.h"
 #include "options/base_options.h"
@@ -184,7 +183,7 @@ void SolverEngine::finishInit()
     ContextManager* ctx = d_ctxManager.get();
     // deep restarts not enabled
     d_smtDriver.reset(
-        new SmtDriverSingleCall(*d_env.get(), *d_smtSolver.get(), ctx));
+        new SmtDriver(*d_env.get(), *d_smtSolver.get(), ctx));
   }
 
   // global push/pop around everything, to ensure proper destruction
@@ -876,17 +875,6 @@ void SolverEngine::assertFormulaInternal(const Node& formula)
   // but currently don't.
   Node f = eliminateSubtypesForProof(formula);
   d_smtSolver->getAssertions().assertFormula(f);
-}
-
-void SolverEngine::addPlugin(Plugin* p)
-{
-  if (d_state->isFullyInited())
-  {
-    throw ModalException(
-        "Cannot add plugin after the solver has been fully initialized.");
-  }
-  // we do not initialize the solver here.
-  d_env->addPlugin(p);
 }
 
 Node SolverEngine::simplify(const Node& t, bool applySubs)

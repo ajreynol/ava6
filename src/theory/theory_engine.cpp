@@ -30,10 +30,9 @@
 #include "smt/env.h"
 #include "smt/logic_exception.h"
 #include "smt/solver_engine_state.h"
-#include "theory/combination_care_graph.h"
+#include "theory/combination_engine.h"
 #include "theory/decision_manager.h"
 #include "theory/ee_manager.h"
-#include "theory/plugin_module.h"
 #include "theory/quantifiers/first_order_model.h"
 #include "theory/quantifiers_engine.h"
 #include "theory/rewriter.h"
@@ -102,7 +101,6 @@ std::string getTheoryString(theory::TheoryId id)
 
 void TheoryEngine::finishInit()
 {
-  d_modules.clear();
   Trace("theory") << "Begin TheoryEngine::finishInit" << std::endl;
   // NOTE: This seems to be required since
   // theory::TheoryTraits<THEORY>::isParametric cannot be accessed without
@@ -122,7 +120,7 @@ void TheoryEngine::finishInit()
 
   // Initialize the theory combination architecture
   {
-    d_tc.reset(new CombinationCareGraph(d_env, *this, paraTheories));
+    d_tc.reset(new CombinationEngine(d_env, *this, paraTheories));
   }
   // create the relevance filter if any option requires it
   
@@ -159,12 +157,6 @@ void TheoryEngine::finishInit()
     {
       continue;
     }
-    // setup the pointers to the utilities
-    const EeTheoryInfo* eeti = d_tc->getEeTheoryInfo(theoryId);
-    Assert(eeti != nullptr);
-    // the theory's official equality engine is the one specified by the
-    // equality engine manager
-    t->setEqualityEngine(eeti->d_usedEe);
     // set the quantifiers engine
     t->setQuantifiersEngine(d_quantEngine);
     // set the decision manager for the theory
@@ -174,16 +166,7 @@ void TheoryEngine::finishInit()
   }
 
 
-  // add user-provided plugins
-  const std::vector<Plugin*> plugins = d_env.getPlugins();
-  Trace("theory") << "initialize with " << plugins.size()
-                  << " user-provided plugins" << std::endl;
-  for (Plugin* p : plugins)
-  {
-    d_userPlugins.push_back(
-        std::unique_ptr<PluginModule>(new PluginModule(d_env, this, p)));
-    d_modules.push_back(d_userPlugins.back().get());
-  }
+
   Trace("theory") << "End TheoryEngine::finishInit" << std::endl;
 }
 
@@ -394,14 +377,8 @@ void TheoryEngine::check(Theory::Effort effort)
     {
       spendResource(Resource::TheoryFullCheckStep);
       d_factsAsserted = true;
-      d_tc->resetRound();
     }
 
-    // check with the theory modules
-    for (TheoryEngineModule* tem : d_modules)
-    {
-      tem->check(effort);
-    }
 
     auto rm = d_env.getResourceManager();
 
@@ -522,21 +499,6 @@ void TheoryEngine::check(Theory::Effort effort)
           // quantifiers engine must check at last call effort
           d_quantEngine->check(Theory::EFFORT_LAST_CALL);
         }
-        // notify the theory modules of the model
-        for (TheoryEngineModule* tem : d_modules)
-        {
-          if (!tem->needsCandidateModel())
-          {
-            // module does not need candidate model
-            continue;
-          }
-          if (!d_tc->buildModel())
-          {
-            // model failed to build, we are done
-            break;
-          }
-          tem->notifyCandidateModel(getModel());
-        }
       }
     }
 
@@ -547,11 +509,6 @@ void TheoryEngine::check(Theory::Effort effort)
     Trace("theory") << ", need check = " << (needCheck() ? "YES" : "NO")
                     << endl;
 
-    // post check with the theory modules
-    for (TheoryEngineModule* tem : d_modules)
-    {
-      tem->postCheck(effort);
-    }
     if (Theory::fullEffort(effort))
     {
       if (!d_inConflict && !needCheck())
@@ -743,23 +700,13 @@ bool TheoryEngine::presolve()
   {
     Trace("theory") << "TheoryEngine::presolve() => interrupted" << endl;
   }
-  // presolve with the theory engine modules as well
-  for (TheoryEngineModule* tem : d_modules)
-  {
-    tem->presolve();
-  }
 
   // return whether we have a conflict
   return false;
 } /* TheoryEngine::presolve() */
 
-void TheoryEngine::postsolve(prop::SatValue result)
+void TheoryEngine::postsolve()
 {
-  // postsolve with the theory engine modules as well
-  for (TheoryEngineModule* tem : d_modules)
-  {
-    tem->postsolve(result);
-  }
 
   // Reset the interrupt flag
   d_interrupted = false;
@@ -1394,15 +1341,6 @@ TrustNode TheoryEngine::getExplanation(TNode node)
     Trace("theory::explain") << "TheoryEngine::getExplanation(" << node
                              << ") => " << texplanation.getNode() << endl;
   }
-  // notify the conflict as a lemma
-  for (TheoryEngineModule* tem : d_modules)
-  {
-    tem->notifyLemma(texplanation.getProven(),
-                     InferenceId::EXPLAINED_PROPAGATION,
-                     LemmaProperty::NONE,
-                     {},
-                     {});
-  }
   return texplanation;
 }
 
@@ -1588,27 +1526,6 @@ void TheoryEngine::lemma(TrustNode tlemma,
 
   // assert the lemma
   d_propEngine->assertLemma(id, tlemma, p);
-
-  // If specified, we must add this lemma to the set of those that need to be
-  // justified, where note we pass all auxiliary lemmas in skAsserts as well,
-  // since these by extension must be justified as well.
-  if (!d_modules.empty())
-  {
-    std::vector<Node> skAsserts;
-    std::vector<Node> sks;
-    Node retLemma =
-        d_propEngine->getPreprocessedTerm(tlemma.getProven(), skAsserts, sks);
-
-    // notify the modules of the lemma
-    for (TheoryEngineModule* tem : d_modules)
-    {
-      // don't notify theory modules of their own lemmas
-      if (tem->getId() != from)
-      {
-        tem->notifyLemma(retLemma, id, p, skAsserts, sks);
-      }
-    }
-  }
 
   // Mark that we added some lemmas
   d_lemmasAdded = true;

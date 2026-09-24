@@ -37,77 +37,54 @@ using namespace cadical;
 
 /* -------------------------------------------------------------------------- */
 
-class ClauseLearner : public CaDiCaL::Learner
-{
- public:
-  ClauseLearner(TheoryProxy& proxy, int32_t clause_size)
-      : d_proxy(proxy), d_max_clause_size(clause_size)
-  {
-  }
-  ~ClauseLearner() override {}
-
-  bool learning(int size) override
-  {
-    return d_max_clause_size == 0 || size <= d_max_clause_size;
-  }
-
-  void learn(int lit) override
-  {
-    if (lit)
-    {
-      SatLiteral slit = toSatLiteral(lit);
-      d_clause.push_back(slit);
-    }
-    else
-    {
-      d_proxy.notifySatClause(d_clause);
-      d_clause.clear();
-    }
-  }
-
- private:
-  TheoryProxy& d_proxy;
-  /** Intermediate literals buffer. */
-  std::vector<SatLiteral> d_clause;
-  /** Maximum size of clauses to get notified about. */
-  int32_t d_max_clause_size;
-};
 
 CadicalSolver::CadicalSolver(Env& env,
-                             StatisticsRegistry& registry,
+                             TheoryProxy& theoryProxy,
                              const std::string& name)
     : EnvObj(env),
       d_solver(new CaDiCaL::Solver()),
       d_context(context()),
-      d_propagateOnly(false),
+      d_proxy(&theoryProxy),
       // Note: CaDiCaL variables start with index 1 rather than 0 since negated
       //       literals are represented as the negation of the index.
       d_nextVarIdx(1),
       d_inSatMode(false),
       d_true(undefSatVariable),
       d_false(undefSatVariable),
-      d_statistics(registry, name)
+      d_statistics(statisticsRegistry(), name)
 {
+  setResourceLimit(resourceManager());
+  initialize();
 }
 
 void CadicalSolver::initialize()
 {
+  d_propagator.reset(new CadicalPropagator(
+      d_proxy,
+      d_context,
+      *d_solver,
+      statisticsRegistry(),
+      d_env.isTheoryProofProducing()));
+  if (d_env.isSatProofProducing())
+  {
+    d_proof_tracer.reset(new ProofTracer(*d_propagator));
+    d_solver->connect_proof_tracer(d_proof_tracer.get(), true);
+  }
+
   d_solver->set("quiet", 1);  // CaDiCaL is verbose by default
 
   // walk and lucky phase do not use the external propagator, disable for now
-  if (d_propagator)
-  {
-    d_solver->set("walk", 0);
-    d_solver->set("lucky", 0);
-    // ilb currently does not play well with user propagators
-    d_solver->set("ilb", 0);
-    d_solver->set("ilbassumptions", 0);
-    d_solver->connect_fixed_listener(d_propagator.get());
-    d_solver->connect_external_propagator(d_propagator.get());
-  }
+  d_solver->set("walk", 0);
+  d_solver->set("lucky", 0);
+  // ilb currently does not play well with user propagators
+  d_solver->set("ilb", 0);
+  d_solver->set("ilbassumptions", 0);
+  d_solver->connect_fixed_listener(d_propagator.get());
+  d_solver->connect_external_propagator(d_propagator.get());
 
-  d_true = newVar(false, true);
-  d_false = newVar(false, true);
+
+  d_true = newVar(false);
+  d_false = newVar(false);
   d_solver->clause(toCadicalVar(d_true));
   d_solver->clause(-toCadicalVar(d_false));
 }
@@ -145,57 +122,45 @@ void CadicalSolver::setResourceLimit(ResourceManager* resmgr)
   d_solver->connect_terminator(d_terminator.get());
 }
 
-SatValue CadicalSolver::_solve(const std::vector<SatLiteral>& assumptions)
+SatValue CadicalSolver::solve(const std::vector<SatLiteral>& assumptions)
 {
-  if (d_propagator)
-  {
-    Trace("cadical::propagator") << "solve start" << std::endl;
-    d_propagator->renotify_fixed();
-  }
+  Trace("cadical::propagator") << "solve start" << std::endl;
+  d_propagator->renotify_fixed();
+
   TimerStat::CodeTimer codeTimer(d_statistics.d_solveTime);
   d_assumptions.clear();
-  if (d_propagator)
+  // Assume activation literals for all active user levels.
+  for (const auto& lit : d_propagator->activation_literals())
   {
-    // Assume activation literals for all active user levels.
-    for (const auto& lit : d_propagator->activation_literals())
-    {
-      Trace("cadical::propagator")
-          << "assume activation lit: " << ~lit << std::endl;
-      d_solver->assume(toCadicalLit(~lit));
-    }
+    Trace("cadical::propagator")
+        << "assume activation lit: " << ~lit << std::endl;
+    d_solver->assume(toCadicalLit(~lit));
   }
+
   for (const SatLiteral& lit : assumptions)
   {
-    if (d_propagator)
-    {
-      Trace("cadical::propagator") << "assume: " << lit << std::endl;
-    }
+    Trace("cadical::propagator") << "assume: " << lit << std::endl;
+
     d_solver->assume(toCadicalLit(lit));
     d_assumptions.push_back(lit);
   }
-  if (d_propagator)
-  {
-    d_propagator->in_search(true);
-  }
+  d_propagator->in_search(true);
+
   const SatValue res =
-      toSatValue(d_propagateOnly ? d_solver->propagate() : d_solver->solve());
-  if (d_propagator)
-  {
-    Assert(res != SAT_VALUE_TRUE || d_propagator->done());
-    Trace("cadical::propagator") << "solve done: " << res << std::endl;
-    d_propagator->in_search(false);
-  }
+      toSatValue(d_solver->solve());
+  Assert(res != SAT_VALUE_TRUE || d_propagator->done());
+  Trace("cadical::propagator") << "solve done: " << res << std::endl;
+  d_propagator->in_search(false);
+
   ++d_statistics.d_numSatCalls;
-  d_propagateOnly = false;
   d_inSatMode = (res == SAT_VALUE_TRUE);
   return res;
 }
 
-/* SatSolver Interface ------------------------------------------------------ */
 
-ClauseId CadicalSolver::addClause(const SatClause& clause, bool removable)
+bool CadicalSolver::addClause(const SatClause& clause, bool removable)
 {
-  if (d_propagator && TraceIsOn("cadical::propagator"))
+  if (TraceIsOn("cadical::propagator"))
   {
     Trace("cadical::propagator") << "addClause (" << removable << "):";
     SatLiteral alit = d_propagator->current_activation_lit();
@@ -209,29 +174,16 @@ ClauseId CadicalSolver::addClause(const SatClause& clause, bool removable)
     }
     Trace("cadical::propagator") << " 0" << std::endl;
   }
-  if (d_propagator)
-  {
-    d_propagator->add_clause(clause, removable);
-  }
-  else
-  {
-    for (const SatLiteral& lit : clause)
-    {
-      d_solver->add(toCadicalLit(lit));
-    }
-    d_solver->add(0);
-  }
+  d_propagator->add_clause(clause, removable);
   ++d_statistics.d_numClauses;
-  return ClauseIdError;
+  return true;
 }
 
-SatVariable CadicalSolver::newVar(bool isTheoryAtom, AVA6_UNUSED bool canErase)
+SatVariable CadicalSolver::newVar(bool isTheoryAtom)
 {
   ++d_statistics.d_numVariables;
-  if (d_propagator)
-  {
-    d_propagator->add_new_var(d_nextVarIdx, isTheoryAtom);
-  }
+  d_propagator->add_new_var(d_nextVarIdx, isTheoryAtom);
+
   return d_nextVarIdx++;
 }
 
@@ -239,24 +191,6 @@ SatVariable CadicalSolver::trueVar() { return d_true; }
 
 SatVariable CadicalSolver::falseVar() { return d_false; }
 
-SatValue CadicalSolver::solve() { return _solve({}); }
-
-SatValue CadicalSolver::solve(long unsigned int&)
-{
-  Unimplemented() << "Setting limits for CaDiCaL not supported yet";
-  return SatValue::SAT_VALUE_UNKNOWN;
-};
-
-SatValue CadicalSolver::solve(const std::vector<SatLiteral>& assumptions)
-{
-  return _solve(assumptions);
-}
-
-bool CadicalSolver::setPropagateOnly()
-{
-  d_propagateOnly = true;
-  return true;
-}
 
 void CadicalSolver::getUnsatAssumptions(std::vector<SatLiteral>& assumptions)
 {
@@ -280,8 +214,6 @@ SatValue CadicalSolver::modelValue(SatLiteral l)
   return toSatValueLit(l.isNegated() ? -val : val);
 }
 
-bool CadicalSolver::ok() const { return d_inSatMode; }
-
 CadicalSolver::Statistics::Statistics(StatisticsRegistry& registry,
                                       const std::string& prefix)
     : d_numSatCalls(registry.registerInt(prefix + "cadical::calls_to_solve")),
@@ -291,36 +223,6 @@ CadicalSolver::Statistics::Statistics(StatisticsRegistry& registry,
 {
 }
 
-/* CDCLTSatSolver Interface ------------------------------------------------- */
-
-void CadicalSolver::initialize(TheoryProxy* theoryProxy)
-{
-  d_proxy = theoryProxy;
-  d_propagator.reset(new CadicalPropagator(
-      theoryProxy,
-      d_context,
-      *d_solver,
-      statisticsRegistry(),
-      d_env.isTheoryProofProducing()));
-  if (!d_env.getPlugins().empty())
-  {
-    d_clause_learner.reset(new ClauseLearner(*theoryProxy, 0));
-    d_solver->connect_learner(d_clause_learner.get());
-  }
-
-  if (d_env.isSatProofProducing())
-  {
-    d_proof_tracer.reset(new ProofTracer(*d_propagator));
-    d_solver->connect_proof_tracer(d_proof_tracer.get(), true);
-  }
-
-  initialize();
-}
-
-void CadicalSolver::attachProofManager(AVA6_UNUSED PropPfManager* ppm)
-{
-  // not implemented yet
-}
 
 void CadicalSolver::push()
 {
@@ -330,7 +232,7 @@ void CadicalSolver::push()
   // Set new activation literal for pushed user level
   // Note: This happens after the push to ensure that the activation literal's
   // introduction level is the current user level.
-  SatVariable alit = newVar(false, true);
+  SatVariable alit = newVar(false);
   d_propagator->set_activation_lit(alit);
 }
 
@@ -367,11 +269,7 @@ bool CadicalSolver::isDecision(SatVariable var) const
 
 bool CadicalSolver::isFixed(SatVariable var) const
 {
-  if (d_propagator)
-  {
-    return d_propagator->is_fixed(var);
-  }
-  return d_solver->fixed(toCadicalVar(var));
+  return d_propagator->is_fixed(var);
 }
 
 std::vector<SatLiteral> CadicalSolver::getDecisions() const
@@ -386,8 +284,6 @@ std::vector<SatLiteral> CadicalSolver::getDecisions() const
   }
   return decisions;
 }
-
-std::vector<Node> CadicalSolver::getOrderHeap() const { return {}; }
 
 std::shared_ptr<ProofNode> CadicalSolver::getProof()
 {

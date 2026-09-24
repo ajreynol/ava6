@@ -26,7 +26,7 @@
 #include "expr/node.h"
 #include "options/decision_options.h"
 #include "prop/cnf_stream.h"
-#include "prop/sat_solver.h"
+#include "prop/cadical/cadical.h"
 #include "prop/sat_solver_types.h"
 
 namespace ava6::internal {
@@ -116,7 +116,7 @@ class JustificationStrategy : public DecisionEngine
  public:
   /** Constructor */
   JustificationStrategy(Env& env,
-                        prop::CDCLTSatSolver* ss,
+                        prop::CadicalSolver* ss,
                         prop::CnfStream* cs);
 
   /** Presolve, called at the beginning of each check-sat call */

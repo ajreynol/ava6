@@ -15,9 +15,6 @@
 
 #include "context/context.h"
 #include "expr/node.h"
-#include "expr/node_algorithm.h"
-#include "expr/skolem_manager.h"
-#include "expr/subtype_elim_node_converter.h"
 #include "options/base_options.h"
 #include "options/printer_options.h"
 #include "options/quantifiers_options.h"
@@ -285,9 +282,6 @@ theory::TheoryId Env::theoryOf(TNode node) const
   return tid;
 }
 
-void Env::addPlugin(Plugin* p) { d_plugins.push_back(p); }
-const std::vector<Plugin*>& Env::getPlugins() const { return d_plugins; }
-
 void Env::registerBooleanTermSkolem(const Node& k)
 {
   Assert(k.isVar());
@@ -302,63 +296,6 @@ bool Env::isBooleanTermSkolem(const Node& k) const
     return false;
   }
   return d_boolTermSkolems.find(k) != d_boolTermSkolems.end();
-}
-
-Node Env::getSharableFormula(const Node& n) const
-{
-  Node on = n;
-
-  SkolemManager* skm = d_nm->getSkolemManager();
-  std::vector<Node> toProcess;
-  toProcess.push_back(on);
-  // The set of kinds that we never want to share. Any kind that can appear
-  // in lemmas but we don't have API support for should go in this list.
-  const std::unordered_set<Kind> excludeKinds = {
-      Kind::INST_CONSTANT,
-      Kind::DUMMY_SKOLEM,
-  };
-  size_t index = 0;
-  do
-  {
-    Node nn = toProcess[index];
-    index++;
-    // get the symbols contained in nn
-    std::unordered_set<Node> syms;
-    expr::getSymbols(nn, syms);
-    for (const Node& s : syms)
-    {
-      Kind sk = s.getKind();
-      if (excludeKinds.find(sk) != excludeKinds.end())
-      {
-        // these kinds are never sharable
-        return Node::null();
-      }
-      if (sk == Kind::SKOLEM)
-      {
-
-        // must ensure that the indices of the skolem are also legal
-        SkolemId id;
-        Node cacheVal;
-        if (!skm->isSkolemFunction(s, id, cacheVal))
-        {
-          // kind SKOLEM should imply that it is a skolem function
-          DebugUnhandled();
-          return Node::null();
-        }
-        if (!cacheVal.isNull()
-            && std::find(toProcess.begin(), toProcess.end(), cacheVal)
-                   == toProcess.end())
-        {
-          // if we have a cache value, add it to process vector
-          toProcess.push_back(cacheVal);
-        }
-      }
-    }
-  } while (index < toProcess.size());
-  // If we didn't encounter an illegal term, we now eliminate subtyping
-  SubtypeElimNodeConverter senc(d_nm);
-  on = senc.convert(on);
-  return on;
 }
 
 }  // namespace ava6::internal

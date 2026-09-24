@@ -21,7 +21,9 @@
 #define AVA6__PROP__CADICAL_H
 
 #include "context/cdhashset.h"
-#include "prop/sat_solver.h"
+#include "prop/sat_clause_sink.h"
+#include "proof/proof_node.h"
+#include "util/statistics_registry.h"
 #include "smt/env_obj.h"
 
 namespace CaDiCaL {
@@ -35,104 +37,52 @@ namespace cadical {
 class CadicalPropagator;
 class ProofTracer;
 }  // namespace cadical
-class ClauseLearner;
+class TheoryProxy;
 
-class CadicalSolver : public CDCLTSatSolver, protected EnvObj
+class CadicalSolver : public SatClauseSink, protected EnvObj
 {
-  friend class SatSolverFactory;
-
  public:
+  CadicalSolver(Env& env, TheoryProxy& theoryProxy, const std::string& name = "");
   ~CadicalSolver() override;
 
-  /* SatSolver interface -------------------------------------------------- */
-
-  ClauseId addClause(const SatClause& clause, bool removable) override;
-
-  SatVariable newVar(bool isTheoryAtom, bool canErase) override;
+  bool addClause(const SatClause& clause, bool removable) override;
+  SatVariable newVar(bool isTheoryAtom) override;
   SatVariable trueVar() override;
   SatVariable falseVar() override;
 
-  SatValue solve() override;
-  SatValue solve(long unsigned int&) override;
-  SatValue solve(const std::vector<SatLiteral>& assumptions) override;
-  bool setPropagateOnly() override;
-  void getUnsatAssumptions(std::vector<SatLiteral>& assumptions) override;
+  SatValue solve(const std::vector<SatLiteral>& assumptions = {});
+  void getUnsatAssumptions(std::vector<SatLiteral>& assumptions);
+  void interrupt();
+  SatValue value(SatLiteral l);
+  SatValue modelValue(SatLiteral l);
 
-  void interrupt() override;
-
-  SatValue value(SatLiteral l) override;
-
-  SatValue modelValue(SatLiteral l) override;
-
-  bool ok() const override;
-
-  /* CDCLTSatSolver interface --------------------------------------------- */
-
-  void initialize(TheoryProxy* theoryProxy) override;
-
-  void attachProofManager(PropPfManager* ppm) override;
-
-  uint32_t getAssertionLevel() const override;
-
-  void push() override;
-
-  void pop() override;
-
-  void resetTrail() override;
-
-  void preferPhase(SatLiteral lit) override;
-
-  bool isDecision(SatVariable var) const override;
-
-  bool isFixed(SatVariable var) const override;
-
-  std::vector<SatLiteral> getDecisions() const override;
-
-  std::vector<Node> getOrderHeap() const override;
-
+  uint32_t getAssertionLevel() const;
+  void push();
+  void pop();
+  void resetTrail();
+  /** Prefer this literal's polarity for decisions made by CaDiCaL. */
+  void preferPhase(SatLiteral lit);
+  bool isDecision(SatVariable var) const;
+  bool isFixed(SatVariable var) const;
+  std::vector<SatLiteral> getDecisions() const;
   /** Get the refutation reconstructed from CaDiCaL proof tracing. */
-  std::shared_ptr<ProofNode> getProof() override;
+  std::shared_ptr<ProofNode> getProof();
 
  private:
-  /**
-   * Constructor.
-   * Private to disallow creation outside of SatSolverFactory.
-   * Function init() must be called after creation.
-   * @param env       The associated environment.
-   * @param registry  The associated statistics registry.
-   * @param name      The name of the SAT solver.
-   */
-  CadicalSolver(Env& env,
-                StatisticsRegistry& registry,
-                const std::string& name = "");
-
-  /**
-   * Initialize SAT solver instance.
-   * Note: Split out to not call virtual functions in constructor.
-   */
-  void initialize() override;
-
-  /**
-   * Set resource limit.
-   * @param resmgr The associated resource manager.
-   */
+  void initialize();
   void setResourceLimit(ResourceManager* resmgr);
-
-  SatValue _solve(const std::vector<SatLiteral>& assumptions);
 
   /** The wrapped CaDiCaL instance. */
   std::unique_ptr<CaDiCaL::Solver> d_solver;
   /** The CaDiCaL terminator (for termination via resource manager). */
   std::unique_ptr<CaDiCaL::Terminator> d_terminator;
 
-  /** Context for synchronizing the SAT solver when in CDCL(T) mode. */
+  /** Context for synchronizing the SAT solver. */
   context::Context* d_context = nullptr;
-  /** The associated theory proxy (for CDCL(T) mode). */
-  prop::TheoryProxy* d_proxy = nullptr;
-  /** The CaDiCaL propagator (for CDCL(T) mode). */
+  /** The associated theory proxy . */
+  TheoryProxy* const d_proxy;
+  /** The CaDiCaL propagator . */
   std::unique_ptr<cadical::CadicalPropagator> d_propagator;
-  /** Clause learner instance for notifications about learned clauses. */
-  std::unique_ptr<ClauseLearner> d_clause_learner;
   /** Proof tracer instance for extracting unsat cores. */
   std::unique_ptr<cadical::ProofTracer> d_proof_tracer;
 
@@ -141,12 +91,8 @@ class CadicalSolver : public CDCLTSatSolver, protected EnvObj
    * query the solver if a given assumption is false.
    */
   std::vector<SatLiteral> d_assumptions;
-  /** When true, the next solve operation will only propagate. */
-  bool d_propagateOnly;
   /** Next fresh SAT variable index. */
   unsigned d_nextVarIdx;
-  /** The proof file */
-  std::string d_pfFile;
   /**
    * Whether we are in SAT mode. If true, the SAT solver returned satisfiable
    * and we are allowed to query model values from the solver.

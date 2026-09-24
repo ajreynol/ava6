@@ -24,12 +24,10 @@
 namespace ava6::internal {
 namespace theory {
 
-ModelManager::ModelManager(Env& env, TheoryEngine& te, EqEngineManager& eem)
+ModelManager::ModelManager(Env& env, TheoryEngine& te)
     : EnvObj(env),
       d_te(te),
-      d_eem(eem),
       d_modelEqualityEngine(nullptr),
-      d_modelEqualityEngineAlloc(nullptr),
       d_model(new TheoryModel(
           env, "DefaultModel", true)),
       d_modelBuilder(nullptr),
@@ -43,7 +41,7 @@ ModelManager::~ModelManager()
   d_modelEeContext.pop();
 }
 
-void ModelManager::finishInit(eq::EqualityEngineNotify* notify)
+void ModelManager::finishInit()
 {
   // construct the model
   // Initialize the model and model builder.
@@ -61,8 +59,11 @@ void ModelManager::finishInit(eq::EqualityEngineNotify* notify)
     d_alocModelBuilder.reset(new TheoryEngineModelBuilder(d_env));
     d_modelBuilder = d_alocModelBuilder.get();
   }
-  // notice that the equality engine of the model has yet to be assigned.
-  initializeModelEqEngine(notify);
+  d_modelEqualityEngine = std::make_unique<eq::EqualityEngine>(
+      d_env, &d_modelEeContext, d_model->getName() + "::ee", false);
+  d_model->finishInit(d_modelEqualityEngine.get());
+  // prepareModel clears this engine with pop/push independently of search.
+  d_modelEeContext.push();
 }
 
 void ModelManager::resetModel()
@@ -184,25 +185,6 @@ bool ModelManager::collectModelBooleanVariables()
     }
   }
   return true;
-}
-
-void ModelManager::initializeModelEqEngine(
-    eq::EqualityEngineNotify* notify)
-{
-  // initialize the model equality engine, use the provided notification object,
-  // which belongs e.g. to CombinationModelBased
-  EeSetupInfo esim;
-  esim.d_notify = notify;
-  esim.d_name = d_model->getName() + "::ee";
-  esim.d_constantsAreTriggers = false;
-  d_modelEqualityEngineAlloc.reset(
-      d_eem.allocateEqualityEngine(esim, &d_modelEeContext));
-  d_modelEqualityEngine = d_modelEqualityEngineAlloc.get();
-  // finish initializing the model
-  d_model->finishInit(d_modelEqualityEngine);
-  // We push a context during initialization since the model is cleared during
-  // collectModelInfo using pop/push.
-  d_modelEeContext.push();
 }
 
 bool ModelManager::prepareModel()

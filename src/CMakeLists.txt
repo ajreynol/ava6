@@ -112,7 +112,6 @@ libava6_add_sources(
   proof/conv_proof_generator.h
   proof/conv_seq_proof_generator.cpp
   proof/conv_seq_proof_generator.h
-  proof/clause_id.h
   proof/eager_proof_generator.cpp
   proof/eager_proof_generator.h
   proof/lazy_proof.cpp
@@ -186,10 +185,8 @@ libava6_add_sources(
   prop/prop_proof_manager.cpp
   prop/prop_proof_manager.h
   prop/registrar.h
-  prop/sat_solver.h
-  prop/sat_solver_factory.cpp
-  prop/sat_solver_factory.h
   prop/sat_solver_types.cpp
+  prop/sat_clause_sink.h
   prop/sat_solver_types.h
   prop/skolem_def_manager.cpp
   prop/skolem_def_manager.h
@@ -296,8 +293,6 @@ libava6_add_sources(
   theory/arith/linear/dual_simplex.h
   theory/arith/linear/error_set.cpp
   theory/arith/linear/error_set.h
-  theory/arith/linear/fc_simplex.cpp
-  theory/arith/linear/fc_simplex.h
   theory/arith/linear/infer_bounds.cpp
   theory/arith/linear/infer_bounds.h
   theory/arith/linear/linear_solver.cpp
@@ -436,7 +431,6 @@ libava6_add_sources(
   theory/bv/bitblast/proof_bitblaster.h
   theory/bv/bv_pp_assert.cpp
   theory/bv/bv_pp_assert.h
-  theory/bv/bv_solver.h
   theory/bv/bv_solver_bitblast_internal.cpp
   theory/bv/bv_solver_bitblast_internal.h
   theory/bv/macro_rewrite_elaborator.cpp
@@ -461,8 +455,6 @@ libava6_add_sources(
   theory/care_graph.h
   theory/care_pair_argument_callback.cpp
   theory/care_pair_argument_callback.cpp
-  theory/combination_care_graph.cpp
-  theory/combination_care_graph.h
   theory/combination_engine.cpp
   theory/combination_engine.h
   theory/datatypes/datatypes_rewriter.cpp
@@ -711,8 +703,6 @@ libava6_add_sources(
   theory/skolem_lemma.h
   theory/smt_engine_subsolver.cpp
   theory/smt_engine_subsolver.h
-  theory/plugin_module.cpp
-  theory/plugin_module.h
   theory/step.cpp
   theory/step.h
   theory/strategy.cpp
@@ -796,8 +786,6 @@ libava6_add_sources(
   theory/theory.h
   theory/theory_engine.cpp
   theory/theory_engine.h
-  theory/theory_engine_module.cpp
-  theory/theory_engine_module.h
   theory/theory_engine_proof_generator.cpp
   theory/theory_engine_proof_generator.h
   theory/theory_id.cpp

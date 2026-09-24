@@ -15,7 +15,7 @@
 #include "prop/cnf_stream.h"
 #include "prop/prop_engine.h"
 #include "prop/registrar.h"
-#include "prop/sat_solver.h"
+#include "prop/sat_clause_sink.h"
 #include "prop/theory_proxy.h"
 #include "test_smt.h"
 #include "theory/arith/theory_arith.h"
@@ -33,84 +33,23 @@ using namespace theory;
 
 namespace test {
 
-/* This fake class relies on the fact that a MiniSat variable is just an int. */
-class FakeSatSolver : public SatSolver
+class FakeSatSolver : public SatClauseSink
 {
  public:
-  FakeSatSolver() : d_nextVar(0), d_addClauseCalled(false) {}
-
-  void initialize() override {}
-
-  SatVariable newVar(AVA6_UNUSED bool theoryAtom,
-                     AVA6_UNUSED bool canErase) override
-  {
-    return d_nextVar++;
-  }
-
+  SatVariable newVar(AVA6_UNUSED bool theoryAtom) override { return d_nextVar++; }
   SatVariable trueVar() override { return d_nextVar++; }
-
   SatVariable falseVar() override { return d_nextVar++; }
-
-  ClauseId addClause(AVA6_UNUSED const SatClause& c,
-                     AVA6_UNUSED bool lemma) override
+  bool addClause(AVA6_UNUSED const SatClause& c, AVA6_UNUSED bool removable) override
   {
     d_addClauseCalled = true;
-    return ClauseIdUndef;
+    return false;
   }
-
   void reset() { d_addClauseCalled = false; }
-
-  unsigned int addClauseCalled() { return d_addClauseCalled; }
-
-  bool isDecision(Node) const { return false; }
-
-  void unregisterVar(AVA6_UNUSED SatLiteral lit) {}
-
-  void renewVar(AVA6_UNUSED SatLiteral lit, AVA6_UNUSED int level = -1) {}
-
-  bool spendResource() { return false; }
-
-  void interrupt() override {}
-
-  SatValue solve() override { return SAT_VALUE_UNKNOWN; }
-
-  SatValue solve(AVA6_UNUSED long unsigned int& resource) override
-  {
-    return SAT_VALUE_UNKNOWN;
-  }
-
-  SatValue solve(
-      AVA6_UNUSED const std::vector<SatLiteral>& assumptions) override
-  {
-    return SAT_VALUE_UNKNOWN;
-  }
-
-  void getUnsatAssumptions(
-      AVA6_UNUSED std::vector<SatLiteral>& unsat_assumptions) override
-  {
-  }
-
-  SatValue value(AVA6_UNUSED SatLiteral l) override
-  {
-    return SAT_VALUE_UNKNOWN;
-  }
-
-  SatValue modelValue(AVA6_UNUSED SatLiteral l) override
-  {
-    return SAT_VALUE_UNKNOWN;
-  }
-
-  bool properExplanation(AVA6_UNUSED SatLiteral lit,
-                         AVA6_UNUSED SatLiteral expl) const
-  {
-    return true;
-  }
-
-  bool ok() const override { return true; }
+  bool addClauseCalled() const { return d_addClauseCalled; }
 
  private:
-  SatVariable d_nextVar;
-  bool d_addClauseCalled;
+  SatVariable d_nextVar = 0;
+  bool d_addClauseCalled = false;
 };
 
 class TestPropWhiteCnfStream : public TestSmt

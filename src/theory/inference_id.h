@@ -47,8 +47,6 @@ enum class InferenceId
   COMBINATION_SPLIT,
   // a conflict due to rewriting an asserted literal
   CONFLICT_REWRITE_LIT,
-  // an explained theory propagation
-  EXPLAINED_PROPAGATION,
   // a skolem lemma introduced by the theory preprocessor
   THEORY_PP_SKOLEM_LEM,
   // ---------------------------------- ext theory
@@ -841,11 +839,6 @@ enum class InferenceId
   UF_ARITH_BV_CONV_VALUE_REFINE,
   //-------------------------------------- end uf theory
 
-  //-------------------------------------- lemma from modules
-  // From the partition generator
-  PARTITION_GENERATOR_PARTITION,
-  // From a plugin
-  PLUGIN_LEMMA,
   //-------------------------------------- unknown
   UNKNOWN
 };

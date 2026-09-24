@@ -102,8 +102,8 @@ class DummyOutputChannel : public theory::OutputChannel
  public:
   DummyOutputChannel(StatisticsRegistry& sr,
                      TheoryEngine* engine,
-                     const std::string& name)
-      : theory::OutputChannel(sr, engine, name)
+                     theory::TheoryId theory)
+      : theory::OutputChannel(sr, engine, theory)
   {
   }
   ~DummyOutputChannel() override {}

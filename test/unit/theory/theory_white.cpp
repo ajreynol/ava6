@@ -43,7 +43,7 @@ class TestTheoryWhite : public TestSmtNoFinishInit
     te->d_theoryOut[THEORY_BUILTIN] = nullptr;
     Env& env = d_slvEngine->getEnv();
     d_outputChannel.reset(
-        new DummyOutputChannel(env.getStatisticsRegistry(), te, "Dummy"));
+        new DummyOutputChannel(env.getStatisticsRegistry(), te, THEORY_BUILTIN));
     d_dummy_theory.reset(new DummyTheory<THEORY_BUILTIN>(
         env, *d_outputChannel.get(), Valuation(nullptr)));
     d_atom0 = d_nodeManager->mkConst(true);

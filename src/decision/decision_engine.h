@@ -17,7 +17,7 @@
 
 #include "expr/node.h"
 #include "prop/cnf_stream.h"
-#include "prop/sat_solver.h"
+#include "prop/cadical/cadical.h"
 #include "prop/sat_solver_types.h"
 #include "smt/env_obj.h"
 
@@ -28,7 +28,7 @@ class DecisionEngine : protected EnvObj
 {
  public:
   /** Constructor */
-  DecisionEngine(Env& env, prop::CDCLTSatSolver* ss, prop::CnfStream* cs);
+  DecisionEngine(Env& env, prop::CadicalSolver* ss, prop::CnfStream* cs);
   virtual ~DecisionEngine() {}
 
   /** Presolve, called at the beginning of each check-sat call */
@@ -61,7 +61,7 @@ class DecisionEngine : protected EnvObj
   /** Get next internal, the engine-specific implementation of getNext */
   virtual prop::SatLiteral getNextInternal(bool& stopSearch) = 0;
   /** Pointer to the SAT solver */
-  prop::CDCLTSatSolver* d_satSolver;
+  prop::CadicalSolver* d_satSolver;
   /** Pointer to the CNF stream */
   prop::CnfStream* d_cnfStream;
 };

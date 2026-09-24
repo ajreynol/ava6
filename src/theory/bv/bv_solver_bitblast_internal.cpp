@@ -8,7 +8,7 @@
  * ****************************************************************************
  *
  * Bit-blast solver that sends bit-blast lemmas directly to the internal
- * MiniSat.
+ * CaDiCaL.
  */
 
 #include "theory/bv/bv_solver_bitblast_internal.h"
@@ -68,7 +68,9 @@ void collectBVAtoms(TNode n, std::unordered_set<Node>& atoms)
 
 BVSolverBitblastInternal::BVSolverBitblastInternal(
     Env& env, TheoryState* s, TheoryInferenceManager& inferMgr)
-    : BVSolver(env, *s, inferMgr),
+    : EnvObj(env),
+      d_state(*s),
+      d_im(inferMgr),
       d_bitblaster(new BBProof(env, s, false)),
       d_epg(new EagerProofGenerator(d_env))
 {

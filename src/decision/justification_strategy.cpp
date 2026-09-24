@@ -22,7 +22,7 @@ namespace ava6::internal {
 namespace decision {
 
 JustificationStrategy::JustificationStrategy(Env& env,
-                                             prop::CDCLTSatSolver* ss,
+                                             prop::CadicalSolver* ss,
                                              prop::CnfStream* cs)
     : DecisionEngine(env, ss, cs),
       d_assertions(

@@ -22,7 +22,6 @@
 namespace ava6::internal {
 namespace prop {
 
-class SatSolver;
 
 /**
  * Boolean values of the SAT solver.

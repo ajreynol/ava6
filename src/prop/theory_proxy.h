@@ -46,6 +46,7 @@ namespace prop {
 
 class PropEngine;
 class CnfStream;
+class CadicalSolver;
 class SkolemDefManager;
 class ZeroLevelLearner;
 
@@ -65,12 +66,12 @@ class TheoryProxy : protected EnvObj, public Registrar
   ~TheoryProxy();
 
   /** Finish initialize */
-  void finishInit(CDCLTSatSolver* ss, CnfStream* cs);
+  void finishInit(CadicalSolver* ss, CnfStream* cs);
 
   /** Presolve, which calls presolve for the modules managed by this class */
   void presolve();
   /** Postsolve, which calls postsolve for the modules managed by this class */
-  void postsolve(SatValue result);
+  void postsolve();
 
   /**
    * Notify that lhs was substituted by rhs during preprocessing. This impacts
@@ -105,12 +106,6 @@ class TheoryProxy : protected EnvObj, public Registrar
 
   /** Get an explanation for literal `l` and save it on clause `explanation`. */
   void explainPropagation(SatLiteral l, SatClause& explanation);
-  /**
-   * Notify SAT clause. This should be called whenever the SAT solver learns
-   * a SAT clause. It notifies user plugins of the added clauses.
-   */
-  void notifySatClause(const SatClause& clause);
-
   void theoryPropagate(SatClause& output);
 
   void enqueueTheoryLiteral(const SatLiteral& l);
@@ -214,12 +209,6 @@ class TheoryProxy : protected EnvObj, public Registrar
    * local assertions.
    */
   bool d_dmTrackActiveSkDefs;
-  /**
-   * Are we in solve?
-   * This is true if there was a call to presolve() after the last call to
-   * postsolve(), if any.
-   */
-  bool d_inSolve;
 
   /** The theory engine we are using. */
   TheoryEngine* d_theoryEngine;

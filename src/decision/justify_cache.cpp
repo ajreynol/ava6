@@ -21,7 +21,7 @@ namespace ava6::internal {
 namespace decision {
 
 JustifyCache::JustifyCache(context::Context* c,
-                           prop::CDCLTSatSolver* ss,
+                           prop::CadicalSolver* ss,
                            prop::CnfStream* cs)
     : d_justified(c), d_satSolver(ss), d_cnfStream(cs)
 {

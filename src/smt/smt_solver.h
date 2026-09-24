@@ -81,14 +81,9 @@ class SmtSolver : protected EnvObj
   void interrupt();
   /**
    * Get the list of preprocessed assertions. Only valid if
-   * trackPreprocessedAssertions is true.
+   * proof production is enabled.
    */
   const context::CDList<Node>& getPreprocessedAssertions() const;
-  /**
-   * Get the skolem map corresponding to the preprocessed assertions. Only valid
-   * if trackPreprocessedAssertions is true.
-   */
-  const context::CDHashMap<size_t, Node>& getPreprocessedSkolemMap() const;
   /** Performs a push on the underlying prop engine. */
   void pushPropContext();
   /** Performs a pop on the underlying prop engine. */
@@ -112,7 +107,7 @@ class SmtSolver : protected EnvObj
   //------------------------------------------ end access methods
   /**
    * Preprocess the assertions. This calls the preprocessor on the assertions
-   * d_asserts and records d_ppAssertions / d_ppSkolemMap if necessary.
+   * d_asserts.
    */
   void preprocess(preprocessing::AssertionPipeline& ap);
   /**
@@ -129,8 +124,6 @@ class SmtSolver : protected EnvObj
   Result checkSatInternal();
 
  private:
-  /** Whether we track information necessary for deep restarts */
-  bool trackPreprocessedAssertions() const;
   /** Finish initialization of preprocessor */
   void finishInitPreprocessor();
   /** The preprocessor of this SMT solver */
@@ -143,11 +136,8 @@ class SmtSolver : protected EnvObj
   std::unique_ptr<TheoryEngine> d_theoryEngine;
   /** The propositional engine */
   std::unique_ptr<prop::PropEngine> d_propEngine;
-  //------------------------------------------ Bookkeeping for deep restarts
   /** The exact list of preprocessed assertions we sent to the PropEngine */
   NodeList d_ppAssertions;
-  /** The skolem map associated with d_ppAssertions */
-  context::CDHashMap<size_t, Node> d_ppSkolemMap;
 };
 
 }  // namespace smt

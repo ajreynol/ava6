@@ -46,7 +46,6 @@ class Env;
 class NodeManager;
 class UnsatCore;
 class StatisticsRegistry;
-class Plugin;
 class Printer;
 class ResourceManager;
 struct InstantiationList;
@@ -289,12 +288,6 @@ class AVA6_EXPORT SolverEngine
    */
   std::vector<Node> getUnsatAssumptions(void);
 
-  /**
-   * Adds plugin to the theory engine of this solver engine.
-   *
-   * @param p The plugin to add.
-   */
-  void addPlugin(Plugin* p);
   /**
    * Simplify a term or formula based on rewriting and (optionally) applying
    * substitutions for solved variables.
