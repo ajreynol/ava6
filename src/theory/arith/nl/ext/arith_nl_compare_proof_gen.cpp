@@ -217,7 +217,7 @@ std::shared_ptr<ProofNode> ArithNlCompareProofGenerator::getProofFor(Node fact)
         Node ceq = etgt.eqNode(zero);
         if (etgt.isConst())
         {
-          // case where we require showing 1 != 0
+          // case where we require showing true
           Node ceqf = ceq.eqNode(nm->mkConst(false));
           cdp.addStep(ceqf, ProofRule::EVALUATE, {}, {ceq});
           deqAssump = ceq.notNode();

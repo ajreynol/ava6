@@ -494,15 +494,6 @@ Sort ParserState::mkFlatFunctionType(std::vector<Sort>& sorts, Sort range)
   return newRange;
 }
 
-Term ParserState::mkHoApply(Term expr, const std::vector<Term>& args)
-{
-  for (size_t i = 0; i < args.size(); i++)
-  {
-    expr = d_tm.mkTerm(Kind::HO_APPLY, {expr, args[i]});
-  }
-  return expr;
-}
-
 Term ParserState::applyTypeAscription(Term t, Sort s)
 {
   Kind k = t.getKind();

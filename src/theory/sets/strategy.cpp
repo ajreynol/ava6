@@ -41,8 +41,6 @@ void Strategy::initializeStrategy()
   // add the ence steps
   addStrategyStep(Step::SETS_CHECK_RESET);
   addStrategyStep(Step::SETS_CHECK_BASIC);
-  addStrategyStep(Step::SETS_CHECK_FILTER);
-  addStrategyStep(Step::SETS_CHECK_MAP);
   addStrategyStep(Step::SETS_CHECK_DISEQUALITY);
   addStrategyStep(Step::SETS_CHECK_COMPREHENSION);
   markEndEffort(Theory::EFFORT_FULL);
@@ -59,8 +57,6 @@ void Strategy::runStep(Step s, Theory::Effort, Theory::Effort effort)
   {
     case Step::SETS_CHECK_RESET: d_setsSolver->fullEffortReset(); break;
     case Step::SETS_CHECK_BASIC: d_setsSolver->checkBasic(); break;
-    case Step::SETS_CHECK_FILTER: d_setsSolver->checkFilters(); break;
-    case Step::SETS_CHECK_MAP: d_setsSolver->checkMaps(); break;
     case Step::SETS_CHECK_DISEQUALITY:
       d_setsSolver->checkDisequalities();
       break;

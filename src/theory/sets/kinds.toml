@@ -132,54 +132,6 @@ typerule = "::ava6::internal::theory::sets::IsSetTypeRule"
 # The set.map operator applies the first argument, a function of type (-> T1 T2), to every element
 # of the second argument, a set of type (Set T1), and returns a set of type (Set T2).
 [[kinds]]
-type     = "operator"
-name     = "SET_MAP"
-children = 2
-comment  = "set map function"
-typerule = "::ava6::internal::theory::sets::SetMapTypeRule"
-
-# The set.filter operator takes a predicate of type (-> T Bool) and a set of type (Set T)
-# and returns the same set excluding those elements that do not satisfy the predicate
-[[kinds]]
-type     = "operator"
-name     = "SET_FILTER"
-children = 2
-comment  = "set filter operator"
-typerule = "::ava6::internal::theory::sets::SetFilterTypeRule"
-
-# set.all operator is a predicate that holds iff all elements in a given set satisfy the the given predicate.
-# (set.all p A) receives a predicate p of type (-> T Bool) and a set of type (Set T) and returns Bool
-[[kinds]]
-type     = "operator"
-name     = "SET_ALL"
-children = 2
-comment  = "set all operator"
-typerule = "::ava6::internal::theory::sets::SetAllSomeTypeRule"
-
-# set.some operator is a predicate that holds iff at least one element in a given set satisfies the the given predicate.
-# (set.some p A) receives a predicate p of type (-> T Bool) and a set of type (Set T) and returns Bool
-[[kinds]]
-type     = "operator"
-name     = "SET_SOME"
-children = 2
-comment  = "set some operator"
-typerule = "::ava6::internal::theory::sets::SetAllSomeTypeRule"
-
-# set.fold operator combines elements of a set into a single value.
-# (set.fold f t A) folds the elements of set A starting with term t and using
-# the combining function f.
-#  f: a binary operation of type (-> T1 T2 T2)
-#  t: an initial value of type T2
-#  A: a bag of type (Set T1)
-[[kinds]]
-type     = "operator"
-name     = "SET_FOLD"
-children = 3
-comment  = "set fold operator"
-typerule = "::ava6::internal::theory::sets::SetFoldTypeRule"
-
-# rel.group operator
-[[kinds]]
 type = "operator"
 name     = "SET_EMPTY_OF_TYPE"
 children = 1

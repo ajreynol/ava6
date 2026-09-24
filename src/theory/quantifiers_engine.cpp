@@ -157,13 +157,7 @@ void QuantifiersEngine::ppNotifyAssertions(const std::vector<Node>& assertions)
   Trace("quant-engine-proc")
       << "ppNotifyAssertions in QE, #assertions = " << assertions.size()
       << std::endl;
-  if (options().quantifiers.instMaxLevel != -1)
-  {
-    for (const Node& a : assertions)
-    {
-      QuantAttributes::setInstantiationLevelAttr(a, 0);
-    }
-  }
+  
   // notify all modules
   for (QuantifiersModule*& mdl : d_modules)
   {

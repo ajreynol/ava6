@@ -104,25 +104,9 @@ void NonlinearExtension::presolve()
   d_im.doPendingLemmas();
 }
 
-void NonlinearExtension::computeRelevantAssertions(
-    const std::vector<Node>& assertions, std::vector<Node>& keep)
-{
-  const Valuation& v = d_containing.getValuation();
-  for (const Node& a : assertions)
-  {
-    if (v.isRelevant(a))
-    {
-      keep.emplace_back(a);
-    }
-  }
-  Trace("nl-ext-rlv") << "...relevant assertions: " << keep.size() << "/"
-                      << assertions.size() << std::endl;
-}
-
 void NonlinearExtension::getAssertions(std::vector<Node>& assertions)
 {
   Trace("nl-ext-assert-debug") << "Getting assertions..." << std::endl;
-  bool useRelevance = false;
   
   
   Valuation v = d_containing.getValuation();
@@ -139,11 +123,7 @@ void NonlinearExtension::getAssertions(std::vector<Node>& assertions)
     Trace("nl-ext-assert-debug")
         << "Loaded " << assertion.d_assertion << " from theory" << std::endl;
     Node lit = assertion.d_assertion;
-    if (useRelevance && !v.isRelevant(lit))
-    {
-      // not relevant, skip
-      continue;
-    }
+    
     // if using the bound inference utility
     if (options().arith.nlRlvAssertBounds && bounds.add(lit, false))
     {

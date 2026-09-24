@@ -223,17 +223,7 @@ bool Instantiate::addInstantiationInternal(
   }
 
   // check based on instantiation level
-  if (options().quantifiers.instMaxLevel != -1)
-  {
-    TermDb* tdb = d_treg.getTermDatabase();
-    for (const Node& t : terms)
-    {
-      if (!tdb->isTermEligibleForInstantiation(t, q))
-      {
-        return false;
-      }
-    }
-  }
+  
 
   // record the instantiation
   bool recorded = recordInstantiationInternal(q, terms, isLocal);
@@ -372,26 +362,7 @@ bool Instantiate::addInstantiationInternal(
       }
     }
   }
-  if (options().quantifiers.instMaxLevel != -1)
-  {
-    Assert(lem.getKind() == Kind::IMPLIES);
-    uint64_t maxInstLevel = 0;
-    uint64_t clevel;
-    for (const Node& tc : terms)
-    {
-      if (!QuantAttributes::getInstantiationLevel(tc, clevel))
-      {
-        // ensure it is set to zero.
-        QuantAttributes::setInstantiationLevelAttr(tc, 0);
-        continue;
-      }
-      if (clevel > maxInstLevel)
-      {
-        maxInstLevel = clevel;
-      }
-    }
-    QuantAttributes::setInstantiationLevelAttr(lem[1], maxInstLevel + 1);
-  }
+  
   Trace("inst-add-debug") << " --> Success." << std::endl;
   ++(d_statistics.d_instantiations);
   return true;

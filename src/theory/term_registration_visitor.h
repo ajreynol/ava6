@@ -121,7 +121,7 @@ class PreRegisterVisitor : protected EnvObj
 /**
  * The reason why we need to make this outside of the pre-registration loop is
  * because we need a shared term x to be associated with every atom that
- * contains it. For example, if given f(x) >= 0 and f(x) + 1 >= 0, although f(x)
+ * contains it. For example, if given f(x) >= 0 and f(x) + true, although f(x)
  * has been visited already, we need to visit it again, since we need to
  * associate it with both atoms.
  */

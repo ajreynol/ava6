@@ -33,7 +33,7 @@ void UfProofRuleChecker::registerTo(ProofChecker* pc)
   pc->registerChecker(ProofRule::TRUE_ELIM, this);
   pc->registerChecker(ProofRule::FALSE_INTRO, this);
   pc->registerChecker(ProofRule::FALSE_ELIM, this);
-  pc->registerChecker(ProofRule::APPLY_CONG, this);
+  pc->registerChecker(ProofRule::HO_CONG, this);
 }
 
 Node UfProofRuleChecker::checkInternal(ProofRule id,
@@ -168,7 +168,7 @@ Node UfProofRuleChecker::checkInternal(ProofRule id,
     }
     return children[0][0].notNode();
   }
-  if (id == ProofRule::APPLY_CONG)
+  if (id == ProofRule::HO_CONG)
   {
     Kind k = Kind::APPLY_UF;
     std::vector<Node> lchildren;

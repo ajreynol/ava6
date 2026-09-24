@@ -1099,11 +1099,6 @@ std::string Smt2Printer::smtKindString(Kind k)
     case Kind::SET_CHOOSE: return "set.choose";
     case Kind::SET_IS_EMPTY: return "set.is_empty";
     case Kind::SET_IS_SINGLETON: return "set.is_singleton";
-    case Kind::SET_MAP: return "set.map";
-    case Kind::SET_FILTER: return "set.filter";
-    case Kind::SET_ALL: return "set.all";
-    case Kind::SET_SOME: return "set.some";
-    case Kind::SET_FOLD: return "set.fold";
     case Kind::SET_EMPTY_OF_TYPE: return "@set.empty_of_type";
 
     // bag theory

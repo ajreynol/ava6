@@ -989,11 +989,7 @@ Node QuantifiersRewriter::computeCondSplit(Node body,
   NodeManager* nm = nodeManager();
   Kind bk = body.getKind();
   
-  if (d_opts.quantifiers.condVarSplitQuant
-      == options::CondVarSplitQuantMode::OFF)
-  {
-    return body;
-  }
+  
   Trace("cond-var-split-debug")
       << "Conditional var elim split " << body << "?" << std::endl;
   // we only do this splitting if miniscoping is enabled, as this is
@@ -1004,8 +1000,7 @@ Node QuantifiersRewriter::computeCondSplit(Node body,
     return body;
   }
 
-  bool aggCondSplit = (d_opts.quantifiers.condVarSplitQuant
-                       == options::CondVarSplitQuantMode::AGG);
+  bool aggCondSplit = (false);
   if (bk == Kind::ITE
       || (bk == Kind::EQUAL && body[0].getType().isBoolean() && aggCondSplit))
   {
@@ -2396,8 +2391,7 @@ bool QuantifiersRewriter::doOperation(Node q,
   else if (computeOption == COMPUTE_COND_SPLIT)
   {
     return (false
-            || d_opts.quantifiers.condVarSplitQuant
-                   != options::CondVarSplitQuantMode::OFF)
+            || true)
            && !is_strict_trigger;
   }
   else if (computeOption == COMPUTE_PRENEX)

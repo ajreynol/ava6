@@ -1189,7 +1189,7 @@ enum ENUM(ProofRule)
    * It is not used for kinds with variadic arity, or for kind
    * ``ava6::Kind::HO_APPLY``, which respectively use the rules
    * :cpp:enumerator:`NARY_CONG <ava6::ProofRule::NARY_CONG>` and
-   * :cpp:enumerator:`APPLY_CONG <ava6::ProofRule::APPLY_CONG>` below.
+   * :cpp:enumerator:`HO_CONG <ava6::ProofRule::HO_CONG>` below.
    * \endverbatim
    */
   EVALUE(CONG),
@@ -1281,7 +1281,7 @@ enum ENUM(ProofRule)
    * ``ava6::Kind::HO_APPLY``.
    * \endverbatim
    */
-  EVALUE(APPLY_CONG),
+  EVALUE(HO_CONG),
   /**
    * \verbatim embed:rst:leading-asterisk
    * **Arrays -- Read over write**
@@ -1539,30 +1539,6 @@ enum ENUM(ProofRule)
    * \endverbatim
    */
   EVALUE(SETS_EXT),
-  /**
-   * \verbatim embed:rst:leading-asterisk
-   * **Sets -- Sets filter up**
-   *
-   * .. math::
-   *
-   *   \inferrule{\mathit{set.member}(x,a)\mid P}
-   *   {\mathit{set.member}(x, \mathit{set.filter}(P, a)) = P(x)}
-   *
-   * \endverbatim
-   */
-  EVALUE(SETS_FILTER_UP),
-  /**
-   * \verbatim embed:rst:leading-asterisk
-   * **Sets -- Sets filter down**
-   *
-   * .. math::
-   *
-   *   \inferrule{\mathit{set.member}(x,\mathit{set.filter}(P, a))\mid -}
-   *   {\mathit{set.member}(x,a) \wedge P(x)}
-   *
-   * \endverbatim
-   */
-  EVALUE(SETS_FILTER_DOWN),
   /**
    * \verbatim embed:rst:leading-asterisk
    * **Strings -- Core rules -- Concatenation equality**

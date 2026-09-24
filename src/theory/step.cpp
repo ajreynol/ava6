@@ -33,8 +33,6 @@ std::ostream& operator<<(std::ostream& out, Step s)
       break;
     case Step::SETS_CHECK_RESET: out << "SETS_CHECK_RESET"; break;
     case Step::SETS_CHECK_BASIC: out << "SETS_CHECK_BASIC"; break;
-    case Step::SETS_CHECK_FILTER: out << "SETS_CHECK_FILTER"; break;
-    case Step::SETS_CHECK_MAP: out << "SETS_CHECK_MAP"; break;
     case Step::SETS_CHECK_DISEQUALITY: out << "SETS_CHECK_DISEQUALITY"; break;
     case Step::SETS_CHECK_COMPREHENSION:
       out << "SETS_CHECK_COMPREHENSION";

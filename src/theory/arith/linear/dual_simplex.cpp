@@ -67,7 +67,7 @@ Result::Status DualSimplexDecisionProcedure::dualFindModel(bool exactResult)
 
   // We need to reduce this because of
   d_errorSet.reduceToSignals();
-  d_errorSet.setSelectionRule(options::ErrorSelectionRule::VAR_ORDER);
+  d_errorSet.setSelectionRule(ErrorSelectionRule::VAR_ORDER);
 
   if (processSignals())
   {
@@ -89,7 +89,7 @@ Result::Status DualSimplexDecisionProcedure::dualFindModel(bool exactResult)
 
   exactResult |= d_varOrderPivotLimit < 0;
 
-  uint32_t checkPeriod = options().arith.arithSimplexCheckPeriod;
+  uint32_t checkPeriod = 200;
 
   uint32_t numDifferencePivots = options().arith.arithHeuristicPivots < 0
                                      ? d_numVariables + 1
@@ -109,7 +109,7 @@ Result::Status DualSimplexDecisionProcedure::dualFindModel(bool exactResult)
   {
     if (exactResult)
     {
-      d_errorSet.setSelectionRule(options::ErrorSelectionRule::VAR_ORDER);
+      d_errorSet.setSelectionRule(ErrorSelectionRule::VAR_ORDER);
       while (!d_errorSet.errorEmpty() && result != Result::UNSAT)
       {
         Assert(checkPeriod > 0);
@@ -121,7 +121,7 @@ Result::Status DualSimplexDecisionProcedure::dualFindModel(bool exactResult)
     }
     else if (d_varOrderPivotLimit > 0)
     {
-      d_errorSet.setSelectionRule(options::ErrorSelectionRule::VAR_ORDER);
+      d_errorSet.setSelectionRule(ErrorSelectionRule::VAR_ORDER);
       if (searchForFeasibleSolution(d_varOrderPivotLimit))
       {
         result = Result::UNSAT;

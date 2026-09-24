@@ -38,8 +38,6 @@ JustificationStrategy::JustificationStrategy(Env& env,
       d_useRlvOrder(false),
       d_decisionStopOnly(options().decision.decisionMode
                          == options::DecisionMode::STOPONLY),
-      d_jhSkMode(options().decision.jhSkolemMode),
-      d_jhSkRlvMode(options().decision.jhSkolemRlvMode),
       d_stats(statisticsRegistry())
 {
 }
@@ -529,15 +527,14 @@ bool JustificationStrategy::refreshCurrentAssertion()
     }
     return true;
   }
-  bool skFirst = (d_jhSkMode != options::JutificationSkolemMode::LAST);
   // use main assertions first
-  if (refreshCurrentAssertionFromList(skFirst))
+  if (refreshCurrentAssertionFromList(true))
   {
     return true;
   }
   // if satisfied all main assertions, use the skolem assertions, which may
   // fail
-  return refreshCurrentAssertionFromList(!skFirst);
+  return refreshCurrentAssertionFromList(false);
 }
 
 bool JustificationStrategy::refreshCurrentAssertionFromList(bool local)

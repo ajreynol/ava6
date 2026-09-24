@@ -166,7 +166,7 @@ class Instantiate : public QuantifiersUtil
    * returns false.  For example, if q is the formula
    *   forall xy. x>5 => P(x,y)
    * If terms = { 4, 0 }, then this method will return false since
-   *   4>5 => P(4,0)
+   *   false => P(4,0)
    * is entailed true based on rewriting. This method may additionally set
    * failMask to "10", indicating that x's value was critical, but y's value
    * was not. In other words, all instantiations including { x -> 4 } will also

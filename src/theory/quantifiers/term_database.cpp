@@ -233,10 +233,7 @@ Node TermDb::getOrMakeTypeFreshVariable(TypeNode tn)
     Node k = sm->mkSkolemFunction(SkolemId::GROUND_TERM, cacheVals);
     Trace("mkVar") << "TermDb:: Make variable " << k << " : " << tn
                    << std::endl;
-    if (options().quantifiers.instMaxLevel != -1)
-    {
-      QuantAttributes::setInstantiationLevelAttr(k, 0);
-    }
+    
     d_type_fv[tn] = k;
     return k;
   }
@@ -587,33 +584,7 @@ bool TermDb::hasTermCurrent(const Node& n, bool useMode) const
 
 bool TermDb::isTermEligibleForInstantiation(TNode n, TNode f)
 {
-  if (options().quantifiers.instMaxLevel != -1)
-  {
-    uint64_t level;
-    if (QuantAttributes::getInstantiationLevel(n, level))
-    {
-      int64_t fml =
-          f.isNull() ? -1 : d_qreg.getQuantAttributes().getQuantInstLevel(f);
-      unsigned ml = fml >= 0 ? fml : options().quantifiers.instMaxLevel;
-
-      if (level > ml)
-      {
-        Trace("inst-add-debug")
-            << "Term " << n << " has instantiation level " << level;
-        Trace("inst-add-debug")
-            << ", which is more than maximum allowed level " << ml
-            << " for this quantified formula." << std::endl;
-        return false;
-      }
-    }
-    else
-    {
-      Trace("inst-add-debug")
-          << "Term " << n << " does not have an instantiation level."
-          << std::endl;
-      return false;
-    }
-  }
+  
   // it cannot have instantiation constants, which originate from
   // counterexample-guided instantiation strategies.
   return !TermUtil::hasInstConstAttr(n);

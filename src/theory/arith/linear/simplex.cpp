@@ -51,7 +51,7 @@ SimplexDecisionProcedure::SimplexDecisionProcedure(
       d_posOne(1),
       d_negOne(-1)
 {
-  d_heuristicRule = options().arith.arithErrorSelectionRule;
+  d_heuristicRule = ErrorSelectionRule::MINIMUM_AMOUNT;
   d_errorSet.setSelectionRule(d_heuristicRule);
   d_conflictBuilder = new FarkasConflictBuilder(options().smt.produceProofs);
 }

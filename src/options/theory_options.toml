@@ -36,19 +36,3 @@ name = "type"
 [[setting.mode.THEORY_OF_TERM_BASED]]
 name = "term"
 
-[[setting]]
-name = "tcMode"
-type = "TcMode"
-default = "CARE_GRAPH"
-[[setting.mode.CARE_GRAPH]]
-name = "care-graph"
-
-[[setting]]
-name = "lemmaInprocessSubsMode"
-type = "LemmaInprocessSubsMode"
-default = "SIMPLE"
-[[setting.mode.ALL]]
-name = "all"
-[[setting.mode.SIMPLE]]
-name = "simple"
-

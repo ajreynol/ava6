@@ -1485,7 +1485,7 @@ void TheoryArrays::notifyFact(TNode atom, bool pol, TNode fact, bool isInternal)
       Node eq = ak.eqNode(bk);
       Node lemma = fact[0].orNode(eq.notNode());
 
-      if (options().arrays.arraysPropagate > 0 && d_equalityEngine->hasTerm(ak)
+      if (true && d_equalityEngine->hasTerm(ak)
           && d_equalityEngine->hasTerm(bk))
       {
         // Propagate witness disequality - might produce a conflict
@@ -1962,7 +1962,7 @@ void TheoryArrays::propagateRowLemma(RowLemmaType lem)
 {
   Trace("pf::array") << "TheoryArrays: RowLemma Propagate called. "
                         "arraysPropagate = "
-                     << options().arrays.arraysPropagate << std::endl;
+                     << 2 << std::endl;
 
   TNode a, b, i, j;
   std::tie(a, b, i, j) = lem;
@@ -1983,7 +1983,7 @@ void TheoryArrays::propagateRowLemma(RowLemmaType lem)
   bool bothExist = ajExists && bjExists;
 
   // If propagating, check propagations
-  int64_t prop = options().arrays.arraysPropagate;
+  int64_t prop = 2;
   if (prop > 0)
   {
     if (d_equalityEngine->areDisequal(i, j, true) && (bothExist || prop > 1))
@@ -2057,7 +2057,7 @@ void TheoryArrays::queueRowLemma(RowLemmaType lem)
   bool bothExist = ajExists && bjExists;
 
   // If propagating, check propagations
-  int64_t prop = options().arrays.arraysPropagate;
+  int64_t prop = 2;
 
   if (prop > 0)
   {
@@ -2216,7 +2216,7 @@ bool TheoryArrays::dischargeLemmas()
       continue;
     }
 
-    int64_t prop = options().arrays.arraysPropagate;
+    int64_t prop = 2;
     if (prop > 0)
     {
       propagateRowLemma(l);

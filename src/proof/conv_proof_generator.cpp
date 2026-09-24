@@ -502,7 +502,7 @@ Node TConvProofGenerator::getProofForRewriting(Node t,
           }
           else if (ck == Kind::APPLY_UF && children[0] != cur.getOperator())
           {
-            congRule = ProofRule::APPLY_CONG;
+            congRule = ProofRule::HO_CONG;
             pfArgs.clear();
             pfArgs.push_back(ProofRuleChecker::mkKindNode(nm, Kind::APPLY_UF));
             pfChildren.push_back(cur.getOperator().eqNode(children[0]));

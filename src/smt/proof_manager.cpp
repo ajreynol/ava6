@@ -75,7 +75,7 @@ PfManager::PfManager(Env& env)
   d_pchecker.reset(
       new ProofChecker(statisticsRegistry(),
                        options().proof.proofCheck,
-                       static_cast<uint32_t>(options().proof.proofPedantic),
+                       static_cast<uint32_t>(0),
                        d_rewriteDb.get()));
   d_pnm.reset(new ProofNodeManager(env.getNodeManager(),
                                    env.getOptions(),

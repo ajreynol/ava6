@@ -223,9 +223,7 @@ class JustificationStrategy : public DecisionEngine
   /** using stop only */
   bool d_decisionStopOnly;
   /** skolem mode */
-  options::JutificationSkolemMode d_jhSkMode;
   /** skolem relevancy mode */
-  options::JutificationSkolemRlvMode d_jhSkRlvMode;
   /** The statistics */
   JustifyStatistics d_stats;
 };

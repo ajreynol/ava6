@@ -116,7 +116,7 @@ class ArithVariables;
  * - InternalAssumeAP : An internal assumption. This has no guarantee of having
  * an external proof. : This must be removed by regression.
  * - FarkasAP         : A proof with Farka's coefficients, i.e.
- *                    :  \sum lambda_i ( asNode(x_i) <= c_i  ) |= 0 < 0
+ *                    :  \sum lambda_i ( asNode(x_i) <= c_i  ) |= false
  *                    : If proofs are on, coefficients will be logged.
  *                    : If proofs are off, coefficients will not be logged.
  *                    : A unate implication is a FarkasAP.
@@ -306,7 +306,7 @@ struct ConstraintRule
    * Thus the proof corresponds to (with multiplication over inequalities):
    *    \sum_{u in U} fc[u] ans[p-n+u] + \sum_{e in E} fc[e] ans[p-n+e]
    *  + \sum_{l in L} fc[l] ans[p-n+l]
-   * |= 0 < 0
+   * |= false
    * where fc[u] > 0, fc[l] < 0, and fc[e] != 0 (i.e. it can be either +/-).
    *
    * There is no requirement that the proof is minimal.
@@ -660,7 +660,7 @@ class Constraint
 
   /**
    * Marks a the constraint c as being entailed by a.
-   * The Farkas proof 1*(a) + -1 (c) |= 0<0
+   * The Farkas proof 1*(a) + -1 (c) |= false
    *
    * After calling impliedByUnate(), the caller should either raise a conflict
    * or try call tryToPropagate().

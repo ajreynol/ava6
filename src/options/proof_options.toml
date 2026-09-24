@@ -104,23 +104,7 @@ name   = "Proof"
 
 # Internal core policies; never accepted as command-line or SMT-LIB options.
 [[setting]]
-name = "proofFormatMode"
-type = "ProofFormatMode"
-default = "CPC"
-[[setting.mode.CPC]]
-name = "cpc"
-
-[[setting]]
-name = "proofPedantic"
-type = "uint64_t"
-default = "0"
-
-[[setting]]
 name = "checkProofsComplete"
 type = "bool"
 default = "false"
 
-[[setting]]
-name = "proofPreSimpLookahead"
-type = "uint64_t"
-default = "2"

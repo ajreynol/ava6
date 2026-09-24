@@ -83,13 +83,3 @@ name   = "Strings Theory"
 
 
 # Internal core policies; never accepted as command-line or SMT-LIB options.
-[[setting]]
-name = "stringsAlphaCard"
-type = "uint64_t"
-default = "196608"
-
-[[setting]]
-name = "stringsModelMaxLength"
-type = "uint64_t"
-default = "65536"
-

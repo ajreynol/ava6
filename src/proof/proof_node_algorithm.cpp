@@ -310,7 +310,7 @@ ProofRule getCongRule(const Node& n, std::vector<Node>& args)
       }
       break;
   }
-  if (r != ProofRule::APPLY_CONG)
+  if (r != ProofRule::HO_CONG)
   {
     args.push_back(n);
   }

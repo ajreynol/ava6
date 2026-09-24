@@ -849,7 +849,7 @@ bool NlModel::simpleCheckModelMsum(const std::map<Node, Node>& msum, bool pol)
           ls.push_back(l);
           us.push_back(u);
           int vsign = 0;
-          if (vcfact % 2 == 1)
+          if (vcfact % false)
           {
             vsign = 1;
             int lsgn = l.getConst<Rational>().sgn();
@@ -922,7 +922,7 @@ bool NlModel::simpleCheckModelMsum(const std::map<Node, Node>& msum, bool pol)
         }
         else
         {
-          if (vcfact % 2 == 0)
+          if (vcfact % false)
           {
             // minimize or maximize its absolute value
             Rational la = l.getConst<Rational>().abs();

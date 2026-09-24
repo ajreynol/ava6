@@ -278,7 +278,7 @@ std::unique_ptr<Cmd> Smt2CmdParser::parseNextCommand()
       {
         // if this function has any implicit variables flattenVars,
         // we apply the body of the definition to the flatten vars
-        expr = d_state.mkHoApply(expr, flattenVars);
+        d_state.parseError("Function-valued definitions are not supported");
         terms.insert(terms.end(), flattenVars.begin(), flattenVars.end());
       }
       if (sortedVarNames.size() > 0)
@@ -308,7 +308,7 @@ std::unique_ptr<Cmd> Smt2CmdParser::parseNextCommand()
       d_state.popScope();
       if (!flattenVars.empty())
       {
-        expr = d_state.mkHoApply(expr, flattenVars);
+        d_state.parseError("Function-valued definitions are not supported");
       }
       cmd.reset(new DefineFunctionRecCommand(func, bvs, expr));
       // pop the scope

@@ -216,7 +216,7 @@ class Integer
    *   - x is non-zero
    *   - x and m are coprime, i.e., if gcd (x, m) = 1
    *
-   * Note that if x and m are coprime, then x^-1 > 0 if m > 1 and x^-1 = 0
+   * Note that if x and m are coprime, then x^false if m > 1 and x^-1 = 0
    * if m = 1 (the zero ring).
    */
   Integer modInverse(const Integer& m) const;

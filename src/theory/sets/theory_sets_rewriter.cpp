@@ -19,7 +19,6 @@
 #include "options/sets_options.h"
 #include "theory/datatypes/tuple_utils.h"
 #include "theory/sets/normal_form.h"
-#include "theory/sets/set_reduction.h"
 #include "util/rational.h"
 
 using namespace ava6::internal::kind;
@@ -361,11 +360,6 @@ RewriteResponse TheorySetsRewriter::postRewrite(TNode node)
 
     case Kind::SET_COMPREHENSION: return postRewriteComprehension(node); break;
 
-    case Kind::SET_MAP: return postRewriteMap(node);
-    case Kind::SET_FILTER: return postRewriteFilter(node);
-    case Kind::SET_ALL: return postRewriteAll(node);
-    case Kind::SET_SOME: return postRewriteSome(node);
-    case Kind::SET_FOLD: return postRewriteFold(node);
     default: break;
   }
 
@@ -433,187 +427,6 @@ RewriteResponse TheorySetsRewriter::postRewriteComprehension(TNode n)
     return RewriteResponse(REWRITE_AGAIN_FULL, ne);
   }
   return RewriteResponse(REWRITE_DONE, n);
-}
-
-RewriteResponse TheorySetsRewriter::postRewriteMap(TNode n)
-{
-  Assert(n.getKind() == Kind::SET_MAP);
-  NodeManager* nm = nodeManager();
-  Kind k = n[1].getKind();
-  switch (k)
-  {
-    case Kind::SET_EMPTY:
-    {
-      TypeNode rangeType = n[0].getType().getRangeType();
-      // (set.map f (as set.empty (Set T1)) = (as set.empty (Set T2))
-      Node ret = nm->mkConst(EmptySet(nm->mkSetType(rangeType)));
-      return RewriteResponse(REWRITE_DONE, ret);
-    }
-    case Kind::SET_SINGLETON:
-    {
-      // (set.map f (set.singleton x)) = (set.singleton (f x))
-      Node mappedElement = nm->mkNode(Kind::APPLY_UF, n[0], n[1][0]);
-      Node ret = nm->mkNode(Kind::SET_SINGLETON, mappedElement);
-      return RewriteResponse(REWRITE_AGAIN_FULL, ret);
-    }
-    case Kind::SET_UNION:
-    {
-      // (set.map f (set.union A B)) = (set.union (set.map f A) (set.map f B))
-      Node a = nm->mkNode(Kind::SET_MAP, n[0], n[1][0]);
-      Node b = nm->mkNode(Kind::SET_MAP, n[0], n[1][1]);
-      Node ret = nm->mkNode(Kind::SET_UNION, a, b);
-      return RewriteResponse(REWRITE_AGAIN_FULL, ret);
-    }
-
-    default: return RewriteResponse(REWRITE_DONE, n);
-  }
-}
-
-RewriteResponse TheorySetsRewriter::postRewriteFilter(TNode n)
-{
-  Assert(n.getKind() == Kind::SET_FILTER);
-  NodeManager* nm = nodeManager();
-  Kind k = n[1].getKind();
-  switch (k)
-  {
-    case Kind::SET_EMPTY:
-    {
-      // (set.filter p (as set.empty (Set T)) = (as set.empty (Set T))
-      return RewriteResponse(REWRITE_DONE, n[1]);
-    }
-    case Kind::SET_SINGLETON:
-    {
-      // (set.filter p (set.singleton x)) =
-      //       (ite (p x) (set.singleton x) (as set.empty (Set T)))
-      Node empty = nm->mkConst(EmptySet(n.getType()));
-      Node condition = nm->mkNode(Kind::APPLY_UF, n[0], n[1][0]);
-      Node ret = nm->mkNode(Kind::ITE, condition, n[1], empty);
-      return RewriteResponse(REWRITE_AGAIN_FULL, ret);
-    }
-    case Kind::SET_UNION:
-    {
-      // (set.filter p (set.union A B)) =
-      //   (set.union (set.filter p A) (set.filter p B))
-      Node a = nm->mkNode(Kind::SET_FILTER, n[0], n[1][0]);
-      Node b = nm->mkNode(Kind::SET_FILTER, n[0], n[1][1]);
-      Node ret = nm->mkNode(Kind::SET_UNION, a, b);
-      return RewriteResponse(REWRITE_AGAIN_FULL, ret);
-    }
-
-    default: return RewriteResponse(REWRITE_DONE, n);
-  }
-}
-
-RewriteResponse TheorySetsRewriter::postRewriteAll(TNode n)
-{
-  Assert(n.getKind() == Kind::SET_ALL);
-  NodeManager* nm = nodeManager();
-  Kind k = n[1].getKind();
-  switch (k)
-  {
-    case Kind::SET_EMPTY:
-    {
-      // (set.all p (as set.empty (Set T)) = true)
-      return RewriteResponse(REWRITE_DONE, nm->mkConst(true));
-    }
-    case Kind::SET_SINGLETON:
-    {
-      // (set.all p (set.singleton x)) = (p x)
-      Node ret = nm->mkNode(Kind::APPLY_UF, n[0], n[1][0]);
-      return RewriteResponse(REWRITE_AGAIN_FULL, ret);
-    }
-    case Kind::SET_UNION:
-    {
-      // (set.all p (set.union A B)) =
-      //   (and (set.all p A) (set.all p B))
-      Node a = nm->mkNode(Kind::SET_ALL, n[0], n[1][0]);
-      Node b = nm->mkNode(Kind::SET_ALL, n[0], n[1][1]);
-      Node ret = a.andNode(b);
-      return RewriteResponse(REWRITE_AGAIN_FULL, ret);
-    }
-    default:
-    {
-      // (set.all p A) is rewritten as (set.filter p A) = A
-      Node filter = nm->mkNode(Kind::SET_FILTER, n[0], n[1]);
-      Node all = filter.eqNode(n[1]);
-      return RewriteResponse(REWRITE_AGAIN_FULL, all);
-    }
-  }
-}
-
-RewriteResponse TheorySetsRewriter::postRewriteSome(TNode n)
-{
-  Assert(n.getKind() == Kind::SET_SOME);
-  NodeManager* nm = nodeManager();
-  Kind k = n[1].getKind();
-  switch (k)
-  {
-    case Kind::SET_EMPTY:
-    {
-      // (set.some p (as set.empty (Set T)) = false)
-      return RewriteResponse(REWRITE_DONE, nm->mkConst(false));
-    }
-    case Kind::SET_SINGLETON:
-    {
-      // (set.some p (set.singleton x)) = (p x)
-      Node ret = nm->mkNode(Kind::APPLY_UF, n[0], n[1][0]);
-      return RewriteResponse(REWRITE_AGAIN_FULL, ret);
-    }
-    case Kind::SET_UNION:
-    {
-      // (set.some p (set.union A B)) =
-      //   (or (set.some p A) (set.some p B))
-      Node a = nm->mkNode(Kind::SET_SOME, n[0], n[1][0]);
-      Node b = nm->mkNode(Kind::SET_SOME, n[0], n[1][1]);
-      Node ret = a.orNode(b);
-      return RewriteResponse(REWRITE_AGAIN_FULL, ret);
-    }
-    default:
-    {
-      // (set.some p A) is rewritten as (distinct (set.filter p A) set.empty))
-      Node filter = nm->mkNode(Kind::SET_FILTER, n[0], n[1]);
-      Node empty = nm->mkConst(EmptySet(n[1].getType()));
-      Node some = filter.eqNode(empty).notNode();
-      return RewriteResponse(REWRITE_AGAIN_FULL, some);
-    }
-  }
-}
-
-RewriteResponse TheorySetsRewriter::postRewriteFold(TNode n)
-{
-  Assert(n.getKind() == Kind::SET_FOLD);
-  NodeManager* nm = nodeManager();
-  Node f = n[0];
-  Node t = n[1];
-  Kind k = n[2].getKind();
-  switch (k)
-  {
-    case Kind::SET_EMPTY:
-    {
-      // ((set.fold f t (as set.empty (Set T))) = t
-      return RewriteResponse(REWRITE_DONE, t);
-    }
-    case Kind::SET_SINGLETON:
-    {
-      // (set.fold f t (set.singleton x)) = (f x t)
-      Node x = n[2][0];
-      Node f_x_t = nm->mkNode(Kind::APPLY_UF, f, x, t);
-      return RewriteResponse(REWRITE_AGAIN_FULL, f_x_t);
-    }
-    case Kind::SET_UNION:
-    {
-      // (set.fold f t (set.union A B)) =
-      // (set.fold f (set.fold f t A) (set.minus B A)))
-      Node A = n[2][0];
-      Node B = n[2][1];
-      Node foldA = nm->mkNode(Kind::SET_FOLD, f, t, A);
-      Node fold = nm->mkNode(
-          Kind::SET_FOLD, f, foldA, nm->mkNode(Kind::SET_MINUS, B, A));
-      return RewriteResponse(REWRITE_AGAIN_FULL, fold);
-    }
-
-    default: return RewriteResponse(REWRITE_DONE, n);
-  }
 }
 
 }  // namespace sets

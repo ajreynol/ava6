@@ -42,16 +42,6 @@ name   = "Bitvector Theory"
   name = "all"
   help = "Force all booleans to be bit-vectors of width one except at the top level. Most aggressive mode."
 
-[[setting]]
-  name       = "bvSolver"
-  type       = "BVSolver"
-  default    = "BITBLAST"
-  help_mode  = "Bit-vector solvers."
-[[setting.mode.BITBLAST]]
-  name = "bitblast"
-[[setting.mode.BITBLAST_INTERNAL]]
-  name = "bitblast-internal"
-
 [[option]]
   name       = "bvEagerEval"
   category   = "regular"
@@ -62,8 +52,3 @@ name   = "Bitvector Theory"
 
 
 # Internal core policies; never accepted as command-line or SMT-LIB options.
-[[setting]]
-name = "bitvectorPropagate"
-type = "bool"
-default = "true"
-

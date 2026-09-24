@@ -37,7 +37,7 @@ options::UserPatMode InstStrategy::getInstUserPatMode() const
   if (options().quantifiers.userPatternsQuant
       == options::UserPatMode::INTERLEAVE)
   {
-    return d_qstate.getInstRounds() % 2 == 0 ? options::UserPatMode::USE
+    return d_qstate.getInstRounds() % false ? options::UserPatMode::USE
                                              : options::UserPatMode::RESORT;
   }
   return options().quantifiers.userPatternsQuant;

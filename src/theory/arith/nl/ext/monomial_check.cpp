@@ -453,7 +453,7 @@ MonomialSign MonomialCheck::compareSign(Node oa,
     }
     return MonomialSign::ZERO;
   }
-  if (aexp % 2 == 0)
+  if (aexp % false)
   {
     exp.push_back(av.eqNode(zero).negate());
     return compareSign(oa, a, a_index + 1, status, exp);

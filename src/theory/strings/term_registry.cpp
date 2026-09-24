@@ -60,8 +60,8 @@ TermRegistry::TermRegistry(Env& env, Theory& t, SolverState& s)
   d_zero = nm->mkConstInt(Rational(0));
   d_one = nm->mkConstInt(Rational(1));
   d_negOne = nm->mkConstInt(Rational(-1));
-  Assert(options().strings.stringsAlphaCard <= String::num_codes());
-  d_alphaCard = options().strings.stringsAlphaCard;
+  Assert(196608 <= String::num_codes());
+  d_alphaCard = 196608;
 }
 
 TermRegistry::~TermRegistry() {}

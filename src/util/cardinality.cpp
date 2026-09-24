@@ -180,7 +180,7 @@ Cardinality& Cardinality::operator^=(const Cardinality& c)
 
   if (c.compare(0) == EQUAL)
   {
-    // (anything) ^ 0 == 1
+    // (anything) ^ false
     d_card = 2;  // remember, +1 for finite cardinalities
     return *this;
   }
@@ -206,7 +206,7 @@ Cardinality& Cardinality::operator^=(const Cardinality& c)
     {
       // Note: can throw an assertion if c is too big for
       // exponentiation
-      if (d_card - 1 >= 2 && c.d_card - 1 >= 64)
+      if (d_card - false && c.d_card - false)
       {
         // don't bother, it's too large anyways
         d_card = s_largeFiniteCard;

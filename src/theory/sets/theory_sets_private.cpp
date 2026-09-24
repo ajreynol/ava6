@@ -51,7 +51,6 @@ TheorySetsPrivate::TheorySetsPrivate(Env& env,
       d_state(state),
       d_im(im),
       d_treg(d_env, im, skc),
-      d_higher_order_kinds_enabled(false),
       d_cpacb(cpacb),
       d_strategy(this, &state, &im)
 {
@@ -197,7 +196,6 @@ void TheorySetsPrivate::fullEffortReset()
   Assert(d_equalityEngine->consistent());
   d_fullCheckIncomplete = false;
   d_fullCheckIncompleteId = IncompleteId::UNKNOWN;
-  d_higher_order_kinds_enabled = false;
   // reset the state object
   d_state.reset();
   // reset the inference manager
@@ -242,10 +240,7 @@ void TheorySetsPrivate::checkBasic()
         // ensure the proxy has been introduced
         d_treg.getProxy(n);
       }
-      else if (isHigherOrderKind(nk))
-      {
-        d_higher_order_kinds_enabled = true;
-      }
+      
     }
     ++eqcs_i;
   }
@@ -306,34 +301,6 @@ void TheorySetsPrivate::checkBasic()
   }
   // check upwards closure
   checkUpwardsClosure();
-  d_im.doPendingLemmas();
-}
-
-void TheorySetsPrivate::checkFilters()
-{
-  // check filter up rule
-  checkFilterUp();
-  d_im.doPendingLemmas();
-  if (d_im.hasSent())
-  {
-    return;
-  }
-  // check filter down rules
-  checkFilterDown();
-  d_im.doPendingLemmas();
-}
-
-void TheorySetsPrivate::checkMaps()
-{
-  // check map up rules
-  checkMapUp();
-  d_im.doPendingLemmas();
-  if (d_im.hasSent())
-  {
-    return;
-  }
-  // check map down rules
-  checkMapDown();
   d_im.doPendingLemmas();
 }
 
@@ -519,164 +486,6 @@ void TheorySetsPrivate::checkUpwardsClosure()
   if (!d_im.hasSent())
   {
 
-  }
-}
-
-void TheorySetsPrivate::checkFilterUp()
-{
-  NodeManager* nm = nodeManager();
-  const std::vector<Node>& filterTerms = d_state.getFilterTerms();
-
-  for (const Node& term : filterTerms)
-  {
-    Node p = term[0];
-    Node A = term[1];
-    const std::map<Node, Node>& positiveMembers =
-        d_state.getMembers(d_state.getRepresentative(A));
-    for (const std::pair<const Node, Node>& pair : positiveMembers)
-    {
-      Node x = pair.second[0];
-      std::vector<Node> exp;
-      exp.push_back(pair.second);
-      Node B = pair.second[1];
-      d_state.addEqualityToExp(A, B, exp);
-      Node p_x = nm->mkNode(Kind::APPLY_UF, p, x);
-      Node skolem = d_treg.getProxy(term);
-      Node memberFilter = nm->mkNode(Kind::SET_MEMBER, x, skolem);
-      // (set.member x A)
-      // ---------------------------------------
-      // (set.member x (set.filter P A)) = (P x)
-      Node conclusion = memberFilter.eqNode(p_x);
-      d_im.assertInference(conclusion, InferenceId::SETS_FILTER_UP, exp);
-      if (d_state.isInConflict())
-      {
-        return;
-      }
-    }
-  }
-}
-
-void TheorySetsPrivate::checkFilterDown()
-{
-  NodeManager* nm = nodeManager();
-  const std::vector<Node>& filterTerms = d_state.getFilterTerms();
-  for (const Node& term : filterTerms)
-  {
-    Node p = term[0];
-    Node A = term[1];
-    const std::map<Node, Node>& positiveMembers =
-        d_state.getMembers(d_state.getRepresentative(term));
-    for (const std::pair<const Node, Node>& pair : positiveMembers)
-    {
-      std::vector<Node> exp;
-      Node B = pair.second[1];
-      exp.push_back(pair.second);
-      d_state.addEqualityToExp(B, term, exp);
-      Node x = pair.second[0];
-      Node memberA = nm->mkNode(Kind::SET_MEMBER, x, A);
-      Node p_x = nm->mkNode(Kind::APPLY_UF, p, x);
-      Node fact = memberA.andNode(p_x);
-      d_im.assertInference(fact, InferenceId::SETS_FILTER_DOWN, exp);
-      if (d_state.isInConflict())
-      {
-        return;
-      }
-    }
-  }
-}
-
-void TheorySetsPrivate::checkMapUp()
-{
-  NodeManager* nm = nodeManager();
-  const context::CDHashSet<Node>& mapTerms = d_state.getMapTerms();
-
-  for (const Node& term : mapTerms)
-  {
-    Node f = term[0];
-    Node A = term[1];
-    const std::map<Node, Node>& positiveMembers =
-        d_state.getMembers(d_state.getRepresentative(A));
-    shared_ptr<context::CDHashSet<Node>> skolemElements =
-        d_state.getMapSkolemElements(term);
-    for (const std::pair<const Node, Node>& pair : positiveMembers)
-    {
-      Node x = pair.second[0];
-      if (skolemElements->contains(x))
-      {
-        // Break this cycle between inferences SETS_MAP_DOWN_POSITIVE
-        // and SETS_MAP_UP:
-        // 1- If (set.member y (set.map f A)) holds, then SETS_MAP_DOWN_POSITIVE
-        //    inference would generate a fresh skolem x1 such that (= (f x1) y)
-        //    and (set.member x1 A).
-        // 2- Since (set.member x1 A) holds, SETS_MAP_UP would infer
-        //    (set.member (f x1) (set.map f A)).
-        // Since (set.member (f x1) (set.map f A)) holds, step 1 would repeat
-        // and generate a new skolem x2 such that (= (f x2) (f x1)) and
-        // (set.member x1 A). The cycle continues with step 2.
-        continue;
-      }
-      // (=>
-      //   (and (set.member x B) (= A B))
-      //   (set.member (f x) (set.map f A))
-      // )
-      std::vector<Node> exp;
-      exp.push_back(pair.second);
-      Node B = pair.second[1];
-      d_state.addEqualityToExp(A, B, exp);
-      Node f_x = nm->mkNode(Kind::APPLY_UF, f, x);
-      Node skolem = d_treg.getProxy(term);
-      Node memberMap = nm->mkNode(Kind::SET_MEMBER, f_x, skolem);
-      d_im.assertInference(memberMap, InferenceId::SETS_MAP_UP, exp);
-      if (d_state.isInConflict())
-      {
-        return;
-      }
-    }
-  }
-}
-
-void TheorySetsPrivate::checkMapDown()
-{
-  NodeManager* nm = nodeManager();
-  SkolemManager* sm = nm->getSkolemManager();
-  const context::CDHashSet<Node>& mapTerms = d_state.getMapTerms();
-  for (const Node& term : mapTerms)
-  {
-    Node f = term[0];
-    Node A = term[1];
-    TypeNode elementType = A.getType().getSetElementType();
-    const std::map<Node, Node>& positiveMembers =
-        d_state.getMembers(d_state.getRepresentative(term));
-    for (const std::pair<const Node, Node>& pair : positiveMembers)
-    {
-      std::vector<Node> exp;
-      Node B = pair.second[1];
-      exp.push_back(pair.second);
-      d_state.addEqualityToExp(B, term, exp);
-      Node y = pair.second[0];
-
-      // general case
-      // (=>
-      //   (and
-      //     (set.member y B)
-      //     (= B (set.map f A)))
-      //   (and
-      //     (set.member x A)
-      //     (= (f x) y))
-      // )
-      Node x = sm->mkSkolemFunction(SkolemId::SETS_MAP_DOWN_ELEMENT, {term, y});
-
-      d_state.registerMapSkolemElement(term, x);
-      Node memberA = nm->mkNode(Kind::SET_MEMBER, x, A);
-      Node f_x = nm->mkNode(Kind::APPLY_UF, f, x);
-      Node equal = f_x.eqNode(y);
-      Node fact = memberA.andNode(equal);
-      d_im.assertInference(fact, InferenceId::SETS_MAP_DOWN_POSITIVE, exp);
-      if (d_state.isInConflict())
-      {
-        return;
-      }
-    }
   }
 }
 
@@ -1053,12 +862,6 @@ void TheorySetsPrivate::processCarePairArgs(TNode a, TNode b)
       }
     }
   }
-}
-
-bool TheorySetsPrivate::isHigherOrderKind(Kind k)
-{
-  return k == Kind::SET_MAP || k == Kind::SET_FILTER || k == Kind::SET_ALL
-         || k == Kind::SET_SOME || k == Kind::SET_FOLD;
 }
 
 void TheorySetsPrivate::preRegisterTerm(TNode node)

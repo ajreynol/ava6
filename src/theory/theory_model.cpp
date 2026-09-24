@@ -418,10 +418,7 @@ void TheoryModel::addTermInternal(TNode n)
     {
       d_uf_terms[n].clear();
     }
-    if (d_ho_uf_terms.find(n) == d_ho_uf_terms.end())
-    {
-      d_ho_uf_terms[n].clear();
-    }
+    
   }
 }
 

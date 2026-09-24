@@ -399,21 +399,6 @@ class AVA6_EXPORT ParserState
    */
   Sort mkFlatFunctionType(std::vector<Sort>& sorts, Sort range);
 
-  /** make higher-order apply
-   *
-   * This returns the left-associative curried application of (function) expr to
-   * the arguments in args.
-   *
-   * For example, mkHoApply( f, { a, b }, 0 ) returns
-   *  (HO_APPLY (HO_APPLY f a) b)
-   *
-   * If args is non-empty, the expected type of expr is (-> T0 ... Tn T), where
-   *    args[i].getType() = Ti
-   * for each i where 0 <= i < args.size(). If expr is not of this
-   * type, the expression returned by this method will not be well typed.
-   */
-  Term mkHoApply(Term expr, const std::vector<Term>& args);
-
   /** Apply type ascription
    *
    * Return term t with a type ascription applied to it. This is used for

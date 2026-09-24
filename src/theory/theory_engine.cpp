@@ -36,7 +36,6 @@
 #include "theory/plugin_module.h"
 #include "theory/quantifiers/first_order_model.h"
 #include "theory/quantifiers_engine.h"
-#include "theory/relevance_manager.h"
 #include "theory/rewriter.h"
 #include "theory/shared_solver.h"
 #include "theory/theory.h"
@@ -122,14 +121,8 @@ void TheoryEngine::finishInit()
   AVA6_FOR_EACH_THEORY;
 
   // Initialize the theory combination architecture
-  if (options().theory.tcMode == options::TcMode::CARE_GRAPH)
   {
     d_tc.reset(new CombinationCareGraph(d_env, *this, paraTheories));
-  }
-  else
-  {
-    Unimplemented() << "TheoryEngine::finishInit: theory combination mode "
-                    << options().theory.tcMode << " not supported";
   }
   // create the relevance filter if any option requires it
   
@@ -207,7 +200,6 @@ TheoryEngine::TheoryEngine(Env& env)
       d_sharedSolver(nullptr),
       d_quantEngine(nullptr),
       d_decManager(new DecisionManager(userContext())),
-      d_relManager(nullptr),
       d_inConflict(context(), false),
       d_modelUnsound(context(), false),
       d_modelUnsoundTheory(context(), THEORY_BUILTIN),
@@ -831,16 +823,6 @@ bool TheoryEngine::hasSatValue(TNode n) const
   return false;
 }
 
-bool TheoryEngine::isRelevant(Node lit) const
-{
-  if (d_relManager != nullptr)
-  {
-    return d_relManager->isRelevant(lit);
-  }
-  // otherwise must assume its relevant
-  return true;
-}
-
 bool TheoryEngine::isLegalElimination(TNode x, TNode val)
 {
   Assert(x.isVar());
@@ -986,10 +968,7 @@ void TheoryEngine::notifyPreprocessedAssertions(
       theoryOf(theoryId)->ppNotifyAssertions(assertions);
     }
   }
-  if (d_relManager != nullptr)
-  {
-    d_relManager->notifyPreprocessedAssertions(assertions, true);
-  }
+  
 }
 
 bool TheoryEngine::markPropagation(TNode assertion,
@@ -1343,18 +1322,6 @@ Node TheoryEngine::getCandidateModelValue(TNode var)
   Assert(d_sharedSolver->isShared(var))
       << "node " << var << " is not shared" << std::endl;
   return theoryOf(d_env.theoryOf(var.getType()))->getCandidateModelValue(var);
-}
-
-std::unordered_set<TNode> TheoryEngine::getRelevantAssertions(bool& success)
-{
-  // if there is no relevance manager, we fail
-  if (d_relManager == nullptr)
-  {
-    success = false;
-    // return empty set
-    return std::unordered_set<TNode>();
-  }
-  return d_relManager->getRelevantAssertions(success);
 }
 
 TrustNode TheoryEngine::getExplanation(TNode node)
@@ -2147,13 +2114,7 @@ void TheoryEngine::checkTheoryAssertionsWithModel(bool hardFailure)
   std::stringstream serror;
   // If possible, get the list of relevant assertions. Those that are not
   // relevant will be skipped.
-  std::unordered_set<TNode> relevantAssertions;
-  bool hasRelevantAssertions = false;
-  if (d_relManager != nullptr)
-  {
-    relevantAssertions =
-        d_relManager->getRelevantAssertions(hasRelevantAssertions);
-  }
+  
   for (TheoryId theoryId = THEORY_FIRST; theoryId < THEORY_LAST; ++theoryId)
   {
     Theory* theory = d_theoryTable[theoryId];
@@ -2166,12 +2127,7 @@ void TheoryEngine::checkTheoryAssertionsWithModel(bool hardFailure)
            ++it)
       {
         Node assertion = (*it).d_assertion;
-        if (hasRelevantAssertions
-            && relevantAssertions.find(assertion) == relevantAssertions.end())
-        {
-          // not relevant, skip
-          continue;
-        }
+        
         Node val = d_tc->getModel()->getValue(assertion);
         if (val != d_true)
         {

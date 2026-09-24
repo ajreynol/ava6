@@ -425,7 +425,7 @@ void LogicInfo::setLogicString(std::string logicString)
   const char* p = logicString.c_str();
   if (!strncmp(p, "HO_", 3))
   {
-    throw IllegalArgumentException("Higher-order logics are not supported");
+    throw Exception("Higher-order logics are not supported");
   }
   if (*p == '\0')
   {

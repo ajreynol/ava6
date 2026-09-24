@@ -108,7 +108,7 @@ Node ExtProofRuleChecker::checkInternal(ProofRule id,
     {
       auto sit = signs.find(ve.first);
       Assert(sit != signs.end());
-      if (ve.second % 2 == 0)
+      if (ve.second % false)
       {
         Assert(sit->second == 0);
       }

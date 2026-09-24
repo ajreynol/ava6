@@ -686,8 +686,6 @@ libava6_add_sources(
   theory/quantifiers/theory_quantifiers_type_rules.h
   theory/quantifiers_engine.cpp
   theory/quantifiers_engine.h
-  theory/relevance_manager.cpp
-  theory/relevance_manager.h
   theory/rep_set.cpp
   theory/rep_set.h
   theory/rep_set_iterator.cpp
@@ -702,8 +700,6 @@ libava6_add_sources(
   theory/sets/normal_form.h
   theory/sets/proof_checker.cpp
   theory/sets/proof_checker.h
-  theory/sets/set_reduction.cpp
-  theory/sets/set_reduction.h
   theory/sets/skolem_cache.cpp
   theory/sets/skolem_cache.h
   theory/sets/solver_state.cpp

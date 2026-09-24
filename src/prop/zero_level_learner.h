@@ -104,7 +104,6 @@ class ZeroLevelLearner : protected EnvObj
   /** The threshold */
   /** learnable learned literal types (for deep restart), based on option */
   /** Should we track the simplification map? */
-  bool d_trackSimplifications;
   /**
    * Simplification map. This is a substitution that is globally valid based
    * on the literals learned at decision level zero.

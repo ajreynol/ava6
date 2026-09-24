@@ -22,20 +22,3 @@ name   = "Decision Heuristics"
 
 
 # Internal core policies; never accepted as command-line or SMT-LIB options.
-[[setting]]
-name = "jhSkolemMode"
-type = "JutificationSkolemMode"
-default = "FIRST"
-[[setting.mode.FIRST]]
-name = "first"
-[[setting.mode.LAST]]
-name = "last"
-
-[[setting]]
-name = "jhSkolemRlvMode"
-type = "JutificationSkolemRlvMode"
-default = "ASSERT"
-[[setting.mode.ASSERT]]
-name = "assert"
-[[setting.mode.ALWAYS]]
-name = "always"

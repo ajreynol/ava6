@@ -34,6 +34,9 @@ namespace ava6::internal {
 namespace theory {
 namespace arith::linear {
 
+enum class ErrorSelectionRule { VAR_ORDER, MINIMUM_AMOUNT, MAXIMUM_AMOUNT, SUM_METRIC };
+
+
 /**
  * The priority queue has 3 different modes of operation:
  * - Collection
@@ -66,14 +69,14 @@ class ComparatorPivotRule
  private:
   const ErrorSet* d_errorSet;
 
-  options::ErrorSelectionRule d_rule;
+  ErrorSelectionRule d_rule;
 
  public:
   ComparatorPivotRule();
-  ComparatorPivotRule(const ErrorSet* es, options::ErrorSelectionRule r);
+  ComparatorPivotRule(const ErrorSet* es, ErrorSelectionRule r);
 
   bool operator()(ArithVar v, ArithVar u) const;
-  options::ErrorSelectionRule getRule() const { return d_rule; }
+  ErrorSelectionRule getRule() const { return d_rule; }
 };
 
 // typedef boost::heap::d_ary_heap<
@@ -226,7 +229,7 @@ class ErrorSet
    */
   ErrorInfoMap d_errInfo;
 
-  options::ErrorSelectionRule d_selectionRule;
+  ErrorSelectionRule d_selectionRule;
   /**
    * The ordered heap for the variables that are in ErrorSet.
    */
@@ -260,7 +263,7 @@ class ErrorSet
   DeltaRational computeDiff(ArithVar x) const;
 
  private:
-  void recomputeAmount(ErrorInformation& ei, options::ErrorSelectionRule r);
+  void recomputeAmount(ErrorInformation& ei, ErrorSelectionRule r);
 
   void update(ErrorInformation& ei);
   void transitionVariableOutOfError(ArithVar v);
@@ -298,8 +301,8 @@ class ErrorSet
   void pushErrorInto(ArithVarVec& vec) const;
   void pushFocusInto(ArithVarVec& vec) const;
 
-  options::ErrorSelectionRule getSelectionRule() const;
-  void setSelectionRule(options::ErrorSelectionRule rule);
+  ErrorSelectionRule getSelectionRule() const;
+  void setSelectionRule(ErrorSelectionRule rule);
 
   inline ArithVar topFocusVariable() const
   {

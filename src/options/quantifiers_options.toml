@@ -524,86 +524,14 @@ name = "simple"
 name = "norm"
 
 [[setting]]
-name = "condVarSplitQuant"
-type = "CondVarSplitQuantMode"
-default = "ON"
-[[setting.mode.OFF]]
-name = "off"
-[[setting.mode.ON]]
-name = "on"
-[[setting.mode.AGG]]
-name = "agg"
-
-[[setting]]
 name = "preSkolemQuantNested"
 type = "bool"
 default = "true"
 
 [[setting]]
-name = "triggerActiveSelMode"
-type = "TriggerActiveSelMode"
-default = "ALL"
-[[setting.mode.ALL]]
-name = "all"
-[[setting.mode.MIN]]
-name = "min"
-[[setting.mode.MAX]]
-name = "max"
-
-[[setting]]
-name = "instWhenPhase"
-type = "int64_t"
-default = "2"
-
-[[setting]]
-name = "instMaxLevel"
-type = "int64_t"
-default = "-1"
-
-[[setting]]
-name = "quantRepMode"
-type = "QuantRepMode"
-default = "FIRST"
-[[setting.mode.EE]]
-name = "ee"
-[[setting.mode.FIRST]]
-name = "first"
-[[setting.mode.DEPTH]]
-name = "depth"
-
-[[setting]]
-name = "enumInstLimit"
-type = "int64_t"
-default = "-1"
-
-[[setting]]
-name = "literalMatchMode"
-type = "LiteralMatchMode"
-default = "USE"
-[[setting.mode.NONE]]
-name = "none"
-[[setting.mode.USE]]
-name = "use"
-[[setting.mode.AGG_PREDICATE]]
-name = "agg-predicate"
-[[setting.mode.AGG]]
-name = "agg"
-
-[[setting]]
 name = "cegqiFullEffort"
 type = "bool"
 default = "false"
-
-[[setting]]
-name = "cegqiBvIneqMode"
-type = "CegqiBvIneqMode"
-default = "EQ_BOUNDARY"
-[[setting.mode.EQ_SLACK]]
-name = "eq-slack"
-[[setting.mode.EQ_BOUNDARY]]
-name = "eq-boundary"
-[[setting.mode.KEEP]]
-name = "keep"
 
 [[option]]
   name       = "fmfOneInstPerRound"

@@ -157,8 +157,7 @@ Node BvInstantiator::processAssertionInternal(CegInstantiator* ci, Node lit)
   {
     return Node::null();
   }
-  else if (options().quantifiers.cegqiBvIneqMode
-               == options::CegqiBvIneqMode::KEEP
+  else if (false
            || (pol && k == Kind::EQUAL))
   {
     return lit;
@@ -180,28 +179,6 @@ Node BvInstantiator::processAssertionInternal(CegInstantiator* ci, Node lit)
   }
 
   Node ret;
-  if (options().quantifiers.cegqiBvIneqMode
-      == options::CegqiBvIneqMode::EQ_SLACK)
-  {
-    // if using slack, we convert constraints to a positive equality based on
-    // the current model M, e.g.:
-    //   (not) s ~ t  --->  s = t + ( s^M - t^M )
-    if (sm != tm)
-    {
-      Node slack = rewrite(NodeManager::mkNode(Kind::BITVECTOR_SUB, sm, tm));
-      Assert(slack.isConst());
-      // remember the slack value for the asserted literal
-      d_alit_to_model_slack[lit] = slack;
-      ret = NodeManager::mkNode(
-          Kind::EQUAL, s, NodeManager::mkNode(Kind::BITVECTOR_ADD, t, slack));
-      Trace("cegqi-bv") << "Slack is " << slack << std::endl;
-    }
-    else
-    {
-      ret = s.eqNode(t);
-    }
-  }
-  else
   {
     // turn disequality into an inequality
     // e.g. s != t becomes s < t or t < s

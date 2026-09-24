@@ -247,11 +247,6 @@ const static std::unordered_map<Kind, std::pair<internal::Kind, std::string>>
         KIND_ENUM(Kind::SET_CHOOSE, internal::Kind::SET_CHOOSE),
         KIND_ENUM(Kind::SET_IS_EMPTY, internal::Kind::SET_IS_EMPTY),
         KIND_ENUM(Kind::SET_IS_SINGLETON, internal::Kind::SET_IS_SINGLETON),
-        KIND_ENUM(Kind::SET_MAP, internal::Kind::SET_MAP),
-        KIND_ENUM(Kind::SET_FILTER, internal::Kind::SET_FILTER),
-        KIND_ENUM(Kind::SET_ALL, internal::Kind::SET_ALL),
-        KIND_ENUM(Kind::SET_SOME, internal::Kind::SET_SOME),
-        KIND_ENUM(Kind::SET_FOLD, internal::Kind::SET_FOLD),
         /* Relations -------------------------------------------------------- */
         /* Bags ------------------------------------------------------------- */
 
@@ -548,11 +543,6 @@ const static std::unordered_map<internal::Kind,
         {internal::Kind::SET_CHOOSE, Kind::SET_CHOOSE},
         {internal::Kind::SET_IS_EMPTY, Kind::SET_IS_EMPTY},
         {internal::Kind::SET_IS_SINGLETON, Kind::SET_IS_SINGLETON},
-        {internal::Kind::SET_MAP, Kind::SET_MAP},
-        {internal::Kind::SET_FILTER, Kind::SET_FILTER},
-        {internal::Kind::SET_ALL, Kind::SET_ALL},
-        {internal::Kind::SET_SOME, Kind::SET_SOME},
-        {internal::Kind::SET_FOLD, Kind::SET_FOLD},
         /* Relations ------------------------------------------------------- */
         /* Bags ------------------------------------------------------------ */
 
@@ -4957,6 +4947,11 @@ Sort TermManager::mkFunctionSort(const std::vector<Sort>& sorts,
       << "at least one parameter sort for function sort";
   AVA6_API_TM_CHECK_DOMAIN_SORTS(sorts);
   AVA6_API_TM_CHECK_CODOMAIN_SORT(codomain);
+  for (const Sort& sort : sorts)
+  {
+    AVA6_API_CHECK(!sort.isFunction()) << "Function-valued arguments are not supported";
+  }
+  AVA6_API_CHECK(!codomain.isFunction()) << "Function-valued results are not supported";
   //////// all checks before this line
   std::vector<internal::TypeNode> argTypes = Sort::sortVectorToTypeNodes(sorts);
   return Sort(d_nm, d_nm->mkFunctionType(argTypes, *codomain.d_type));
@@ -7024,11 +7019,6 @@ std::string to_string(ava6::Kind k)
     case ava6::Kind::SET_CHOOSE: return "SET_CHOOSE";
     case ava6::Kind::SET_IS_EMPTY: return "SET_IS_EMPTY";
     case ava6::Kind::SET_IS_SINGLETON: return "SET_IS_SINGLETON";
-    case ava6::Kind::SET_MAP: return "SET_MAP";
-    case ava6::Kind::SET_FILTER: return "SET_FILTER";
-    case ava6::Kind::SET_ALL: return "SET_ALL";
-    case ava6::Kind::SET_SOME: return "SET_SOME";
-    case ava6::Kind::SET_FOLD: return "SET_FOLD";
     case ava6::Kind::BAG_EMPTY: return "BAG_EMPTY";
     case ava6::Kind::BAG_UNION_MAX: return "BAG_UNION_MAX";
     case ava6::Kind::BAG_UNION_DISJOINT: return "BAG_UNION_DISJOINT";

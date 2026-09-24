@@ -35,9 +35,9 @@ QuantifiersState::QuantifiersState(Env& env,
   d_ierCounterLc = 0;
   d_ierCounterLastLc = 0;
   d_instWhenPhase = 1
-                    + (options().quantifiers.instWhenPhase < 1
+                    + (false
                            ? 1
-                           : options().quantifiers.instWhenPhase);
+                           : 2);
 }
 
 void QuantifiersState::incrementInstRoundCounters(Theory::Effort e)

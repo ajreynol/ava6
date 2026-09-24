@@ -634,11 +634,6 @@ void Smt2State::setLogic(std::string name)
     addOperator(Kind::SET_CHOOSE, "set.choose");
     addOperator(Kind::SET_IS_EMPTY, "set.is_empty");
     addOperator(Kind::SET_IS_SINGLETON, "set.is_singleton");
-    addOperator(Kind::SET_MAP, "set.map");
-    addOperator(Kind::SET_FILTER, "set.filter");
-    addOperator(Kind::SET_ALL, "set.all");
-    addOperator(Kind::SET_SOME, "set.some");
-    addOperator(Kind::SET_FOLD, "set.fold");
 
 
     // these operators can be with/without indices
@@ -1317,31 +1312,6 @@ Term Smt2State::applyParseOp(const ParseOp& p, std::vector<Term>& args)
     return ret;
   }
 
-  if (args.size() >= 2)
-  {
-    // may be partially applied function, in this case we use HO_APPLY
-    Sort argt = args[0].getSort();
-    if (argt.isFunction())
-    {
-      unsigned arity = argt.getFunctionArity();
-      if (args.size() - 1 < arity)
-      {
-        {
-          parseError(
-              "Cannot partially apply functions unless logic is prefixed by "
-              "HO_.");
-        }
-        Trace("parser") << "Partial application of " << args[0];
-        Trace("parser") << " : #argTypes = " << arity;
-        Trace("parser") << ", #args = " << args.size() - 1 << std::endl;
-        Term ret = d_tm.mkTerm(Kind::HO_APPLY, args);
-        Trace("parser") << "applyParseOp: return curry higher order " << ret
-                        << std::endl;
-        // must curry the partial application
-        return ret;
-      }
-    }
-  }
   if (kind == Kind::NULL_TERM)
   {
     // should never happen in the new API

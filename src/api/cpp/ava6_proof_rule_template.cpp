@@ -106,7 +106,7 @@ const char* toString(ProofRule rule)
     case ProofRule::TRUE_ELIM: return "TRUE_ELIM";
     case ProofRule::FALSE_INTRO: return "FALSE_INTRO";
     case ProofRule::FALSE_ELIM: return "FALSE_ELIM";
-    case ProofRule::APPLY_CONG: return "APPLY_CONG";
+    case ProofRule::HO_CONG: return "HO_CONG";
     //================================================= Array rules
     case ProofRule::ARRAYS_READ_OVER_WRITE: return "ARRAYS_READ_OVER_WRITE";
     case ProofRule::ARRAYS_READ_OVER_WRITE_CONTRA:
@@ -131,9 +131,6 @@ const char* toString(ProofRule rule)
     //================================================= Sets rules
     case ProofRule::SETS_SINGLETON_INJ: return "SETS_SINGLETON_INJ";
     case ProofRule::SETS_EXT: return "SETS_EXT";
-    case ProofRule::SETS_FILTER_DOWN: return "SETS_FILTER_DOWN";
-    case ProofRule::SETS_FILTER_UP: return "SETS_FILTER_UP";
-    //================================================= String rules
     case ProofRule::CONCAT_EQ: return "CONCAT_EQ";
     case ProofRule::CONCAT_UNIFY: return "CONCAT_UNIFY";
     case ProofRule::CONCAT_SPLIT: return "CONCAT_SPLIT";

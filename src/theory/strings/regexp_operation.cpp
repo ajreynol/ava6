@@ -45,7 +45,7 @@ RegExpOpr::RegExpOpr(Env& env, SkolemCache* sc)
 
   d_emptySingleton =
       nodeManager()->mkNode(Kind::STRING_TO_REGEXP, d_emptyString);
-  d_lastchar = options().strings.stringsAlphaCard - 1;
+  d_lastchar = 196608 - 1;
 }
 
 RegExpOpr::~RegExpOpr() {}

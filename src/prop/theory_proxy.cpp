@@ -78,8 +78,6 @@ void TheoryProxy::finishInit(CDCLTSatSolver* ss, CnfStream* cs)
       || dmode == options::DecisionMode::STOPONLY)
   {
     d_decisionEngine.reset(new decision::JustificationStrategy(d_env, ss, cs));
-    if (options().decision.jhSkolemRlvMode
-        == options::JutificationSkolemRlvMode::ASSERT)
     {
       d_dmTrackActiveSkDefs = true;
       d_trackActiveSkDefs = true;

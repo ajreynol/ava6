@@ -27,8 +27,6 @@ namespace sets {
 SolverState::SolverState(Env& env, Valuation val, SkolemCache& skc)
     : TheoryState(env, val),
       d_skCache(skc),
-      d_mapTerms(env.getUserContext()),
-      d_mapSkolemElements(env.getUserContext()),
       d_members(env.getContext())
 {
   d_true = nodeManager()->mkConst(true);
@@ -51,7 +49,6 @@ void SolverState::reset()
   d_bop_index.clear();
   d_op_list.clear();
   d_allCompSets.clear();
-  d_filterTerms.clear();
 }
 
 void SolverState::registerEqc(TypeNode tn, Node r)
@@ -135,20 +132,6 @@ void SolverState::registerTerm(Node r, TypeNode tnn, Node n)
     }
     d_nvar_sets[r].push_back(n);
     Trace("sets-debug2") << "Non-var-set[" << r << "] : " << n << std::endl;
-  }
-  else if (nk == Kind::SET_FILTER)
-  {
-    d_filterTerms.push_back(n);
-  }
-  else if (nk == Kind::SET_MAP)
-  {
-    d_mapTerms.insert(n);
-    if (d_mapSkolemElements.find(n) == d_mapSkolemElements.end())
-    {
-      std::shared_ptr<context::CDHashSet<Node>> set =
-          std::make_shared<context::CDHashSet<Node>>(d_env.getUserContext());
-      d_mapSkolemElements[n] = set;
-    }
   }
   else if (nk == Kind::SET_COMPREHENSION)
   {
@@ -463,22 +446,6 @@ const std::map<Kind, std::vector<Node>>& SolverState::getOperatorList() const
   return d_op_list;
 }
 
-const std::vector<Node>& SolverState::getFilterTerms() const
-{
-  return d_filterTerms;
-}
-
-const context::CDHashSet<Node>& SolverState::getMapTerms() const
-{
-  return d_mapTerms;
-}
-
-std::shared_ptr<context::CDHashSet<Node>> SolverState::getMapSkolemElements(
-    Node n)
-{
-  return d_mapSkolemElements[n];
-}
-
 const std::vector<Node>& SolverState::getComprehensionSets() const
 {
   return d_allCompSets;
@@ -614,14 +581,6 @@ bool SolverState::merge(TNode t1,
   }
   d_members[t1] = n_members;
   return true;
-}
-
-void SolverState::registerMapSkolemElement(const Node& n, const Node& element)
-{
-  Assert(n.getKind() == Kind::SET_MAP);
-  Assert(element.getKind() == Kind::SKOLEM
-         && AVA6_EQUAL(element.getType(), n[1].getType().getSetElementType()));
-  d_mapSkolemElements[n].get()->insert(element);
 }
 
 }  // namespace sets

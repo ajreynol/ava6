@@ -1054,7 +1054,7 @@ Node StringsPreprocess::simplify(Node t, std::vector<Node>& asserts)
 {
   size_t prev_asserts = asserts.size();
   // call the static reduce routine
-  Node retNode = reduce(t, asserts, d_sc, options().strings.stringsAlphaCard);
+  Node retNode = reduce(t, asserts, d_sc, 196608);
   if (t != retNode)
   {
     Trace("strings-preprocess") << "StringsPreprocess::simplify: " << t

@@ -504,7 +504,7 @@ TypeNode SkolemManager::getTypeFor(SkolemId id,
     }
     case SkolemId::SETS_MAP_DOWN_ELEMENT:
     {
-      Assert(cacheVals.size() == 2 && cacheVals[0].getKind() == Kind::SET_MAP);
+      Assert(cacheVals.size() == 2 && false);
       TypeNode stype = cacheVals[0][1].getType();
       Assert(stype.isSet());
       return stype.getSetElementType();

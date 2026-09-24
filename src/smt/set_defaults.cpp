@@ -135,7 +135,7 @@ void SetDefaults::setDefaultsPre(Options& opts)
   {
     SET_AND_NOTIFY(proof, checkProofsComplete, true, "check-proofs");
   }
-  SET_AND_NOTIFY(bv, bvSolver, options::BVSolver::BITBLAST_INTERNAL, "proof support");
+  
   // implied options
   if (opts.proof.checkProofsComplete)
   {
@@ -587,10 +587,7 @@ void SetDefaults::setDefaultsPost(const LogicInfo& logic, Options& opts) const
   }
 
   /* Disable bit-level propagation by default for the BITBLAST solver. */
-  if (opts.bv.bvSolver == options::BVSolver::BITBLAST)
-  {
-    SET_AND_NOTIFY(bv, bitvectorPropagate, false, "bitblast solver");
-  }
+  
 
   if (opts.bv.boolToBitvector == options::BoolToBVMode::ALL
       && !logic.isTheoryEnabled(THEORY_BV))
@@ -802,8 +799,7 @@ bool SetDefaults::incompatibleWithProofs(Options& opts,
   if (isFullPf)
   {
     // this is always set by safe options, ok to silently change
-    SET_AND_NOTIFY_IF_NOT_USER_VAL_SYM(
-        bv, bvSolver, options::BVSolver::BITBLAST_INTERNAL, "proofs");
+    
   }
 
 
@@ -1035,10 +1031,7 @@ void SetDefaults::setDefaultsQuantifiers(const LogicInfo& logic,
   }
 
 
-  if (opts.quantifiers.instMaxLevel != -1)
-  {
-    SET_AND_NOTIFY(quantifiers, cegqi, false, "instMaxLevel");
-  }
+  
 
   // enable MBQI if --mbqi-enum is provided
 
@@ -1147,7 +1140,7 @@ void SetDefaults::setDefaultDecisionMode(const LogicInfo& logic,
           ? options::DecisionMode::JUSTIFICATION
           : (  // QF_BV without internal bit-blasting
                 (!logic.isQuantified() && logic.isPure(THEORY_BV)
-                 && opts.bv.bvSolver != options::BVSolver::BITBLAST_INTERNAL)
+                 && false)
                         ||
                         // QF_AUFBV or QF_ABV or QF_UFBV
                         (!logic.isQuantified()

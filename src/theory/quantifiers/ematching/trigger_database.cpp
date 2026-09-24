@@ -66,23 +66,7 @@ Trigger* TriggerDatabase::mkTrigger(Node q,
     }
   }
 
-  // check if higher-order
-  Trace("trigger-debug") << "Collect higher-order variable triggers..."
-                         << std::endl;
-  std::map<Node, std::vector<Node> > hoApps;
-  HigherOrderTrigger::collectHoVarApplyTerms(q, trNodes, hoApps);
-  Trace("trigger-debug") << "...got " << hoApps.size()
-                         << " higher-order applications." << std::endl;
-  Trigger* t;
-  if (!hoApps.empty())
-  {
-    t = new HigherOrderTrigger(
-        d_env, d_qs, d_qim, d_qreg, d_treg, q, trNodes, hoApps, isUser);
-  }
-  else
-  {
-    t = new Trigger(d_env, d_qs, d_qim, d_qreg, d_treg, q, trNodes, isUser);
-  }
+  Trigger* t = new Trigger(d_env, d_qs, d_qim, d_qreg, d_treg, q, trNodes, isUser);
   d_trie.addTrigger(trNodes, t);
   return t;
 }

@@ -43,7 +43,7 @@ BaseSolver::BaseSolver(Env& env,
       d_strUnitOobEq(userContext())
 {
   d_false = nodeManager()->mkConst(false);
-  d_cardSize = options().strings.stringsAlphaCard;
+  d_cardSize = 196608;
 }
 
 BaseSolver::~BaseSolver() {}

@@ -167,7 +167,7 @@ ErrorSet::ErrorSet(StatisticsRegistry& sr,
                    BoundCountingLookup lookups)
     : d_variables(vars),
       d_errInfo(),
-      d_selectionRule(options::ErrorSelectionRule::VAR_ORDER),
+      d_selectionRule(ErrorSelectionRule::VAR_ORDER),
       d_focus(ComparatorPivotRule(this, d_selectionRule)),
       d_outOfFocus(),
       d_signals(),
@@ -177,30 +177,30 @@ ErrorSet::ErrorSet(StatisticsRegistry& sr,
 {
 }
 
-options::ErrorSelectionRule ErrorSet::getSelectionRule() const
+ErrorSelectionRule ErrorSet::getSelectionRule() const
 {
   return d_selectionRule;
 }
 
 void ErrorSet::recomputeAmount(ErrorInformation& ei,
-                               options::ErrorSelectionRule rule)
+                               ErrorSelectionRule rule)
 {
   switch (rule)
   {
-    case options::ErrorSelectionRule::MINIMUM_AMOUNT:
-    case options::ErrorSelectionRule::MAXIMUM_AMOUNT:
+    case ErrorSelectionRule::MINIMUM_AMOUNT:
+    case ErrorSelectionRule::MAXIMUM_AMOUNT:
       ei.setAmount(computeDiff(ei.getVariable()));
       break;
-    case options::ErrorSelectionRule::SUM_METRIC:
+    case ErrorSelectionRule::SUM_METRIC:
       ei.setMetric(sumMetric(ei.getVariable()));
       break;
-    case options::ErrorSelectionRule::VAR_ORDER:
+    case ErrorSelectionRule::VAR_ORDER:
       // do nothing
       break;
   }
 }
 
-void ErrorSet::setSelectionRule(options::ErrorSelectionRule rule)
+void ErrorSet::setSelectionRule(ErrorSelectionRule rule)
 {
   if (rule != getSelectionRule())
   {
@@ -225,7 +225,7 @@ void ErrorSet::setSelectionRule(options::ErrorSelectionRule rule)
 }
 
 ComparatorPivotRule::ComparatorPivotRule(const ErrorSet* es,
-                                         options::ErrorSelectionRule r)
+                                         ErrorSelectionRule r)
     : d_errorSet(es), d_rule(r)
 {
 }
@@ -234,10 +234,10 @@ bool ComparatorPivotRule::operator()(ArithVar v, ArithVar u) const
 {
   switch (d_rule)
   {
-    case options::ErrorSelectionRule::VAR_ORDER:
+    case ErrorSelectionRule::VAR_ORDER:
       // This needs to be the reverse of the minVariableOrder
       return v > u;
-    case options::ErrorSelectionRule::SUM_METRIC:
+    case ErrorSelectionRule::SUM_METRIC:
     {
       uint32_t v_metric = d_errorSet->getMetric(v);
       uint32_t u_metric = d_errorSet->getMetric(u);
@@ -250,7 +250,7 @@ bool ComparatorPivotRule::operator()(ArithVar v, ArithVar u) const
         return v_metric > u_metric;
       }
     }
-    case options::ErrorSelectionRule::MINIMUM_AMOUNT:
+    case ErrorSelectionRule::MINIMUM_AMOUNT:
     {
       const DeltaRational& vamt = d_errorSet->getAmount(v);
       const DeltaRational& uamt = d_errorSet->getAmount(u);
@@ -264,7 +264,7 @@ bool ComparatorPivotRule::operator()(ArithVar v, ArithVar u) const
         return cmp > 0;
       }
     }
-    case options::ErrorSelectionRule::MAXIMUM_AMOUNT:
+    case ErrorSelectionRule::MAXIMUM_AMOUNT:
     {
       const DeltaRational& vamt = d_errorSet->getAmount(v);
       const DeltaRational& uamt = d_errorSet->getAmount(u);
@@ -288,16 +288,16 @@ void ErrorSet::update(ErrorInformation& ei)
   {
     switch (getSelectionRule())
     {
-      case options::ErrorSelectionRule::MINIMUM_AMOUNT:
-      case options::ErrorSelectionRule::MAXIMUM_AMOUNT:
+      case ErrorSelectionRule::MINIMUM_AMOUNT:
+      case ErrorSelectionRule::MAXIMUM_AMOUNT:
         ei.setAmount(computeDiff(ei.getVariable()));
         d_focus.update(ei.getHandle(), ei.getVariable());
         break;
-      case options::ErrorSelectionRule::SUM_METRIC:
+      case ErrorSelectionRule::SUM_METRIC:
         ei.setMetric(sumMetric(ei.getVariable()));
         d_focus.update(ei.getHandle(), ei.getVariable());
         break;
-      case options::ErrorSelectionRule::VAR_ORDER:
+      case ErrorSelectionRule::VAR_ORDER:
         // do nothing
         break;
     }
@@ -344,14 +344,14 @@ void ErrorSet::transitionVariableIntoError(ArithVar v)
 
   switch (getSelectionRule())
   {
-    case options::ErrorSelectionRule::MINIMUM_AMOUNT:
-    case options::ErrorSelectionRule::MAXIMUM_AMOUNT:
+    case ErrorSelectionRule::MINIMUM_AMOUNT:
+    case ErrorSelectionRule::MAXIMUM_AMOUNT:
       ei.setAmount(computeDiff(v));
       break;
-    case options::ErrorSelectionRule::SUM_METRIC:
+    case ErrorSelectionRule::SUM_METRIC:
       ei.setMetric(sumMetric(ei.getVariable()));
       break;
-    case options::ErrorSelectionRule::VAR_ORDER:
+    case ErrorSelectionRule::VAR_ORDER:
       // do nothing
       break;
   }
@@ -377,14 +377,14 @@ void ErrorSet::addBackIntoFocus(ArithVar v)
   Assert(!ei.inFocus());
   switch (getSelectionRule())
   {
-    case options::ErrorSelectionRule::MINIMUM_AMOUNT:
-    case options::ErrorSelectionRule::MAXIMUM_AMOUNT:
+    case ErrorSelectionRule::MINIMUM_AMOUNT:
+    case ErrorSelectionRule::MAXIMUM_AMOUNT:
       ei.setAmount(computeDiff(v));
       break;
-    case options::ErrorSelectionRule::SUM_METRIC:
+    case ErrorSelectionRule::SUM_METRIC:
       ei.setMetric(sumMetric(v));
       break;
-    case options::ErrorSelectionRule::VAR_ORDER:
+    case ErrorSelectionRule::VAR_ORDER:
       // do nothing
       break;
   }

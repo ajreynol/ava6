@@ -35,7 +35,6 @@ ZeroLevelLearner::ZeroLevelLearner(Env& env, TheoryEngine* theoryEngine)
       d_ppnSyms(userContext()),
       d_tsmap(env, userContext(), "ZllSimplificationMap")
 {
-  d_trackSimplifications = true;
 }
 
 ZeroLevelLearner::~ZeroLevelLearner() {}
@@ -106,7 +105,6 @@ void ZeroLevelLearner::notifyInputFormulas(const std::vector<Node>& assertions)
     if (!lit.isConst() || !lit.getConst<bool>())
     {
       // output learned literals from preprocessing
-      if (d_trackSimplifications)
       {
         computeLearnedLiteralType(lit);
       }
@@ -191,7 +189,7 @@ LearnedLitType ZeroLevelLearner::computeLearnedLiteralType(
   LearnedLitType ltype =
       internal ? LearnedLitType::INTERNAL : LearnedLitType::INPUT;
   // we don't try to solve for literals that simplify to constants
-  if ((internal || d_trackSimplifications) && !lit.isConst())
+  if ((internal || true) && !lit.isConst())
   {
     Subs ss;
     bool processed = false;
@@ -209,16 +207,8 @@ LearnedLitType ZeroLevelLearner::computeLearnedLiteralType(
             ltype = LearnedLitType::SOLVABLE;
           }
         }
-        if (d_trackSimplifications)
         {
-          bool addSubs = true;
-          switch (options().theory.lemmaInprocessSubsMode)
-          {
-            case options::LemmaInprocessSubsMode::SIMPLE:
-              addSubs = ss.d_subs[i].getNumChildren() == 0;
-              break;
-            default: break;
-          }
+          bool addSubs = ss.d_subs[i].getNumChildren() == 0;
           if (addSubs)
           {
             processed = true;
@@ -229,7 +219,7 @@ LearnedLitType ZeroLevelLearner::computeLearnedLiteralType(
         }
       }
     }
-    if ((d_trackSimplifications && !processed)
+    if ((true && !processed)
         || ltype != LearnedLitType::SOLVABLE)
     {
       // maybe a constant prop?
@@ -246,7 +236,7 @@ LearnedLitType ZeroLevelLearner::computeLearnedLiteralType(
             {
               ltype = LearnedLitType::CONSTANT_PROP;
             }
-            if (d_trackSimplifications && !processed)
+            if (true && !processed)
             {
               Trace("lemma-inprocess-subs")
                   << "Add cp: " << lit[1 - i] << " -> " << lit[i] << std::endl;
@@ -255,7 +245,7 @@ LearnedLitType ZeroLevelLearner::computeLearnedLiteralType(
             }
             break;
           }
-          else if ((d_trackSimplifications && !processed)
+          else if ((true && !processed)
                    && expr::hasSubterm(lit[1 - i], lit[i]))
           {
             Trace("lemma-inprocess-subs") << "Add cp subterm: " << lit[1 - i]

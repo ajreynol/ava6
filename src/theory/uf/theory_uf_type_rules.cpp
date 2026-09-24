@@ -52,11 +52,11 @@ TypeNode UfTypeRule::computeType(NodeManager* nodeManager,
     // otherwise, application of abstract function is always abstract
     return nodeManager->mkAbstractType(Kind::ABSTRACT_TYPE);
   }
-  if (fType.getNumChildren() <= n.getNumChildren())
+  if (fType.getNumChildren() != n.getNumChildren() + 1)
   {
     if (errOut)
     {
-      (*errOut) << "too many arguments to operator";
+      (*errOut) << "wrong number of arguments to operator";
     }
     return TypeNode::null();
   }
@@ -85,75 +85,7 @@ TypeNode UfTypeRule::computeType(NodeManager* nodeManager,
       }
     }
   }
-  TypeNode ret = fType.getRangeType();
-  // If partially applied, we return the function type. Note we generally
-  // never construct APPLY_UF like this; moreover all such APPLY_UF terms are
-  // rewritten to HO_APPLY chains.
-  if (n.getNumChildren() != fType.getNumChildren() - 1)
-  {
-    std::vector<TypeNode> argTypes(fType.begin() + n.getNumChildren(),
-                                   fType.end() - 1);
-    ret = nodeManager->mkFunctionType(argTypes, ret);
-  }
-  return ret;
-}
-
-TypeNode HoApplyTypeRule::preComputeType(AVA6_UNUSED NodeManager* nm,
-                                         AVA6_UNUSED TNode n)
-{
-  return TypeNode::null();
-}
-
-TypeNode HoApplyTypeRule::computeType(NodeManager* nodeManager,
-                                      TNode n,
-                                      bool check,
-                                      std::ostream* errOut)
-{
-  Assert(false);
-  TypeNode fType = n[0].getTypeOrNull();
-  if (!fType.isFunction())
-  {
-    // if it is not even maybe a function type
-    if (!fType.isMaybeKind(Kind::FUNCTION_TYPE))
-    {
-      if (errOut)
-      {
-        (*errOut) << "first argument does not have function type";
-      }
-      return TypeNode::null();
-    }
-    // otherwise, application of abstract function is always abstract
-    return nodeManager->mkAbstractType(Kind::ABSTRACT_TYPE);
-  }
-  Assert(fType.getNumChildren() >= 2);
-  if (check)
-  {
-    TypeNode aType = n[1].getTypeOrNull();
-    if (!aType.isComparableTo(fType[0]))
-    {
-      if (errOut)
-      {
-        (*errOut) << "argument does not match function type";
-      }
-      return TypeNode::null();
-    }
-  }
-  if (fType.getNumChildren() == 2)
-  {
-    return fType.getRangeType();
-  }
-  else
-  {
-    std::vector<TypeNode> children;
-    TypeNode::iterator argument_type_it = fType.begin();
-    TypeNode::iterator argument_type_it_end = fType.end();
-    ++argument_type_it;
-    for (; argument_type_it != argument_type_it_end; ++argument_type_it)
-    {
-      children.push_back(*argument_type_it);
-    }
-    return nodeManager->mkFunctionType(children);
-  }
+  return fType.getRangeType();
 }
 
 TypeNode LambdaTypeRule::preComputeType(AVA6_UNUSED NodeManager* nm,

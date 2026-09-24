@@ -37,7 +37,7 @@ InstStrategyEnum::InstStrategyEnum(Env& env,
 }
 void InstStrategyEnum::presolve()
 {
-  d_enumInstLimit = options().quantifiers.enumInstLimit;
+  d_enumInstLimit = -1;
 }
 bool InstStrategyEnum::needsCheck(Theory::Effort e)
 {

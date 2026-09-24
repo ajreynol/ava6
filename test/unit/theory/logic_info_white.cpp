@@ -539,9 +539,6 @@ TEST_F(TestTheoryWhiteLogicInfo, smtlib_logics)
 
 TEST_F(TestTheoryWhiteLogicInfo, comparison)
 {
-  LogicInfo ufHo = LogicInfo("QF_UF").getUnlockedCopy();
-  ufHo.enableHigherOrder();
-  ufHo.lock();
 
   eq("QF_UF", "QF_UF");
   nc("QF_UF", "QF_LRA");
@@ -567,7 +564,6 @@ TEST_F(TestTheoryWhiteLogicInfo, comparison)
   lt("QF_UF", "AUFLIA");
   lt("QF_UF", "AUFLIRA");
   lt("QF_UF", "AUFNIRA");
-  lt("QF_UF", ufHo);
 
   nc("QF_LRA", "QF_UF");
   eq("QF_LRA", "QF_LRA");
@@ -1149,7 +1145,6 @@ TEST_F(TestTheoryWhiteLogicInfo, comparison)
   lt("AUFNIRA", "AUFNIRAT");
 
 
-  gt(ufHo, "QF_UF");
 }
 }  // namespace test
 }  // namespace ava6::internal

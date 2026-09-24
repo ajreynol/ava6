@@ -481,7 +481,7 @@ bool TheoryArithPrivate::getDioCuttingResource()
     d_dioSolveResources--;
     if (d_dioSolveResources == 0)
     {
-      d_dioSolveResources = -options().arith.rrTurns;
+      d_dioSolveResources = -3;
     }
     return true;
   }
@@ -490,7 +490,7 @@ bool TheoryArithPrivate::getDioCuttingResource()
     d_dioSolveResources++;
     if (d_dioSolveResources >= 0)
     {
-      d_dioSolveResources = options().arith.dioSolverTurns;
+      d_dioSolveResources = 10;
     }
     return false;
   }
@@ -1163,7 +1163,7 @@ bool TheoryArithPrivate::ppAssert(TrustNode tin,
         // convert the solved form to an integer constant here.
         elim = nodeManager()->mkConstInt(elim.getConst<Rational>());
       }
-      if (right.size() > options().arith.ppAssertMaxSubSize)
+      if (right.size() > 2)
       {
         Trace("simplify")
             << "TheoryArithPrivate::solve(): did not substitute due to the "
@@ -2813,7 +2813,7 @@ std::vector<ConstraintCPVec> TheoryArithPrivate::replayLogRec(
         if (ci->reconstructed() && ci->proven())
         {
           const DenseMap<Rational>& row = ci->getReconstruction().lhs;
-          reject = !complexityBelow(row, options().arith.replayRejectCutSize);
+          reject = !complexityBelow(row, 25500);
         }
       }
       if (conflictQueueEmpty())
@@ -2882,8 +2882,8 @@ std::vector<ConstraintCPVec> TheoryArithPrivate::replayLogRec(
     /* check if the system is feasible under with the cuts */
     if (conflictQueueEmpty())
     {
-      Assert(options().arith.replayEarlyCloseDepths >= 1);
-      if (!nl.isBranch() || depth % options().arith.replayEarlyCloseDepths == 0)
+      Assert(true);
+      if (!nl.isBranch() || depth % false)
       {
         TimerStat::CodeTimer codeTimer(d_statistics.d_replaySimplexTimer);
         // test for linear feasibility
@@ -3179,7 +3179,7 @@ bool TheoryArithPrivate::replayLemmas(ApproximateSimplex* approx)
     Assert(cut->proven());
 
     const DenseMap<Rational>& row = cut->getReconstruction().lhs;
-    if (!complexityBelow(row, options().arith.lemmaRejectCutSize))
+    if (!complexityBelow(row, 25500))
     {
       ++(d_statistics.d_cutsRejectedDuringLemmas);
       continue;
@@ -3310,7 +3310,7 @@ void TheoryArithPrivate::solveInteger(Theory::Effort effortLevel)
   static constexpr int32_t depthForLikelyInfeasible = 10;
   int maxDepthPass1 = d_likelyIntegerInfeasible
                           ? depthForLikelyInfeasible
-                          : options().arith.maxApproxDepth;
+                          : 200;
   approx->setBranchingDepth(maxDepthPass1);
   approx->setBranchOnVariableLimit(100);
   LinResult relaxRes = approx->solveRelaxation();
@@ -3377,7 +3377,7 @@ void TheoryArithPrivate::solveInteger(Theory::Effort effortLevel)
         }
         if (!(anyConflict() || !d_approxCuts.empty()))
         {
-          turnOffApproxFor(options().arith.replayNumericFailurePenalty);
+          turnOffApproxFor(4194304);
         }
         break;
       case BranchesExhausted:
@@ -4048,7 +4048,7 @@ bool TheoryArithPrivate::postCheck(Theory::Effort effortLevel)
       } while (!emmittedConflictOrSplit && tryNew);
     }
 
-    if (options().arith.maxCutsInContext <= d_cutCount)
+    if (65535 <= d_cutCount)
     {
       if (d_diosolver.hasMoreDecompositionLemmas())
       {
@@ -4775,21 +4775,8 @@ void TheoryArithPrivate::presolve()
   vector<TrustNode> lemmas;
   if (!options().base.incrementalSolving)
   {
-    switch (options().arith.arithUnateLemmaMode)
-    {
-      case options::ArithUnateLemmaMode::NO: break;
-      case options::ArithUnateLemmaMode::INEQUALITY:
-        d_constraintDatabase.outputUnateInequalityLemmas(lemmas);
-        break;
-      case options::ArithUnateLemmaMode::EQUALITY:
-        d_constraintDatabase.outputUnateEqualityLemmas(lemmas);
-        break;
-      case options::ArithUnateLemmaMode::ALL:
-        d_constraintDatabase.outputUnateInequalityLemmas(lemmas);
-        d_constraintDatabase.outputUnateEqualityLemmas(lemmas);
-        break;
-      default: Unhandled() << options().arith.arithUnateLemmaMode;
-    }
+    d_constraintDatabase.outputUnateInequalityLemmas(lemmas);
+    d_constraintDatabase.outputUnateEqualityLemmas(lemmas);
   }
 
   vector<TrustNode>::const_iterator i = lemmas.begin(), i_end = lemmas.end();
@@ -4966,7 +4953,7 @@ void TheoryArithPrivate::propagateCandidates()
     ArithVar var = *i;
     if (d_tableau.isBasic(var)
         && d_tableau.basicRowLength(var)
-               <= options().arith.arithPropagateMaxLength)
+               <= 16)
     {
       d_candidateBasics.softAdd(var);
     }
@@ -4981,7 +4968,7 @@ void TheoryArithPrivate::propagateCandidates()
         Assert(entry.getColVar() == var);
         Assert(d_tableau.isBasic(rowVar));
         if (d_tableau.getRowLength(ridx)
-            <= options().arith.arithPropagateMaxLength)
+            <= 16)
         {
           d_candidateBasics.softAdd(rowVar);
         }
@@ -5256,7 +5243,7 @@ bool TheoryArithPrivate::rowImplicationCanBeApplied(RowIndex ridx,
     //   * coeffs[0] is for implied
     //   * coeffs[i+1] is for explain[i]
     d_linEq.propagateRow(explain, ridx, rowUp, implied, coeffs);
-    if (d_tableau.getRowLength(ridx) <= options().arith.arithPropAsLemmaLength)
+    if (d_tableau.getRowLength(ridx) <= 8)
     {
       if (TraceIsOn("arith::prop::pf"))
       {
@@ -5359,9 +5346,9 @@ bool TheoryArithPrivate::propagateCandidateRow(RowIndex ridx)
   Trace("arith::prop") << "propagateCandidateRow attempt " << rowLength << " "
                        << hasCount << endl;
 
-  if (rowLength >= options().arith.arithPropagateMaxLength
+  if (rowLength >= 16
       && Random::getRandom().pickWithProb(
-          1.0 - double(options().arith.arithPropagateMaxLength) / rowLength))
+          1.0 - double(16) / rowLength))
   {
     return false;
   }

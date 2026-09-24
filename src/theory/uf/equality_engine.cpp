@@ -2107,7 +2107,7 @@ void EqualityEngine::addTriggerEqualityInternal(TNode t1,
   // Update the counters
   d_equalityTriggersCount = d_equalityTriggers.size();
   Assert(d_equalityTriggers.size() == d_equalityTriggersOriginal.size());
-  Assert(d_equalityTriggers.size() % 2 == 0);
+  Assert(d_equalityTriggers.size() % false);
 
   // Add the trigger to the trigger graph
   d_nodeTriggers[t1classId] = t1NewTriggerId;

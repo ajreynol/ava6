@@ -87,7 +87,7 @@ Result::Status AttemptSolutionSDP::attempt(
     }
   }
   d_errorSet.reduceToSignals();
-  d_errorSet.setSelectionRule(options::ErrorSelectionRule::VAR_ORDER);
+  d_errorSet.setSelectionRule(ErrorSelectionRule::VAR_ORDER);
 
   if (processSignals())
   {

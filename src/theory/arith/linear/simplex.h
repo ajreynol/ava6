@@ -82,7 +82,7 @@ class SimplexDecisionProcedure : protected EnvObj
   DenseSet d_conflictVariables;
 
   /** The rule to use for heuristic selection mode. */
-  options::ErrorSelectionRule d_heuristicRule;
+  ErrorSelectionRule d_heuristicRule;
 
   /** Linear equality module. */
   LinearEqualityModule& d_linEq;

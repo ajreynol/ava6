@@ -111,19 +111,6 @@ name   = "Arithmetic Theory"
 
 # Internal core policies; never accepted as command-line or SMT-LIB options.
 [[setting]]
-name = "arithUnateLemmaMode"
-type = "ArithUnateLemmaMode"
-default = "ALL"
-[[setting.mode.ALL]]
-name = "all"
-[[setting.mode.EQUALITY]]
-name = "eqs"
-[[setting.mode.INEQUALITY]]
-name = "ineqs"
-[[setting.mode.NO]]
-name = "none"
-
-[[setting]]
 name = "arithPropagationMode"
 type = "ArithPropagationMode"
 default = "BOTH_PROP"
@@ -147,87 +134,14 @@ type = "int64_t"
 default = "-1"
 
 [[setting]]
-name = "arithErrorSelectionRule"
-type = "ErrorSelectionRule"
-default = "MINIMUM_AMOUNT"
-[[setting.mode.MINIMUM_AMOUNT]]
-name = "min"
-[[setting.mode.VAR_ORDER]]
-name = "varord"
-[[setting.mode.MAXIMUM_AMOUNT]]
-name = "max"
-[[setting.mode.SUM_METRIC]]
-name = "sum"
-
-[[setting]]
-name = "arithSimplexCheckPeriod"
-type = "uint64_t"
-default = "200"
-
-[[setting]]
 name = "arithPivotThreshold"
 type = "uint64_t"
 default = "2"
 
 [[setting]]
-name = "arithPropagateMaxLength"
-type = "uint64_t"
-default = "16"
-
-[[setting]]
 name = "arithDioSolver"
 type = "bool"
 default = "true"
-
-[[setting]]
-name = "maxCutsInContext"
-type = "uint64_t"
-default = "65535"
-
-[[setting]]
-name = "maxApproxDepth"
-type = "int64_t"
-default = "200"
-
-[[setting]]
-name = "arithPropAsLemmaLength"
-type = "uint64_t"
-default = "8"
-
-[[setting]]
-name = "dioSolverTurns"
-type = "int64_t"
-default = "10"
-
-[[setting]]
-name = "rrTurns"
-type = "int64_t"
-default = "3"
-
-[[setting]]
-name = "replayEarlyCloseDepths"
-type = "int64_t"
-default = "1"
-
-[[setting]]
-name = "replayNumericFailurePenalty"
-type = "int64_t"
-default = "4194304"
-
-[[setting]]
-name = "replayRejectCutSize"
-type = "uint64_t"
-default = "25500"
-
-[[setting]]
-name = "lemmaRejectCutSize"
-type = "uint64_t"
-default = "25500"
-
-[[setting]]
-name = "ppAssertMaxSubSize"
-type = "uint64_t"
-default = "2"
 
 [[setting]]
 name = "nlRlvAssertBounds"

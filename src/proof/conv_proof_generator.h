@@ -232,7 +232,7 @@ class TConvProofGenerator : protected EnvObj, public ProofGenerator
   /**
    * Whether we rewrite operators. If this flag is true, then the main
    * traversal algorithm of this proof generator traverses operators of
-   * APPLY_UF and uses APPLY_CONG to justify rewriting of subterms when necessary.
+   * APPLY_UF and uses HO_CONG to justify rewriting of subterms when necessary.
    */
   bool d_rewriteOps;
   /** Get rewrite step for (hash value of) term. */

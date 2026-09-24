@@ -13,7 +13,6 @@
 #include "theory/sets/theory_sets.h"
 
 #include "options/sets_options.h"
-#include "theory/sets/set_reduction.h"
 #include "theory/sets/theory_sets_private.h"
 #include "theory/sets/theory_sets_rewriter.h"
 #include "theory/theory_model.h"
@@ -139,26 +138,8 @@ TrustNode TheorySets::ppRewrite(TNode n, std::vector<SkolemLemma>& lems)
       throw LogicException(ss.str());
     }
   }
-  if (nk == Kind::SET_MAP || nk == Kind::SET_FOLD)
-  {
-    // requires higher order
-    {
-      std::stringstream ss;
-      ss << "Term of kind " << nk
-         << " are only supported with "
-            "higher-order logic. Try adding the logic prefix HO_.";
-      throw LogicException(ss.str());
-    }
-  }
-  if (nk == Kind::SET_FOLD)
-  {
-    std::vector<Node> asserts;
-    Node ret = SetReduction::reduceFoldOperator(n, asserts);
-    NodeManager* nm = nodeManager();
-    Node andNode = nm->mkNode(Kind::AND, asserts);
-    d_im.lemma(andNode, InferenceId::SETS_FOLD);
-    return TrustNode::mkTrustRewrite(n, ret, nullptr);
-  }
+  
+  
 
 
   return d_internal->ppRewrite(n, lems);

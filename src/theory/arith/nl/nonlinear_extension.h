@@ -170,9 +170,6 @@ class NonlinearExtension : EnvObj
    */
   bool checkModel(const std::vector<Node>& assertions);
   //---------------------------end check model
-  /** compute relevant assertions */
-  void computeRelevantAssertions(const std::vector<Node>& assertions,
-                                 std::vector<Node>& keep);
   /** run check strategy
    *
    * Check assertions for consistency in the effort LAST_CALL with a subset of

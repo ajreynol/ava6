@@ -164,41 +164,7 @@ InstStrategyStatus InstStrategyAutoGenTriggers::process(
       }
     }
   }
-  if (options().quantifiers.triggerActiveSelMode
-      != options::TriggerActiveSelMode::ALL)
-  {
-    int max_score = -1;
-    Trigger* max_trigger = nullptr;
-    std::map<Trigger*, bool>& agt = d_auto_gen_trigger[0][f];
-    for (std::map<Trigger*, bool>::iterator it = agt.begin(); it != agt.end();
-         ++it)
-    {
-      Trigger* t = it->first;
-      int score = t->getActiveScore();
-      if (options().quantifiers.triggerActiveSelMode
-          == options::TriggerActiveSelMode::MIN)
-      {
-        if (score >= 0 && (score < max_score || max_score < 0))
-        {
-          max_score = score;
-          max_trigger = t;
-        }
-      }
-      else
-      {
-        if (score > max_score)
-        {
-          max_score = score;
-          max_trigger = t;
-        }
-      }
-      agt[t] = false;
-    }
-    if (max_trigger != nullptr)
-    {
-      agt[max_trigger] = true;
-    }
-  }
+  
 
   bool hasInst = false;
   for (unsigned r = 0; r < 2; r++)
@@ -466,15 +432,8 @@ bool InstStrategyAutoGenTriggers::generatePatternTerms(Node f)
                || TriggerTermInfo::isUsableRelationTrigger(pat));
         if (pat.getType().isBoolean() && rpoleq.isNull())
         {
-          if (options().quantifiers.literalMatchMode
-              == options::LiteralMatchMode::USE)
           {
             pat = pat.eqNode(nm->mkConst(rpol == -1)).negate();
-          }
-          else if (options().quantifiers.literalMatchMode
-                   != options::LiteralMatchMode::NONE)
-          {
-            pat = pat.eqNode(nm->mkConst(rpol == 1));
           }
         }
         else
@@ -482,8 +441,6 @@ bool InstStrategyAutoGenTriggers::generatePatternTerms(Node f)
           Assert(!rpoleq.isNull());
           if (rpol == -1)
           {
-            if (options().quantifiers.literalMatchMode
-                != options::LiteralMatchMode::NONE)
             {
               // all equivalence classes except rpoleq
               pat = pat.eqNode(rpoleq).negate();
@@ -491,12 +448,7 @@ bool InstStrategyAutoGenTriggers::generatePatternTerms(Node f)
           }
           else if (rpol == 1)
           {
-            if (options().quantifiers.literalMatchMode
-                == options::LiteralMatchMode::AGG)
-            {
-              // only equivalence class rpoleq
-              pat = pat.eqNode(rpoleq);
-            }
+            
           }
         }
       }

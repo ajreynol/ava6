@@ -98,56 +98,6 @@ class TheorySetsRewriter : public TheoryRewriter
    * Rewrite set comprehension
    */
   RewriteResponse postRewriteComprehension(TNode n);
-  /**
-   *  rewrites for n include:
-   *  - (set.map f (as set.empty (Set T1)) = (as set.empty (Set T2))
-   *  - (set.map f (set.singleton x)) = (set.singleton (apply f x))
-   *  - (set.map f (set.union A B)) =
-   *       (set.union (set.map f A) (set.map f B))
-   *  where f: T1 -> T2
-   */
-  RewriteResponse postRewriteMap(TNode n);
-
-  /**
-   *  rewrites for n include:
-   *  - (set.filter p (as set.empty (Set T)) = (as set.empty (Set T))
-   *  - (set.filter p (set.singleton x)) =
-   *       (ite (p x) (set.singleton x) (as set.empty (Set T)))
-   *  - (set.filter p (set.union A B)) =
-   *       (set.union (set.filter p A) (set.filter p B))
-   *  where p: T -> Bool
-   */
-  RewriteResponse postRewriteFilter(TNode n);
-  /**
-   *  rewrites for n include:
-   *  - (set.all p (as set.empty (Set T)) is rewritten as true
-   *  - (set.all p (set.singleton x)) is rewritten as (p x)
-   *  - (set.all p (set.union A B)) is rewritten as
-   *       (and (set.all p A) (set.all p B))
-   *  - otherwise (set.all p A) is rewritten as (= (set.filter p A) A)
-   *  where p: T -> Bool
-   */
-  RewriteResponse postRewriteAll(TNode n);
-  /**
-   *  rewrites for n include:
-   *  - (set.some p (as set.empty (Set T)) is rewritten as false
-   *  - (set.some p (set.singleton x)) is rewritten as  (p x)
-   *  - (set.some p (set.union A B)) is rewritten as
-   *       (or (set.some p A) (set.some p B))
-   *  - otherwise (set.some p A) is rewritten as
-   *       (distinct (set.filter p A) (as set.empty (Set T)))
-   *  where p: T -> Bool
-   */
-  RewriteResponse postRewriteSome(TNode n);
-  /**
-   *  rewrites for n include:
-   *  - (set.fold f t (as set.empty (Set T))) = t
-   *  - (set.fold f t (set.singleton x)) = (f t x)
-   *  - (set.fold f t (set.union A B)) =
-   *    (set.fold f (set.fold f t A) (set.minus B A)))
-   *  where f: T -> S -> S, and t : S
-   */
-  RewriteResponse postRewriteFold(TNode n);
   /** Is sets+cardinality enabled? */
   bool d_cardEnabled;
   /** Are relations enabled? */

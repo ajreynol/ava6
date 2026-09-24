@@ -81,7 +81,7 @@ bool EoPrinter::isHandled(const Options& opts, const ProofNode* pfn)
     case ProofRule::CONG:
     case ProofRule::NARY_CONG:
     case ProofRule::PAIRWISE_CONG:
-    case ProofRule::APPLY_CONG:
+    case ProofRule::HO_CONG:
     case ProofRule::TRUE_INTRO:
     case ProofRule::TRUE_ELIM:
     case ProofRule::FALSE_INTRO:
@@ -245,7 +245,7 @@ bool EoPrinter::isHandled(const Options& opts, const ProofNode* pfn)
       if (k == Kind::STRING_TO_CODE || k == Kind::STRING_FROM_CODE)
       {
         // must use standard alphabet size
-        return opts.strings.stringsAlphaCard == String::num_codes();
+        return 196608 == String::num_codes();
       }
       return k == Kind::STRING_CONTAINS || k == Kind::STRING_INDEXOF
              || k == Kind::STRING_INDEXOF_RE || k == Kind::STRING_IN_REGEXP
@@ -281,8 +281,8 @@ bool EoPrinter::isHandled(const Options& opts, const ProofNode* pfn)
     case ProofRule::ARITH_TRANS_SINE_SYMMETRY:
     case ProofRule::ARITH_TRANS_SINE_TANGENT_ZERO:
     case ProofRule::ARITH_TRANS_SINE_TANGENT_PI:
-    case ProofRule::SETS_FILTER_UP:
-    case ProofRule::SETS_FILTER_DOWN:
+
+
     {
           }
     break;
@@ -1136,7 +1136,7 @@ void EoPrinter::getArgsFromProofRule(const ProofNode* pn,
   ProofRule r = pn->getRule();
   switch (r)
   {
-    case ProofRule::APPLY_CONG:
+    case ProofRule::HO_CONG:
     {
       // argument is ignored
       return;

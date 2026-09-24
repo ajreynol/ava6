@@ -60,47 +60,6 @@ class TheorySetsPrivate : protected EnvObj
    */
   void checkUpwardsClosure();
 
-  /**
-   * Apply the following rule for filter terms (set.filter p A):
-   * (=>
-   *   (and (set.member x B) (= A B))
-   *   (= (set.member x (set.filter p A)) (p x))
-   * )
-   */
-  void checkFilterUp();
-  /**
-   * Apply the following rule for filter terms (set.filter p A):
-   * (=>
-   *   (set.member x (set.filter p A))
-   *   (and
-   *    (p x)
-   *    (set.member x A)
-   *   )
-   * )
-   */
-  void checkFilterDown();
-  /**
-   * Apply the following rule for map terms (set.map f A):
-   * Positive member rule:
-   * (=>
-   *   (set.member x A)
-   *   (set.member (f x) (set.map f A)
-   * )
-   */
-  void checkMapUp();
-  /**
-   * Apply the following rules for map terms (set.map f A) where A has type
-   * (Set T):
-   *   (=>
-   *     (set.member y (set.map f A))
-   *     (and
-   *       (= (f x) y)
-   *       (set.member x A)
-   *     )
-   *   )
-   *   where x is a fresh skolem
-   */
-  void checkMapDown();
   Node d_true;
   Node d_false;
   Node d_zero;
@@ -182,10 +141,6 @@ class TheorySetsPrivate : protected EnvObj
    * been produced, so the strategy can flush and restart.
    */
   void checkBasic();
-  /** Run the set.filter inference rules (checkFilterUp / checkFilterDown). */
-  void checkFilters();
-  /** Run the set.map inference rules (checkMapUp / checkMapDown). */
-  void checkMaps();
   /**
    * Split on set disequalities (SET DISEQUALITY rule from Bansal et al IJCAR
    * 2016). Runs after the operator rules to preserve the original inference
@@ -218,9 +173,6 @@ class TheorySetsPrivate : protected EnvObj
    * equal nor disequal and are sets.
    */
   void processCarePairArgs(TNode a, TNode b);
-
-  /** returns whether the given kind is a higher order kind for sets. */
-  bool isHigherOrderKind(Kind k);
 
  private:
   TheorySets& d_external;
@@ -264,7 +216,6 @@ class TheorySetsPrivate : protected EnvObj
    * This flag is set to true during a full effort check if any
    * higher order constraints is asserted to this theory.
    */
-  bool d_higher_order_kinds_enabled;
 
   /** a map that maps each set to an existential quantifier generated for
    * operator is_singleton */

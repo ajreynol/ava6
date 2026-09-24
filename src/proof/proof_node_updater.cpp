@@ -306,7 +306,7 @@ void ProofNodeUpdater::preSimplify(std::shared_ptr<ProofNode> cur)
     // rewrite rewrites to false. This optimization saves the internal work of
     // post-processing F1 ... F{i-1} F{i+1} ... Fn. The depth is configurable by
     // --proof-pre-simp-lookahead=N, default 2.
-    uint64_t depthLimit = options().proof.proofPreSimpLookahead;
+    uint64_t depthLimit = 2;
     if (toMerge == nullptr && depthLimit > 0)
     {
       Node res = cur->getResult();

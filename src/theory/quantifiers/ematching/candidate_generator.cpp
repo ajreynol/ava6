@@ -254,15 +254,7 @@ Node CandidateGeneratorQEAll::getNextCandidate()
       TNode nh = tdb->getEligibleTermInEqc(n);
       if (!nh.isNull())
       {
-        if (options().quantifiers.instMaxLevel != -1)
-        {
-          nh = d_treg.getModel()->getInternalRepresentative(nh, d_f, d_index);
-          // don't consider this if already the instantiation is ineligible
-          if (!nh.isNull() && !tdb->isTermEligibleForInstantiation(nh, d_f))
-          {
-            nh = Node::null();
-          }
-        }
+        
         if (!nh.isNull())
         {
           d_firstTime = false;

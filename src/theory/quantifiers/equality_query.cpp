@@ -50,15 +50,7 @@ Node EqualityQuery::getInternalRepresentative(Node a, Node q, size_t index)
   Node r = d_qstate.getRepresentative(a);
 
   TypeNode v_tn = q.isNull() ? a.getType() : q[0][index].getType();
-  if (options().quantifiers.quantRepMode == options::QuantRepMode::EE)
-  {
-    int32_t score = getRepScore(r, v_tn);
-    if (score >= 0)
-    {
-      return r;
-    }
-    // if we are not a valid representative, try to select one below
-  }
+  
   std::map<Node, Node>& v_int_rep = d_int_rep[v_tn];
   std::map<Node, Node>::const_iterator itir = v_int_rep.find(r);
   if (itir != v_int_rep.end())
@@ -158,25 +150,11 @@ int32_t EqualityQuery::getRepScore(Node n, TypeNode v_tn)
   {  // reject if incorrect type
     return -2;
   }
-  else if (options().quantifiers.instMaxLevel != -1)
-  {
-    // score prefer lowest instantiation level
-    uint64_t level;
-    if (QuantAttributes::getInstantiationLevel(n, level))
-    {
-      return static_cast<int32_t>(level);
-    }
-    return -1;
-  }
-  else if (options().quantifiers.quantRepMode == options::QuantRepMode::FIRST)
-  {
+  else {
     // score prefers earliest use of this term as a representative
     return d_rep_score.find(n) == d_rep_score.end() ? -1 : d_rep_score[n];
   }
-  else if (options().quantifiers.quantRepMode == options::QuantRepMode::DEPTH)
-  {
-    return quantifiers::TermUtil::getTermDepth(n);
-  }
+  
   // no preference
   return 0;
 }

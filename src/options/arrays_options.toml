@@ -16,8 +16,3 @@ name = "arraysOptimizeLinear"
 type = "bool"
 default = "true"
 
-[[setting]]
-name = "arraysPropagate"
-type = "int64_t"
-default = "2"
-
