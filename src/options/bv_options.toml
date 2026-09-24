@@ -1,0 +1,74 @@
+id     = "BV"
+name   = "Bitvector Theory"
+
+[[option]]
+  name       = "bitblastMode"
+  category   = "regular"
+  long       = "bitblast=MODE"
+  type       = "BitblastMode"
+  default    = "LAZY"
+  help       = "choose bitblasting mode, see --bitblast=help"
+  help_mode  = "Bit-blasting modes."
+[[option.mode.LAZY]]
+  name = "lazy"
+  help = "Separate Boolean structure and term reasoning between the core SAT solver and the bit-vector SAT solver."
+[[option.mode.EAGER]]
+  name = "eager"
+  help = "Bitblast eagerly to bit-vector SAT solver."
+
+[[option]]
+  name       = "bitvectorToBool"
+  category   = "regular"
+  long       = "bv-to-bool"
+  type       = "bool"
+  default    = "false"
+  help       = "lift bit-vectors of size 1 to booleans when possible"
+
+[[option]]
+  name       = "boolToBitvector"
+  category   = "regular"
+  long       = "bool-to-bv=MODE"
+  type       = "BoolToBVMode"
+  default    = "OFF"
+  help       = "convert booleans to bit-vectors of size 1 at various levels of aggressiveness, see --bool-to-bv=help"
+  help_mode  = "BoolToBV preprocessing pass modes."
+[[option.mode.OFF]]
+  name = "off"
+  help = "Don't push any booleans to width one bit-vectors."
+[[option.mode.ITE]]
+  name = "ite"
+  help = "Try to turn ITEs into BITVECTOR_ITE when possible. It can fail per-formula if not all sub-formulas can be turned to bit-vectors."
+[[option.mode.ALL]]
+  name = "all"
+  help = "Force all booleans to be bit-vectors of width one except at the top level. Most aggressive mode."
+
+[[setting]]
+  name       = "bvSolver"
+  type       = "BVSolver"
+  default    = "BITBLAST"
+  help_mode  = "Bit-vector solvers."
+[[setting.mode.BITBLAST]]
+  name = "bitblast"
+[[setting.mode.BITBLAST_INTERNAL]]
+  name = "bitblast-internal"
+
+[[option]]
+  name       = "bvEagerEval"
+  category   = "regular"
+  long       = "bv-eager-eval"
+  type       = "bool"
+  default    = "false"
+  help       = "perform eager context-dependent evaluation for applications of bv kinds in the equality engine"
+
+
+# Internal core policies; never accepted as command-line or SMT-LIB options.
+[[setting]]
+name = "bitvectorPropagate"
+type = "bool"
+default = "true"
+
+[[setting]]
+name = "bvAssertInput"
+type = "bool"
+default = "false"
+

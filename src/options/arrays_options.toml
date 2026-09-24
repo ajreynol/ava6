@@ -1,0 +1,23 @@
+id     = "ARRAYS"
+name   = "Arrays Theory"
+
+[[option]]
+  name       = "arraysEagerIndexSplitting"
+  category   = "regular"
+  long       = "arrays-eager-index"
+  type       = "bool"
+  default    = "true"
+  help       = "turn on eager index splitting for generated array lemmas"
+
+
+# Internal core policies; never accepted as command-line or SMT-LIB options.
+[[setting]]
+name = "arraysOptimizeLinear"
+type = "bool"
+default = "true"
+
+[[setting]]
+name = "arraysPropagate"
+type = "int64_t"
+default = "2"
+

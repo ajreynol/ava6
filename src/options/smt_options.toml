@@ -1,0 +1,329 @@
+id     = "SMT"
+name   = "SMT Layer"
+
+[[option]]
+  name       = "simplificationMode"
+  alias      = ["simplification-mode"]
+  category   = "regular"
+  long       = "simplification=MODE"
+  type       = "SimplificationMode"
+  default    = "BATCH"
+  help       = "choose simplification mode, see --simplification=help"
+  help_mode  = "Simplification modes."
+[[option.mode.NONE]]
+  name = "none"
+  help = "Do not perform nonclausal simplification."
+[[option.mode.BATCH]]
+  name = "batch"
+  help = "Save up all ASSERTions; run nonclausal simplification and clausal (MiniSat) propagation for all of them only after reaching a querying command (CHECKSAT or QUERY or predicate SUBTYPE declaration)."
+
+[[option]]
+  name       = "staticLearning"
+  category   = "regular"
+  long       = "static-learning"
+  type       = "bool"
+  default    = "true"
+  help       = "use static learning (on by default)"
+
+[[setting]]
+  name       = "learnedRewrite"
+  type       = "bool"
+  default    = "false"
+
+[[option]]
+  name       = "produceModels"
+  category   = "common"
+  short      = "m"
+  long       = "produce-models"
+  type       = "bool"
+  default    = "false"
+  help       = "support the get-value and get-model commands"
+
+[[option]]
+  name       = "checkModels"
+  category   = "common"
+  long       = "check-models"
+  type       = "bool"
+  default    = "false"
+  help       = "after SAT/INVALID/UNKNOWN, check that the generated model satisfies user assertions"
+
+[[option]]
+  name       = "debugCheckModels"
+  category   = "common"
+  long       = "debug-check-models"
+  type       = "bool"
+  default    = "false"
+  help       = "after SAT/INVALID/UNKNOWN, check that the generated model satisfies user and internal assertions"
+
+[[option]]
+  name       = "checkModelSubsolver"
+  category   = "common"
+  long       = "check-model-subsolver"
+  type       = "bool"
+  default    = "true"
+  help       = "use subsolver to compute values when applicable in calls to get-value and check-models"
+
+[[option]]
+  name       = "modelCoresMode"
+  category   = "regular"
+  long       = "model-cores=MODE"
+  type       = "ModelCoresMode"
+  default    = "NONE"
+  help       = "mode for producing model cores"
+  help_mode  = "Model cores modes."
+[[option.mode.NONE]]
+  name = "none"
+  help = "Do not compute model cores."
+[[option.mode.SIMPLE]]
+  name = "simple"
+  help = "Only include a subset of variables whose values are sufficient to show the input formula is satisfied by the given model."
+[[option.mode.NON_IMPLIED]]
+  name = "non-implied"
+  help = "Only include a subset of variables whose values, in addition to the values of variables whose values are implied, are sufficient to show the input formula is satisfied by the given model."
+
+[[option]]
+  name       = "produceLearnedLiterals"
+  category   = "regular"
+  long       = "produce-learned-literals"
+  type       = "bool"
+  default    = "false"
+  help       = "produce learned literals, support get-learned-literals"
+
+[[option]]
+  name       = "produceProofs"
+  category   = "common"
+  long       = "produce-proofs"
+  type       = "bool"
+  default    = "false"
+  help       = "produce proofs, support check-proofs and get-proof"
+
+[[option]]
+  name       = "checkProofs"
+  category   = "common"
+  long       = "check-proofs"
+  type       = "bool"
+  default    = "false"
+  help       = "after UNSAT/VALID, check the generated proof (with proof)"
+
+[[option]]
+  name       = "produceUnsatCores"
+  category   = "common"
+  long       = "produce-unsat-cores"
+  type       = "bool"
+  default    = "false"
+  help       = "turn on unsat core generation. Unless otherwise specified, cores will be produced using SAT soving under assumptions and preprocessing proofs."
+
+[[option]]
+  name       = "printCoresFull"
+  category   = "regular"
+  long       = "print-cores-full"
+  type       = "bool"
+  default    = "false"
+  help       = "print all formulas regardless of whether they are named, e.g. in unsat cores"
+
+[[option]]
+  name       = "checkUnsatCores"
+  category   = "common"
+  long       = "check-unsat-cores"
+  type       = "bool"
+  default    = "false"
+  help       = "after UNSAT/VALID, produce and check an unsat core (expensive)"
+
+[[option]]
+  name       = "unsatAssumptions"
+  category   = "common"
+  long       = "produce-unsat-assumptions"
+  type       = "bool"
+  default    = "false"
+  help       = "turn on unsat assumptions generation"
+
+[[option]]
+  name       = "produceDifficulty"
+  category   = "regular"
+  long       = "produce-difficulty"
+  type       = "bool"
+  default    = "false"
+  help       = "enable tracking of difficulty."
+
+[[option]]
+  name       = "checkSynthSol"
+  category   = "common"
+  long       = "check-synth-sol"
+  type       = "bool"
+  default    = "false"
+  help       = "checks whether produced solutions to functions-to-synthesize satisfy the conjecture"
+
+[[option]]
+  name       = "produceAssignments"
+  category   = "regular"
+  long       = "produce-assignments"
+  type       = "bool"
+  default    = "false"
+  help       = "support the get-assignment command"
+
+[[option]]
+  name       = "produceAssertions"
+  category   = "regular"
+  long       = "produce-assertions"
+  type       = "bool"
+  alias      = ["interactive-mode"]
+  default    = "true"
+  help       = "keep an assertions list. Note this option is always enabled."
+
+[[setting]]
+  name       = "solveBVAsInt"
+  type       = "SolveBVAsIntMode"
+  default    = "OFF"
+  help_mode  = "solve-bv-as-int modes."
+[[setting.mode.OFF]]
+  name = "off"
+[[setting.mode.SUM]]
+  name = "sum"
+[[setting.mode.IAND]]
+  name = "iand"
+[[setting.mode.BV]]
+  name = "bv"
+[[setting.mode.BITWISE]]
+  name = "bitwise"
+
+[[option]]
+  name       = "solveRealAsInt"
+  category   = "regular"
+  long       = "solve-real-as-int"
+  type       = "bool"
+  default    = "false"
+  help       = "attempt to solve a pure real satisfiable problem as an integer problem (for non-linear)"
+
+[[option]]
+  name       = "toCoreTimeout"
+  category   = "common"
+  long       = "timeout-core-timeout=N"
+  type       = "uint64_t"
+  default    = "10000"
+  help       = "timeout (in milliseconds) for satisfiability checks for timeout cores"
+
+
+# Internal core policies; never accepted as command-line or SMT-LIB options.
+[[setting]]
+name = "ackermann"
+type = "bool"
+default = "false"
+
+[[setting]]
+name = "simplificationBoolConstProp"
+type = "bool"
+default = "false"
+
+[[setting]]
+name = "modelVarElimUneval"
+type = "bool"
+default = "true"
+
+[[setting]]
+name = "proofMode"
+type = "ProofMode"
+default = "OFF"
+[[setting.mode.OFF]]
+name = "off"
+[[setting.mode.PP_ONLY]]
+name = "pp-only"
+[[setting.mode.SAT]]
+name = "sat-proof"
+[[setting.mode.FULL]]
+name = "full-proof"
+[[setting.mode.FULL_STRICT]]
+name = "full-proof-strict"
+
+[[setting]]
+name = "unsatCoresMode"
+type = "UnsatCoresMode"
+default = "OFF"
+[[setting.mode.OFF]]
+name = "off"
+[[setting.mode.SAT_PROOF]]
+name = "sat-proof"
+[[setting.mode.ASSUMPTIONS]]
+name = "assumptions"
+
+[[setting]]
+name = "difficultyMode"
+type = "DifficultyMode"
+default = "LEMMA_LITERAL_ALL"
+[[setting.mode.LEMMA_LITERAL]]
+name = "lemma-literal"
+[[setting.mode.LEMMA_LITERAL_ALL]]
+name = "lemma-literal-all"
+[[setting.mode.MODEL_CHECK]]
+name = "model-check"
+
+[[setting]]
+name = "extRewPrep"
+type = "ExtRewPrepMode"
+default = "OFF"
+[[setting.mode.OFF]]
+name = "off"
+[[setting.mode.USE]]
+name = "use"
+[[setting.mode.AGG]]
+name = "agg"
+
+[[setting]]
+name = "simplifyWithCareEnabled"
+type = "bool"
+default = "false"
+
+[[setting]]
+name = "earlyIteRemoval"
+type = "bool"
+default = "false"
+
+[[setting]]
+name = "unconstrainedSimp"
+type = "bool"
+default = "false"
+
+[[setting]]
+name = "repeatSimp"
+type = "bool"
+default = "false"
+
+[[setting]]
+name = "sortInference"
+type = "bool"
+default = "false"
+
+[[setting]]
+name = "distinctElimThreshold"
+type = "uint64_t"
+default = "0"
+
+[[setting]]
+name = "BVAndIntegerGranularity"
+type = "uint64_t"
+default = "1"
+
+[[setting]]
+name = "solveIntAsBV"
+type = "uint64_t"
+default = "0"
+
+[[setting]]
+name = "deepRestartMode"
+type = "DeepRestartMode"
+default = "NONE"
+[[setting.mode.NONE]]
+name = "none"
+[[setting.mode.INPUT]]
+name = "input"
+[[setting.mode.INPUT_AND_SOLVABLE]]
+name = "input-and-solvable"
+[[setting.mode.INPUT_AND_PROP]]
+name = "input-and-prop"
+[[setting.mode.ALL]]
+name = "all"
+
+[[setting]]
+name = "deepRestartFactor"
+type = "double"
+default = "3.0"
+

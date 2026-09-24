@@ -1,0 +1,159 @@
+id     = "DRIVER"
+name   = "Driver"
+
+[[option]]
+  name       = "showVersion"
+  category   = "common"
+  short      = "V"
+  long       = "version"
+  type       = "bool"
+  default    = "false"
+  predicates = ["showVersion"]
+  alternate  = false
+  help       = "identify this ava6 binary"
+
+[[option]]
+  name       = "help"
+  category   = "common"
+  short      = "h"
+  long       = "help"
+  type       = "bool"
+  default    = "false"
+  alternate  = false
+  help       = "full command line reference"
+
+[[option]]
+  name       = "helpRegular"
+  category   = "common"
+  long       = "help-regular"
+  short      = "H"
+  type       = "bool"
+  default    = "false"
+  alternate  = false
+  help       = "regular command line reference"
+
+[[option]]
+  name       = "helpOptionCategories"
+  category   = "common"
+  long       = "help-option-categories"
+  type       = "bool"
+  default    = "false"
+  alternate  = false
+  help       = "Print summary of options for each category"
+
+[[option]]
+  name       = "showConfiguration"
+  category   = "common"
+  long       = "show-config"
+  type       = "bool"
+  default    = "false"
+  predicates = ["showConfiguration"]
+  alternate  = false
+  help       = "show ava6 static configuration"
+
+[[option]]
+  name       = "showCopyright"
+  category   = "common"
+  long       = "copyright"
+  type       = "bool"
+  default    = "false"
+  predicates = ["showCopyright"]
+  alternate  = false
+  help       = "show ava6 copyright information"
+
+[[option]]
+  name       = "seed"
+  alias      = ["random-seed"]
+  category   = "common"
+  short      = "s"
+  long       = "seed=N"
+  type       = "uint64_t"
+  default    = "0"
+  help       = "seed for random number generator"
+
+[[option]]
+  name       = "earlyExit"
+  category   = "common"
+  long       = "early-exit"
+  type       = "bool"
+  default    = "true"
+  help       = "do not run destructors at exit; default on except in debug builds"
+
+[[option]]
+  name       = "interactive"
+  category   = "common"
+  long       = "interactive"
+  type       = "bool"
+  default    = "false"
+  help       = "force interactive shell/non-interactive mode"
+
+[[option]]
+  name       = "filename"
+  category   = "undocumented"
+  long       = "filename=FILENAME"
+  type       = "std::string"
+  default    = '""'
+  help       = "filename of the input"
+
+[[option]]
+  name       = "dumpModels"
+  category   = "common"
+  long       = "dump-models"
+  type       = "bool"
+  default    = "false"
+  help       = "output models after every SAT/INVALID/UNKNOWN response"
+
+[[option]]
+  name       = "dumpProofs"
+  category   = "common"
+  long       = "dump-proofs"
+  type       = "bool"
+  default    = "false"
+  help       = "output proofs after every UNSAT/VALID response"
+
+[[option]]
+  name       = "dumpInstantiations"
+  category   = "common"
+  long       = "dump-instantiations"
+  type       = "bool"
+  default    = "false"
+  help       = "output instantiations of quantified formulas after every UNSAT/VALID response"
+
+[[option]]
+  name       = "dumpUnsatCores"
+  category   = "regular"
+  long       = "dump-unsat-cores"
+  type       = "bool"
+  default    = "false"
+  help       = "output unsat cores after every UNSAT/VALID response"
+
+[[option]]
+  name       = "dumpUnsatCoresLemmas"
+  category   = "regular"
+  long       = "dump-unsat-cores-lemmas"
+  type       = "bool"
+  default    = "false"
+  help       = "output lemmas in unsat cores after every UNSAT/VALID response"
+
+[[option]]
+  name       = "dumpDifficulty"
+  category   = "regular"
+  long       = "dump-difficulty"
+  type       = "bool"
+  default    = "false"
+  help       = "dump the difficulty measure after every response to check-sat"
+
+[[option]]
+  name       = "printSuccess"
+  category   = "common"
+  long       = "print-success"
+  type       = "bool"
+  default    = "false"
+  help       = "print the \"success\" output required of SMT-LIBv2"
+
+# Internal core policies; never accepted as command-line or SMT-LIB options.
+[[setting]]
+name = "showTraceTags"
+type = "bool"
+default = "false"
+

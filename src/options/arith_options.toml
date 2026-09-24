@@ -1,0 +1,271 @@
+id     = "ARITH"
+name   = "Arithmetic Theory"
+
+[[option]]
+  name       = "arithRewriteEq"
+  category   = "regular"
+  long       = "arith-rewrite-equalities"
+  type       = "bool"
+  default    = "false"
+  help       = "turns on the preprocessing rewrite turning equalities into a conjunction of inequalities"
+
+[[option]]
+  name       = "nlExt"
+  category   = "common"
+  long       = "nl-ext=MODE"
+  type       = "NlExtMode"
+  default    = "FULL"
+  help       = "incremental linearization approach to non-linear"
+  help_mode  = "Modes for the non-linear linearization"
+[[option.mode.NONE]]
+  name = "none"
+  help = "Disable linearization approach"
+[[option.mode.LIGHT]]
+  name = "light"
+  help = "Only use a few light-weight lemma schemes"
+[[option.mode.FULL]]
+  name = "full"
+  help = "Use all lemma schemes"
+
+[[option]]
+  name       = "nlExtFactor"
+  category   = "regular"
+  long       = "nl-ext-factor"
+  type       = "bool"
+  default    = "true"
+  help       = "use factoring inference in non-linear incremental linearization solver"
+
+[[option]]
+  name       = "nlExtFlattenMon"
+  category   = "regular"
+  long       = "nl-ext-flatten-mon"
+  type       = "bool"
+  default    = "true"
+  help       = "use inference schema based on flattening monomials"
+
+[[option]]
+  name       = "nlExtTangentPlanes"
+  category   = "regular"
+  long       = "nl-ext-tplanes"
+  type       = "bool"
+  default    = "true"
+  help       = "use non-terminating tangent plane strategy for non-linear incremental linearization solver"
+
+[[option]]
+  name       = "nlExtTangentPlanesInterleave"
+  category   = "regular"
+  long       = "nl-ext-tplanes-interleave"
+  type       = "bool"
+  default    = "false"
+  help       = "interleave tangent plane strategy for non-linear incremental linearization solver"
+
+[[option]]
+  name       = "nlExtTfTangentPlanes"
+  category   = "regular"
+  long       = "nl-ext-tf-tplanes"
+  type       = "bool"
+  default    = "true"
+  help       = "use non-terminating tangent plane strategy for transcendental functions for non-linear incremental linearization solver"
+
+[[option]]
+  name       = "nlExtRewrites"
+  category   = "regular"
+  long       = "nl-ext-rewrite"
+  type       = "bool"
+  default    = "true"
+  help       = "do context-dependent simplification based on rewrites in non-linear solver"
+
+[[option]]
+  name       = "brabTest"
+  category   = "regular"
+  long       = "arith-brab"
+  type       = "bool"
+  default    = "true"
+  help       = "whether to use simple rounding, similar to a unit-cube test, for integers"
+
+[[option]]
+  name       = "nlCovLinearModel"
+  category   = "regular"
+  long       = "nl-cov-linear-model=MODE"
+  type       = "nlCovLinearModelMode"
+  default    = "NONE"
+  help       = "whether to use the linear model as initial guess for the cylindrical algebraic coverings solver"
+  help_mode  = "Modes for the usage of the linear model in non-linear arithmetic."
+[[option.mode.NONE]]
+  name       = "none"
+  help       = "Do not use linear model to seed nonlinear model"
+[[option.mode.INITIAL]]
+  name       = "initial"
+  help       = "Use linear model to seed nonlinear model initially, discard it when it does not work"
+[[option.mode.PERSISTENT]]
+  name       = "persistent"
+  help       = "Use linear model to seed nonlinear model whenever possible"
+
+[[option]]
+  name       = "arithStaticLearning"
+  category   = "regular"
+  long       = "arith-static-learning"
+  type       = "bool"
+  default    = "true"
+  help       = "do arithmetic static learning for ite terms based on bounds when static learning is enabled"
+
+# Internal core policies; never accepted as command-line or SMT-LIB options.
+[[setting]]
+name = "arithUnateLemmaMode"
+type = "ArithUnateLemmaMode"
+default = "ALL"
+[[setting.mode.ALL]]
+name = "all"
+[[setting.mode.EQUALITY]]
+name = "eqs"
+[[setting.mode.INEQUALITY]]
+name = "ineqs"
+[[setting.mode.NO]]
+name = "none"
+
+[[setting]]
+name = "arithPropagationMode"
+type = "ArithPropagationMode"
+default = "BOTH_PROP"
+[[setting.mode.NO_PROP]]
+name = "none"
+[[setting.mode.UNATE_PROP]]
+name = "unate"
+[[setting.mode.BOUND_INFERENCE_PROP]]
+name = "bi"
+[[setting.mode.BOTH_PROP]]
+name = "both"
+
+[[setting]]
+name = "arithHeuristicPivots"
+type = "int64_t"
+default = "0"
+
+[[setting]]
+name = "arithStandardCheckVarOrderPivots"
+type = "int64_t"
+default = "-1"
+
+[[setting]]
+name = "arithErrorSelectionRule"
+type = "ErrorSelectionRule"
+default = "MINIMUM_AMOUNT"
+[[setting.mode.MINIMUM_AMOUNT]]
+name = "min"
+[[setting.mode.VAR_ORDER]]
+name = "varord"
+[[setting.mode.MAXIMUM_AMOUNT]]
+name = "max"
+[[setting.mode.SUM_METRIC]]
+name = "sum"
+
+[[setting]]
+name = "arithSimplexCheckPeriod"
+type = "uint64_t"
+default = "200"
+
+[[setting]]
+name = "arithPivotThreshold"
+type = "uint64_t"
+default = "2"
+
+[[setting]]
+name = "arithPropagateMaxLength"
+type = "uint64_t"
+default = "16"
+
+[[setting]]
+name = "arithDioSolver"
+type = "bool"
+default = "true"
+
+[[setting]]
+name = "arithMLTrick"
+type = "bool"
+default = "false"
+
+[[setting]]
+name = "arithMLTrickSubstitutions"
+type = "uint64_t"
+default = "1"
+
+[[setting]]
+name = "maxCutsInContext"
+type = "uint64_t"
+default = "65535"
+
+[[setting]]
+name = "maxApproxDepth"
+type = "int64_t"
+default = "200"
+
+[[setting]]
+name = "arithPropAsLemmaLength"
+type = "uint64_t"
+default = "8"
+
+[[setting]]
+name = "dioSolverTurns"
+type = "int64_t"
+default = "10"
+
+[[setting]]
+name = "rrTurns"
+type = "int64_t"
+default = "3"
+
+[[setting]]
+name = "replayEarlyCloseDepths"
+type = "int64_t"
+default = "1"
+
+[[setting]]
+name = "replayNumericFailurePenalty"
+type = "int64_t"
+default = "4194304"
+
+[[setting]]
+name = "replayRejectCutSize"
+type = "uint64_t"
+default = "25500"
+
+[[setting]]
+name = "lemmaRejectCutSize"
+type = "uint64_t"
+default = "25500"
+
+[[setting]]
+name = "ppAssertMaxSubSize"
+type = "uint64_t"
+default = "2"
+
+[[setting]]
+name = "pbRewrites"
+type = "bool"
+default = "false"
+
+[[setting]]
+name = "nlRlvAssertBounds"
+type = "bool"
+default = "false"
+
+[[setting]]
+name = "nlExtInitialSignLemmas"
+type = "bool"
+default = "false"
+
+[[setting]]
+name = "nlRlvMode"
+type = "NlRlvMode"
+default = "NONE"
+[[setting.mode.NONE]]
+name = "none"
+[[setting.mode.INTERLEAVE]]
+name = "interleave"
+[[setting.mode.ALWAYS]]
+name = "always"
+
+[[setting]]
+name = "arithEqSolver"
+type = "bool"
+default = "false"

@@ -1,0 +1,139 @@
+id     = "STRINGS"
+name   = "Strings Theory"
+
+[[option]]
+  name       = "stringExp"
+  category   = "regular"
+  long       = "strings-exp"
+  type       = "bool"
+  default    = "false"
+  help       = "experimental features in the theory of strings"
+
+[[option]]
+  name       = "stringFMF"
+  category   = "regular"
+  long       = "strings-fmf"
+  type       = "bool"
+  default    = "false"
+  help       = "the finite model finding used by the theory of strings"
+
+[[option]]
+  name       = "stringCheckEntailLen"
+  category   = "regular"
+  long       = "strings-check-entail-len"
+  type       = "bool"
+  default    = "true"
+  help       = "check entailment between length terms to reduce splitting"
+
+[[option]]
+  name       = "stringProcessLoopMode"
+  category   = "regular"
+  long       = "strings-process-loop-mode=MODE"
+  type       = "ProcessLoopMode"
+  default    = "FULL"
+  help       = "determines how to process looping string equations"
+  help_mode = "Loop processing modes."
+[[option.mode.FULL]]
+  name = "full"
+  help = "Perform full processing of looping word equations."
+[[option.mode.SIMPLE]]
+  name = "simple"
+  help = "Omit normal loop breaking (default with --strings-fmf)."
+[[option.mode.SIMPLE_ABORT]]
+  name = "simple-abort"
+  help = "Abort when normal loop breaking is required."
+[[option.mode.NONE]]
+  name = "none"
+  help = "Omit loop processing."
+[[option.mode.ABORT]]
+  name = "abort"
+  help = "Abort if looping word equations are encountered."
+
+[[option]]
+  name       = "stringModelBasedReduction"
+  category   = "regular"
+  long       = "strings-mbr"
+  type       = "bool"
+  default    = "true"
+  help       = "use models to avoid reductions for extended functions that introduce quantified formulas"
+
+[[setting]]
+  name       = "regExpElim"
+  type       = "RegExpElimMode"
+  default    = "OFF"
+  help_mode  = "Regular expression elimination modes."
+[[setting.mode.OFF]]
+  name = "off"
+[[setting.mode.ON]]
+  name = "on"
+[[setting.mode.AGG]]
+  name = "agg"
+
+[[option]]
+  name       = "stringEagerEval"
+  category   = "regular"
+  long       = "strings-eager-eval"
+  type       = "bool"
+  default    = "true"
+  help       = "perform eager context-dependent evaluation for applications of string kinds in the equality engine"
+
+[[option]]
+  name       = "stringsDeqExt"
+  category   = "regular"
+  long       = "strings-deq-ext"
+  type       = "bool"
+  default    = "false"
+  help       = "use extensionality for string disequalities"
+
+[[option]]
+  name       = "stringEagerSolver"
+  category   = "regular"
+  long       = "strings-eager-solver"
+  type       = "bool"
+  default    = "true"
+  help       = "use the eager solver"
+
+[[option]]
+  name       = "stringRegexpInclusion"
+  category   = "regular"
+  long       = "strings-regexp-inclusion"
+  type       = "bool"
+  default    = "true"
+  help       = "use regular expression inclusion for finding conflicts and avoiding regular expression unfolding"
+
+
+# Internal core policies; never accepted as command-line or SMT-LIB options.
+[[setting]]
+name = "stringRegExpInterMode"
+type = "RegExpInterMode"
+default = "NONE"
+[[setting.mode.ALL]]
+name = "all"
+[[setting.mode.CONSTANT]]
+name = "constant"
+[[setting.mode.ONE_CONSTANT]]
+name = "one-constant"
+[[setting.mode.NONE]]
+name = "none"
+
+[[setting]]
+name = "stringsAlphaCard"
+type = "uint64_t"
+default = "196608"
+
+[[setting]]
+name = "seqArray"
+type = "SeqArrayMode"
+default = "NONE"
+[[setting.mode.LAZY]]
+name = "lazy"
+[[setting.mode.EAGER]]
+name = "eager"
+[[setting.mode.NONE]]
+name = "none"
+
+[[setting]]
+name = "stringsModelMaxLength"
+type = "uint64_t"
+default = "65536"
+

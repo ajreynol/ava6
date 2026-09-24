@@ -1,0 +1,5 @@
+id     = "SETS"
+name   = "Sets Theory"
+
+
+# Internal core policies; never accepted as command-line or SMT-LIB options.

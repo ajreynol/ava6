@@ -1,0 +1,25 @@
+name: Core debug checks
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+concurrency:
+  group: core-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  debug:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y ninja-build libgmp-dev python3-pyparsing
+      - name: Configure debug build
+        run: >-
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+          -DENABLE_UNIT_TESTING=OFF -DENABLE_AUTO_DOWNLOAD=ON -DSTATIC_BINARY=OFF
+          -DPython_EXECUTABLE=/usr/bin/python3
+      - name: Build solver and C++ API smoke test
+        run: cmake --build build --target ava6-bin core-api-smoke -j2
+      - name: Run small core suite
+        run: ctest --test-dir build --output-on-failure -L core

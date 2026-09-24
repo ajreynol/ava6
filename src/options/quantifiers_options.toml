@@ -1,0 +1,732 @@
+id     = "QUANTIFIERS"
+name   = "Quantifiers"
+
+# Whether to mini-scope quantifiers.
+# Miniscoping is done based on two techniques.
+# First, miniscoping can be done based on conjunctions within quantified
+# formulas. For example, forall x. (P(x) ^ Q(x)) can be rewritten to
+# (forall x. P(x)) ^ (forall x. Q(x))
+# Second, miniscoping can be done based which free variables occur in
+# subformulas of quantified formulas. For example, forall xy. (P(x) V Q(y))
+# can be rewritten to:
+# (forall x. P(x)) V (forall y. Q(y)).
+[[option]]
+  name       = "miniscopeQuant"
+  category   = "regular"
+  long       = "miniscope-quant=MODE"
+  type       = "MiniscopeQuantMode"
+  default    = "CONJ_AND_FV"
+  help       = "miniscope mode for quantified formulas"
+  help_mode  = "Miniscope quantifiers modes."
+[[option.mode.OFF]]
+  name = "off"
+  help = "Do not miniscope quantifiers."
+[[option.mode.CONJ]]
+  name = "conj"
+  help = "Use miniscoping of conjunctions only."
+[[option.mode.FV]]
+  name = "fv"
+  help = "Use free variable miniscoping only."
+[[option.mode.CONJ_AND_FV]]
+  name = "conj-and-fv"
+  help = "Enable both conjunction and free variable miniscoping."
+[[option.mode.AGG]]
+  name = "agg"
+  help = "Enable aggressive miniscope, which further may rewrite quantified formulas into a form where miniscoping is possible."
+
+[[option]]
+  name       = "miniscopeQuantUser"
+  category   = "regular"
+  long       = "miniscope-quant-user"
+  type       = "bool"
+  default    = "false"
+  help       = "miniscope quantified formulas with user patterns"
+
+[[option]]
+  name       = "prenexQuantUser"
+  category   = "regular"
+  long       = "prenex-quant-user"
+  type       = "bool"
+  default    = "false"
+  help       = "prenex quantified formulas with user patterns"
+
+# Whether to variable-eliminate quantifiers.
+# For example, forall x y. ( P( x, y ) V x != c ) will be rewritten to
+#   forall y. P( c, y )
+[[option]]
+  name       = "varElimQuant"
+  category   = "regular"
+  long       = "var-elim-quant"
+  type       = "bool"
+  default    = "true"
+  help       = "enable simple variable elimination for quantified formulas"
+
+[[option]]
+  name       = "varIneqElimQuant"
+  category   = "regular"
+  long       = "var-ineq-elim-quant"
+  type       = "bool"
+  default    = "true"
+  help       = "enable variable elimination based on infinite projection of unbound arithmetic variables"
+
+[[option]]
+  name       = "iteLiftQuant"
+  category   = "regular"
+  long       = "ite-lift-quant=MODE"
+  type       = "IteLiftQuantMode"
+  default    = "SIMPLE"
+  help       = "ite lifting mode for quantified formulas"
+  help_mode  = "ITE lifting modes for quantified formulas."
+[[option.mode.NONE]]
+  name = "none"
+  help = "Do not lift if-then-else in quantified formulas."
+[[option.mode.SIMPLE]]
+  name = "simple"
+  help = "Lift if-then-else in quantified formulas if results in smaller term size."
+[[option.mode.ALL]]
+  name = "all"
+  help = "Lift if-then-else in quantified formulas."
+
+[[option]]
+  name       = "preSkolemQuant"
+  category   = "regular"
+  long       = "pre-skolem-quant=MODE"
+  type       = "PreSkolemQuantMode"
+  default    = "OFF"
+  help       = "modes to apply skolemization eagerly to bodies of quantified formulas"
+  help_mode  = "Modes to apply skolemization eagerly to bodies of quantified formulas."
+[[option.mode.OFF]]
+  name = "off"
+  help = "Do not apply Skolemization eagerly."
+[[option.mode.ON]]
+  name = "on"
+  help = "Apply Skolemization eagerly to top-level (negatively asserted) quantified formulas."
+[[option.mode.AGG]]
+  name = "agg"
+  help = "Apply Skolemization eagerly and aggressively during preprocessing."
+
+# Whether to pre-skolemize quantifier bodies.
+# For example, forall x. ( P( x ) => (exists y. f( y ) = x) ) will be rewritten to
+#   forall x. P( x ) => f( S( x ) ) = x
+[[option]]
+  name       = "elimTautQuant"
+  category   = "regular"
+  long       = "elim-taut-quant"
+  type       = "bool"
+  default    = "true"
+  help       = "eliminate tautological disjuncts of quantified formulas"
+
+[[option]]
+  name       = "mbqi"
+  category   = "regular"
+  long       = "mbqi"
+  type       = "bool"
+  default    = "false"
+  help       = "use model-based quantifier instantiation"
+
+[[option]]
+  name       = "mbqiCheckTimeout"
+  category   = "common"
+  long       = "mbqi-check-timeout=N"
+  type       = "uint64_t"
+  default    = "500"
+  help       = "timeout (in milliseconds) for verifying subcalls for model-based instantiation (0 == no limit)"
+
+[[option]]
+  name       = "eMatching"
+  category   = "regular"
+  long       = "e-matching"
+  type       = "bool"
+  default    = "true"
+  help       = "whether to do heuristic E-matching"
+
+[[option]]
+  name       = "termDbMode"
+  category   = "regular"
+  long       = "term-db-mode=MODE"
+  type       = "TermDbMode"
+  default    = "RELEVANT_ALL_DELAY"
+  help       = "which ground terms to consider for instantiation"
+  help_mode  = "Modes for terms included in the quantifiers term database."
+[[option.mode.ALL]]
+  name = "all"
+  help = "Quantifiers module considers all ground terms."
+[[option.mode.RELEVANT]]
+  name = "relevant"
+  help = "Quantifiers module considers only ground terms connected to current assertions."
+[[option.mode.RELEVANT_ALL_DELAY]]
+  name = "relevant-all-delay"
+  help = "Quantifiers module considers only ground terms connected to current assertions, then all ground terms as a last resort."
+
+[[option]]
+  name       = "relevantTriggers"
+  category   = "regular"
+  long       = "relevant-triggers"
+  type       = "bool"
+  default    = "false"
+  help       = "prefer triggers that are more relevant based on SInE style analysis"
+
+[[option]]
+  name       = "multiTriggerWhenSingle"
+  category   = "regular"
+  long       = "multi-trigger-when-single"
+  type       = "bool"
+  default    = "false"
+  help       = "select multi triggers when single triggers exist"
+
+[[option]]
+  name       = "multiTriggerPriority"
+  category   = "regular"
+  long       = "multi-trigger-priority"
+  type       = "bool"
+  default    = "false"
+  help       = "only try multi triggers if single triggers give no instantiations"
+
+[[option]]
+  name       = "multiTriggerCache"
+  category   = "regular"
+  long       = "multi-trigger-cache"
+  type       = "bool"
+  default    = "false"
+  help       = "caching version of multi triggers"
+
+[[option]]
+  name       = "multiTriggerLinear"
+  category   = "regular"
+  long       = "multi-trigger-linear"
+  type       = "bool"
+  default    = "true"
+  help       = "implementation of multi triggers where maximum number of instantiations is linear wrt number of ground terms"
+
+# Trigger selection mode.
+#
+# These modes are used for determining which terms to select
+# as triggers for quantified formulas, when necessary, during E-matching.
+# In the following, note the following terminology. A trigger is a set of terms,
+# where a single trigger is a singleton set and a multi-trigger is a set of more
+# than one term.
+#
+# MIN selects single triggers of minimal term size.
+# MAX selects single triggers of maximal term size.
+#
+# For example, consider the quantified formula :
+#   forall xy. P( f( g( x, y ) ) ) V Q( f( x ), y )
+#
+# MIN will select g( x, y ) and Q( f( x ), y ).
+# MAX will select P( f( g( x ) ) ) and Q( f( x ), y ).
+#
+# The remaining three trigger selections make a difference for multi-triggers
+# only. For quantified formulas that require multi-triggers, we build a set of
+# partial triggers that don't contain all variables, call this set S. Then,
+# multi-triggers are built by taking a random subset of S that collectively
+# contains all variables.
+#
+# Consider the quantified formula :
+#   forall xyz. P( h( x ), y ) V Q( y, z )
+#
+# For ALL and MIN_SINGLE_ALL,
+#   S = { h( x ), P( h( x ), y ), Q( y, z ) }.
+# For MIN_SINGLE_MAX,
+#   S = { P( h( x ), y ), Q( y, z ) }.
+#
+# Furthermore, MIN_SINGLE_ALL and MIN_SINGLE_MAX, when
+# selecting single triggers, only select terms of minimal size.
+#
+[[option]]
+  name       = "triggerSelMode"
+  category   = "regular"
+  long       = "trigger-sel=MODE"
+  type       = "TriggerSelMode"
+  default    = "MIN"
+  help       = "selection mode for triggers"
+  help_mode  = "Trigger selection modes."
+[[option.mode.MIN]]
+  name = "min"
+  help = "Consider only minimal subterms that meet criteria for triggers."
+[[option.mode.MAX]]
+  name = "max"
+  help = "Consider only maximal subterms that meet criteria for triggers."
+[[option.mode.MIN_SINGLE_MAX]]
+  name = "min-s-max"
+  help = "Consider only minimal subterms that meet criteria for single triggers, maximal otherwise."
+[[option.mode.MIN_SINGLE_ALL]]
+  name = "min-s-all"
+  help = "Consider only minimal subterms that meet criteria for single triggers, all otherwise."
+[[option.mode.ALL]]
+  name = "all"
+  help = "Consider all subterms that meet criteria for triggers."
+
+[[option]]
+  name       = "userPatternsQuant"
+  category   = "regular"
+  long       = "user-pat=MODE"
+  type       = "UserPatMode"
+  default    = "TRUST"
+  help       = "policy for handling user-provided patterns for quantifier instantiation"
+  help_mode  = "These modes determine how user provided patterns (triggers) are used during E-matching. The modes vary on when instantiation based on user-provided triggers is combined with instantiation based on automatically selected triggers."
+[[option.mode.USE]]
+  name = "use"
+  help = "Use both user-provided and auto-generated patterns when patterns are provided for a quantified formula."
+[[option.mode.TRUST]]
+  name = "trust"
+  help = "When provided, use only user-provided patterns for a quantified formula."
+[[option.mode.STRICT]]
+  name = "strict"
+  help = "When provided, use only user-provided patterns for a quantified formula, and do not use any other instantiation techniques."
+[[option.mode.RESORT]]
+  name = "resort"
+  help = "Use user-provided patterns only after auto-generated patterns saturate."
+[[option.mode.IGNORE]]
+  name = "ignore"
+  help = "Ignore user-provided patterns."
+[[option.mode.INTERLEAVE]]
+  name = "interleave"
+  help = "Alternate between use/resort."
+
+[[option]]
+  name       = "instWhenMode"
+  category   = "regular"
+  long       = "inst-when=MODE"
+  type       = "InstWhenMode"
+  default    = "FULL_LAST_CALL"
+  help       = "when to apply instantiation"
+  help_mode  = "Instantiation modes."
+[[option.mode.FULL]]
+  name = "full"
+  help = "Run instantiation round at full effort, before theory combination."
+[[option.mode.FULL_DELAY]]
+  name = "full-delay"
+  help = "Run instantiation round at full effort, before theory combination, after all other theories have finished."
+[[option.mode.FULL_LAST_CALL]]
+  name = "full-last-call"
+  help = "Alternate running instantiation rounds at full effort and last call.  In other words, interleave instantiation and theory combination."
+[[option.mode.FULL_DELAY_LAST_CALL]]
+  name = "full-delay-last-call"
+  help = "Alternate running instantiation rounds at full effort after all other theories have finished, and last call."
+[[option.mode.LAST_CALL]]
+  name = "last-call"
+  help = "Run instantiation at last call effort, after theory combination and and theories report sat."
+
+[[option]]
+  name       = "printInstMode"
+  category   = "common"
+  long       = "print-inst=MODE"
+  type       = "PrintInstMode"
+  default    = "LIST"
+  help       = "print format for printing instantiations"
+  help_mode  = "Print format for printing instantiations."
+[[option.mode.LIST]]
+  name = "list"
+  help = "Print the list of instantiations per quantified formula, when non-empty."
+[[option.mode.NUM]]
+  name = "num"
+  help = "Print the total number of instantiations per quantified formula, when non-zero."
+
+[[option]]
+  name       = "printInstFull"
+  category   = "regular"
+  long       = "print-inst-full"
+  type       = "bool"
+  default    = "true"
+  help       = "print instantiations for formulas that do not have given identifiers"
+
+[[option]]
+  name       = "instMaxRounds"
+  category   = "regular"
+  long       = "inst-max-rounds=N"
+  type       = "int64_t"
+  default    = "-1"
+  help       = "maximum number of instantiation rounds (-1 == no limit, default)"
+
+[[option]]
+  name       = "fullSaturateQuant"
+  category   = "common"
+  long       = "full-saturate-quant"
+  type       = "bool"
+  default    = "false"
+  help       = "resort to full effort techniques instead of answering unknown due to limited quantifier reasoning. Currently enables enumerative instantiation"
+
+[[option]]
+  name       = "enumInst"
+  category   = "common"
+  long       = "enum-inst"
+  type       = "bool"
+  default    = "false"
+  help       = "enumerative instantiation: instantiate with ground terms from relevant domain, then arbitrary ground terms before answering unknown"
+
+[[option]]
+  name       = "enumInstInterleave"
+  category   = "regular"
+  long       = "enum-inst-interleave"
+  type       = "bool"
+  default    = "false"
+  help       = "interleave enumerative instantiation with other techniques"
+
+[[option]]
+  name       = "enumInstSum"
+  category   = "regular"
+  long       = "enum-inst-sum"
+  type       = "bool"
+  default    = "false"
+  help       = "enumerating tuples of quantifiers by increasing the sum of indices, rather than the maximum"
+
+[[option]]
+  name       = "finiteModelFind"
+  category   = "regular"
+  long       = "finite-model-find"
+  type       = "bool"
+  default    = "false"
+  help       = "use finite model finding heuristic for quantifier instantiation"
+
+[[option]]
+  name       = "fmfOneInstPerRound"
+  category   = "regular"
+  long       = "mbqi-one-inst-per-round"
+  type       = "bool"
+  default    = "false"
+  help       = "only add one instantiation per quantifier per round for mbqi"
+
+[[option]]
+  name       = "fmfBound"
+  category   = "regular"
+  long       = "fmf-bound"
+  type       = "bool"
+  default    = "false"
+  help       = "finite model finding on bounded quantification"
+
+[[option]]
+  name       = "fmfTypeCompletionThresh"
+  category   = "regular"
+  long       = "fmf-type-completion-thresh=N"
+  type       = "int64_t"
+  default    = "1000"
+  help       = "the maximum cardinality of an interpreted type for which exhaustive enumeration in finite model finding is attempted"
+
+[[option]]
+  name       = "conflictBasedInst"
+  category   = "common"
+  long       = "cbqi"
+  type       = "bool"
+  default    = "true"
+  help       = "enable conflict-based quantifier instantiation"
+
+[[option]]
+  name       = "cbqiMode"
+  category   = "regular"
+  long       = "cbqi-mode=MODE"
+  type       = "QcfMode"
+  default    = "PROP_EQ"
+  help       = "what effort to apply conflict find mechanism"
+  help_mode  = "Quantifier conflict find modes."
+[[option.mode.CONFLICT_ONLY]]
+  name = "conflict"
+  help = "Apply QCF algorithm to find conflicts only."
+[[option.mode.PROP_EQ]]
+  name = "prop-eq"
+  help = "Apply QCF algorithm to propagate equalities as well as conflicts."
+
+[[option]]
+  name       = "cbqiAllConflict"
+  category   = "regular"
+  long       = "cbqi-all-conflict"
+  type       = "bool"
+  default    = "false"
+  help       = "add all available conflicting instances during conflict-based instantiation"
+
+[[option]]
+  name       = "instNoEntail"
+  category   = "regular"
+  long       = "inst-no-entail"
+  type       = "bool"
+  default    = "true"
+  help       = "do not consider instances of quantified formulas that are currently entailed"
+
+[[option]]
+  name       = "ievalMode"
+  category   = "regular"
+  long       = "ieval=MODE"
+  type       = "IevalMode"
+  default    = "USE"
+  help       = "mode for using instantiation evaluation"
+  help_mode  = "Mode for using instantiation evaluation."
+[[option.mode.OFF]]
+  name = "off"
+  help = "Do not use instantiation evaluation."
+[[option.mode.USE]]
+  name = "use"
+  help = "Use instantiation evaluation."
+[[option.mode.USE_LEARN]]
+  name = "use-learn"
+  help = "Use instantiation evaluation, and generalize learning."
+
+[[option]]
+  name       = "quantSubCbqiTimeout"
+  category   = "common"
+  long       = "sub-cbqi-timeout=N"
+  type       = "uint64_t"
+  default    = "0"
+  help       = "Timeout (in milliseconds) for subsolver calls for sub-cbqi"
+
+### Induction options
+
+[[option]]
+  name       = "cegisSample"
+  category   = "regular"
+  long       = "cegis-sample=MODE"
+  type       = "CegisSampleMode"
+  default    = "NONE"
+  help       = "mode for using samples in the counterexample-guided inductive synthesis loop"
+  help_mode  = "Modes for sampling with counterexample-guided inductive synthesis (CEGIS)."
+[[option.mode.NONE]]
+  name = "none"
+  help = "Do not use sampling with CEGIS."
+[[option.mode.USE]]
+  name = "use"
+  help = "Use sampling to accelerate CEGIS. This will rule out solutions for a conjecture when they are not satisfied by a sample point."
+[[option.mode.TRUST]]
+  name = "trust"
+  help = "Trust that when a solution for a conjecture is always true under sampling, then it is indeed a solution. Note this option may print out spurious solutions for synthesis conjectures."
+
+[[option]]
+  name       = "cegqi"
+  category   = "regular"
+  long       = "cegqi"
+  type       = "bool"
+  default    = "false"
+  help       = "turns on counterexample-based quantifier instantiation"
+
+[[option]]
+  name       = "cegqiInnermost"
+  category   = "regular"
+  long       = "cegqi-innermost"
+  type       = "bool"
+  default    = "true"
+  help       = "only process innermost quantified formulas in counterexample-based quantifier instantiation"
+
+[[setting]]
+  name       = "cegqiNestedQE"
+  type       = "bool"
+  default    = "false"
+
+# CEGQI for arithmetic
+
+[[option]]
+  name       = "quantAlphaEquiv"
+  category   = "regular"
+  long       = "quant-alpha-equiv"
+  type       = "bool"
+  default    = "true"
+  help       = "infer alpha equivalence between quantified formulas"
+
+[[setting]]
+  name       = "macrosQuant"
+  type       = "bool"
+  default    = "false"
+
+[[setting]]
+  name       = "macrosQuantMode"
+  type       = "MacrosQuantMode"
+  default    = "GROUND_UF"
+  help_mode  = "Modes for quantifiers macro expansion."
+[[setting.mode.ALL]]
+  name = "all"
+[[setting.mode.GROUND]]
+  name = "ground"
+[[setting.mode.GROUND_UF]]
+  name = "ground-uf"
+
+[[option]]
+  name       = "quantDynamicSplit"
+  category   = "regular"
+  long       = "quant-dsplit=MODE"
+  type       = "QuantDSplitMode"
+  default    = "DEFAULT"
+  help       = "mode for dynamic quantifiers splitting"
+  help_mode  = "Modes for quantifiers splitting."
+[[option.mode.NONE]]
+  name = "none"
+  help = "Never split quantified formulas."
+[[option.mode.DEFAULT]]
+  name = "default"
+  help = "Split quantified formulas over some finite datatypes when finite model finding is enabled."
+[[option.mode.AGG]]
+  name = "agg"
+  help = "Aggressively split quantified formulas."
+
+### Higher-order options
+
+[[option]]
+  name       = "instLocal"
+  category   = "regular"
+  long       = "inst-local"
+  type       = "bool"
+  default    = "false"
+  help       = "Instantiations are local to the SAT context"
+
+### SyGuS instantiation options
+
+[[setting]]
+name = "prenexQuant"
+type = "PrenexQuantMode"
+default = "SIMPLE"
+[[setting.mode.NONE]]
+name = "none"
+[[setting.mode.SIMPLE]]
+name = "simple"
+[[setting.mode.NORMAL]]
+name = "norm"
+
+[[setting]]
+name = "condVarSplitQuant"
+type = "CondVarSplitQuantMode"
+default = "ON"
+[[setting.mode.OFF]]
+name = "off"
+[[setting.mode.ON]]
+name = "on"
+[[setting.mode.AGG]]
+name = "agg"
+
+[[setting]]
+name = "iteDtTesterSplitQuant"
+type = "bool"
+default = "false"
+
+[[setting]]
+name = "preSkolemQuantNested"
+type = "bool"
+default = "true"
+
+[[setting]]
+name = "globalNegate"
+type = "bool"
+default = "false"
+
+[[setting]]
+name = "purifyTriggers"
+type = "bool"
+default = "false"
+
+[[setting]]
+name = "triggerActiveSelMode"
+type = "TriggerActiveSelMode"
+default = "ALL"
+[[setting.mode.ALL]]
+name = "all"
+[[setting.mode.MIN]]
+name = "min"
+[[setting.mode.MAX]]
+name = "max"
+
+[[setting]]
+name = "instWhenPhase"
+type = "int64_t"
+default = "2"
+
+[[setting]]
+name = "instMaxLevel"
+type = "int64_t"
+default = "-1"
+
+[[setting]]
+name = "quantRepMode"
+type = "QuantRepMode"
+default = "FIRST"
+[[setting.mode.EE]]
+name = "ee"
+[[setting.mode.FIRST]]
+name = "first"
+[[setting.mode.DEPTH]]
+name = "depth"
+
+[[setting]]
+name = "enumInstLimit"
+type = "int64_t"
+default = "-1"
+
+[[setting]]
+name = "literalMatchMode"
+type = "LiteralMatchMode"
+default = "USE"
+[[setting.mode.NONE]]
+name = "none"
+[[setting.mode.USE]]
+name = "use"
+[[setting.mode.AGG_PREDICATE]]
+name = "agg-predicate"
+[[setting.mode.AGG]]
+name = "agg"
+
+[[setting]]
+name = "userPoolQuant"
+type = "UserPoolMode"
+default = "TRUST"
+[[setting.mode.USE]]
+name = "use"
+[[setting.mode.TRUST]]
+name = "trust"
+[[setting.mode.IGNORE]]
+name = "ignore"
+
+[[setting]]
+name = "fmfFunWellDefined"
+type = "bool"
+default = "false"
+
+[[setting]]
+name = "fmfMbqiMode"
+type = "FmfMbqiMode"
+default = "FMC"
+[[setting.mode.NONE]]
+name = "none"
+[[setting.mode.FMC]]
+name = "fmc"
+[[setting.mode.TRUST]]
+name = "trust"
+
+[[setting]]
+name = "dtStcInduction"
+type = "bool"
+default = "false"
+
+[[setting]]
+name = "intWfInduction"
+type = "bool"
+default = "false"
+
+[[setting]]
+name = "cegqiFullEffort"
+type = "bool"
+default = "false"
+
+[[setting]]
+name = "cegqiUseInfInt"
+type = "bool"
+default = "false"
+
+[[setting]]
+name = "cegqiUseInfReal"
+type = "bool"
+default = "false"
+
+[[setting]]
+name = "cegqiMidpoint"
+type = "bool"
+default = "true"
+
+[[setting]]
+name = "cegqiBvIneqMode"
+type = "CegqiBvIneqMode"
+default = "EQ_BOUNDARY"
+[[setting.mode.EQ_SLACK]]
+name = "eq-slack"
+[[setting.mode.EQ_BOUNDARY]]
+name = "eq-boundary"
+[[setting.mode.KEEP]]
+name = "keep"
+
+[[setting]]
+name = "hoElimStoreAx"
+type = "bool"
+default = "true"
+

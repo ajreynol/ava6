@@ -1,0 +1,8 @@
+id     = "DATATYPES"
+name   = "Datatypes Theory"
+
+[[setting]]
+name = "dtSharedSelectors"
+type = "bool"
+default = "false"
+

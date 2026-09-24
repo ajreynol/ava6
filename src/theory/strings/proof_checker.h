@@ -1,0 +1,48 @@
+/******************************************************************************
+ * This file is part of the cvc5 project.
+ *
+ * Copyright (c) 2009-2026 by the authors listed in the file AUTHORS
+ * in the top-level source directory and their institutional affiliations.
+ * All rights reserved.  See the file COPYING in the top-level source
+ * directory for licensing information.
+ * ****************************************************************************
+ *
+ * Strings proof checker utility.
+ */
+
+#include "ava6_private.h"
+
+#ifndef AVA6__THEORY__STRINGS__PROOF_CHECKER_H
+#define AVA6__THEORY__STRINGS__PROOF_CHECKER_H
+
+#include "expr/node.h"
+#include "proof/proof_checker.h"
+#include "proof/proof_node.h"
+
+namespace ava6::internal {
+namespace theory {
+namespace strings {
+
+/** A checker for strings proofs */
+class StringProofRuleChecker : public ProofRuleChecker
+{
+ public:
+  StringProofRuleChecker(NodeManager* nm, uint32_t alphaCard);
+
+  /** Register all rules owned by this rule checker in pc. */
+  void registerTo(ProofChecker* pc) override;
+
+ protected:
+  /** Return the conclusion of the given proof step, or null if it is invalid */
+  Node checkInternal(ProofRule id,
+                     const std::vector<Node>& children,
+                     const std::vector<Node>& args) override;
+  /** cardinality of the alphabet, which impacts certain inferences */
+  uint32_t d_alphaCard;
+};
+
+}  // namespace strings
+}  // namespace theory
+}  // namespace ava6::internal
+
+#endif /* AVA6__THEORY__STRINGS__PROOF_CHECKER_H */

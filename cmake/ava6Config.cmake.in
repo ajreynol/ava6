@@ -1,0 +1,43 @@
+###############################################################################
+# This file is part of the cvc5 project.
+#
+# Copyright (c) 2009-2026 by the authors listed in the file AUTHORS
+# in the top-level source directory and their institutional affiliations.
+# All rights reserved.  See the file COPYING in the top-level source
+# directory for licensing information.
+# #############################################################################
+##
+
+@PACKAGE_INIT@
+
+# Static consumers need the solver's link dependencies. Search both the
+# installation (downloaded dependencies) and the consumer's CMAKE_PREFIX_PATH.
+if(NOT @BUILD_SHARED_LIBS@)
+  find_library(ava6_CADICAL_LIBRARY NAMES cadical
+    HINTS "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@")
+  find_library(ava6_GMP_LIBRARY NAMES gmp
+    HINTS "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@")
+  if(NOT ava6_CADICAL_LIBRARY OR NOT ava6_GMP_LIBRARY)
+    set(ava6_FOUND FALSE)
+    set(ava6_NOT_FOUND_MESSAGE
+      "ava6 requires CaDiCaL and GMP. Add their installation prefixes to CMAKE_PREFIX_PATH.")
+    return()
+  endif()
+  if(NOT TARGET ava6::cadical)
+    add_library(ava6::cadical UNKNOWN IMPORTED)
+    set_target_properties(ava6::cadical PROPERTIES
+      IMPORTED_LOCATION "${ava6_CADICAL_LIBRARY}")
+    if(WIN32)
+      set_property(TARGET ava6::cadical PROPERTY INTERFACE_LINK_LIBRARIES psapi)
+    endif()
+  endif()
+  if(NOT TARGET ava6::gmp)
+    add_library(ava6::gmp UNKNOWN IMPORTED)
+    set_target_properties(ava6::gmp PROPERTIES
+      IMPORTED_LOCATION "${ava6_GMP_LIBRARY}")
+  endif()
+endif()
+
+if(NOT TARGET ava6::ava6)
+  include(${CMAKE_CURRENT_LIST_DIR}/ava6Targets.cmake)
+endif()

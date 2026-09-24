@@ -1,0 +1,49 @@
+id     = "PARSER"
+name   = "Parser"
+
+[[option]]
+  name       = "strictParsing"
+  category   = "common"
+  long       = "strict-parsing"
+  type       = "bool"
+  default    = "false"
+  predicates = ["strictParsing"]
+  help       = "be less tolerant of non-conforming inputs"
+
+[[option]]
+  name       = "globalDeclarations"
+  long       = "global-declarations"
+  category   = "regular"
+  type       = "bool"
+  default    = "false"
+  help       = "force all declarations and definitions to be global when parsing"
+
+[[option]]
+  name       = "freshDeclarations"
+  long       = "fresh-declarations"
+  category   = "regular"
+  type       = "bool"
+  default    = "true"
+  help       = "use API interface for fresh constants when parsing declarations and definitions"
+
+[[option]]
+  name       = "forceLogicString"
+  category   = "common"
+  long       = "force-logic=LOGIC"
+  type       = "std::string"
+  default    = '""'
+  help       = "set the logic, and override all further user attempts to change it"
+
+
+# Internal core policies; never accepted as command-line or SMT-LIB options.
+[[setting]]
+name = "parsingMode"
+type = "ParsingMode"
+default = "DEFAULT"
+[[setting.mode.DEFAULT]]
+name = "default"
+[[setting.mode.STRICT]]
+name = "strict"
+[[setting.mode.LENIENT]]
+name = "lenient"
+
