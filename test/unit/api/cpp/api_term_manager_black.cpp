@@ -175,8 +175,9 @@ TEST_F(TestApiBlackTermManager, mkFunctionSort)
                                       d_tm.getIntegerSort()));
   Sort funSort = d_tm.mkFunctionSort({d_tm.mkUninterpretedSort("u")},
                                      d_tm.getIntegerSort());
-  // function arguments are allowed
-  ASSERT_NO_THROW(d_tm.mkFunctionSort({funSort}, d_tm.getIntegerSort()));
+  // Function-valued arguments and results are excluded.
+  ASSERT_THROW(d_tm.mkFunctionSort({funSort}, d_tm.getIntegerSort()),
+               Ava6ApiException);
   ASSERT_THROW(d_tm.mkFunctionSort({d_tm.getIntegerSort()}, funSort),
                Ava6ApiException);
   ASSERT_NO_THROW(d_tm.mkFunctionSort(
@@ -184,7 +185,7 @@ TEST_F(TestApiBlackTermManager, mkFunctionSort)
       d_tm.getIntegerSort()));
   Sort funSort2 = d_tm.mkFunctionSort({d_tm.mkUninterpretedSort("u")},
                                       d_tm.getIntegerSort());
-  // function arguments are allowed
+  // Function-valued arguments and results are excluded.
   ASSERT_NO_THROW(d_tm.mkFunctionSort({funSort2, d_tm.mkUninterpretedSort("u")},
                                       d_tm.getIntegerSort()));
   ASSERT_THROW(
@@ -683,7 +684,6 @@ TEST_F(TestApiBlackTermManager, getNumIndicesForSkolemId)
   ASSERT_EQ(
       d_tm.getNumIndicesForSkolemId(SkolemId::STRINGS_REPLACE_RE_ALL_RESULT),
       3);
-  ASSERT_EQ(d_tm.getNumIndicesForSkolemId(SkolemId::BAGS_MAP_INDEX), 5);
 }
 
 TEST_F(TestApiBlackTermManager, uFIteration)

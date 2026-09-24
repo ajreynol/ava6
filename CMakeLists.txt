@@ -124,7 +124,6 @@ option(TREAT_WARNING_AS_ERROR  "Treat warnings on building as errors")
 #
 # >> 2-valued: ON OFF
 #    > for options where we don't need to detect if set by user (default: OFF)
-option(USE_EDITLINE      "Use Editline for better interactive support")
 
 # Custom install directories for dependencies
 # If no directory is provided by the user, we first check if the dependency was
@@ -168,9 +167,7 @@ elseif(BUILD_SHARED_LIBS OR NOT(STATIC_BINARY) OR NOT(ENABLE_AUTO_DOWNLOAD))
   message(FATAL_ERROR "Use --static, --static-binary and --auto-download flags for WebAssembly compilation. GMP will not compile with shared libraries.")
 else()
   # Older SDKs miscompile ava6: their getrusage() overruns the caller's
-  # buffer by 16 bytes, silently corrupting adjacent memory (a stack
-  # smash in Minisat::cpuTime and, via CoCoALib, a nulled
-  # GlobalManager pointer).
+  # buffer by 16 bytes, silently corrupting adjacent memory.
   if(EMSCRIPTEN_VERSION VERSION_LESS "6.0.8")
     message(FATAL_ERROR
       "Emscripten >= 6.0.8 is required for WebAssembly builds "
@@ -574,10 +571,6 @@ find_package(CaDiCaL REQUIRED)
 
 
 
-if(USE_EDITLINE)
-  find_package(Editline REQUIRED)
-  set(HAVE_LIBEDITLINE 1)
-endif()
 
 # SymFPU is always needed for the symbolic FP word blaster in the theory solver.
 
@@ -763,7 +756,6 @@ message("")
 
 
 
-print_config("Editline                  " ${USE_EDITLINE})
 message("")
 message("")
 if(GLPK_DIR)

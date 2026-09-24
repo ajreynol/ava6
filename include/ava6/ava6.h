@@ -446,23 +446,10 @@ class AVA6_EXPORT Sort
   bool isRegExp() const;
 
   /**
-   * Determine if this is the rounding mode sort (SMT-LIB: `RoundingMode`).
-   * @return True if this sort is the rounding mode sort.
-   */
-  bool isRoundingMode() const;
-
-  /**
    * Determine if this is a bit-vector sort (SMT-LIB: `(_ BitVec i)`).
    * @return True if this sort is a bit-vector sort.
    */
   bool isBitVector() const;
-
-  /**
-   * Determine if this is a floatingpoint sort
-   * (SMT-LIB: `(_ FloatingPoint eb sb)`).
-   * @return True if this sort is a floating-point sort.
-   */
-  bool isFloatingPoint() const;
 
   /**
    * Determine if this is a datatype sort.
@@ -515,12 +502,6 @@ class AVA6_EXPORT Sort
   bool isTuple() const;
 
   /**
-   * Determine if this is a nullable sort.
-   * @return True if the sort is a nullable sort.
-   */
-  bool isNullable() const;
-
-  /**
    * Determine if this is a record sort.
    * @warning This function is experimental and may change in future versions.
    * @return True if the sort is a record sort.
@@ -534,22 +515,10 @@ class AVA6_EXPORT Sort
   bool isArray() const;
 
   /**
-   * Determine if this is a finite field sort.
-   * @return True if the sort is a finite field sort.
-   */
-  bool isFiniteField() const;
-
-  /**
    * Determine if this is a Set sort.
    * @return True if the sort is a Set sort.
    */
   bool isSet() const;
-
-  /**
-   * Determine if this is a Bag sort.
-   * @return True if the sort is a Bag sort.
-   */
-  bool isBag() const;
 
   /**
    * Determine if this is a Sequence sort.
@@ -754,11 +723,6 @@ class AVA6_EXPORT Sort
 
   /* Bag sort ------------------------------------------------------------ */
 
-  /**
-   * @return The element sort of a bag sort.
-   */
-  Sort getBagElementSort() const;
-
   /* Sequence sort ------------------------------------------------------- */
 
   /**
@@ -791,22 +755,7 @@ class AVA6_EXPORT Sort
 
   /* Finite field sort --------------------------------------------------- */
 
-  /**
-   * @return The size of the finite field sort.
-   */
-  std::string getFiniteFieldSize() const;
-
   /* Floating-point sort ------------------------------------------------- */
-
-  /**
-   * @return The bit-width of the exponent of the floating-point sort.
-   */
-  uint32_t getFloatingPointExponentSize() const;
-
-  /**
-   * @return The width of the significand of the floating-point sort.
-   */
-  uint32_t getFloatingPointSignificandSize() const;
 
   /* Datatype sort ------------------------------------------------------- */
 
@@ -828,11 +777,6 @@ class AVA6_EXPORT Sort
    * @return The element sorts of a tuple sort.
    */
   std::vector<Sort> getTupleSorts() const;
-
-  /**
-   * @return The element sort of a nullable sort.
-   */
-  Sort getNullableElementSort() const;
 
   /* --------------------------------------------------------------------- */
 
@@ -1583,23 +1527,6 @@ class AVA6_EXPORT Term
   std::string getBitVectorValue(uint32_t base = 2) const;
 
   /**
-   * Determine if this term is a finite field value.
-   * @return True if the term is a finite field value.
-   */
-  bool isFiniteFieldValue() const;
-  /**
-   * Get the string representation of a finite field value (base 10).
-   *
-   * @note Asserts isFiniteFieldValue().
-   *
-   * @note Uses the integer representative of smallest absolute value.
-   *
-   * @return The string representation of the integer representation of this
-   * finite field value.
-   */
-  std::string getFiniteFieldValue() const;
-
-  /**
    * Determine if this term is an uninterpreted sort value.
    * @return True if the term is an abstract value.
    */
@@ -1622,58 +1549,6 @@ class AVA6_EXPORT Term
    * @return The representation of a tuple value as a vector of terms.
    */
   std::vector<Term> getTupleValue() const;
-
-  /**
-   * Determine if this term is a floating-point rounding mode value.
-   * @return True if the term is a rounding mode value.
-   */
-  bool isRoundingModeValue() const;
-  /**
-   * Get the RoundingMode value of a given rounding-mode value term.
-   * @note Asserts isRoundingModeValue().
-   * @return The floating-point rounding mode value of the term.
-   */
-  RoundingMode getRoundingModeValue() const;
-
-  /**
-   * Determine if this term is a floating-point positive zero value (+zero).
-   * @return True if the term is the floating-point value for positive zero.
-   */
-  bool isFloatingPointPosZero() const;
-  /**
-   * Determine if this term is a floating-point negative zero value (-zero).
-   * @return True if the term is the floating-point value for negative zero.
-   */
-  bool isFloatingPointNegZero() const;
-  /**
-   * Determine if this term is a floating-point positive infinity value (+oo).
-   * @return True if the term is the floating-point value for positive.
-   * infinity.
-   */
-  bool isFloatingPointPosInf() const;
-  /**
-   * Determine if this term is a floating-point negative infinity value (-oo).
-   * @return True if the term is the floating-point value for negative.
-   * infinity.
-   */
-  bool isFloatingPointNegInf() const;
-  /**
-   * Determine if a given term is a floating-point NaN value.
-   * @return True if the term is the floating-point value for not a number.
-   */
-  bool isFloatingPointNaN() const;
-  /**
-   * Determine if a given term is a floating-point value.
-   * @return True if the term is a floating-point value.
-   */
-  bool isFloatingPointValue() const;
-  /**
-   * Get the representation of a floating-point value as a tuple of its
-   * exponent width, significand width and a bit-vector value term.
-   * @note Asserts isFloatingPointValue().
-   * @return The floating-point value representation.
-   */
-  std::tuple<uint32_t, uint32_t, Term> getFloatingPointValue() const;
 
   /**
    * Determine if this term is a set value.
@@ -3072,22 +2947,6 @@ struct AVA6_EXPORT OptionInfo
   std::vector<std::string> noSupports;
   /** Whether the option was explicitly set by the user */
   bool setByUser;
-  /**
-   * True if the option is an expert option
-   * @warning This field is deprecated and replaced by `category`. It will be
-   *          removed in a future release.
-   */
-  [[deprecated(
-      "Query ava6::modes::OptionCategory category for EXPERT instead")]] bool
-      isExpert;
-  /**
-   * True if the option is a regular option
-   * @warning This field is deprecated and replaced by `category`. It will be
-   *          removed in a future release.
-   */
-  [[deprecated(
-      "Query ava6::modes::OptionCategory category for REGULAR instead")]] bool
-      isRegular;
   /** The category of this option. */
   modes::OptionCategory category;
   /** Possible types for ``valueInfo``. */
@@ -3556,11 +3415,6 @@ class AVA6_EXPORT TermManager
    */
   Sort getRegExpSort();
   /**
-   * Get the rounding mode sort.
-   * @return Sort `RoundingMode`.
-   */
-  Sort getRoundingModeSort();
-  /**
    * Get the string sort.
    * @return Sort `String`.
    */
@@ -3578,20 +3432,6 @@ class AVA6_EXPORT TermManager
    * @return The bit-vector sort.
    */
   Sort mkBitVectorSort(uint32_t size);
-  /**
-   * Create a floating-point sort.
-   * @param exp The bit-width of the exponent of the floating-point sort.
-   * @param sig The bit-width of the significand of the floating-point sort.
-   * @return The floating-point sort.
-   */
-  Sort mkFloatingPointSort(uint32_t exp, uint32_t sig);
-  /**
-   * Create a finite-field sort from a given string of base n.
-   * @param size The modulus of the field. Must be prime.
-   * @param base The base of the string representation of `size`.
-   * @return The finite-field sort.
-   */
-  Sort mkFiniteFieldSort(const std::string& size, uint32_t base = 10);
   /**
    * Create a datatype sort.
    * @param dtypedecl The datatype declaration from which the sort is created.
@@ -3663,12 +3503,6 @@ class AVA6_EXPORT TermManager
    */
   Sort mkSetSort(const Sort& elemSort);
   /**
-   * Create a bag sort.
-   * @param elemSort The sort of the bag elements.
-   * @return The bag sort.
-   */
-  Sort mkBagSort(const Sort& elemSort);
-  /**
    * Create a sequence sort.
    * @param elemSort The sort of the sequence elements.
    * @return The sequence sort.
@@ -3735,13 +3569,6 @@ class AVA6_EXPORT TermManager
    * @return The tuple sort.
    */
   Sort mkTupleSort(const std::vector<Sort>& sorts);
-  /**
-   * Create a nullable sort.
-   * @param sort The sort of the element of the nullable.
-   * @return The nullable sort.
-   */
-  Sort mkNullableSort(const Sort& sort);
-
   /* Operators ---------------------------------------------------------- */
 
   /**
@@ -3884,25 +3711,6 @@ class AVA6_EXPORT TermManager
    */
   Term mkEmptySet(const Sort& sort);
   /**
-   * Create a constant representing an empty bag of the given sort.
-   * @param sort The sort of the bag elements.
-   * @return The empty bag constant.
-   */
-  Term mkEmptyBag(const Sort& sort);
-  /**
-   * Create a separation logic empty term.
-   * @return The separation logic empty term.
-   * @warning This function is experimental and may change in future versions.
-   */
-  Term mkSepEmp();
-  /**
-   * Create a separation logic nil term.
-   * @param sort The sort of the nil term.
-   * @return The separation logic nil term.
-   * @warning This function is experimental and may change in future versions.
-   */
-  Term mkSepNil(const Sort& sort);
-  /**
    * Create a String constant from a `std::string` which may contain SMT-LIB
    * compatible escape sequences like `\u1234` to encode unicode characters.
    * @param s               The string this constant represents.
@@ -3967,22 +3775,6 @@ class AVA6_EXPORT TermManager
    */
   Term mkBitVector(uint32_t size, const std::string& s, uint32_t base);
   /**
-   * Create a finite field constant in a given field from a given string
-   * of base n.
-   *
-   * If `size` is the field size, the constant needs not be in the range
-   * [0,size). If it is outside this range, it will be reduced modulo size
-   * before being constructed.
-   *
-   * @param value The string representation of the constant.
-   * @param sort  The field sort.
-   * @param base  The base of the string representation of `value`.
-   *
-   */
-  Term mkFiniteFieldElem(const std::string& value,
-                         const Sort& sort,
-                         uint32_t base = 10);
-  /**
    * Create a constant array with the provided constant value stored at every
    * index.
    * @param sort The sort of the constant array (must be an array sort).
@@ -3992,117 +3784,11 @@ class AVA6_EXPORT TermManager
    */
   Term mkConstArray(const Sort& sort, const Term& val);
   /**
-   * Create a positive infinity floating-point constant (SMT-LIB: `+oo`).
-   * @param exp Number of bits in the exponent.
-   * @param sig Number of bits in the significand.
-   * @return The floating-point constant.
-   */
-  Term mkFloatingPointPosInf(uint32_t exp, uint32_t sig);
-  /**
-   * Create a negative infinity floating-point constant (SMT-LIB: `-oo`).
-   * @param exp Number of bits in the exponent.
-   * @param sig Number of bits in the significand.
-   * @return The floating-point constant.
-   */
-  Term mkFloatingPointNegInf(uint32_t exp, uint32_t sig);
-  /**
-   * Create a not-a-number floating-point constant (SMT-LIB: `NaN`).
-   * @param exp Number of bits in the exponent.
-   * @param sig Number of bits in the significand.
-   * @return The floating-point constant.
-   */
-  Term mkFloatingPointNaN(uint32_t exp, uint32_t sig);
-  /**
-   * Create a positive zero floating-point constant (SMT-LIB: +zero).
-   * @param exp Number of bits in the exponent.
-   * @param sig Number of bits in the significand.
-   * @return The floating-point constant.
-   */
-  Term mkFloatingPointPosZero(uint32_t exp, uint32_t sig);
-  /**
-   * Create a negative zero floating-point constant (SMT-LIB: -zero).
-   * @param exp Number of bits in the exponent.
-   * @param sig Number of bits in the significand.
-   * @return The floating-point constant.
-   */
-  Term mkFloatingPointNegZero(uint32_t exp, uint32_t sig);
-  /**
-   * Create a rounding mode value.
-   * @param rm The floating point rounding mode this constant represents.
-   * @return The rounding mode value.
-   */
-  Term mkRoundingMode(RoundingMode rm);
-  /**
-   * Create a floating-point value from a bit-vector given in IEEE-754
-   * format.
-   * @param exp Size of the exponent.
-   * @param sig Size of the significand.
-   * @param val Value of the floating-point constant as a bit-vector term.
-   * @return The floating-point value.
-   */
-  Term mkFloatingPoint(uint32_t exp, uint32_t sig, const Term& val);
-  /**
-   * Create a floating-point value from its three IEEE-754 bit-vector
-   * value components (sign bit, exponent, significand).
-   * @param sign The sign bit.
-   * @param exp  The bit-vector representing the exponent.
-   * @param sig  The bit-vector representing the significand.
-   * @return The floating-point value.
-   */
-  Term mkFloatingPoint(const Term& sign, const Term& exp, const Term& sig);
-  /**
    * Create a tuple term.
    * @param terms The elements in the tuple.
    * @return The tuple Term.
    */
   Term mkTuple(const std::vector<Term>& terms);
-  /**
-   * Create a nullable some term.
-   * @param term The element value.
-   * @return the Element value wrapped in some constructor.
-   */
-  Term mkNullableSome(const Term& term);
-  /**
-   * Create a selector for nullable term.
-   * @param term A nullable term.
-   * @return The element value of the nullable term.
-   */
-  Term mkNullableVal(const Term& term);
-  /**
-   * Create a null tester for a nullable term.
-   * @param term A nullable term.
-   * @return A tester whether term is null.
-   */
-  Term mkNullableIsNull(const Term& term);
-  /**
-   * Create a some tester for a nullable term.
-   * @param term A nullable term.
-   * @return A tester whether term is some.
-   */
-  Term mkNullableIsSome(const Term& term);
-  /**
-   * Create a constant representing an null of the given sort.
-   * @param sort The sort of the Nullable element.
-   * @return The null constant.
-   */
-  Term mkNullableNull(const Sort& sort);
-  /**
-   * Create a term that lifts kind to nullable terms.
-   *
-   * Example:
-   * If we have the term ((_ nullable.lift +) x y),
-   * where x, y of type (Nullable Int), then
-   * kind would be ADD, and args would be [x, y].
-   * This function would return
-   * (nullable.lift (lambda ((a Int) (b Int)) (+ a b)) x y)
-   *
-   * @param kind The lifted operator.
-   * @param args The arguments of the lifted operator.
-   * @return A term of Kind NULLABLE_LIFT where the first child is a lambda
-   *         expression, and the remaining children are the original arguments.
-   */
-  Term mkNullableLift(Kind kind, const std::vector<Term>& args);
-
   /* Constants and Variables -------------------------------------------- */
 
   /**
@@ -4844,8 +4530,7 @@ class AVA6_EXPORT Solver
    * @param sorts The list of uninterpreted sorts that should be printed in
    *              the model.
    * @param consts The list of free constants that should be printed in the
-   *               model. A subset of these may be printed based on
-   *               isModelCoreSymbol().
+   *               model.
    * @return A string representing the model.
    */
   std::string getModel(const std::vector<Sort>& sorts,

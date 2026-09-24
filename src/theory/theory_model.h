@@ -225,22 +225,11 @@ class TheoryModel : protected EnvObj
    */
   Node simplify(TNode n) const;
 
-  //---------------------------- separation logic
-  /** set the heap and value sep.nil is equal to */
-  void setHeapModel(Node h, Node neq);
-  /** get the heap and value sep.nil is equal to */
-  bool getHeapModel(Node& h, Node& neq) const;
-  //---------------------------- end separation logic
-
-  /** get domain elements for uninterpreted sort t */
+  /** Get domain elements for uninterpreted sort t. */
   std::vector<Node> getDomainElements(TypeNode t) const;
-  /** get the representative set object */
+  /** Get the representative set. */
   const RepSet* getRepSet() const { return &d_rep_set; }
-  /** get the representative set object (FIXME: remove this, see #1199) */
   RepSet* getRepSetPtr() { return &d_rep_set; }
-
-  //---------------------------- model cores
-  //---------------------------- end model cores
 
   //---------------------------- function values
   /** Does this model have terms for the given uninterpreted function? */
@@ -372,18 +361,9 @@ class TheoryModel : protected EnvObj
   /** cache used for evaluateSemiEvalTerm */
   mutable std::unordered_map<Node, NodeTrie> d_semiEvalCache;
 
-  //---------------------------- separation logic
-  /** the value of the heap */
-  Node d_sep_heap;
-  /** the value of the nil element */
-  Node d_sep_nil_eq;
-  //---------------------------- end separation logic
-
   //---------------------------- function values
   /** a map from functions f to a list of all APPLY_UF terms with operator f */
   std::map<Node, std::vector<Node> > d_uf_terms;
-  /** a map from functions f to a list of all HO_APPLY terms with first argument
-   * f */
   /** whether function models are enabled */
   bool d_enableFuncModels;
   /**

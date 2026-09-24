@@ -38,7 +38,7 @@ namespace datatypes {
 class DatatypesRewriter : public TheoryRewriter
 {
  public:
-  DatatypesRewriter(NodeManager* nm, Evaluator* sygusEval, const Options& opts);
+  explicit DatatypesRewriter(NodeManager* nm);
   RewriteResponse postRewrite(TNode in) override;
   RewriteResponse preRewrite(TNode in) override;
 
@@ -67,33 +67,6 @@ class DatatypesRewriter : public TheoryRewriter
   static Node expandMatch(Node n);
   /** expand defintions */
   Node expandDefinition(Node n) override;
-  /**
-   * Expand a nullable lift term with an ite expression.
-   * Example:
-   * input : (nullable.lift f x y) where f is a function
-   *         and x,y are nullable terms.
-   * output: (ite
-   *           (or (nullable.is_null x) (nullable.is_null y))
-   *           (nullable.null)
-   *           (f (nullable.val x) (nullable.val y))
-   *         )
-   * @pre Higher-order logic is enabled.
-   * @param n A nullable lift term.
-   * @return An ite expression.
-   */
-  Node expandNullableLift(Node n);
-
-  /**
-   * Rewrite nullable lift terms as null if any of the arguments is null,
-   * or return the some of applying the function (first child) to values
-   * if all arguments are some constants.
-   * - input : (nullable.lift f x1 ... (nullable.null) ... xn))
-   *   output: (nullable.null)
-   * - input : (nullable.lift f (nullable.some c1) ... (nullable.some cn))
-   *   output: (f c1 ... cn)
-   */
-  RewriteResponse rewriteNullableLift(TNode n);
-
  private:
   /** rewrite constructor term in */
   RewriteResponse rewriteConstructor(TNode in);
@@ -104,32 +77,6 @@ class DatatypesRewriter : public TheoryRewriter
   /** rewrite updater term in */
   RewriteResponse rewriteUpdater(TNode in);
 
-  /** Sygus to builtin eval
-   *
-   * This method returns the rewritten form of (DT_SYGUS_EVAL n args). Notice
-   * that n does not necessarily need to be a constant.
-   *
-   * It does so by (1) converting constant subterms of n to builtin terms and
-   * evaluating them on the arguments args, (2) unfolding non-constant
-   * applications of sygus constructors in n with respect to args and (3)
-   * converting all other non-constant subterms of n to applications of
-   * DT_SYGUS_EVAL.
-   *
-   * For example, if
-   *   n = C_+( C_*( C_x(), C_y() ), n' ), and args = { 3, 4 }
-   * where n' is a variable, then this method returns:
-   *   12 + (DT_SYGUS_EVAL n' 3 4)
-   * Notice that the subterm C_*( C_x(), C_y() ) is converted to its builtin
-   * equivalent x*y and evaluated under the substition { x -> 3, y -> 4 } giving
-   * 12. The subterm n' is non-constant and thus we return its evaluation under
-   * 3,4, giving the term (DT_SYGUS_EVAL n' 3 4). Since the top-level
-   * constructor is C_+, these terms are added together to give the result.
-   */
-  Node sygusToBuiltinEval(Node n, const std::vector<Node>& args);
-  /** Pointer to the evaluator, used as an optimization for the above method */
-  Evaluator* d_sygusEval;
-  /** Reference to the options */
-  const Options& d_opts;
 };
 
 }  // namespace datatypes

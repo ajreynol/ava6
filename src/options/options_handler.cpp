@@ -266,7 +266,7 @@ void OptionsHandler::enableOutputTag(AVA6_UNUSED const std::string& flag,
                                      const OutputTag optarg) const
 {
   const size_t tagid = static_cast<size_t>(optarg);
-  Assert(d_options->io.outputTagHolder.size() > tagid)
+  Assert(d_options->base.outputTagHolder.size() > tagid)
       << "Output tag is larger than the bitset that holds it.";
   d_options->write_base().outputTagHolder.set(tagid);
 }
@@ -335,7 +335,6 @@ void OptionsHandler::showConfiguration(AVA6_UNUSED const std::string& flag,
   print_config_cond(o, "poly", Configuration::isBuiltWithPoly());
   print_config_cond(o, "cocoa", Configuration::isBuiltWithCoCoA());
   print_config_cond(o, "normaliz", Configuration::isBuiltWithNormaliz());
-  print_config_cond(o, "editline", Configuration::isBuiltWithEditline());
 }
 
 void OptionsHandler::showCopyright(AVA6_UNUSED const std::string& flag,

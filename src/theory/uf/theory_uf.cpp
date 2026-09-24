@@ -74,13 +74,8 @@ bool TheoryUF::needsEqualityEngine(EeSetupInfo& esi)
 void TheoryUF::finishInit()
 {
   Assert(d_equalityEngine != nullptr);
-  // combined cardinality constraints are not evaluated in getModelValue
   // distinct should not be sent to the model
   d_valuation.setIrrelevantKind(Kind::DISTINCT);
-
-  // Initialize the cardinality constraints solver if the logic includes UF,
-  // finite model finding is enabled, and it is not disabled by
-  // the ufssMode option.
 
   // The kinds we are treating as function application in congruence
 
@@ -95,10 +90,7 @@ void TheoryUF::finishInit()
 
 bool TheoryUF::needsCheckLastEffort()
 {
-  // last call effort needed if using finite model finding,
-  // arithmetic/bit-vector conversions, or higher-order extension
-  return d_csolver != nullptr || false
-         || d_distinct.needsCheckLastEffort();
+  return d_csolver != nullptr || d_distinct.needsCheckLastEffort();
 }
 
 void TheoryUF::postCheck(Effort level)
@@ -107,7 +99,6 @@ void TheoryUF::postCheck(Effort level)
   {
     return;
   }
-  // check with the cardinality constraints extension
 
   if (!d_state.isInConflict())
   {
@@ -120,7 +111,6 @@ void TheoryUF::postCheck(Effort level)
       }
     }
     d_distinct.check(level);
-    // check with the higher-order extension at full effort
     
   }
 }
@@ -137,11 +127,6 @@ void TheoryUF::notifyFact(TNode atom,
 
   switch (atom.getKind())
   {
-    case Kind::EQUAL:
-    {
-      
-    }
-    break;
     case Kind::DISTINCT:
     {
       // call the distinct extension
@@ -167,28 +152,13 @@ TrustNode TheoryUF::ppRewrite(TNode node, AVA6_UNUSED std::vector<SkolemLemma>& 
   }
   if (node.getType().isFunction())
   {
-    {
-      std::stringstream ss;
-      {
-        ss << "Function terms";
-      }
-      ss << " are only supported with "
-            "first-order terms.";
-      throw LogicException(ss.str());
-    }
+    throw LogicException("Function-valued terms are not supported.");
   }
   else if (k == Kind::APPLY_UF)
   {
     if (isHigherOrderType(node.getOperator().getType()))
     {
-      // check for higher-order
-      // logic exception if higher-order is not enabled
-      std::stringstream ss;
-      ss << "UF received an application whose operator has higher-order type "
-         << node
-         << ", which is only supported with first-order terms. "
-            "";
-      throw LogicException(ss.str());
+      throw LogicException("Function arguments cannot have function types.");
     }
   }
   else if ((k == Kind::BITVECTOR_UBV_TO_INT || k == Kind::INT_TO_BITVECTOR) && options().uf.eagerArithBvConv)

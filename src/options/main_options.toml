@@ -80,14 +80,6 @@ name   = "Driver"
   help       = "do not run destructors at exit; default on except in debug builds"
 
 [[option]]
-  name       = "interactive"
-  category   = "common"
-  long       = "interactive"
-  type       = "bool"
-  default    = "false"
-  help       = "force interactive shell/non-interactive mode"
-
-[[option]]
   name       = "filename"
   category   = "undocumented"
   long       = "filename=FILENAME"
@@ -143,4 +135,3 @@ name   = "Driver"
   default    = "false"
   help       = "print the \"success\" output required of SMT-LIBv2"
 
-# Internal core policies; never accepted as command-line or SMT-LIB options.

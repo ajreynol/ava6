@@ -149,22 +149,6 @@ Token Smt2Lexer::computeNextToken()
             parseError("Error expected hexadecimal string");
           }
           return Token::HEX_LITERAL;
-        case 'f':
-          pushToToken(ch);
-          // parse [0-9]+m[0-9]+
-          if (!parseNonEmptyCharList(CharacterClass::DECIMAL_DIGIT))
-          {
-            parseError("Error expected decimal for finite field value");
-          }
-          if (!parseLiteralChar('m'))
-          {
-            parseError("Error bad syntax for finite field value");
-          }
-          if (!parseNonEmptyCharList(CharacterClass::DECIMAL_DIGIT))
-          {
-            parseError("Error expected decimal for finite field size");
-          }
-          return Token::FIELD_LITERAL;
         default:
           // otherwise error
           parseError("Error finding token following #");

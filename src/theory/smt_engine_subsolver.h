@@ -30,9 +30,7 @@ struct SubsolverSetupInfo
 {
   /** Construct the info from explicit arguments */
   SubsolverSetupInfo(const Options& opts,
-                     const LogicInfo& logicInfo,
-                     TypeNode sepLocType = TypeNode::null(),
-                     TypeNode sepDataType = TypeNode::null());
+                     const LogicInfo& logicInfo);
   /** Construct the info from Env */
   SubsolverSetupInfo(const Env& env);
   /** Construct from env, but with options replaced */
@@ -41,9 +39,6 @@ struct SubsolverSetupInfo
   const Options& d_opts;
   /** The logic info of the subsolver */
   const LogicInfo& d_logicInfo;
-  /** The separation logic location and data types */
-  TypeNode d_sepLocType;
-  TypeNode d_sepDataType;
 };
 
 /**
@@ -54,10 +49,6 @@ struct SubsolverSetupInfo
  * Notice this method intentionally does not fully initialize smte. This means
  * that the options of smte can still be modified after it is returned by
  * this method.
- *
- * Notice that some aspects of subsolvers are not incoporated by this call.
- * For example, the type of separation logic heaps is not set on smte, even
- * if the current SMT engine has declared a separation logic heap.
  *
  * @param smte The smt engine pointer to initialize
  * @param info The information for setting up the subsolver

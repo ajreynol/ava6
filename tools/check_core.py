@@ -11,6 +11,13 @@ CASES = {
     'booleans': '(declare-const p Bool) (assert p) (assert (not p))',
     'uf': '''(declare-sort U 0) (declare-const a U) (declare-const b U)
       (declare-fun f (U) U) (assert (= a b)) (assert (distinct (f a) (f b)))''',
+    'function-definitions': '''(define-fun f ((x Int)) Int (+ x 1))
+      (declare-const a Int) (assert (distinct (f a) (+ a 1)))''',
+    'combined-equality': '''(declare-fun f (Int) Int)
+      (declare-const a (Array Int Int)) (declare-const x Int)
+      (declare-const y Int) (assert (= (+ x 1) y))
+      (assert (= (select a (f (+ x 1))) 0))
+      (assert (= (select a (f y)) 1))''',
     'arithmetic': '(declare-const x Int) (assert (< x 0)) (assert (>= x 0))',
     'bitvectors': '''(declare-const x (_ BitVec 8))
       (assert (distinct (bvand #x03 x x #x07) (bvand #x03 x)))''',
@@ -85,10 +92,19 @@ def main():
                    '--fp', '--ff', '--bags', '--sep', '--arith-exp',
                    '--finite-model-find', '--strings-fmf',
                    '--produce-difficulty', '--dump-difficulty',
-                   '--produce-learned-literals', '--timeout-core-timeout=100']:
+                   '--produce-learned-literals', '--timeout-core-timeout=100',
+                   '--sat-solver=minisat', '--sat-solver=cadical',
+                   '--ee-mode=distributed', '--ee-mode=central',
+                   '--dt-shared-sel', '--check-synth-sol', '--model-cores=simple',
+                   '--interactive', '-o=normalize']:
         result = run(args.binary, '(check-sat)', option)
         assert result.returncode != 0, (option, result.stdout)
-    for text in ['(set-logic QF_FP)', '(set-logic QF_FF)', '(set-logic QF_UFC)',
+    for text in ['(set-logic HO_ALL)',
+                 '(set-logic ALL) (declare-fun f (Int) Int) (assert (= (@ f 0) 0))',
+                 '(set-logic ALL) (define-fun f () (-> Int Int) (lambda ((x Int)) x))',
+                 '(set-logic ALL) (declare-fun f (Int) Int) (assert (= (set.map f (set.singleton 0)) (set.singleton 0)))',
+                 '(set-logic ALL) (declare-fun p (Int) Bool) (assert (= (set.filter p (set.singleton 0)) (set.singleton 0)))',
+                 '(set-logic QF_FP)', '(set-logic QF_FF)', '(set-logic QF_UFC)',
                  '(set-logic ALL) (declare-const x (_ FloatingPoint 8 24))',
                  '(set-logic ALL) (declare-const x (Bag Int))',
                  '(set-option :nl-cov true)', '(set-option :sygus true)',

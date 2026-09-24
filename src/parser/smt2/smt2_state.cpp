@@ -786,19 +786,7 @@ void Smt2State::parseOpApplyTypeAscription(ParseOp& p, Sort type)
       p.d_expr = d_tm.mkConst(type, "_placeholder_");
       return;
     }
-    else if (p.d_name.find("ff") == 0)
-    {
-      std::string rest = p.d_name.substr(2);
-      if (!type.isFiniteField())
-      {
-        std::stringstream ss;
-        ss << "expected finite field sort to ascribe " << p.d_name
-           << " but found sort: " << type;
-        parseError(ss.str());
-      }
-      p.d_expr = d_tm.mkFiniteFieldElem(rest, type);
-      return;
-    }
+    
     if (p.d_expr.isNull())
     {
       std::stringstream ss;
@@ -858,54 +846,8 @@ Term Smt2State::applyParseOp(const ParseOp& p, std::vector<Term>& args)
     if (k == Kind::UNDEFINED_KIND)
     {
       // Resolve indexed symbols that cannot be resolved without knowing the
-      // type of the arguments. This is currently limited to `to_fp`,
-      // `tuple.select`, and `tuple.update`.
-      size_t nchildren = args.size();
-      if (p.d_name == "to_fp")
-      {
-        if (nchildren == 1)
-        {
-          kind = Kind::FLOATINGPOINT_TO_FP_FROM_IEEE_BV;
-          op = d_tm.mkOp(kind, p.d_indices);
-        }
-        else if (nchildren > 2 || nchildren == 0)
-        {
-          std::stringstream ss;
-          ss << "Wrong number of arguments for indexed operator to_fp, "
-                "expected "
-                "1 or 2, got "
-             << nchildren;
-          parseError(ss.str());
-        }
-        else if (!args[0].getSort().isRoundingMode())
-        {
-          std::stringstream ss;
-          ss << "Expected a rounding mode as the first argument, got "
-             << args[0].getSort();
-          parseError(ss.str());
-        }
-        else
-        {
-          Sort t = args[1].getSort();
-
-          if (t.isFloatingPoint())
-          {
-            kind = Kind::FLOATINGPOINT_TO_FP_FROM_FP;
-            op = d_tm.mkOp(kind, p.d_indices);
-          }
-          else if (t.isInteger() || t.isReal())
-          {
-            kind = Kind::FLOATINGPOINT_TO_FP_FROM_REAL;
-            op = d_tm.mkOp(kind, p.d_indices);
-          }
-          else
-          {
-            kind = Kind::FLOATINGPOINT_TO_FP_FROM_SBV;
-            op = d_tm.mkOp(kind, p.d_indices);
-          }
-        }
-      }
-      else if (p.d_name == "tuple.select" || p.d_name == "tuple.update")
+      // type of the arguments: `tuple.select` and `tuple.update`.
+      if (p.d_name == "tuple.select" || p.d_name == "tuple.update")
       {
         bool isSelect = (p.d_name == "tuple.select");
         if (p.d_indices.size() != 1)
@@ -986,9 +928,7 @@ Term Smt2State::applyParseOp(const ParseOp& p, std::vector<Term>& args)
       // a builtin operator, convert to kind
       kind = getOperatorKind(p.d_name);
       // special case: indexed operators with zero arguments
-      if (kind == Kind::TUPLE_PROJECT || kind == Kind::TABLE_PROJECT
-          || kind == Kind::TABLE_AGGREGATE || kind == Kind::TABLE_JOIN
-          || kind == Kind::TABLE_GROUP)
+      if (kind == Kind::TUPLE_PROJECT)
       {
         std::vector<uint32_t> indices;
         Op op = d_tm.mkOp(kind, indices);
@@ -1001,63 +941,14 @@ Term Smt2State::applyParseOp(const ParseOp& p, std::vector<Term>& args)
           // tuple application
           return d_tm.mkTuple(args);
         }
-        else if (p.d_name == "nullable.some")
-        {
-          if (args.size() == 1)
-          {
-            return d_tm.mkNullableSome(args[0]);
-          }
-          parseError("nullable.some requires exactly one argument.");
-        }
-        else
-        {
+        else {
           std::stringstream ss;
           ss << "Unknown APPLY_CONSTRUCTOR symbol '" << p.d_name << "'";
           parseError(ss.str());
         }
       }
-      else if (kind == Kind::APPLY_SELECTOR)
-      {
-        if (p.d_name == "nullable.val")
-        {
-          if (args.size() == 1)
-          {
-            return d_tm.mkNullableVal(args[0]);
-          }
-          parseError("nullable.val requires exactly one argument.");
-        }
-        else
-        {
-          std::stringstream ss;
-          ss << "Unknown APPLY_SELECTOR symbol '" << p.d_name << "'";
-          parseError(ss.str());
-        }
-      }
-      else if (kind == Kind::APPLY_TESTER)
-      {
-        if (p.d_name == "nullable.is_null")
-        {
-          if (args.size() == 1)
-          {
-            return d_tm.mkNullableIsNull(args[0]);
-          }
-          parseError("nullable.is_null requires exactly one argument.");
-        }
-        else if (p.d_name == "nullable.is_some")
-        {
-          if (args.size() == 1)
-          {
-            return d_tm.mkNullableIsSome(args[0]);
-          }
-          parseError("nullable.is_some requires exactly one argument.");
-        }
-        else
-        {
-          std::stringstream ss;
-          ss << "Unknown APPLY_TESTER symbol '" << p.d_name << "'";
-          parseError(ss.str());
-        }
-      }
+      
+      
       Trace("parser") << "Got builtin kind " << kind << " for name"
                       << std::endl;
     }
@@ -1260,22 +1151,6 @@ Term Smt2State::applyParseOp(const ParseOp& p, std::vector<Term>& args)
       Trace("parser") << "applyParseOp: return uminus " << ret << std::endl;
       return ret;
     }
-    else if (kind == Kind::FLOATINGPOINT_FP)
-    {
-      // (fp #bX #bY #bZ) denotes a floating-point value
-      if (args.size() != 3)
-      {
-        parseError("expected 3 arguments to 'fp', got "
-                   + std::to_string(args.size()));
-      }
-      if (isConstBv(args[0]) && isConstBv(args[1]) && isConstBv(args[2]))
-      {
-        Term ret = d_tm.mkFloatingPoint(args[0], args[1], args[2]);
-        Trace("parser") << "applyParseOp: return floating-point value " << ret
-                        << std::endl;
-        return ret;
-      }
-    }
     else if (kind == Kind::SKOLEM)
     {
       Term ret;
@@ -1363,16 +1238,6 @@ Sort Smt2State::getParametricSort(const std::string& name,
   else if (name == "Tuple" && !strictModeEnabled())
   {
     t = d_tm.mkTupleSort(args);
-  }
-  else if (name == "Relation" && !strictModeEnabled())
-  {
-    Sort tupleSort = d_tm.mkTupleSort(args);
-    t = d_tm.mkSetSort(tupleSort);
-  }
-  else if (name == "Table" && !strictModeEnabled())
-  {
-    Sort tupleSort = d_tm.mkTupleSort(args);
-    t = d_tm.mkBagSort(tupleSort);
   }
   else {
     t = ParserState::getParametricSort(name, args);

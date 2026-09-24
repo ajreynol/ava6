@@ -285,28 +285,8 @@ theory::TheoryId Env::theoryOf(TNode node) const
   return tid;
 }
 
-bool Env::hasSepHeap() const { return !d_sepLocType.isNull(); }
-
-TypeNode Env::getSepLocType() const { return d_sepLocType; }
-
-TypeNode Env::getSepDataType() const { return d_sepDataType; }
-
-void Env::declareSepHeap(TypeNode locT, TypeNode dataT)
-{
-  Assert(!locT.isNull());
-  Assert(!dataT.isNull());
-  // remember the types we have set
-  d_sepLocType = locT;
-  d_sepDataType = dataT;
-}
-
 void Env::addPlugin(Plugin* p) { d_plugins.push_back(p); }
 const std::vector<Plugin*>& Env::getPlugins() const { return d_plugins; }
-
-theory::quantifiers::OracleChecker* Env::getOracleChecker() const
-{
-  return nullptr;
-}
 
 void Env::registerBooleanTermSkolem(const Node& k)
 {

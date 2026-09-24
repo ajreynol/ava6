@@ -10,4 +10,3 @@ name   = "Arrays Theory"
   help       = "turn on eager index splitting for generated array lemmas"
 
 
-# Internal core policies; never accepted as command-line or SMT-LIB options.

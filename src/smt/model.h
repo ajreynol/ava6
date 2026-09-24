@@ -51,8 +51,6 @@ class Model
   const std::vector<Node>& getDomainElements(TypeNode tn) const;
   /** Get value */
   Node getValue(TNode n) const;
-  /** Get separation logic heap and nil, return true if they have been set */
-  bool getHeapModel(Node& h, Node& nilEq) const;
   //----------------------- model declarations
   /**
    * Set that tn is a sort that should be printed in the model, when applicable,
@@ -70,14 +68,6 @@ class Model
    * @param value The value of the variable in the model
    */
   void addDeclarationTerm(Node n, Node value);
-  /**
-   * Set the separation logic model information where h is the heap and nilEq
-   * is the value of sep.nil.
-   *
-   * @param h The value of heap in the heap model
-   * @param nilEq The value of sep.nil in the heap model
-   */
-  void setHeapModel(Node h, Node nilEq);
   /** get declared sorts */
   const std::vector<TypeNode>& getDeclaredSorts() const;
   /** get declared terms */
@@ -105,9 +95,6 @@ class Model
   std::vector<Node> d_declareTerms;
   /** Mapping terms to values */
   std::map<Node, Node> d_declareTermValues;
-  /** Separation logic heap and nil */
-  Node d_sepHeap;
-  Node d_sepNilEq;
 };
 
 }  // namespace smt

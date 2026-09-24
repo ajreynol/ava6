@@ -51,13 +51,10 @@ struct EeTheoryInfo
  * class during finishInit() to determine the equality engines to pass to each
  * theories based on getEeTheoryInfo.
  *
- * It also may allocate a "master" equality engine, which is intuitively the
- * equality engine of the theory of quantifiers. If all theories use the
- * central equality engine, then the master equality engine is the same as the
- * central equality engine.
+ * Quantifiers receive notifications from this same central equality engine.
  *
  * The theories that use central equality engine are determined by
- * Theory::usesCentralEqualityEngine.
+ * EqEngineManager::usesCentralEqualityEngine.
  *
  * The main idea behind this class is to use a notification class on the
  * central equality engine which dispatches *multiple* notifications to the
@@ -69,14 +66,12 @@ class EqEngineManager : protected EnvObj
   EqEngineManager(Env& env, TheoryEngine& te, SharedSolver& shs);
   ~EqEngineManager();
   /**
-   * Initialize theories. This method allocates unique equality engines
-   * per theories and connects them to a master equality engine.
+   * Initialize the shared solving equality engine and its theory notifications.
    */
   void initializeTheories();
 
   /**
-   * Return true if the theory with the given id uses central equality engine
-   * with the given options.
+   * Return true if the theory with the given id uses the central equality engine.
    */
   static bool usesCentralEqualityEngine(TheoryId id);
   const EeTheoryInfo* getEeTheoryInfo(TheoryId tid) const;

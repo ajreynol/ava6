@@ -33,7 +33,6 @@ namespace quantifiers {
 class TermDbSygus;
 
 class FirstOrderModel;
-class OracleChecker;
 
 /**
  * Term Registry, which manages notifying modules within quantifiers about
@@ -68,8 +67,6 @@ class TermRegistry : protected EnvObj
   TermDb* getTermDatabase() const;
   /** get term database sygus */
   TermDbSygus* getTermDatabaseSygus() const;
-  /** get oracle checker */
-  OracleChecker* getOracleChecker() const;
   /** get entailment check utility */
   EntailmentCheck* getEntailmentCheck() const;
   /** get term enumeration utility */

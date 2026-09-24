@@ -82,4 +82,3 @@ name   = "Strings Theory"
   help       = "use regular expression inclusion for finding conflicts and avoiding regular expression unfolding"
 
 
-# Internal core policies; never accepted as command-line or SMT-LIB options.

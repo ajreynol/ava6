@@ -76,10 +76,6 @@ libava6_add_sources(
   preprocessing/passes/static_rewrite.h
   preprocessing/passes/theory_preprocess.cpp
   preprocessing/passes/theory_preprocess.h
-  preprocessing/passes/unconstrained_simplifier.cpp
-  preprocessing/passes/unconstrained_simplifier.h
-  preprocessing/passes/normalize.cpp
-  preprocessing/passes/normalize.h
   preprocessing/preprocessing_pass.cpp
   preprocessing/preprocessing_pass.h
   preprocessing/preprocessing_pass_context.cpp
@@ -485,8 +481,6 @@ libava6_add_sources(
   theory/datatypes/infer_proof_cons.h
   theory/datatypes/proof_checker.cpp
   theory/datatypes/proof_checker.h
-  theory/datatypes/sygus_datatype_utils.cpp
-  theory/datatypes/sygus_datatype_utils.h
   theory/datatypes/theory_datatypes.cpp
   theory/datatypes/theory_datatypes.h
   theory/datatypes/theory_datatypes_type_rules.cpp

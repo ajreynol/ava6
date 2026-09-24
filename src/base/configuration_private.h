@@ -113,11 +113,6 @@ namespace ava6::internal {
 #define IS_NORMALIZ_BUILD false
 #endif /* AVA6_USE_NORMALIZ */
 
-#if HAVE_LIBEDITLINE
-#define IS_EDITLINE_BUILD true
-#else /* HAVE_LIBEDITLINE */
-#define IS_EDITLINE_BUILD false
-#endif /* HAVE_LIBEDITLINE */
 
 
 #if AVA6_GPL_DEPS

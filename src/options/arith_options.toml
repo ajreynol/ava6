@@ -109,4 +109,3 @@ name   = "Arithmetic Theory"
   default    = "true"
   help       = "do arithmetic static learning for ite terms based on bounds when static learning is enabled"
 
-# Internal core policies; never accepted as command-line or SMT-LIB options.

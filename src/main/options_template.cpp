@@ -96,15 +96,10 @@ void printUsageCategories(ava6::Solver& solver, std::ostream& os)
   std::stringstream ssCommon;
   std::stringstream ssRegular;
   std::stringstream ssRegularNoSupport;
-  std::stringstream ssExpert;
   for (const auto& name : options::getNames())
   {
     auto info = solver.getOptionInfo(name);
-    if (info.category == ava6::modes::OptionCategory::EXPERT)
-    {
-      ssExpert << "- " << name << std::endl;
-    }
-    else if (info.category == ava6::modes::OptionCategory::REGULAR)
+    if (info.category == ava6::modes::OptionCategory::REGULAR)
     {
       if (info.noSupports.empty())
       {
@@ -141,8 +136,6 @@ void printUsageCategories(ava6::Solver& solver, std::ostream& os)
   os << ssRegular.str();
   os << "Regular options with a no-support restriction:" << std::endl;
   os << ssRegularNoSupport.str();
-  os << "Expert options:" << std::endl;
-  os << ssExpert.str();
 }
 
 /**

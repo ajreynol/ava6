@@ -85,7 +85,7 @@ std::string Configuration::copyright()
      << "information.\n\n";
 
   if (isBuiltWithCryptominisat() || isBuiltWithKissat()
-      || isBuiltWithEditline())
+     )
   {
     if (isBuiltWithCryptominisat())
     {
@@ -99,12 +99,7 @@ std::string Configuration::copyright()
          << "  See https://fmv.jku.at/kissat for copyright "
          << "information.\n\n";
     }
-    if (isBuiltWithEditline())
-    {
-      ss << "  Editline Library\n"
-         << "  See https://thrysoee.dk/editline\n"
-         << "  for copyright information.\n\n";
-    }
+    
   }
 
 
@@ -212,8 +207,6 @@ bool Configuration::isBuiltWithCryptominisat()
 }
 
 bool Configuration::isBuiltWithKissat() { return IS_KISSAT_BUILD; }
-
-bool Configuration::isBuiltWithEditline() { return IS_EDITLINE_BUILD; }
 
 bool Configuration::isBuiltWithPoly() { return IS_POLY_BUILD; }
 

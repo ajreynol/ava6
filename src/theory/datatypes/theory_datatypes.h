@@ -149,7 +149,6 @@ class TheoryDatatypes : public Theory
    * User-context dependent cache for which terms we have called
    * registerInitialLemmas(...) on.
    */
-  BoolMap d_initialLemmaCache;
   /** All the function terms that the theory has seen */
   context::CDList<TNode> d_functionTerms;
   /** uninterpreted constant to variable map */
@@ -251,11 +250,6 @@ class TheoryDatatypes : public Theory
   void merge(Node t1, Node t2);
   /** collapse selector, s is of the form sel( n ) where n = c */
   void collapseSelector(Node s, Node c);
-  /**
-   * Register initial lemmas. This adds pending lemmas on the inference manager
-   * corresponding to unit lemmas for e.g. dt.size.
-   */
-  void registerInitialLemmas(Node n);
   /** for checking if cycles exist */
   void checkCycles();
   Node searchForCycle(TNode n,
@@ -291,8 +285,6 @@ class TheoryDatatypes : public Theory
   void computeRelevantTerms(std::set<Node>& termSet) override;
   /** Commonly used terms */
   Node d_true;
-  Node d_zero;
-  /** sygus symmetry breaking utility */
   /** The theory rewriter for this theory. */
   DatatypesRewriter d_rewriter;
   /** A (default) theory state object */

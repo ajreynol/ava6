@@ -18,9 +18,8 @@ theory constructors, rewriters, and enumerators include only the eight retained
 theories plus builtin and quantifier infrastructure. Removed theories have no
 solver directories or generated internal kinds.
 
-The C++ API remains useful for SMT solving and parser integration. Some legacy
-public declarations and enums are retained to avoid an unrelated API redesign.
-Remaining constructors for excluded theories reject calls. The SyGuS API,
+The C++ API remains useful for SMT solving and parser integration. Public kinds, sort kinds, constructors, value queries, proof identifiers, and
+skolem identifiers for removed theories are deleted. The SyGuS API,
 including `Grammar`, `SynthResult`, and synthesis queries, is deleted.
 Quantifier elimination, abduction, interpolation, oracle, and separation-logic
 queries are also deleted from the public solver API. Their parser commands and
@@ -36,11 +35,14 @@ and the expert CPC signature are removed. Internal proof Nodes and debug traces
 remain available to solver code; these are not selectable proof output formats.
 
 Ordinary inductive datatypes remain, including their constructor, selector,
-tester, and matching operations. Codatatype declarations, cyclic values,
-bisimilarity, and their API construction flags are removed.
+tester, and matching operations. Shared-selector encodings are removed;
+selectors retain their original constructor signatures. Codatatype declarations, cyclic values,
+bisimilarity, and their API construction flags are removed. Nullable datatypes
+and SyGuS datatype encodings (`DT_*` kinds, evaluation, size/height bounds,
+grammar attributes, and constructor weights) are removed.
 
 Sets retain ordinary finite-set operations. Relational operators, cardinality,
-universe sets, and complement are removed. UF cardinality constraints,
+universe sets, complement, and higher-order set operations are removed. UF cardinality constraints,
 `--finite-model-find`, and strings FMF are removed. Bounded-integer quantification
 (`--fmf-bound`) and its model-checking machinery remain, including dependent
 integer bounds, fixed finite lists of terms, and small interpreted finite types.
@@ -58,22 +60,36 @@ value exclusion and FMF domain restrictions disappear with their solvers.
 
 Pool declarations/annotations and difficulty, timeout-core, learned-literal,
 and model-blocking queries have no API, parser commands, or solver-engine entry
-points. Internal learned-literal classification used by lemma preprocessing
-remains private to the propositional solver.
+points. Internal learned-literal classification remains for the diagnostic
+`-o learned-lits` output. Model-core computation and its API query are removed.
+
+Higher-order solving, function-valued inputs, partial applications, `HO_APPLY`,
+and higher-order elimination/instantiation are removed. Internal lambda terms
+still represent ordinary first-order function definitions and function models.
+`HO_CONG` remains as a proof rule for rewriting an `APPLY_UF` operator when
+expanding a first-order function definition. It does not enable higher-order
+input or solving.
 
 ## Options and internal policies
 
-`[[option]]` entries define the configurable interface. There are no expert
-entries. `[[setting]]` entries describe private policies used by retained core
-algorithms, and are never registered in command-line parsing, `set-option`,
-`get-option`, or public option enumeration. Some policies are adjusted internally
-when enabling models/proofs or selecting algorithms for a logic; preserving
-these decisions avoids changing the behavior of core solving during import.
-Unused policy entries are removed with their features. The settings are not a
-mechanism for restoring expert command-line options.
+`[[option]]` entries define the configurable interface. Expert options and
+`[[setting]]` entries, including generator support, are removed. Fixed algorithm
+choices live in their implementations, with unused branches deleted.
+[solver_config.h](src/options/solver_config.h) holds only configuration derived
+from the logic and supported options, plus stream/parser state. For example,
+proof and unsat-core bookkeeping follows the requested output and checking;
+these are not independent configurable modes.
+
+Benchmark normalization and unconstrained simplification passes are deleted.
+There is no interactive shell or Editline dependency; stdin and file input
+use the ordinary SMT-LIB parser.
 
 External optional arithmetic and SAT backends have been removed from the build;
-GMP and CaDiCaL, along with the inherited internal SAT machinery, are retained.
+GMP and CaDiCaL are retained. CaDiCaL is the only SAT backend; Minisat and
+backend selection are removed. The central equality engine is the sole
+architecture: applicable theories share its facts and receive its notifications.
+There are no per-theory solving equality engines or master-engine forwarding.
+Model construction still has its own equality engine.
 Nonlinear arithmetic uses the retained extension solver and is still incomplete
 on some inputs. The rational implementation of real algebraic number storage is
 retained without libpoly.

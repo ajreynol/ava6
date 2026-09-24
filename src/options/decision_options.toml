@@ -21,4 +21,3 @@ name   = "Decision Heuristics"
   help = "Use the justification heuristic only to stop early, not for decisions."
 
 
-# Internal core policies; never accepted as command-line or SMT-LIB options.

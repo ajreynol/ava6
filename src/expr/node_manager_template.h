@@ -356,9 +356,6 @@ class NodeManager
   /** Get the (singleton) type for RegExp. */
   TypeNode regExpType();
 
-  /** Get the (singleton) type for rounding modes. */
-  TypeNode roundingModeType();
-
   /** Get the bound var list type. */
   TypeNode boundVarListType();
 
@@ -423,13 +420,6 @@ class NodeManager
    * @returns the tuple type (types[0], ..., types[n])
    */
   TypeNode mkTupleType(const std::vector<TypeNode>& types);
-
-  /**
-   * Make a nullable type from the given type.
-   * @param type An element type.
-   * @returns The nullable type.
-   */
-  TypeNode mkNullableType(const TypeNode& type);
 
   /**
    * Make a record type with the description from rec.
@@ -1075,8 +1065,6 @@ class NodeManager
   std::map<std::pair<std::string, TypeNode>, Node> d_nfreshVars;
 
   TupleTypeCache d_tt_cache;
-  /** a mapping from the element types to nullable datatypes */
-  std::map<TypeNode, TypeNode> d_nt_cache;
   RecTypeCache d_rt_cache;
 }; /* class NodeManager */
 

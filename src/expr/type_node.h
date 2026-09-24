@@ -621,9 +621,6 @@ class AVA6_EXPORT TypeNode
   /** Is this a tuple type? */
   bool isTuple() const;
 
-  /** Is this a nullable type? */
-  bool isNullable() const;
-
   /** Is this a record type? */
   bool isRecord() const;
 
@@ -632,9 +629,6 @@ class AVA6_EXPORT TypeNode
 
   /** Get the constituent types of a tuple type */
   std::vector<TypeNode> getTupleTypes() const;
-
-  /** Get the element type (for nullable types) */
-  TypeNode getNullableElementType() const;
 
   /** Is this a regexp type */
   bool isRegExp() const;
@@ -668,9 +662,6 @@ class AVA6_EXPORT TypeNode
    * uninterpreted sort constructor type.
    */
   bool isInstantiated() const;
-
-  /** Is this a sygus datatype type */
-  bool isSygusDatatype() const;
 
   /**
    * Instantiate parametric type (parametric datatype or uninterpreted sort

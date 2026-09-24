@@ -60,6 +60,5 @@ name   = "Printing"
   help       = "print bit-vector constants in decimal (e.g. (_ bv1 4)) instead of binary (e.g. #b0001), applies to SMT-LIB 2.x"
 
 
-# Internal core policies; never accepted as command-line or SMT-LIB options.
 
 

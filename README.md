@@ -8,7 +8,7 @@ in [AUTHORS](AUTHORS). Ava6 develops its own feature set and may change its APIs
 as experiments progress.
 
 It retains the SMT-LIB text interface and C++ API, models, incremental solving,
-quantifiers, proof construction/checking, and **CPC as the only proof output**.
+first-order quantifiers, proof construction/checking, and **CPC as the only proof output**.
 The eight theories are Booleans, uninterpreted functions, arithmetic,
 bit-vectors, arrays, datatypes, sets, and strings/sequences. Builtin terms and
 quantifier infrastructure support these theories.
@@ -22,11 +22,15 @@ The retained language is the default, with no safe/unrestricted modes or
 separate illegal-input checker.
 
 Ordinary datatypes and bounded-integer quantification (`--fmf-bound`) remain;
-codatatypes are removed. Pools, `--finite-model-find`, strings FMF,
+codatatypes, nullable datatypes, and higher-order solving are removed. Pools, `--finite-model-find`, strings FMF,
 UF cardinality constraints, set cardinality, relational
 set operators, and universe sets/complement are removed. Difficulty,
 timeout-core, learned-literal, and model-blocking queries are removed from the
-C++ API, parser, and solver engine.
+C++ API, parser, and solver engine. Model-core computation is removed.
+CaDiCaL is the sole SAT solver, and applicable theories share one central
+equality engine. Datatype selectors use their original constructor signatures. SyGuS datatype kinds and
+utilities, benchmark normalization, and unconstrained simplification are removed.
+The executable reads SMT-LIB from a file or stdin; it has no interactive shell.
 
 See [DESIGN.md](DESIGN.md) for the boundary between retained core policies and
 removed features, and [test/README.md](test/README.md) for test selection.
@@ -99,7 +103,7 @@ Run `./count_loc` for C++ line counts grouped by `src`, `include`, and `test`.
 It uses Python 3's standard library and needs no `cloc` installation or downloads.
 Pass paths to narrow the scope, for example `./count_loc src/theory`, or use
 `--by-file` or `--json` for more detail. Build directories and downloaded
-dependencies are excluded; bundled source such as MiniSAT is included.
+dependencies are excluded.
 Counts are physical lines: mixed code/comment lines count as code, and blank
 lines remain blank even inside multiline comments. Generated build outputs
 are excluded; their checked-in C++ templates are counted.

@@ -74,13 +74,6 @@ void CheckModels::checkModel(TheoryModel* m,
   // If this function is running, the user gave --check-model (or equivalent),
   // and if verbose(1) is on, the user gave --verbose (or equivalent).
 
-  Node sepHeap, sepNeq;
-  if (m->getHeapModel(sepHeap, sepNeq))
-  {
-    throw RecoverableModalException(
-        "Cannot run check-model on a model with a separation logic heap.");
-  }
-
   // expand definitions module and substitutions
   std::unordered_map<Node, Node> ecache;
   ExpandDefs expDef(d_env);

@@ -19,7 +19,9 @@ int main()
     Solver solver(tm);
     for (const auto& name : solver.getOptionNames())
     {
-      require(solver.getOptionInfo(name).category != modes::OptionCategory::EXPERT,
+      require(solver.getOptionInfo(name).category == modes::OptionCategory::COMMON
+                  || solver.getOptionInfo(name).category == modes::OptionCategory::REGULAR
+                  || solver.getOptionInfo(name).category == modes::OptionCategory::UNDOCUMENTED,
               "Expert option remains exposed");
     }
     solver.setLogic("QF_LIA");

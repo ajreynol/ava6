@@ -201,20 +201,6 @@ const char* toString(ProofRule rule)
     case ProofRule::ARITH_TRANS_SINE_APPROX_BELOW_POS:
       return "ARITH_TRANS_SINE_APPROX_BELOW_POS";
     //================================================= Finite fields
-    case ProofRule::FF_ROOT_BRANCH: return "FF_ROOT_BRANCH";
-    case ProofRule::FF_EXHAUST_BRANCH: return "FF_EXHAUST_BRANCH";
-    case ProofRule::FF_FIELD_POLYS: return "FF_FIELD_POLYS";
-    case ProofRule::FF_ONE_UNSAT: return "FF_ONE_UNSAT";
-    case ProofRule::FF_POLY_CONVERSION: return "FF_POLY_CONVERSION";
-    case ProofRule::FF_IDEAL_GENERATOR: return "FF_IDEAL_GENERATOR";
-    case ProofRule::MACRO_FF_POLY_COMBINATION:
-      return "MACRO_FF_POLY_COMBINATION";
-    case ProofRule::FF_POLY_COMBINATION: return "FF_POLY_COMBINATION";
-    case ProofRule::FF_DISEQ: return "FF_DISEQ";
-    case ProofRule::FF_POLY_NORM: return "FF_POLY_NORM";
-    case ProofRule::FF_POLY_NORM_EQ:
-      return "FF_POLY_NORM_EQ";
-      //================================================= External rules
     case ProofRule::ALETHE_RULE: return "ALETHE_RULE";
     //================================================= Unknown rule
     case ProofRule::UNKNOWN: return "UNKNOWN";

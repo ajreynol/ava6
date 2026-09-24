@@ -305,18 +305,6 @@ Term Smt2TermParser::parseTerm()
         ret = tm.mkBitVector(binStr.size(), binStr, 2);
       }
       break;
-      case Token::FIELD_LITERAL:
-      {
-        std::string ffStr = d_lex.tokenStr();
-        Assert(ffStr.find("#f") == 0);
-        size_t mPos = ffStr.find("m");
-        Assert(mPos > 2);
-        std::string ffValStr = ffStr.substr(2, mPos - 2);
-        std::string ffModStr = ffStr.substr(mPos + 1);
-        Sort ffSort = tm.mkFiniteFieldSort(ffModStr);
-        ret = tm.mkFiniteFieldElem(ffValStr, ffSort);
-      }
-      break;
       case Token::STRING_LITERAL:
       {
         std::string s = d_lex.tokenStr();
@@ -1196,8 +1184,7 @@ ParseOp Smt2TermParser::continueParseIndexedIdentifier(bool isOperator)
     // handles:
     // - testers and updaters indexed by constructor names
     Kind k = d_state.getIndexedOpKind(name);
-    if (k != Kind::APPLY_UPDATER && k != Kind::APPLY_TESTER
-        && k != Kind::NULLABLE_LIFT)
+    if (k != Kind::APPLY_UPDATER && k != Kind::APPLY_TESTER)
     {
       d_lex.parseError(std::string("Unexpected indexed symbol " + name));
     }

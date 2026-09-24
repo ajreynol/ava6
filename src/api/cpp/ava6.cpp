@@ -355,13 +355,10 @@ const static std::unordered_map<SortKind,
         SORT_KIND_ENUM(SortKind::INTEGER_SORT, internal::Kind::TYPE_CONSTANT),
         SORT_KIND_ENUM(SortKind::REAL_SORT, internal::Kind::TYPE_CONSTANT),
         SORT_KIND_ENUM(SortKind::REGLAN_SORT, internal::Kind::TYPE_CONSTANT),
-        SORT_KIND_ENUM(SortKind::ROUNDINGMODE_SORT,
-                       internal::Kind::TYPE_CONSTANT),
         SORT_KIND_ENUM(SortKind::SEQUENCE_SORT, internal::Kind::SEQUENCE_TYPE),
         SORT_KIND_ENUM(SortKind::SET_SORT, internal::Kind::SET_TYPE),
         SORT_KIND_ENUM(SortKind::STRING_SORT, internal::Kind::TYPE_CONSTANT),
         SORT_KIND_ENUM(SortKind::TUPLE_SORT, internal::Kind::TUPLE_TYPE),
-        SORT_KIND_ENUM(SortKind::NULLABLE_SORT, internal::Kind::NULLABLE_TYPE),
         SORT_KIND_ENUM(SortKind::UNINTERPRETED_SORT, internal::Kind::SORT_TYPE),
         SORT_KIND_ENUM(SortKind::LAST_SORT_KIND, internal::Kind::LAST_KIND),
     };
@@ -526,7 +523,6 @@ const static std::unordered_map<internal::Kind,
         {internal::Kind::MATCH_BIND_CASE, Kind::MATCH_BIND_CASE},
         {internal::Kind::TUPLE_PROJECT, Kind::TUPLE_PROJECT},
         {internal::Kind::TUPLE_PROJECT_OP, Kind::TUPLE_PROJECT},
-        {internal::Kind::NULLABLE_LIFT, Kind::NULLABLE_LIFT},
         /* Separation Logic ------------------------------------------------ */
 
 
@@ -624,7 +620,6 @@ const static std::
             {internal::Kind::SET_TYPE, SortKind::SET_SORT},
             {internal::Kind::SORT_TYPE, SortKind::UNINTERPRETED_SORT},
             {internal::Kind::TUPLE_TYPE, SortKind::TUPLE_SORT},
-            {internal::Kind::NULLABLE_TYPE, SortKind::NULLABLE_SORT},
         };
 
 /* Set of kinds for indexed operators */
@@ -1106,11 +1101,6 @@ bool Sort::isRegExp() const
   AVA6_API_TRY_CATCH_END;
 }
 
-bool Sort::isRoundingMode() const
-{
-  return false;
-}
-
 bool Sort::isBitVector() const
 {
   AVA6_API_TRY_CATCH_BEGIN;
@@ -1118,11 +1108,6 @@ bool Sort::isBitVector() const
   return d_type->isBitVector();
   ////////
   AVA6_API_TRY_CATCH_END;
-}
-
-bool Sort::isFloatingPoint() const
-{
-  return false;
 }
 
 bool Sort::isDatatype() const
@@ -1197,15 +1182,6 @@ bool Sort::isTuple() const
   AVA6_API_TRY_CATCH_END;
 }
 
-bool Sort::isNullable() const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  //////// all checks before this line
-  return d_type->isNullable();
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
 bool Sort::isRecord() const
 {
   AVA6_API_TRY_CATCH_BEGIN;
@@ -1224,11 +1200,6 @@ bool Sort::isArray() const
   AVA6_API_TRY_CATCH_END;
 }
 
-bool Sort::isFiniteField() const
-{
-  return false;
-}
-
 bool Sort::isSet() const
 {
   AVA6_API_TRY_CATCH_BEGIN;
@@ -1236,11 +1207,6 @@ bool Sort::isSet() const
   return d_type->isSet();
   ////////
   AVA6_API_TRY_CATCH_END;
-}
-
-bool Sort::isBag() const
-{
-  return false;
 }
 
 bool Sort::isSequence() const
@@ -1555,11 +1521,6 @@ Sort Sort::getSetElementSort() const
 
 /* Bag sort ------------------------------------------------------------ */
 
-Sort Sort::getBagElementSort() const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
 /* Sequence sort ------------------------------------------------------- */
 
 Sort Sort::getSequenceElementSort() const
@@ -1615,22 +1576,7 @@ uint32_t Sort::getBitVectorSize() const
 
 /* Finite field sort --------------------------------------------------- */
 
-std::string Sort::getFiniteFieldSize() const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
 /* Floating-point sort ------------------------------------------------- */
-
-uint32_t Sort::getFloatingPointExponentSize() const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-uint32_t Sort::getFloatingPointSignificandSize() const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
 
 /* Datatype sort ------------------------------------------------------- */
 
@@ -1665,17 +1611,6 @@ std::vector<Sort> Sort::getTupleSorts() const
   AVA6_API_CHECK(d_type->isTuple()) << "not a tuple sort.";
   //////// all checks before this line
   return typeNodeVectorToSorts(d_nm, d_type->getTupleTypes());
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-Sort Sort::getNullableElementSort() const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_CHECK_NOT_NULL;
-  AVA6_API_CHECK(isNullable()) << "not a nullable sort.";
-  //////// all checks before this line
-  return Sort(d_nm, d_type->getNullableElementType());
   ////////
   AVA6_API_TRY_CATCH_END;
 }
@@ -2806,15 +2741,6 @@ std::string Term::getBitVectorValue(std::uint32_t base) const
   AVA6_API_TRY_CATCH_END;
 }
 
-bool Term::isFiniteFieldValue() const
-{
-  return false;
-}
-std::string Term::getFiniteFieldValue() const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
 bool Term::isUninterpretedSortValue() const
 {
   AVA6_API_TRY_CATCH_BEGIN;
@@ -2866,45 +2792,6 @@ std::vector<Term> Term::getTupleValue() const
   return res;
   ////////
   AVA6_API_TRY_CATCH_END;
-}
-
-bool Term::isRoundingModeValue() const
-{
-  return false;
-}
-RoundingMode Term::getRoundingModeValue() const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-bool Term::isFloatingPointPosZero() const
-{
-  return false;
-}
-bool Term::isFloatingPointNegZero() const
-{
-  return false;
-}
-bool Term::isFloatingPointPosInf() const
-{
-  return false;
-}
-bool Term::isFloatingPointNegInf() const
-{
-  return false;
-}
-bool Term::isFloatingPointNaN() const
-{
-  return false;
-}
-bool Term::isFloatingPointValue() const
-{
-  return false;
-}
-std::tuple<std::uint32_t, std::uint32_t, Term> Term::getFloatingPointValue()
-    const
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
 }
 
 bool Term::isSetValue() const
@@ -4702,9 +4589,9 @@ Term TermManager::mkTermFromKind(Kind kind)
 {
   AVA6_API_KIND_CHECK_EXPECTED(
       kind == Kind::PI || kind == Kind::REGEXP_NONE || kind == Kind::REGEXP_ALL
-          || kind == Kind::REGEXP_ALLCHAR || kind == Kind::SEP_EMP,
+          || kind == Kind::REGEXP_ALLCHAR,
       kind)
-      << "PI, REGEXP_NONE, REGEXP_ALL, REGEXP_ALLCHAR or SEP_EMP";
+      << "PI, REGEXP_NONE, REGEXP_ALL, REGEXP_ALLCHAR";
   //////// all checks before this line
   internal::Node res;
   internal::Kind k = extToIntKind(kind);
@@ -4713,10 +4600,6 @@ Term TermManager::mkTermFromKind(Kind kind)
   {
     Assert(isDefinedIntKind(k));
     res = d_nm->mkNode(k, std::vector<internal::Node>());
-  }
-  else if (kind == Kind::SEP_EMP)
-  {
-    res = d_nm->mkNullaryOperator(d_nm->booleanType(), k);
   }
   else
   {
@@ -4743,11 +4626,7 @@ Term TermManager::mkTermHelper(Kind kind, const std::vector<Term>& children)
     if (kind == Kind::INTS_DIVISION || kind == Kind::XOR || kind == Kind::SUB
         || kind == Kind::DIVISION || false
         || kind == Kind::REGEXP_DIFF || kind == Kind::SET_UNION
-        || kind == Kind::SET_INTER || kind == Kind::SET_MINUS
-        || kind == Kind::BAG_INTER_MIN || kind == Kind::BAG_UNION_MAX
-        || kind == Kind::BAG_UNION_DISJOINT
-        || kind == Kind::BAG_DIFFERENCE_REMOVE
-        || kind == Kind::BAG_DIFFERENCE_SUBTRACT)
+        || kind == Kind::SET_INTER || kind == Kind::SET_MINUS)
     {
       // left-associative, but ava6 internally only supports 2 args
       res = d_nm->mkLeftAssociative(k, echildren);
@@ -4864,11 +4743,6 @@ Sort TermManager::getStringSort(void)
   AVA6_API_TRY_CATCH_END;
 }
 
-Sort TermManager::getRoundingModeSort(void)
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
 Sort TermManager::mkArraySort(const Sort& indexSort, const Sort& elemSort)
 {
   AVA6_API_TRY_CATCH_BEGIN;
@@ -4888,16 +4762,6 @@ Sort TermManager::mkBitVectorSort(uint32_t size)
   return Sort(d_nm, d_nm->mkBitVectorType(size));
   ////////
   AVA6_API_TRY_CATCH_END;
-}
-
-Sort TermManager::mkFiniteFieldSort(const std::string&, uint32_t)
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Sort TermManager::mkFloatingPointSort(uint32_t, uint32_t)
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
 }
 
 Sort TermManager::mkDatatypeSort(const DatatypeDecl& dtypedecl)
@@ -5039,11 +4903,6 @@ Sort TermManager::mkSetSort(const Sort& elemSort)
   AVA6_API_TRY_CATCH_END;
 }
 
-Sort TermManager::mkBagSort(const Sort&)
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
 Sort TermManager::mkSequenceSort(const Sort& elemSort)
 {
   AVA6_API_TRY_CATCH_BEGIN;
@@ -5109,11 +4968,6 @@ Sort TermManager::mkTupleSort(const std::vector<Sort>& sorts)
   return mkTupleSortHelper(sorts);
   ////////
   AVA6_API_TRY_CATCH_END;
-}
-
-Sort TermManager::mkNullableSort(const Sort&)
-{
-  throw Ava6ApiException("This constructor is not part of the core SMT language");
 }
 
 /* Terms -------------------------------------------------------------------- */
@@ -5390,21 +5244,6 @@ Term TermManager::mkEmptySet(const Sort& sort)
   AVA6_API_TRY_CATCH_END;
 }
 
-Term TermManager::mkEmptyBag(const Sort&)
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term TermManager::mkSepEmp()
-{
-  throw Ava6ApiException("Separation logic is not supported by the core solver");
-}
-
-Term TermManager::mkSepNil(const Sort&)
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
 Term TermManager::mkString(const std::string& s, bool useEscSequences)
 {
   AVA6_API_TRY_CATCH_BEGIN;
@@ -5476,61 +5315,7 @@ Term TermManager::mkBitVector(uint32_t size,
   AVA6_API_TRY_CATCH_END;
 }
 
-Term TermManager::mkFiniteFieldElem(const std::string&,
-                                    const Sort&,
-                                    uint32_t)
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
 Term TermManager::mkConstArray(const Sort&, const Term&)
-{
-  throw Ava6ApiException("This constructor is not part of the core SMT language");
-}
-
-Term TermManager::mkFloatingPointPosInf(uint32_t, uint32_t)
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term TermManager::mkFloatingPointNegInf(uint32_t, uint32_t)
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term TermManager::mkFloatingPointNaN(uint32_t, uint32_t)
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term TermManager::mkFloatingPointPosZero(uint32_t, uint32_t)
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term TermManager::mkFloatingPointNegZero(uint32_t, uint32_t)
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term TermManager::mkRoundingMode(RoundingMode)
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term TermManager::mkFloatingPoint(uint32_t, uint32_t, const Term&)
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term TermManager::mkFloatingPoint(const Term&,
-                                  const Term&,
-                                  const Term&)
-{
-  throw Ava6ApiException("This feature is not supported by the core solver");
-}
-
-Term TermManager::mkNullableLift(Kind, const std::vector<Term>&)
 {
   throw Ava6ApiException("This constructor is not part of the core SMT language");
 }
@@ -5582,31 +5367,6 @@ Term TermManager::mkTuple(const std::vector<Term>& terms)
   return Term(d_nm, res);
   ////////
   AVA6_API_TRY_CATCH_END;
-}
-
-Term TermManager::mkNullableSome(const Term&)
-{
-  throw Ava6ApiException("This constructor is not part of the core SMT language");
-}
-
-Term TermManager::mkNullableNull(const Sort&)
-{
-  throw Ava6ApiException("This constructor is not part of the core SMT language");
-}
-
-Term TermManager::mkNullableVal(const Term&)
-{
-  throw Ava6ApiException("This constructor is not part of the core SMT language");
-}
-
-Term TermManager::mkNullableIsNull(const Term&)
-{
-  throw Ava6ApiException("This constructor is not part of the core SMT language");
-}
-
-Term TermManager::mkNullableIsSome(const Term&)
-{
-  throw Ava6ApiException("This constructor is not part of the core SMT language");
 }
 
 /* Datatype Constructor Declaration ----------------------------------------- */
@@ -6237,8 +5997,6 @@ modes::OptionCategory convertOptionCategory(
   {
     case internal::options::OptionInfo::Category::REGULAR:
       return modes::OptionCategory::REGULAR;
-    case internal::options::OptionInfo::Category::EXPERT:
-      return modes::OptionCategory::EXPERT;
     case internal::options::OptionInfo::Category::COMMON:
       return modes::OptionCategory::COMMON;
     default:
@@ -6258,90 +6016,83 @@ OptionInfo Solver::getOptionInfo(const std::string& option) const
   return std::visit(
       overloaded{
           [&info](const internal::options::OptionInfo::VoidInfo&) {
-            auto cat = convertOptionCategory(info.category);
             return OptionInfo{info.name,
                               info.aliases,
                               info.noSupports,
                               info.setByUser,
-                              cat == modes::OptionCategory::EXPERT,
-                              cat == modes::OptionCategory::REGULAR,
+                              
+                              
                               convertOptionCategory(info.category),
                               OptionInfo::VoidInfo{}};
           },
           [&info](const internal::options::OptionInfo::ValueInfo<bool>& vi) {
-            auto cat = convertOptionCategory(info.category);
             return OptionInfo{
                 info.name,
                 info.aliases,
                 info.noSupports,
                 info.setByUser,
-                cat == modes::OptionCategory::EXPERT,
-                cat == modes::OptionCategory::REGULAR,
+                
+                
                 convertOptionCategory(info.category),
                 OptionInfo::ValueInfo<bool>{vi.defaultValue, vi.currentValue}};
           },
           [&info](
               const internal::options::OptionInfo::ValueInfo<std::string>& vi) {
-            auto cat = convertOptionCategory(info.category);
             return OptionInfo{info.name,
                               info.aliases,
                               info.noSupports,
                               info.setByUser,
-                              cat == modes::OptionCategory::EXPERT,
-                              cat == modes::OptionCategory::REGULAR,
+                              
+                              
                               convertOptionCategory(info.category),
                               OptionInfo::ValueInfo<std::string>{
                                   vi.defaultValue, vi.currentValue}};
           },
           [&info](
               const internal::options::OptionInfo::NumberInfo<int64_t>& vi) {
-            auto cat = convertOptionCategory(info.category);
             return OptionInfo{
                 info.name,
                 info.aliases,
                 info.noSupports,
                 info.setByUser,
-                cat == modes::OptionCategory::EXPERT,
-                cat == modes::OptionCategory::REGULAR,
+                
+                
                 convertOptionCategory(info.category),
                 OptionInfo::NumberInfo<int64_t>{
                     vi.defaultValue, vi.currentValue, vi.minimum, vi.maximum}};
           },
           [&info](
               const internal::options::OptionInfo::NumberInfo<uint64_t>& vi) {
-            auto cat = convertOptionCategory(info.category);
             return OptionInfo{
                 info.name,
                 info.aliases,
                 info.noSupports,
                 info.setByUser,
-                cat == modes::OptionCategory::EXPERT,
-                cat == modes::OptionCategory::REGULAR,
+                
+                
                 convertOptionCategory(info.category),
                 OptionInfo::NumberInfo<uint64_t>{
                     vi.defaultValue, vi.currentValue, vi.minimum, vi.maximum}};
           },
           [&info](const internal::options::OptionInfo::NumberInfo<double>& vi) {
-            auto cat = convertOptionCategory(info.category);
             return OptionInfo{
                 info.name,
                 info.aliases,
                 info.noSupports,
                 info.setByUser,
-                cat == modes::OptionCategory::EXPERT,
-                cat == modes::OptionCategory::REGULAR,
+                
+                
                 convertOptionCategory(info.category),
                 OptionInfo::NumberInfo<double>{
                     vi.defaultValue, vi.currentValue, vi.minimum, vi.maximum}};
           },
           [&info](const internal::options::OptionInfo::ModeInfo& vi) {
-            auto cat = convertOptionCategory(info.category);
             return OptionInfo{info.name,
                               info.aliases,
                               info.noSupports,
                               info.setByUser,
-                              cat == modes::OptionCategory::EXPERT,
-                              cat == modes::OptionCategory::REGULAR,
+                              
+                              
                               convertOptionCategory(info.category),
                               OptionInfo::ModeInfo{
                                   vi.defaultValue, vi.currentValue, vi.modes}};
@@ -6930,46 +6681,6 @@ std::string to_string(ava6::Kind k)
     case ava6::Kind::BITVECTOR_SBV_TO_INT: return "BITVECTOR_SBV_TO_INT";
     case ava6::Kind::BITVECTOR_FROM_BOOLS: return "BITVECTOR_FROM_BOOLS";
     case ava6::Kind::BITVECTOR_BIT: return "BITVECTOR_BIT";
-    case ava6::Kind::CONST_FINITE_FIELD: return "CONST_FINITE_FIELD";
-    case ava6::Kind::FINITE_FIELD_NEG: return "FINITE_FIELD_NEG";
-    case ava6::Kind::FINITE_FIELD_ADD: return "FINITE_FIELD_ADD";
-    case ava6::Kind::FINITE_FIELD_BITSUM: return "FINITE_FIELD_BITSUM";
-    case ava6::Kind::FINITE_FIELD_MULT: return "FINITE_FIELD_MULT";
-    case ava6::Kind::CONST_FLOATINGPOINT: return "CONST_FLOATINGPOINT";
-    case ava6::Kind::CONST_ROUNDINGMODE: return "CONST_ROUNDINGMODE";
-    case ava6::Kind::FLOATINGPOINT_FP: return "FLOATINGPOINT_FP";
-    case ava6::Kind::FLOATINGPOINT_EQ: return "FLOATINGPOINT_EQ";
-    case ava6::Kind::FLOATINGPOINT_ABS: return "FLOATINGPOINT_ABS";
-    case ava6::Kind::FLOATINGPOINT_NEG: return "FLOATINGPOINT_NEG";
-    case ava6::Kind::FLOATINGPOINT_ADD: return "FLOATINGPOINT_ADD";
-    case ava6::Kind::FLOATINGPOINT_SUB: return "FLOATINGPOINT_SUB";
-    case ava6::Kind::FLOATINGPOINT_MULT: return "FLOATINGPOINT_MULT";
-    case ava6::Kind::FLOATINGPOINT_DIV: return "FLOATINGPOINT_DIV";
-    case ava6::Kind::FLOATINGPOINT_FMA: return "FLOATINGPOINT_FMA";
-    case ava6::Kind::FLOATINGPOINT_SQRT: return "FLOATINGPOINT_SQRT";
-    case ava6::Kind::FLOATINGPOINT_REM: return "FLOATINGPOINT_REM";
-    case ava6::Kind::FLOATINGPOINT_RTI: return "FLOATINGPOINT_RTI";
-    case ava6::Kind::FLOATINGPOINT_MIN: return "FLOATINGPOINT_MIN";
-    case ava6::Kind::FLOATINGPOINT_MAX: return "FLOATINGPOINT_MAX";
-    case ava6::Kind::FLOATINGPOINT_LEQ: return "FLOATINGPOINT_LEQ";
-    case ava6::Kind::FLOATINGPOINT_LT: return "FLOATINGPOINT_LT";
-    case ava6::Kind::FLOATINGPOINT_GEQ: return "FLOATINGPOINT_GEQ";
-    case ava6::Kind::FLOATINGPOINT_GT: return "FLOATINGPOINT_GT";
-    case ava6::Kind::FLOATINGPOINT_IS_NORMAL: return "FLOATINGPOINT_IS_NORMAL";
-    case ava6::Kind::FLOATINGPOINT_IS_SUBNORMAL: return "FLOATINGPOINT_IS_SUBNORMAL";
-    case ava6::Kind::FLOATINGPOINT_IS_ZERO: return "FLOATINGPOINT_IS_ZERO";
-    case ava6::Kind::FLOATINGPOINT_IS_INF: return "FLOATINGPOINT_IS_INF";
-    case ava6::Kind::FLOATINGPOINT_IS_NAN: return "FLOATINGPOINT_IS_NAN";
-    case ava6::Kind::FLOATINGPOINT_IS_NEG: return "FLOATINGPOINT_IS_NEG";
-    case ava6::Kind::FLOATINGPOINT_IS_POS: return "FLOATINGPOINT_IS_POS";
-    case ava6::Kind::FLOATINGPOINT_TO_FP_FROM_IEEE_BV: return "FLOATINGPOINT_TO_FP_FROM_IEEE_BV";
-    case ava6::Kind::FLOATINGPOINT_TO_FP_FROM_FP: return "FLOATINGPOINT_TO_FP_FROM_FP";
-    case ava6::Kind::FLOATINGPOINT_TO_FP_FROM_REAL: return "FLOATINGPOINT_TO_FP_FROM_REAL";
-    case ava6::Kind::FLOATINGPOINT_TO_FP_FROM_SBV: return "FLOATINGPOINT_TO_FP_FROM_SBV";
-    case ava6::Kind::FLOATINGPOINT_TO_FP_FROM_UBV: return "FLOATINGPOINT_TO_FP_FROM_UBV";
-    case ava6::Kind::FLOATINGPOINT_TO_UBV: return "FLOATINGPOINT_TO_UBV";
-    case ava6::Kind::FLOATINGPOINT_TO_SBV: return "FLOATINGPOINT_TO_SBV";
-    case ava6::Kind::FLOATINGPOINT_TO_REAL: return "FLOATINGPOINT_TO_REAL";
     case ava6::Kind::SELECT: return "SELECT";
     case ava6::Kind::STORE: return "STORE";
     case ava6::Kind::CONST_ARRAY: return "CONST_ARRAY";
@@ -6982,12 +6693,6 @@ std::string to_string(ava6::Kind k)
     case ava6::Kind::MATCH_CASE: return "MATCH_CASE";
     case ava6::Kind::MATCH_BIND_CASE: return "MATCH_BIND_CASE";
     case ava6::Kind::TUPLE_PROJECT: return "TUPLE_PROJECT";
-    case ava6::Kind::NULLABLE_LIFT: return "NULLABLE_LIFT";
-    case ava6::Kind::SEP_NIL: return "SEP_NIL";
-    case ava6::Kind::SEP_EMP: return "SEP_EMP";
-    case ava6::Kind::SEP_PTO: return "SEP_PTO";
-    case ava6::Kind::SEP_STAR: return "SEP_STAR";
-    case ava6::Kind::SEP_WAND: return "SEP_WAND";
     case ava6::Kind::SET_EMPTY: return "SET_EMPTY";
     case ava6::Kind::SET_UNION: return "SET_UNION";
     case ava6::Kind::SET_INTER: return "SET_INTER";
@@ -7000,30 +6705,6 @@ std::string to_string(ava6::Kind k)
     case ava6::Kind::SET_CHOOSE: return "SET_CHOOSE";
     case ava6::Kind::SET_IS_EMPTY: return "SET_IS_EMPTY";
     case ava6::Kind::SET_IS_SINGLETON: return "SET_IS_SINGLETON";
-    case ava6::Kind::BAG_EMPTY: return "BAG_EMPTY";
-    case ava6::Kind::BAG_UNION_MAX: return "BAG_UNION_MAX";
-    case ava6::Kind::BAG_UNION_DISJOINT: return "BAG_UNION_DISJOINT";
-    case ava6::Kind::BAG_INTER_MIN: return "BAG_INTER_MIN";
-    case ava6::Kind::BAG_DIFFERENCE_SUBTRACT: return "BAG_DIFFERENCE_SUBTRACT";
-    case ava6::Kind::BAG_DIFFERENCE_REMOVE: return "BAG_DIFFERENCE_REMOVE";
-    case ava6::Kind::BAG_SUBBAG: return "BAG_SUBBAG";
-    case ava6::Kind::BAG_COUNT: return "BAG_COUNT";
-    case ava6::Kind::BAG_MEMBER: return "BAG_MEMBER";
-    case ava6::Kind::BAG_SETOF: return "BAG_SETOF";
-    case ava6::Kind::BAG_MAKE: return "BAG_MAKE";
-    case ava6::Kind::BAG_CARD: return "BAG_CARD";
-    case ava6::Kind::BAG_CHOOSE: return "BAG_CHOOSE";
-    case ava6::Kind::BAG_MAP: return "BAG_MAP";
-    case ava6::Kind::BAG_FILTER: return "BAG_FILTER";
-    case ava6::Kind::BAG_ALL: return "BAG_ALL";
-    case ava6::Kind::BAG_SOME: return "BAG_SOME";
-    case ava6::Kind::BAG_FOLD: return "BAG_FOLD";
-    case ava6::Kind::BAG_PARTITION: return "BAG_PARTITION";
-    case ava6::Kind::TABLE_PRODUCT: return "TABLE_PRODUCT";
-    case ava6::Kind::TABLE_PROJECT: return "TABLE_PROJECT";
-    case ava6::Kind::TABLE_AGGREGATE: return "TABLE_AGGREGATE";
-    case ava6::Kind::TABLE_JOIN: return "TABLE_JOIN";
-    case ava6::Kind::TABLE_GROUP: return "TABLE_GROUP";
     case ava6::Kind::STRING_CONCAT: return "STRING_CONCAT";
     case ava6::Kind::STRING_IN_REGEXP: return "STRING_IN_REGEXP";
     case ava6::Kind::STRING_LENGTH: return "STRING_LENGTH";
@@ -7106,22 +6787,17 @@ std::string to_string(ava6::SortKind k)
     case ava6::SortKind::NULL_SORT: return "NULL_SORT";
     case ava6::SortKind::ABSTRACT_SORT: return "ABSTRACT_SORT";
     case ava6::SortKind::ARRAY_SORT: return "ARRAY_SORT";
-    case ava6::SortKind::BAG_SORT: return "BAG_SORT";
     case ava6::SortKind::BOOLEAN_SORT: return "BOOLEAN_SORT";
     case ava6::SortKind::BITVECTOR_SORT: return "BITVECTOR_SORT";
     case ava6::SortKind::DATATYPE_SORT: return "DATATYPE_SORT";
-    case ava6::SortKind::FINITE_FIELD_SORT: return "FINITE_FIELD_SORT";
-    case ava6::SortKind::FLOATINGPOINT_SORT: return "FLOATINGPOINT_SORT";
     case ava6::SortKind::FUNCTION_SORT: return "FUNCTION_SORT";
     case ava6::SortKind::INTEGER_SORT: return "INTEGER_SORT";
     case ava6::SortKind::REAL_SORT: return "REAL_SORT";
     case ava6::SortKind::REGLAN_SORT: return "REGLAN_SORT";
-    case ava6::SortKind::ROUNDINGMODE_SORT: return "ROUNDINGMODE_SORT";
     case ava6::SortKind::SEQUENCE_SORT: return "SEQUENCE_SORT";
     case ava6::SortKind::SET_SORT: return "SET_SORT";
     case ava6::SortKind::STRING_SORT: return "STRING_SORT";
     case ava6::SortKind::TUPLE_SORT: return "TUPLE_SORT";
-    case ava6::SortKind::NULLABLE_SORT: return "NULLABLE_SORT";
     case ava6::SortKind::UNINTERPRETED_SORT: return "UNINTERPRETED_SORT";
     case ava6::SortKind::LAST_SORT_KIND: return "LAST_SORT_KIND";
     default: return "UNDEFINED_SORT_KIND";

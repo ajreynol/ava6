@@ -293,7 +293,7 @@ ProofRule getCongRule(const Node& n, std::vector<Node>& args)
     case Kind::DISTINCT: r = ProofRule::PAIRWISE_CONG; break;
     case Kind::APPLY_UF:
     
-    case Kind::NULLABLE_LIFT:
+
     case Kind::APPLY_INDEXED_SYMBOLIC:
       // takes arbitrary but we use CONG
       break;

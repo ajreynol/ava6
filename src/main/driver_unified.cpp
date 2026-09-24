@@ -27,7 +27,6 @@
 #include "base/ava6config.h"
 #include "base/output.h"
 #include "main/command_executor.h"
-#include "main/interactive_shell.h"
 #include "main/main.h"
 #include "main/options.h"
 #include "parser/commands.h"
@@ -109,14 +108,6 @@ int runAva6(int argc, char* argv[], std::unique_ptr<ava6::Solver>& solver)
   // If no file supplied we will read from standard input
   const bool inputFromStdin = filenames.empty() || filenames[0] == "-";
 
-  // If we're reading from stdin, use interactive mode if we are a TTY.
-  if (!solver->getOptionInfo("interactive").setByUser)
-  {
-    pExecutor->setOptionInternal(
-        "interactive",
-        (inputFromStdin && isatty(fileno(stdin))) ? "true" : "false");
-  }
-
   // Auto-detect input language by filename extension
   std::string filenameStr("<stdin>");
   if (!inputFromStdin)
@@ -164,42 +155,6 @@ int runAva6(int argc, char* argv[], std::unique_ptr<ava6::Solver>& solver)
     solver->setInfo("filename", filenameStr);
 
     // Parse and execute commands until we are done
-    if (solver->getOptionInfo("interactive").boolValue() && inputFromStdin)
-    {
-      // We use the interactive shell when piping from stdin, even some cases
-      // where the input stream is not a TTY. We do this to avoid memory issues
-      // involving tokens that span multiple lines.
-      // We compute whether the interactive shell is actually interactive
-      // (via isatty). If we are not interactive, we disable certain output
-      // information, e.g. for querying the user.
-      bool isInteractive = isatty(fileno(stdin));
-      // set incremental if we are in interactive mode
-      if (!solver->getOptionInfo("incremental").setByUser)
-      {
-        pExecutor->setOptionInternal("incremental",
-                                     isInteractive ? "true" : "false");
-      }
-      // now store options as original
-      pExecutor->storeOptionsAsOriginal();
-      InteractiveShell shell(
-          pExecutor.get(), dopts.in(), dopts.out(), isInteractive);
-
-      if (isInteractive)
-      {
-        auto& out = solver->getDriverOptions().out();
-        out << Configuration::aboutAndCopyright();
-      }
-
-      while (true)
-      {
-        // read and execute all available commands
-        if (!shell.readAndExecCommands())
-        {
-          break;
-        }
-      }
-    }
-    else
     {
       if (!solver->getOptionInfo("incremental").setByUser)
       {
@@ -215,7 +170,7 @@ int runAva6(int argc, char* argv[], std::unique_ptr<ava6::Solver>& solver)
           pExecutor->getSolver(), pExecutor->getSymbolManager()));
       if (inputFromStdin)
       {
-        parser->setStreamInput(ilang, cin, filename);
+        parser->setStreamInput(ilang, dopts.in(), filename);
       }
       else
       {

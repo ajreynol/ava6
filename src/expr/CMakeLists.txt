@@ -98,12 +98,8 @@ libava6_add_sources(
   sort_to_term.h
   subs.cpp
   subs.h
-  sygus_datatype.cpp
-  sygus_datatype.h
   non_closed_node_converter.cpp
   non_closed_node_converter.h
-  normalize_sort_converter.cpp
-  normalize_sort_converter.h
 )
 
 libava6_add_sources(GENERATED

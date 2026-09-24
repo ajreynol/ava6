@@ -157,11 +157,6 @@ TypeNode NodeManager::regExpType()
                                                  REGEXP_TYPE);
 }
 
-TypeNode NodeManager::roundingModeType()
-{
-  Unreachable() << "Removed theory";
-}
-
 TypeNode NodeManager::boundVarListType()
 {
   return mkConstInternal<TypeNode, TypeConstant>(Kind::TYPE_CONSTANT,
@@ -222,7 +217,6 @@ NodeManager::~NodeManager()
   TypeNode dummy;
   d_tt_cache.d_children.clear();
   d_tt_cache.d_data = dummy;
-  d_nt_cache.clear();
   d_rt_cache.d_children.clear();
   d_rt_cache.d_data = dummy;
 
@@ -294,13 +288,7 @@ const DType& NodeManager::getDTypeFor(TypeNode tn) const
     Assert(!dtt.isNull());
     return getDTypeFor(dtt);
   }
-  else if (k == Kind::NULLABLE_TYPE)
-  {
-    // lookup its datatype encoding
-    TypeNode dtt = getAttribute(tn, expr::NullableDatatypeAttr());
-    Assert(!dtt.isNull());
-    return getDTypeFor(dtt);
-  }
+  
   Assert(k == Kind::PARAMETRIC_DATATYPE);
   return getDTypeFor(tn[0]);
 }
@@ -656,15 +644,7 @@ std::vector<TypeNode> NodeManager::mkMutualDatatypeTypesInternal(
         typeNode = mkTypeNode(Kind::TUPLE_TYPE, tupleTypes);
         typeNode.setAttribute(expr::TupleDatatypeAttr(), dtt);
       }
-      if (dt.isNullable())
-      {
-        TypeNode dtt = typeNode;
-        const DTypeConstructor& some = dt[1];
-        Assert(some.getNumArgs() == 1);
-        // Set its datatype representation
-        typeNode = mkTypeNode(Kind::NULLABLE_TYPE, some[0].getType());
-        typeNode.setAttribute(expr::NullableDatatypeAttr(), dtt);
-      }
+      
     }
     else
     {
@@ -937,35 +917,6 @@ TypeNode NodeManager::mkFunctionType(const std::vector<TypeNode>& argTypes,
 TypeNode NodeManager::mkTupleType(const std::vector<TypeNode>& types)
 {
   return d_tt_cache.getTupleType(this, types);
-}
-
-TypeNode NodeManager::mkNullableType(const TypeNode& type)
-{
-  Assert(!type.isNull());
-  auto it = d_nt_cache.find(type);
-  if (it != d_nt_cache.end())
-  {
-    return it->second;
-  }
-  // construct the corresponding datatype with two constructors
-  // null and some.
-  std::stringstream sst;
-  sst << "__ava6_nullable_" << type;
-  DType dt(sst.str());
-  dt.setNullable();
-  std::shared_ptr<DTypeConstructor> null =
-      std::make_shared<DTypeConstructor>("nullable.null");
-  dt.addConstructor(null);
-  std::shared_ptr<DTypeConstructor> some =
-      std::make_shared<DTypeConstructor>("nullable.some");
-  some->addArg("nullable.val", type);
-  dt.addConstructor(some);
-  TypeNode datatype = mkDatatypeType(dt);
-  Assert(datatype.isNullable());
-  d_nt_cache[type] = datatype;
-  Trace("nullable-debug") << "NodeManager::mkNullableType(" << type
-                          << ") = " << datatype << std::endl;
-  return datatype;
 }
 
 TypeNode NodeManager::mkRecordType(const Record& rec)

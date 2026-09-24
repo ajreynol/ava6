@@ -88,7 +88,7 @@ bool SkolemManager::isCommutativeSkolemId(SkolemId id)
   switch (id)
   {
     case ava6::SkolemId::ARRAY_DEQ_DIFF:
-    case ava6::SkolemId::BAGS_DEQ_DIFF:
+
     case ava6::SkolemId::SETS_DEQ_DIFF:
     case ava6::SkolemId::STRINGS_DEQ_DIFF: return true;
     default: break;
@@ -397,8 +397,8 @@ TypeNode SkolemManager::getTypeFor(SkolemId id,
     case SkolemId::STRINGS_OCCUR_INDEX_RE:
     case SkolemId::STRINGS_STOI_RESULT:
     case SkolemId::STRINGS_ITOS_RESULT:
-    case SkolemId::BAGS_MAP_SUM:
-    case SkolemId::BAGS_CARD_COMBINE:
+
+
     {
       TypeNode itype = d_nm->integerType();
       return d_nm->mkFunctionType(itype, itype);
@@ -420,10 +420,10 @@ TypeNode SkolemManager::getTypeFor(SkolemId id,
     case SkolemId::STRINGS_NUM_OCCUR_RE:
     case SkolemId::STRINGS_DEQ_DIFF:
     case SkolemId::STRINGS_STOI_NON_DIGIT:
-    case SkolemId::BAGS_FOLD_CARD:
 
-    case SkolemId::BAGS_DISTINCT_ELEMENTS_SIZE:
-    case SkolemId::BAGS_MAP_INDEX: return d_nm->integerType();
+
+
+ return d_nm->integerType();
     // string skolems
     case SkolemId::RE_UNFOLD_POS_COMPONENT: return d_nm->stringType();
     case SkolemId::ARRAY_DEQ_DIFF:
@@ -464,7 +464,7 @@ TypeNode SkolemManager::getTypeFor(SkolemId id,
     }
     break;
     // skolems that return the set element type
-    case SkolemId::BAGS_DEQ_DIFF:
+
     case SkolemId::SETS_DEQ_DIFF:
     {
       Assert(cacheVals.size() > 0);
@@ -473,7 +473,7 @@ TypeNode SkolemManager::getTypeFor(SkolemId id,
       return stype[0];
     }
     // skolems that return the set to set element type
-    case SkolemId::BAGS_CHOOSE:
+
     case SkolemId::SETS_CHOOSE:
     {
       Assert(cacheVals.size() > 0);
@@ -481,118 +481,6 @@ TypeNode SkolemManager::getTypeFor(SkolemId id,
       Assert(stype.getNumChildren() == 1);
       return d_nm->mkFunctionType(stype, stype[0]);
     }
-    case SkolemId::TABLES_GROUP_PART:
-    case SkolemId::RELATIONS_GROUP_PART:
-    {
-      Assert(cacheVals.size() > 0);
-      TypeNode stype = cacheVals[0].getType();
-      Assert(stype.getNumChildren() == 1);
-      stype = stype[0];
-      Assert(stype.getNumChildren() == 1);
-      return d_nm->mkFunctionType(stype[0], stype);
-    }
-    // skolems that return the set element of set element type
-    case SkolemId::TABLES_GROUP_PART_ELEMENT:
-    case SkolemId::RELATIONS_GROUP_PART_ELEMENT:
-    {
-      Assert(cacheVals.size() > 0);
-      TypeNode stype = cacheVals[0].getType();
-      Assert(stype.getNumChildren() == 1);
-      stype = stype[0];
-      Assert(stype.getNumChildren() == 1);
-      return stype[0];
-    }
-    case SkolemId::SETS_MAP_DOWN_ELEMENT:
-    {
-      Assert(cacheVals.size() == 2 && false);
-      TypeNode stype = cacheVals[0][1].getType();
-      Assert(stype.isSet());
-      return stype.getSetElementType();
-    }
-    case SkolemId::BAGS_FOLD_UNION_DISJOINT:
-
-    case SkolemId::BAGS_DISTINCT_ELEMENTS_UNION_DISJOINT:
-    {
-      Assert(cacheVals.size() > 0);
-      TypeNode itype = d_nm->integerType();
-      return d_nm->mkFunctionType(itype, cacheVals[0].getType());
-    }
-    case SkolemId::BAGS_DISTINCT_ELEMENTS:
-    case SkolemId::BAGS_FOLD_ELEMENTS:
-
-    {
-      Assert(cacheVals.size() > 0);
-      TypeNode itype = d_nm->integerType();
-      TypeNode collectionType = cacheVals[0].getType();
-      Assert(collectionType.getNumChildren() == 1);
-      TypeNode elementType = collectionType[0];
-      return d_nm->mkFunctionType(itype, elementType);
-    }
-    case SkolemId::BAGS_FOLD_COMBINE:
-
-    {
-      Assert(cacheVals.size() == 3);
-      TypeNode itype = d_nm->integerType();
-      return d_nm->mkFunctionType(itype, cacheVals[1].getType());
-    }
-    case SkolemId::BAGS_MAP_PREIMAGE_INJECTIVE:
-    {
-      Assert(cacheVals[0].getType().isFunction());
-      return cacheVals[0].getType().getArgTypes()[0];
-    }
-    case SkolemId::FP_MIN_ZERO:
-    case SkolemId::FP_MAX_ZERO:
-    {
-      Assert(cacheVals.size() == 1);
-      Assert(cacheVals[0].getKind() == Kind::SORT_TO_TERM);
-      TypeNode type = cacheVals[0].getConst<SortToTerm>().getType();
-      Assert(type.isFloatingPoint());
-      return d_nm->mkFunctionType({type, type}, d_nm->mkBitVectorType(1));
-    }
-    case SkolemId::FP_TO_SBV:
-    case SkolemId::FP_TO_UBV:
-    {
-      Assert(cacheVals.size() == 2);
-      Assert(cacheVals[0].getKind() == Kind::SORT_TO_TERM);
-      TypeNode fptype = cacheVals[0].getConst<SortToTerm>().getType();
-      Assert(fptype.isFloatingPoint());
-      Assert(cacheVals[1].getKind() == Kind::SORT_TO_TERM);
-      TypeNode bvtype = cacheVals[1].getConst<SortToTerm>().getType();
-      Assert(bvtype.isBitVector());
-      return d_nm->mkFunctionType({d_nm->roundingModeType(), fptype}, bvtype);
-    }
-    case SkolemId::FP_TO_REAL:
-    {
-      Assert(cacheVals.size() == 1);
-      Assert(cacheVals[0].getKind() == Kind::SORT_TO_TERM);
-      TypeNode type = cacheVals[0].getConst<SortToTerm>().getType();
-      Assert(type.isFloatingPoint());
-      return d_nm->mkFunctionType({type}, d_nm->realType());
-    }
-    case SkolemId::BV_TO_INT_UF:
-    {
-      Assert(cacheVals.size() == 1);
-      // fetch the original function
-      Node bvUF = cacheVals[0];
-      Assert(cacheVals[0].getType().isFunction());
-      // old and new types of domain and result
-      TypeNode tn = bvUF.getType();
-      TypeNode bvRange = tn.getRangeType();
-      std::vector<TypeNode> bvDomain = tn.getArgTypes();
-      std::vector<TypeNode> intDomain;
-
-      // if the original range is a bit-vector sort,
-      // the new range should be an integer sort.
-      // Otherwise, we keep the original range.
-      // Similarly for the domain sorts.
-      TypeNode intRange = bvRange.isBitVector() ? d_nm->integerType() : bvRange;
-      for (const TypeNode& d : bvDomain)
-      {
-        intDomain.push_back(d.isBitVector() ? d_nm->integerType() : d);
-      }
-      return d_nm->mkFunctionType(intDomain, intRange);
-    }
-    //
     default: break;
   }
   return TypeNode();
@@ -622,24 +510,24 @@ size_t SkolemManager::getNumIndicesForSkolemId(SkolemId id) const
     case SkolemId::STRINGS_ITOS_RESULT:
     case SkolemId::STRINGS_STOI_RESULT:
     case SkolemId::STRINGS_STOI_NON_DIGIT:
-    case SkolemId::BAGS_CARD_COMBINE:
-    case SkolemId::BAGS_DISTINCT_ELEMENTS_UNION_DISJOINT:
-    case SkolemId::BAGS_FOLD_CARD:
-    case SkolemId::BAGS_FOLD_ELEMENTS:
-    case SkolemId::BAGS_FOLD_UNION_DISJOINT:
-    case SkolemId::BAGS_CHOOSE:
-    case SkolemId::BAGS_DISTINCT_ELEMENTS:
-    case SkolemId::BAGS_DISTINCT_ELEMENTS_SIZE:
-    case SkolemId::TABLES_GROUP_PART:
-    case SkolemId::RELATIONS_GROUP_PART:
+
+
+
+
+
+
+
+
+
+
     case SkolemId::SETS_CHOOSE:
 
 
 
-    case SkolemId::FP_MIN_ZERO:
-    case SkolemId::FP_MAX_ZERO:
-    case SkolemId::BV_TO_INT_UF:
-    case SkolemId::FP_TO_REAL: return 1;
+
+
+
+ return 1;
 
     // Number of skolem indices: 2
     case SkolemId::ARRAY_DEQ_DIFF:
@@ -649,13 +537,13 @@ size_t SkolemManager::getNumIndicesForSkolemId(SkolemId id) const
     case SkolemId::STRINGS_NUM_OCCUR_RE:
     case SkolemId::STRINGS_OCCUR_INDEX_RE:
     case SkolemId::STRINGS_DEQ_DIFF:
-    case SkolemId::BAGS_DEQ_DIFF:
-    case SkolemId::TABLES_GROUP_PART_ELEMENT:
-    case SkolemId::RELATIONS_GROUP_PART_ELEMENT:
+
+
+
     case SkolemId::SETS_DEQ_DIFF:
-    case SkolemId::SETS_MAP_DOWN_ELEMENT:
-    case SkolemId::FP_TO_SBV:
-    case SkolemId::FP_TO_UBV: return 2;
+
+
+ return 2;
 
     // Number of skolem indices: 3
 
@@ -664,14 +552,12 @@ size_t SkolemManager::getNumIndicesForSkolemId(SkolemId id) const
     case SkolemId::STRINGS_REPLACE_ALL_RESULT:
     case SkolemId::STRINGS_REPLACE_RE_ALL_RESULT:
     case SkolemId::RE_UNFOLD_POS_COMPONENT:
-    case SkolemId::BAGS_FOLD_COMBINE:
-    case SkolemId::BAGS_MAP_PREIMAGE_INJECTIVE:
-    case SkolemId::BAGS_MAP_SUM:
+
+
+
  return 3;
 
     // Number of skolem indices: 5
-    case SkolemId::BAGS_MAP_INDEX: return 5;
-
     default: Unimplemented() << "Unknown skolem kind " << id; break;
   }
 }

@@ -24,4 +24,3 @@ name   = "SAT Layer"
   name = "lazy"
   help = "Preregister literals when they are asserted by the SAT solver."
 
-# Internal core policies; never accepted as command-line or SMT-LIB options.

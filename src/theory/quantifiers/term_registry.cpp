@@ -86,11 +86,6 @@ TermDbSygus* TermRegistry::getTermDatabaseSygus() const
   return nullptr;
 }
 
-OracleChecker* TermRegistry::getOracleChecker() const
-{
-  return nullptr;
-}
-
 EntailmentCheck* TermRegistry::getEntailmentCheck() const
 {
   return d_echeck.get();

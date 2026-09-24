@@ -23,22 +23,14 @@ using namespace ava6::internal::theory;
 
 namespace ava6::internal {
 
-/** Attribute true for variables that represent any constant */
-struct SygusAnyConstAttributeId
-{
-};
-typedef expr::Attribute<SygusAnyConstAttributeId, bool> SygusAnyConstAttribute;
-
-DTypeConstructor::DTypeConstructor(std::string name,
-                                   unsigned weight)
+DTypeConstructor::DTypeConstructor(std::string name)
     :  // We don't want to introduce a new data member, because eventually
        // we're going to be a constant stuffed inside a node.  So we stow
        // the tester name away inside the constructor name until
        // resolution.
       d_name(name),
       d_tester(),
-      d_args(),
-      d_weight(weight)
+      d_args()
 {
   Assert(name != "");
 }
@@ -97,55 +89,6 @@ Node DTypeConstructor::getTester() const
 {
   Assert(isResolved());
   return d_tester;
-}
-
-void DTypeConstructor::setSygus(Node op)
-{
-  Assert(!isResolved());
-  d_sygusOp = op;
-  if (op.getKind() == Kind::SKOLEM)
-  {
-    // check if stands for the "any constant" constructor
-    if (op.getInternalSkolemId() == InternalSkolemId::SYGUS_ANY_CONSTANT)
-    {
-      // mark with attribute, which is a faster lookup
-      SygusAnyConstAttribute saca;
-      op.setAttribute(saca, true);
-    }
-  }
-}
-
-Node DTypeConstructor::getSygusOp() const
-{
-  Assert(isResolved());
-  return d_sygusOp;
-}
-
-bool DTypeConstructor::isSygusIdFunc() const
-{
-  Assert(isResolved());
-  Assert(!d_sygusOp.isNull());
-  return (d_sygusOp.getKind() == Kind::LAMBDA
-          && d_sygusOp[0].getNumChildren() == 1
-          && d_sygusOp[0][0] == d_sygusOp[1]);
-}
-
-bool DTypeConstructor::isSygusAnyConstant() const
-{
-  Assert(isResolved());
-  Assert(!d_sygusOp.isNull());
-  return isSygusAnyConstantOp(d_sygusOp);
-}
-
-bool DTypeConstructor::isSygusAnyConstantOp(const Node& n)
-{
-  return n.getAttribute(SygusAnyConstAttribute());
-}
-
-unsigned DTypeConstructor::getWeight() const
-{
-  Assert(isResolved());
-  return d_weight;
 }
 
 size_t DTypeConstructor::getNumArgs() const { return d_args.size(); }

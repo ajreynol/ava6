@@ -104,8 +104,6 @@ class AVA6_EXPORT Configuration final
 
   static bool isBuiltWithKissat();
 
-  static bool isBuiltWithEditline();
-
   static bool isBuiltWithPoly();
 
   static bool isBuiltWithCoCoA();

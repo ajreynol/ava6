@@ -121,30 +121,7 @@ bool ProcessAssertions::apply(AssertionPipeline& ap)
       << "ProcessAssertions::processAssertions() : pre-definition-expansion"
       << endl;
 
-  if (isOutputOn(OutputTag::NORMALIZE))
-  {
-    // For normalization, apply substitutions WITHOUT rewriting, then beta
-    // reduction This preserves the exact structure for normalization purposes
-    BetaReduceNodeConverter bnc(nodeManager());
-    theory::SubstitutionMap& sm =
-        d_preprocessingPassContext->getTopLevelSubstitutions().get();
-
-    for (size_t i = 0, size = ap.size(); i < size; ++i)
-    {
-      Node ar = sm.apply(ap[i]);
-      ar = bnc.convert(ar);
-      ap.replace(i, ar);
-    }
-
-    // Now apply the normalize pass for variable renaming and sorting
-    applyPass("normalize", ap);
-
-    std::ostream& outPA = d_env.output(OutputTag::NORMALIZE);
-    outPA << ";; normalize start" << std::endl;
-    dumpAssertionsToStream(outPA, ap, false);
-    outPA << ";; normalize end" << std::endl;
-    return true;
-  }
+  
 
   // Apply substitutions first. If we are non-incremental, this has only the
   // effect of replacing defined functions with their definitions.
@@ -179,11 +156,7 @@ bool ProcessAssertions::apply(AssertionPipeline& ap)
   
 
   // Unconstrained simplification
-  if (options().solver.unconstrainedSimp)
-  {
-    applyPass("rewrite", ap);
-    applyPass("unconstrained-simplifier", ap);
-  }
+  
 
 
   // Lift bit-vectors of size 1 to bool
@@ -359,10 +332,7 @@ bool ProcessAssertions::simplifyAssertions(AssertionPipeline& ap)
     Trace("smt") << " assertions     : " << ap.size() << endl;
 
     // Unconstrained simplification
-    if (options().solver.unconstrainedSimp)
-    {
-      applyPass("unconstrained-simplifier", ap);
-    }
+    
 
     if (options().solver.repeatSimp
         && options().smt.simplificationMode

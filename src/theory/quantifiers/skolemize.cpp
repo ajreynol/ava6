@@ -53,12 +53,10 @@ TrustNode Skolemize::process(Node q)
   }
   Node lem;
   ProofGenerator* pg = nullptr;
-  if (isProofEnabled() && !false
-      && !false)
+  if (isProofEnabled())
   {
     ProofNodeManager* pnm = d_env.getProofNodeManager();
-    // if using proofs and not using induction, we use the justified
-    // skolemization
+    // Construct a justified skolemization.
     NodeManager* nm = d_env.getNodeManager();
     // cache the skolems in d_skolem_constants[q]
     std::vector<Node>& skolems = d_skolem_constants[q];
@@ -122,16 +120,16 @@ Node Skolemize::mkSkolemizedBody(Node q, Node body,
                                 std::vector<Node>& skolems)
 {
   Assert(q.getKind() == Kind::FORALL);
-  Assert(skolems.empty());
+  Assert(skolems.empty() || skolems.size() == q[0].getNumChildren());
   NodeManager* nm = q.getNodeManager();
   std::vector<TypeNode> argTypes;
   for (TNode v : fvs) { argTypes.push_back(v.getType()); }
   std::vector<Node> vars(q[0].begin(), q[0].end());
-  if (fvs.empty())
+  if (skolems.empty() && fvs.empty())
   {
     skolems = getSkolemConstants(q);
   }
-  else
+  else if (skolems.empty())
   {
     for (Node v : vars)
     {

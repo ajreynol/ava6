@@ -89,7 +89,7 @@ void PrintBenchmark::printDeclarationsFrom(std::ostream& outDecl,
         d_printer->toStreamCmdDeclareType(outDecl, ctn);
         outDecl << std::endl;
       }
-      else if (ctn.isDatatype() && !ctn.isTuple() && !ctn.isNullable())
+      else if (ctn.isDatatype() && !ctn.isTuple())
       {
         datatypeBlock.push_back(ctn);
       }

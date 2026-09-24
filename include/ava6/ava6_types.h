@@ -100,99 +100,8 @@ AVA6_EXPORT std::string to_string(ava6::UnknownExplanation exp);
 namespace ava6 {
 #endif
 
-/* -------------------------------------------------------------------------- */
-/* RoundingMode                                                               */
-/* -------------------------------------------------------------------------- */
-
-#ifdef AVA6_API_USE_C_ENUMS
-#undef EVALUE
-#define EVALUE(name) AVA6_RM_##name
-#endif
-
-/**
- * Rounding modes for floating-point numbers.
- *
- * For many floating-point operations, infinitely precise results may not be
- * representable with the number of available bits. Thus, the results are
- * rounded in a certain way to one of the representable floating-point numbers.
- *
- * \verbatim embed:rst:leading-asterisk
- * These rounding modes directly follow the SMT-LIB theory for floating-point
- * arithmetic, which in turn is based on IEEE Standard 754 :cite:`IEEE754`.
- * The rounding modes are specified in Sections 4.3.1 and 4.3.2 of the IEEE
- * Standard 754.
- * \endverbatim
- */
-enum ENUM(RoundingMode)
-{
-  /**
-   * Round to the nearest even number.
-   *
-   * If the two nearest floating-point numbers bracketing an unrepresentable
-   * infinitely precise result are equally near, the one with an even least
-   * significant digit will be delivered.
-   */
-  EVALUE(ROUND_NEAREST_TIES_TO_EVEN) = 0,
-  /**
-   * Round towards positive infinity (SMT-LIB: ``+oo``).
-   *
-   * The result shall be the format's floating-point number (possibly ``+oo``)
-   * closest to and no less than the infinitely precise result.
-   */
-  EVALUE(ROUND_TOWARD_POSITIVE),
-  /**
-   * Round towards negative infinity (``-oo``).
-   *
-   * The result shall be the format's floating-point number (possibly ``-oo``)
-   * closest to and no less than the infinitely precise result.
-   */
-  EVALUE(ROUND_TOWARD_NEGATIVE),
-  /**
-   * Round towards zero.
-   *
-   * The result shall be the format's floating-point number closest to and no
-   * greater in magnitude than the infinitely precise result.
-   */
-  EVALUE(ROUND_TOWARD_ZERO),
-  /**
-   * Round to the nearest number away from zero.
-   *
-   * If the two nearest floating-point numbers bracketing an unrepresentable
-   * infinitely precise result are equally near), the one with larger magnitude
-   * will be selected.
-   */
-  EVALUE(ROUND_NEAREST_TIES_TO_AWAY),
-#ifdef AVA6_API_USE_C_ENUMS
-  // must be last entry
-  EVALUE(LAST),
-#endif
-};
-
-#ifdef AVA6_API_USE_C_ENUMS
-#ifndef DOXYGEN_SKIP
-typedef enum ENUM(RoundingMode) ENUM(RoundingMode);
-#endif
-#endif
-
-#ifdef AVA6_API_USE_C_ENUMS
-/**
- * Get a string representation of a Ava6RoundingMode.
- * @param rm The rounding mode.
- * @return The string representation.
- */
-AVA6_EXPORT const char* ava6_rm_to_string(Ava6RoundingMode rm);
-#else
-/**
- * Serialize a RoundingMode to given stream.
- * @param out The output stream
- * @param rm The rounding mode to be serialized to the given output stream
- * @return The output stream
- */
-AVA6_EXPORT std::ostream& operator<<(std::ostream& out, RoundingMode rm);
+#ifndef AVA6_API_USE_C_ENUMS
 }  // namespace ava6
-namespace std {
-AVA6_EXPORT std::string to_string(ava6::RoundingMode rm);
-}
 #endif
 
 #ifndef AVA6_API_USE_C_ENUMS
@@ -363,8 +272,6 @@ enum ENUM(OptionCategory)
 {
   /** Option available to regular users */
   EVALUE(REGULAR) = 0,
-  /** Option available to expert users */
-  EVALUE(EXPERT),
   /** Common options */
   EVALUE(COMMON),
   /** Undocumented options */

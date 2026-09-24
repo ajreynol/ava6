@@ -52,9 +52,6 @@ class Evaluator;
 class Rewriter;
 class TrustSubstitutionMap;
 
-namespace quantifiers {
-class OracleChecker;
-}
 }  // namespace theory
 
 /**
@@ -269,21 +266,6 @@ class Env
   theory::TheoryId theoryOf(TNode node) const;
 
   /**
-   * Declare heap. This is used for separation logics to set the location
-   * and data types. It should be called only once, and before any separation
-   * logic constraints are asserted to the theory engine.
-   */
-  void declareSepHeap(TypeNode locT, TypeNode dataT);
-
-  /** Have we called declareSepHeap? */
-  bool hasSepHeap() const;
-
-  /** get the separation logic location type */
-  TypeNode getSepLocType() const;
-  /** get the separation logic data type */
-  TypeNode getSepDataType() const;
-
-  /**
    * Add plugin to this environment. Any theory engine that uses this
    * environment will use these plugins. These plugins should not be added
    * after having fully initialized the solver engine for this environment.
@@ -291,9 +273,6 @@ class Env
   void addPlugin(Plugin* p);
   /** Get plugins */
   const std::vector<Plugin*>& getPlugins() const;
-
-  /** get oracle checker */
-  theory::quantifiers::OracleChecker* getOracleChecker() const;
 
   /**
    * Register Boolean term skolem. This registers that k is a Boolean variable
@@ -399,15 +378,11 @@ class Env
   std::unique_ptr<ResourceManager> d_resourceManager;
   /** The theory that owns the uninterpreted sort. */
   theory::TheoryId d_uninterpretedSortOwner;
-  /** The separation logic location and data types */
-  TypeNode d_sepLocType;
-  TypeNode d_sepDataType;
   /**
    * List of plugins, to be used in any theory engine that uses this
    * environment
    */
   std::vector<Plugin*> d_plugins;
-  /** oracle checker */
   /**
    * The set of skolems introduced for Boolean term elimination. This is a set
    * of purification skolems of Boolean type. These variables are important

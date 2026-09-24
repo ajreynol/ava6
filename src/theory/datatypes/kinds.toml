@@ -155,42 +155,6 @@ header    = "expr/ascription_type.h"
 comment   = "a type parameter for type ascription; payload is an instance of the ava6::internal::AscriptionType class"
 typerule  = "SimpleTypeRule<RBuiltinOperator>"
 
-# the remaining kinds are used only by the sygus extension
-[[kinds]]
-type     = "operator"
-name     = "DT_SIZE"
-children = 1
-comment  = "datatypes size"
-typerule = "::ava6::internal::theory::datatypes::DtSizeTypeRule"
-
-[[kinds]]
-type     = "operator"
-name     = "DT_HEIGHT_BOUND"
-children = 2
-comment  = "datatypes height bound"
-typerule = "::ava6::internal::theory::datatypes::DtBoundTypeRule"
-
-[[kinds]]
-type     = "operator"
-name     = "DT_SIZE_BOUND"
-children = 2
-comment  = "datatypes height bound"
-typerule = "::ava6::internal::theory::datatypes::DtBoundTypeRule"
-
-[[kinds]]
-type     = "operator"
-name     = "DT_SYGUS_BOUND"
-children = 2
-comment  = "datatypes sygus bound"
-typerule = "::ava6::internal::theory::datatypes::DtBoundTypeRule"
-
-[[kinds]]
-type     = "operator"
-name     = "DT_SYGUS_EVAL"
-children = "1:"
-comment  = "datatypes sygus evaluation function"
-typerule = "::ava6::internal::theory::datatypes::DtSygusEvalTypeRule"
-
 # Kinds for match terms. For example, the match term
 #   (match l (((cons h t) h) (nil 0)))
 # is represented by the AST
@@ -240,26 +204,3 @@ children = 1
 comment  = "projects a tuple from an existing tuple using indices passed in TupleProjectOp"
 typerule = "::ava6::internal::theory::datatypes::TupleProjectTypeRule"
 
-# For representing codatatype values
-[[kinds]]
-type     = "operator"
-name     = "NULLABLE_TYPE"
-children = "0:"
-comment  = "nullable type"
-[kinds.cardinality]
-computer = "%TYPE%.getDType().getCardinality(%TYPE%)"
-header   = "expr/dtype.h"
-[kinds.well-founded]
-wellfoundedness-computer = "%TYPE%.getDType().isWellFounded()"
-ground-term-computer     = "%TYPE%.getDType().mkGroundTerm(%TYPE%)"
-header                   = "expr/dtype.h"
-[kinds.enumerator]
-class  = "::ava6::internal::theory::datatypes::DatatypesEnumerator"
-header = "expr/dtype.h"
-
-[[kinds]]
-type     = "operator"
-name     = "NULLABLE_LIFT"
-children = "1:"
-comment  = "application of lift operator; first parameter is the lift operator, remaining ones are its arguments"
-typerule = "::ava6::internal::theory::datatypes::NullableLiftTypeRule"

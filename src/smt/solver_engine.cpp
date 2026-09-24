@@ -1121,38 +1121,10 @@ std::string SolverEngine::getModel(const std::vector<TypeNode>& declaredSorts,
     Node value = tm->getValue(n);
     m.addDeclarationTerm(n, value);
   }
-  // for separation logic
-  TypeNode locT, dataT;
-  if (getSepHeapTypes(locT, dataT))
-  {
-    std::pair<Node, Node> sh = getSepHeapAndNilExpr();
-    m.setHeapModel(sh.first, sh.second);
-  }
   // print the model
   std::stringstream ssm;
   ssm << m;
   return ssm.str();
-}
-
-std::pair<Node, Node> SolverEngine::getSepHeapAndNilExpr(void)
-{
-  {
-    const char* msg =
-        "Cannot obtain separation logic expressions if not using the "
-        "separation logic theory.";
-    throw RecoverableModalException(msg);
-  }
-  Node heap;
-  Node nil;
-  TheoryModel* tm = getAvailableModel("get separation logic heap and nil");
-  if (!tm->getHeapModel(heap, nil))
-  {
-    const char* msg =
-        "Failed to obtain heap/nil "
-        "expressions from theory model.";
-    throw RecoverableModalException(msg);
-  }
-  return std::make_pair(heap, nil);
 }
 
 std::vector<Node> SolverEngine::getAssertionsInternal() const
@@ -1238,47 +1210,6 @@ std::vector<Node> SolverEngine::getSubstitutedAssertions()
 }
 
 Env& SolverEngine::getEnv() { return *d_env.get(); }
-
-void SolverEngine::declareSepHeap(TypeNode locT, TypeNode dataT)
-{
-  if (d_state->isFullyInited())
-  {
-    throw ModalException(
-        "Cannot set logic in SolverEngine after the engine has "
-        "finished initializing.");
-  }
-  {
-    const char* msg =
-        "Cannot declare heap if not using the separation logic theory.";
-    throw RecoverableModalException(msg);
-  }
-  TypeNode locT2, dataT2;
-  if (getSepHeapTypes(locT2, dataT2))
-  {
-    std::stringstream ss;
-    ss << "ERROR: cannot declare heap types for separation logic more than "
-          "once.  We are declaring heap of type ";
-    ss << locT << " -> " << dataT << ", but we already have ";
-    ss << locT2 << " -> " << dataT2;
-    throw LogicException(ss.str());
-  }
-  d_env->declareSepHeap(locT, dataT);
-}
-
-bool SolverEngine::getSepHeapTypes(TypeNode& locT, TypeNode& dataT)
-{
-  if (!d_env->hasSepHeap())
-  {
-    return false;
-  }
-  locT = d_env->getSepLocType();
-  dataT = d_env->getSepDataType();
-  return true;
-}
-
-Node SolverEngine::getSepHeapExpr() { return getSepHeapAndNilExpr().first; }
-
-Node SolverEngine::getSepNilExpr() { return getSepHeapAndNilExpr().second; }
 
 void SolverEngine::checkProof()
 {

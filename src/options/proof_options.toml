@@ -102,4 +102,3 @@ name   = "Proof"
   help = "A proof containing a step that will be proven externally."
 
 
-# Internal core policies; never accepted as command-line or SMT-LIB options.

@@ -159,58 +159,8 @@ class DType
    * be unique; they are for convenience and pretty-printing only.
    */
   void addConstructor(std::shared_ptr<DTypeConstructor> c);
-  /** add sygus constructor
-   *
-   * This adds a sygus constructor to this datatype, where
-   * this datatype should be currently unresolved. Note this method is
-   * syntactic sugar for adding a normal constructor and setting it to be a
-   * sygus constructor, and following a naming convention that avoids
-   * constructors with the same name.
-   *
-   * @param op : the builtin operator, constant, or variable that this
-   * constructor encodes
-   * @param cname the name of the constructor (for printing only)
-   * @param cargs the arguments of the constructor.
-   * It should be the case that cargs are sygus datatypes that
-   * encode the arguments of op. For example, a sygus constructor
-   * with op = ADD should be such that cargs.size()>=2 and
-   * the sygus type of cargs[i] is Real/Int for each i.
-   * @param weight denotes the value added by the constructor when computing the
-   * size of datatype terms. Passing a value < 0 denotes the default weight for
-   * the constructor, which is 0 for nullary constructors and 1 for non-nullary
-   * constructors.
-   */
-  void addSygusConstructor(Node op,
-                           const std::string& cname,
-                           const std::vector<TypeNode>& cargs,
-                           int weight = -1);
-
-  /** set sygus
-   *
-   * This marks this datatype as a sygus datatype.
-   * A sygus datatype is one that represents terms of type st
-   * via a deep embedding described in Section 4 of
-   * Reynolds et al. CAV 2015. We say that this sygus datatype
-   * "encodes" its sygus type st in the following.
-   *
-   * st : the type this datatype encodes (this can be Int, Bool, etc.),
-   * bvl : the list of arguments for the synth-fun
-   * allow_const : whether all constants are (implicitly) allowed by the
-   * datatype
-   * allow_all : whether all terms are (implicitly) allowed by the datatype
-   *
-   * Notice that allow_const/allow_all do not reflect the constructors
-   * for this datatype, and instead are used solely for relaxing constraints
-   * when doing solution reconstruction (Figure 5 of Reynolds et al.
-   * CAV 2015).
-   */
-  void setSygus(TypeNode st, Node bvl, bool allowConst, bool allowAll);
-
   /** set that this datatype is a tuple */
   void setTuple();
-
-  /** set that this datatype is a nullable */
-  void setNullable();
 
   /** set that this datatype is a record */
   void setRecord();
@@ -233,14 +183,8 @@ class DType
   /** Get parameters */
   std::vector<TypeNode> getParameters() const;
 
-  /** is this a sygus datatype? */
-  bool isSygus() const;
-
   /** is this a tuple datatype? */
   bool isTuple() const;
-
-  /** is this a nullable datatype? */
-  bool isNullable() const;
 
   /** is this a record datatype? */
   bool isRecord() const;
@@ -338,42 +282,6 @@ class DType
 
   /** Get the ith DTypeConstructor. */
   const DTypeConstructor& operator[](size_t index) const;
-
-  /** get sygus type
-   * This gets the built-in type associated with
-   * this sygus datatype, i.e. the type of the
-   * term that this sygus datatype encodes.
-   */
-  TypeNode getSygusType() const;
-
-  /** get sygus var list
-   * This gets the variable list of the function
-   * to synthesize using this sygus datatype.
-   * For example, if we are synthesizing a binary
-   * function f where solutions are of the form:
-   *   f = (lambda (xy) t[x,y])
-   * In this case, this method returns the
-   * bound variable list containing x and y.
-   */
-  Node getSygusVarList() const;
-  /** get sygus allow constants
-   *
-   * Does this sygus datatype allow constants?
-   * Notice that this is not a property of the
-   * constructors of this datatype. Instead, it is
-   * an auxiliary flag (provided in the call
-   * to setSygus).
-   */
-  bool getSygusAllowConst() const;
-  /** get sygus allow all
-   *
-   * Does this sygus datatype allow all terms?
-   * Notice that this is not a property of the
-   * constructors of this datatype. Instead, it is
-   * an auxiliary flag (provided in the call
-   * to setSygus).
-   */
-  bool getSygusAllowAll() const;
 
   /** involves external type
    * Get whether this datatype has a subfield
@@ -520,8 +428,6 @@ class DType
   std::vector<TypeNode> d_params;
   /** whether the datatype is a tuple */
   bool d_isTuple;
-  /** whether the datatype is a nullable */
-  bool d_isNullable;
   /** whether the datatype is a record */
   bool d_isRecord;
   /** the constructors of this datatype */
@@ -534,15 +440,6 @@ class DType
   bool d_involvesExt;
   /** cache for involves uninterpreted type */
   bool d_involvesUt;
-  /** the builtin type that this sygus type encodes */
-  TypeNode d_sygusType;
-  /** the variable list for the sygus function to synthesize */
-  Node d_sygusBvl;
-  /** whether all constants are allowed as solutions */
-  bool d_sygusAllowConst;
-  /** whether all terms are allowed as solutions */
-  bool d_sygusAllowAll;
-
   /** the cardinality of this datatype
    * "mutable" because computing the cardinality can be expensive,
    * and so it's computed just once, on demand---this is the cache

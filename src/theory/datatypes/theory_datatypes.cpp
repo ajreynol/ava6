@@ -52,9 +52,8 @@ TheoryDatatypes::TheoryDatatypes(Env& env,
       d_term_sk(userContext()),
       d_labels(context()),
       d_selector_apps(context()),
-      d_initialLemmaCache(userContext()),
       d_functionTerms(context()),
-      d_rewriter(nodeManager(), env.getEvaluator(), options()),
+      d_rewriter(nodeManager()),
       d_state(env, valuation),
       d_im(env, *this, d_state),
       d_notify(d_im, *this),
@@ -62,7 +61,6 @@ TheoryDatatypes::TheoryDatatypes(Env& env,
       d_cpacb(*this)
 {
   d_true = nodeManager()->mkConst(true);
-  d_zero = nodeManager()->mkConstInt(Rational(0));
 
   // indicate we are using the default theory state object
   d_theoryState = &d_state;
@@ -122,9 +120,7 @@ void TheoryDatatypes::finishInit()
 
   // testers are not relevant for model building
   d_valuation.setIrrelevantKind(Kind::APPLY_TESTER);
-  d_valuation.setIrrelevantKind(Kind::DT_SYGUS_BOUND);
   // evaluation functions are not relevant to model construction.
-  d_valuation.setIrrelevantKind(Kind::DT_SYGUS_EVAL);
   // selectors don't always evaluate
   d_valuation.setSemiEvaluatedKind(Kind::APPLY_SELECTOR);
 }
@@ -357,7 +353,6 @@ void TheoryDatatypes::preRegisterTerm(TNode n)
     break;
     default:
       // do initial lemmas (e.g. for dt.size)
-      registerInitialLemmas(n);
       // Function applications/predicates
       d_equalityEngine->addTerm(n);
 
@@ -366,25 +361,9 @@ void TheoryDatatypes::preRegisterTerm(TNode n)
   d_im.process();
 }
 
-TrustNode TheoryDatatypes::ppRewrite(TNode in, std::vector<SkolemLemma>& lems)
+TrustNode TheoryDatatypes::ppRewrite(TNode in, AVA6_UNUSED std::vector<SkolemLemma>& lems)
 {
   Trace("datatypes") << "TheoryDatatypes::ppRewrite(" << in << ")" << endl;
-  // Eliminate DT_SIZE, which is only used for enforcing fairness in sygus.
-  // We only assume that DT_SIZE terms are greater than or equal to zero.
-  // Note that this ensures that spurious check-model failures are not
-  // generated.
-  if (in.getKind() == Kind::DT_SIZE)
-  {
-    NodeManager* nm = nodeManager();
-    SkolemManager* sm = nm->getSkolemManager();
-    Node k = sm->mkPurifySkolem(in);
-    Node lem = nm->mkNode(Kind::LEQ, d_zero, k);
-    Trace("datatypes-infer")
-        << "DtInfer : size geq zero : " << lem << std::endl;
-    TrustNode tlem = TrustNode::mkTrustLemma(lem);
-    lems.emplace_back(tlem, k);
-    return TrustNode::mkTrustRewrite(in, k);
-  }
   // first, see if we need to expand definitions
   Node texp = d_rewriter.expandDefinition(in);
   if (!texp.isNull())
@@ -428,7 +407,7 @@ void TheoryDatatypes::eqNotifyNewClass(TNode n)
       d_functionTerms.push_back(n);
     }
   }
-  if (nk == Kind::APPLY_SELECTOR || nk == Kind::DT_HEIGHT_BOUND)
+  if (nk == Kind::APPLY_SELECTOR)
   {
     d_functionTerms.push_back(n);
     // we must also record which selectors exist
@@ -885,8 +864,7 @@ void TheoryDatatypes::addSelector(Node s,
     for (size_t j = 0; j < n_sel; j++)
     {
       Node ss = d_selector_apps_data[n][j];
-      if (s.getOperator() == ss.getOperator()
-          && (s.getKind() != Kind::DT_HEIGHT_BOUND || s[1] == ss[1]))
+      if (s.getOperator() == ss.getOperator())
       {
         Trace("dt-collapse-sel") << "...redundant." << std::endl;
         return;
@@ -1182,43 +1160,6 @@ bool TheoryDatatypes::collectModelValues(TheoryModel* m,
     }
   }
   return true;
-}
-
-void TheoryDatatypes::registerInitialLemmas(Node n)
-{
-  if (d_initialLemmaCache.find(n) != d_initialLemmaCache.end())
-  {
-    return;
-  }
-  d_initialLemmaCache[n] = true;
-
-  NodeManager* nm = nodeManager();
-  Kind nk = n.getKind();
-  if (nk == Kind::DT_HEIGHT_BOUND && n[1].getConst<Rational>().isZero())
-  {
-    std::vector<Node> children;
-    const DType& dt = n[0].getType().getDType();
-    for (unsigned i = 0, ncons = dt.getNumConstructors(); i < ncons; i++)
-    {
-      if (utils::isNullaryConstructor(dt[i]))
-      {
-        Node test = utils::mkTester(n[0], i, dt);
-        children.push_back(test);
-      }
-    }
-    Node lem;
-    if (children.empty())
-    {
-      lem = n.negate();
-    }
-    else
-    {
-      lem = n.eqNode(children.size() == 1 ? children[0]
-                                          : nm->mkNode(Kind::OR, children));
-    }
-    Trace("datatypes-infer") << "DtInfer : zero height : " << lem << std::endl;
-    d_im.addPendingLemma(lem, InferenceId::DATATYPES_HEIGHT_ZERO);
-  }
 }
 
 Node TheoryDatatypes::getInstantiateCons(Node n, const DType& dt, int index)
@@ -1534,7 +1475,7 @@ void TheoryDatatypes::checkSplit()
     }
     else
     {
-      Assert(consIndex != -1 || dt.isSygus());
+      Assert(consIndex != -1);
       bool sentLemma = false;
       {
         Trace("dt-split") << "*************Split for constructors on " << n
@@ -1544,7 +1485,7 @@ void TheoryDatatypes::checkSplit()
         sentLemma = d_im.sendDtLemma(
             lemma, InferenceId::DATATYPES_SPLIT, LemmaProperty::SEND_ATOMS);
       }
-      if (sentLemma && !false)
+      if (sentLemma)
       {
         return;
       }

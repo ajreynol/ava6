@@ -20,29 +20,18 @@ namespace ava6::internal {
 namespace theory {
 
 SubsolverSetupInfo::SubsolverSetupInfo(const Options& opts,
-                                       const LogicInfo& logicInfo,
-                                       TypeNode sepLocType,
-                                       TypeNode sepDataType)
-    : d_opts(opts),
-      d_logicInfo(logicInfo),
-      d_sepLocType(sepLocType),
-      d_sepDataType(sepDataType)
+                                     const LogicInfo& logicInfo)
+    : d_opts(opts), d_logicInfo(logicInfo)
 {
 }
 
 SubsolverSetupInfo::SubsolverSetupInfo(const Env& env)
-    : d_opts(env.getOptions()),
-      d_logicInfo(env.getLogicInfo()),
-      d_sepLocType(env.getSepLocType()),
-      d_sepDataType(env.getSepDataType())
+    : SubsolverSetupInfo(env.getOptions(), env.getLogicInfo())
 {
 }
 
 SubsolverSetupInfo::SubsolverSetupInfo(const Env& env, const Options& opts)
-    : d_opts(opts),
-      d_logicInfo(env.getLogicInfo()),
-      d_sepLocType(env.getSepLocType()),
-      d_sepDataType(env.getSepDataType())
+    : SubsolverSetupInfo(opts, env.getLogicInfo())
 {
 }
 
@@ -76,11 +65,6 @@ void initializeSubsolver(NodeManager* nm,
   if (needsTimeout)
   {
     smte->setTimeLimit(timeout);
-  }
-  // set up separation logic heap if necessary
-  if (!info.d_sepLocType.isNull() && !info.d_sepDataType.isNull())
-  {
-    smte->declareSepHeap(info.d_sepLocType, info.d_sepDataType);
   }
 }
 void initializeSubsolver(std::unique_ptr<SolverEngine>& smte,

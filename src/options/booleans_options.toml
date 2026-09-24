@@ -2,4 +2,3 @@ id     = "BOOLEANS"
 name   = "Boolean Theory"
 
 
-# Internal core policies; never accepted as command-line or SMT-LIB options.

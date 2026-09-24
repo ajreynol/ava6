@@ -40,8 +40,6 @@ TheoryModel::TheoryModel(Env& env, std::string name, bool enableFuncModels)
       d_equalityEngine(nullptr),
       d_enableFuncModels(enableFuncModels)
 {
-  // must use function models when ufHo is enabled
-  Assert(d_enableFuncModels || !false);
   d_true = nodeManager()->mkConst(true);
   d_false = nodeManager()->mkConst(false);
 }
@@ -52,8 +50,7 @@ void TheoryModel::finishInit(eq::EqualityEngine* ee)
 {
   Assert(ee != nullptr);
   d_equalityEngine = ee;
-  // we do not do congruence on any kind in the model equality engine, with
-  // the exception of HO_APPLY for the sake of higher-order.
+  // The model equality engine does not use congruence.
   // do not interpret APPLY_UF if we are not assigning function values
   if (!d_enableFuncModels)
   {
@@ -72,29 +69,10 @@ void TheoryModel::reset()
   d_modelCache.clear();
   d_semiEvalCacheSet = false;
   d_semiEvalCache.clear();
-  d_sep_heap = Node::null();
-  d_sep_nil_eq = Node::null();
   d_reps.clear();
   d_rep_set.clear();
   d_uf_terms.clear();
   d_uf_models.clear();
-}
-
-void TheoryModel::setHeapModel(Node h, Node neq)
-{
-  d_sep_heap = h;
-  d_sep_nil_eq = neq;
-}
-
-bool TheoryModel::getHeapModel(Node& h, Node& neq) const
-{
-  if (d_sep_heap.isNull() || d_sep_nil_eq.isNull())
-  {
-    return false;
-  }
-  h = d_sep_heap;
-  neq = d_sep_nil_eq;
-  return true;
 }
 
 std::vector<Node> TheoryModel::getDomainElements(TypeNode tn) const

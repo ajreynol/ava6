@@ -15,7 +15,7 @@ name   = "SMT Layer"
   help = "Do not perform nonclausal simplification."
 [[option.mode.BATCH]]
   name = "batch"
-  help = "Save up all ASSERTions; run nonclausal simplification and clausal (MiniSat) propagation for all of them only after reaching a querying command (CHECKSAT or QUERY or predicate SUBTYPE declaration)."
+  help = "Simplify assertions in batches before check-sat."
 
 [[option]]
   name       = "staticLearning"
@@ -119,7 +119,6 @@ name   = "SMT Layer"
   category   = "regular"
   long       = "produce-assertions"
   type       = "bool"
-  alias      = ["interactive-mode"]
   default    = "true"
   help       = "keep an assertions list. Note this option is always enabled."
 

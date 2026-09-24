@@ -80,11 +80,10 @@ Node EoNodeConverter::postConvert(Node n)
   // case for skolems, unhandled variables, and other unhandled terms
   // These should print as @const, or otherwise be printed as a skolem,
   // which may need further processing below. In the case of unhandled
-  // terms (e.g. DT_SYGUS_EVAL), we prefer printing them as @const instead
+  // terms, we prefer printing them as @const instead
   // of using their smt2 printer, which would lead to undeclared identifiers in
   // the proof.
-  if (k == Kind::SKOLEM || k == Kind::DUMMY_SKOLEM || k == Kind::INST_CONSTANT
-      || k == Kind::DT_SYGUS_EVAL)
+  if (k == Kind::SKOLEM || k == Kind::DUMMY_SKOLEM || k == Kind::INST_CONSTANT)
   {
     TypeNode tn = n.getType();
     // constructors/selectors are represented by skolems, which are defined
@@ -403,7 +402,11 @@ Node EoNodeConverter::mkInternalApp(const std::string& name,
       Assert(!a.isNull());
       argTypes.push_back(a.getType());
     }
-    TypeNode atype = d_nm->mkFunctionType(argTypes, ret);
+    // These symbols describe CPC syntax, including lambda definitions and
+    // skolems whose printed representation has a function type. Preserve the
+    // result type without currying the printer's arguments into that type.
+    argTypes.push_back(ret);
+    TypeNode atype = d_nm->mkTypeNode(Kind::FUNCTION_TYPE, argTypes);
     Node op = mkInternalSymbol(name, atype, useRawSym);
     std::vector<Node> aargs;
     aargs.push_back(op);
@@ -493,9 +496,8 @@ Node EoNodeConverter::getOperatorOfTerm(Node n)
           opName << "tuple";
         }
       }
-      else if ((dt.isNullable() && index == 0)
-               || (dt.isParametric()
-                   && isAmbiguousDtConstructor(dt[index].getConstructor())))
+      else if (dt.isParametric()
+               && isAmbiguousDtConstructor(dt[index].getConstructor()))
       {
         // ambiguous if nullable.null or a user provided ambiguous datatype
         // constructor
@@ -638,13 +640,13 @@ bool EoNodeConverter::isHandledSkolemId(SkolemId id)
     case SkolemId::STRINGS_STOI_RESULT:
     case SkolemId::STRINGS_STOI_NON_DIGIT:
     case SkolemId::RE_UNFOLD_POS_COMPONENT:
-    case SkolemId::BAGS_DEQ_DIFF:
-    case SkolemId::BAGS_DISTINCT_ELEMENTS:
-    case SkolemId::BAGS_MAP_PREIMAGE_INJECTIVE:
-    case SkolemId::BAGS_DISTINCT_ELEMENTS_SIZE:
-    case SkolemId::BAGS_MAP_SUM:
-    case SkolemId::TABLES_GROUP_PART:
-    case SkolemId::TABLES_GROUP_PART_ELEMENT:
+
+
+
+
+
+
+
     case SkolemId::WITNESS_STRING_LENGTH: return true;
     default: break;
   }

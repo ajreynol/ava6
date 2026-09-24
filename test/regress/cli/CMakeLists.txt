@@ -621,7 +621,6 @@ set(regress_0_tests
   regress0/datatypes/model-subterms-min.smt2
   regress0/datatypes/mutual-rec-param-dt.smt2
   regress0/datatypes/mutually-recursive.cvc.smt2
-  regress0/datatypes/nullable_checks.smt2
   regress0/datatypes/pair-bool-bool.cvc.smt2
   regress0/datatypes/pair-real-bool.smt2
   regress0/datatypes/par-updater-type-rule.smt2
@@ -939,7 +938,6 @@ set(regress_0_tests
   regress0/printer/learned-lit-output.smt2
   regress0/printer/let_shadowing.smt2
   regress0/printer/model-u-print.smt2
-  regress0/printer/normalize.smt2
   regress0/printer/post-asserts-output.smt2
   regress0/printer/pre-asserts-output.smt2
   regress0/printer/print_options_auto.smt2

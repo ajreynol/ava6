@@ -47,7 +47,7 @@ class DTypeConstructor
    * for SyGuS. For example, if A, B, C have weights 0, 1, and 3 respectively,
    * then C( B( A() ), B( A() ) ) has size 5.
    */
-  DTypeConstructor(std::string name, unsigned weight = 1);
+  explicit DTypeConstructor(std::string name);
 
   ~DTypeConstructor() {}
   /**
@@ -96,36 +96,6 @@ class DTypeConstructor
    */
   Node getTester() const;
   //-------------------------------------- sygus
-  /** set sygus
-   *
-   * Set that this constructor is a sygus datatype constructor that encodes
-   * operator op. If op is a skolem with id SYGUS_ANY_CONSTANT, then this
-   * is treated as the "any constant" constructor.
-   */
-  void setSygus(Node op);
-  /** get sygus op
-   *
-   * This method returns the operator or term that this constructor represents
-   * in the sygus encoding. This may be a builtin operator, defined function,
-   * variable, or constant that this constructor encodes in this deep embedding.
-   */
-  Node getSygusOp() const;
-  /** is this a sygus identity function?
-   *
-   * This returns true if the sygus operator of this datatype constructor is
-   * of the form (lambda (x) x).
-   */
-  bool isSygusIdFunc() const;
-  /** is this the "any constant" constructor? */
-  bool isSygusAnyConstant() const;
-  /** is n is the "any constant" sygus operator? */
-  static bool isSygusAnyConstantOp(const Node& n);
-  /** get weight
-   *
-   * Get the weight of this constructor. This value is used when computing the
-   * size of datatype terms that involve this constructor.
-   */
-  unsigned getWeight() const;
   //-------------------------------------- end sygus
 
   /**
@@ -305,10 +275,6 @@ class DTypeConstructor
   Node d_tester;
   /** the arguments of this constructor */
   std::vector<std::shared_ptr<DTypeSelector> > d_args;
-  /** sygus operator */
-  Node d_sygusOp;
-  /** weight */
-  unsigned d_weight;
   /**  A cache for computeCardinalityInfo. */
   mutable std::map<TypeNode, std::pair<CardinalityClass, bool> > d_cardInfo;
 }; /* class DTypeConstructor */

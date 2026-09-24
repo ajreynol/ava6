@@ -24,7 +24,6 @@ const char* toString(InternalSkolemId id)
       return "SEQ_MODEL_BASE_ELEMENT";
     case InternalSkolemId::IEVAL_NONE: return "IEVAL_NONE";
     case InternalSkolemId::IEVAL_SOME: return "IEVAL_SOME";
-    case InternalSkolemId::SYGUS_ANY_CONSTANT: return "SYGUS_ANY_CONSTANT";
     case InternalSkolemId::QUANTIFIERS_SYNTH_FUN_EMBED:
       return "QUANTIFIERS_SYNTH_FUN_EMBED";
     case InternalSkolemId::MBQI_INPUT: return "MBQI_INPUT";

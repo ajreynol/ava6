@@ -1,7 +1,7 @@
 # Ava6 options
 
-Ava6 retains cvc5's TOML option generator, with public options and private
-settings for the retained core algorithms. Expert options are removed. See
+Ava6 retains cvc5's TOML generator for public options. Expert options and
+private setting entries are removed. See
 [DESIGN.md](../../DESIGN.md) for the feature boundary.
 
 Specifying Modules
@@ -77,15 +77,15 @@ Every option has one of the following categories that influences where and how a
 * `undocumented`: Omitted from command-line help, for values populated through
   other options, such as `outputTagHolder`.
 
-Private settings
-----------------
+Derived configuration
+---------------------
 
-Use `[[setting]]` for internal core policies. Settings declare `name`, `type`,
-and `default`, with `[[setting.mode.NAME]]` entries for enum values. They have
-no public category, command-line spelling, or help text, and are absent from
-`set-option`, `get-option`, and public option enumeration. Remove settings
-when their algorithms are removed; see the root design notes before adding
-new ones.
+The generator accepts public options only. Fixed implementation choices belong
+in the algorithms that use them, with unused alternatives removed. Configuration
+derived from the logic or supported public options lives in
+[solver_config.h](solver_config.h), alongside stream/parser state. It has no
+command-line or SMT-LIB registration and no user-set flags. Do not add private
+TOML entries to preserve removed expert features.
 
 Option types
 ------------

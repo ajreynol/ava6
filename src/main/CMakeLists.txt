@@ -13,8 +13,6 @@
 # libmain source files
 set(libmain_src_files
   command_executor.cpp
-  interactive_shell.cpp
-  interactive_shell.h
   main.h
   options.h
   signal_handlers.cpp
@@ -80,11 +78,6 @@ endif()
 target_link_libraries(ava6-bin PUBLIC ava6 ava6parser)
 
 
-if(USE_EDITLINE)
-  target_link_libraries(ava6-bin PUBLIC ${Editline_LIBRARIES})
-  target_link_libraries(main-test PUBLIC ${Editline_LIBRARIES})
-  target_include_directories(main PUBLIC ${Editline_INCLUDE_DIRS})
-endif()
 
 #-----------------------------------------------------------------------------#
 # Generate language tokens header files.

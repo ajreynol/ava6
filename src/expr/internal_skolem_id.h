@@ -37,7 +37,6 @@ enum class InternalSkolemId
   /** the "some" term, for instantiation evaluation */
   IEVAL_SOME,
   /** sygus "any constant" placeholder */
-  SYGUS_ANY_CONSTANT,
   /**
    * Quantifiers synth fun embedding, for function-to-synthesize, this the
    * first order datatype variable for f.

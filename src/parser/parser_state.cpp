@@ -501,10 +501,6 @@ Term ParserState::applyTypeAscription(Term t, Sort s)
   {
     t = d_tm.mkEmptySet(s);
   }
-  else if (k == Kind::BAG_EMPTY)
-  {
-    t = d_tm.mkEmptyBag(s);
-  }
   else if (k == Kind::CONST_SEQUENCE)
   {
     if (!s.isSequence())
@@ -521,20 +517,10 @@ Term ParserState::applyTypeAscription(Term t, Sort s)
     }
     t = d_tm.mkEmptySequence(s.getSequenceElementSort());
   }
-  else if (k == Kind::SEP_NIL)
-  {
-    t = d_tm.mkSepNil(s);
-  }
   else if (k == Kind::APPLY_CONSTRUCTOR)
   {
     // For nullable.null we do not have a kind.
     // so we need to check the sort here.
-    if (s.isNullable())
-    {
-      // parsing (as nullable.null (Nullable T))
-      t = d_tm.mkNullableNull(s);
-    }
-    else
     {
       std::vector<Term> children(t.begin(), t.end());
       // apply type ascription to the operator and reconstruct

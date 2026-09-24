@@ -62,7 +62,6 @@ struct AVA6_EXPORT OptionInfo
   enum class Category
   {
     COMMON,
-    EXPERT,
     REGULAR,
     UNDOCUMENTED
   };

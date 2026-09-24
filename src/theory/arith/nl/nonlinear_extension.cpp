@@ -108,7 +108,6 @@ void NonlinearExtension::getAssertions(std::vector<Node>& assertions)
   Trace("nl-ext-assert-debug") << "Getting assertions..." << std::endl;
   
   
-  Valuation v = d_containing.getValuation();
 
   BoundInference bounds(d_env);
 

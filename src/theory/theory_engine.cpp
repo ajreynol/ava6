@@ -1096,6 +1096,16 @@ void TheoryEngine::assertToTheory(TNode assertion,
     if (markPropagation(
             assertion, originalAssertion, toTheoryIdProp, fromTheoryId))
     {
+      // Array and arithmetic solvers can explain their own inferences, but
+      // their input facts may also become leaves of a central EE explanation.
+      // Record the SAT origin there before processing the fact, including
+      // non-equality predicates such as Boolean array selects.
+      if (toTheoryIdProp != THEORY_BUILTIN
+          && EqEngineManager::usesCentralEqualityEngine(toTheoryId))
+      {
+        markPropagation(
+            assertion, originalAssertion, THEORY_BUILTIN, fromTheoryId);
+      }
       // Is it preregistered
       bool preregistered = d_propEngine->isSatLiteral(assertion)
                            && d_env.theoryOf(assertion) == toTheoryId;

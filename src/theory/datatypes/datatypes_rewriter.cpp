@@ -20,7 +20,6 @@
 #include "expr/skolem_manager.h"
 #include "options/datatypes_options.h"
 #include "theory/datatypes/project_op.h"
-#include "theory/datatypes/sygus_datatype_utils.h"
 #include "theory/datatypes/theory_datatypes_utils.h"
 #include "tuple_utils.h"
 #include "util/rational.h"
@@ -32,10 +31,7 @@ namespace ava6::internal {
 namespace theory {
 namespace datatypes {
 
-DatatypesRewriter::DatatypesRewriter(NodeManager* nm,
-                                     Evaluator* sygusEval,
-                                     const Options& opts)
-    : TheoryRewriter(nm), d_sygusEval(sygusEval), d_opts(opts)
+DatatypesRewriter::DatatypesRewriter(NodeManager* nm) : TheoryRewriter(nm)
 {
   registerProofRewriteRule(ProofRewriteRule::DT_INST,
                            TheoryRewriteCtx::PRE_DSL);
@@ -282,103 +278,6 @@ RewriteResponse DatatypesRewriter::postRewrite(TNode in)
   {
     return rewriteUpdater(in);
   }
-  else if (kind == Kind::NULLABLE_LIFT)
-  {
-    return rewriteNullableLift(in);
-  }
-  else if (kind == Kind::DT_SIZE)
-  {
-    if (in[0].getKind() == Kind::APPLY_CONSTRUCTOR)
-    {
-      std::vector<Node> children;
-      for (unsigned i = 0, size = in[0].getNumChildren(); i < size; i++)
-      {
-        if (in[0][i].getType().isDatatype())
-        {
-          children.push_back(nm->mkNode(Kind::DT_SIZE, in[0][i]));
-        }
-      }
-      TNode constructor = in[0].getOperator();
-      size_t constructorIndex = utils::indexOf(constructor);
-      const DType& dt = utils::datatypeOf(constructor);
-      const DTypeConstructor& c = dt[constructorIndex];
-      unsigned weight = c.getWeight();
-      children.push_back(nm->mkConstInt(Rational(weight)));
-      Node res =
-          children.size() == 1 ? children[0] : nm->mkNode(Kind::ADD, children);
-      Trace("datatypes-rewrite")
-          << "DatatypesRewriter::postRewrite: rewrite size " << in << " to "
-          << res << std::endl;
-      return RewriteResponse(REWRITE_AGAIN_FULL, res);
-    }
-  }
-  else if (kind == Kind::DT_HEIGHT_BOUND)
-  {
-    if (in[0].getKind() == Kind::APPLY_CONSTRUCTOR)
-    {
-      std::vector<Node> children;
-      Node res;
-      Rational r = in[1].getConst<Rational>();
-      Rational rmo = Rational(r - Rational(1));
-      for (unsigned i = 0, size = in[0].getNumChildren(); i < size; i++)
-      {
-        if (in[0][i].getType().isDatatype())
-        {
-          if (r.isZero())
-          {
-            res = nm->mkConst(false);
-            break;
-          }
-          children.push_back(
-              nm->mkNode(Kind::DT_HEIGHT_BOUND, in[0][i], nm->mkConstInt(rmo)));
-        }
-      }
-      if (res.isNull())
-      {
-        res = children.size() == 0
-                  ? nm->mkConst(true)
-                  : (children.size() == 1 ? children[0]
-                                          : nm->mkNode(Kind::AND, children));
-      }
-      Trace("datatypes-rewrite")
-          << "DatatypesRewriter::postRewrite: rewrite height " << in << " to "
-          << res << std::endl;
-      return RewriteResponse(REWRITE_AGAIN_FULL, res);
-    }
-  }
-  else if (kind == Kind::DT_SIZE_BOUND)
-  {
-    if (in[0].isConst())
-    {
-      Node res = nm->mkNode(Kind::LEQ, nm->mkNode(Kind::DT_SIZE, in[0]), in[1]);
-      return RewriteResponse(REWRITE_AGAIN_FULL, res);
-    }
-  }
-  else if (kind == Kind::DT_SYGUS_EVAL)
-  {
-    // sygus evaluation function
-    Node ev = in[0];
-    if (ev.getKind() == Kind::APPLY_CONSTRUCTOR)
-    {
-      Trace("dt-sygus-util") << "Rewrite " << in << " by unfolding...\n";
-      Trace("dt-sygus-util") << "Type is " << in.getType() << std::endl;
-      std::vector<Node> args;
-      for (unsigned j = 1, nchild = in.getNumChildren(); j < nchild; j++)
-      {
-        args.push_back(in[j]);
-      }
-      Node ret = sygusToBuiltinEval(ev, args);
-      Trace("dt-sygus-util") << "...got " << ret << "\n";
-      Trace("dt-sygus-util") << "Type is " << ret.getType() << std::endl;
-      AssertEqual(in.getType(), ret.getType());
-      return RewriteResponse(REWRITE_AGAIN_FULL, ret);
-    }
-  }
-  else if (kind == Kind::MATCH)
-  {
-    // only rewrite if expert
-
-  }
   else if (kind == Kind::MATCH_BIND_CASE)
   {
     // eliminate shadowing
@@ -621,9 +520,6 @@ RewriteResponse DatatypesRewriter::rewriteTester(TNode in)
   }
   TypeNode tn = in[0].getType();
   const DType& dt = tn.getDType();
-  // the rewrites below aren't applied to sygus datatypes, which rely on
-  // always getting testers asserted.
-  if (!dt.isSygus())
   {
     if (dt[i].getNumArgs() == 0)
     {
@@ -671,41 +567,6 @@ RewriteResponse DatatypesRewriter::rewriteUpdater(TNode in)
   return RewriteResponse(REWRITE_DONE, in);
 }
 
-RewriteResponse DatatypesRewriter::rewriteNullableLift(TNode n)
-{
-  Assert(n.getKind() == Kind::NULLABLE_LIFT);
-  NodeManager* nm = nodeManager();
-  std::vector<Node> someArgs;
-  TypeNode type = n.getType();
-  const DType& dt = n.getType().getDType();
-  someArgs.push_back(n[0]);
-  for (size_t i = 1; i < n.getNumChildren(); i++)
-  {
-    if (n[i].isConst())
-    {
-      if (n[i].getNumChildren() == 0)
-      {
-        // null constructor
-        Node null = nm->mkNode(Kind::APPLY_CONSTRUCTOR, dt[0].getConstructor());
-        return RewriteResponse(REWRITE_DONE, null);
-      }
-      else
-      {
-        // some constructor
-        someArgs.push_back(n[i][0]);
-      }
-    }
-  }
-  if (someArgs.size() == n.getNumChildren())
-  {
-    Node some = nm->mkNode(Kind::APPLY_CONSTRUCTOR,
-                           dt[1].getConstructor(),
-                           nm->mkNode(Kind::APPLY_UF, someArgs));
-    return RewriteResponse(REWRITE_AGAIN_FULL, some);
-  }
-  return RewriteResponse(REWRITE_DONE, n);
-}
-
 Node DatatypesRewriter::expandDefinition(Node n)
 {
   Node ret;
@@ -715,11 +576,6 @@ Node DatatypesRewriter::expandDefinition(Node n)
     {
       ret = expandUpdater(n);
       Trace("dt-expand") << "return " << ret << std::endl;
-      break;
-    }
-    case Kind::NULLABLE_LIFT:
-    {
-      ret = expandNullableLift(n);
       break;
     }
     default: break;
@@ -773,157 +629,6 @@ Node DatatypesRewriter::expandUpdater(const Node& n)
   Node tester = nm->mkNode(Kind::APPLY_TESTER, dc.getTester(), n[0]);
   return nm->mkNode(Kind::ITE, tester, ret, n[0]);
 }
-Node DatatypesRewriter::expandNullableLift(Node n)
-{
-  NodeManager* nm = nodeManager();
-  std::vector<Node> eqs;
-  std::vector<Node> someArgs;
-  someArgs.push_back(n[0]);
-  TypeNode type = n.getType();
-  for (size_t i = 1; i < n.getNumChildren(); i++)
-  {
-    TypeNode t = n[i].getType();
-    const DType& dt = t.getDType();
-    Node null = nm->mkNode(Kind::APPLY_CONSTRUCTOR, dt[0].getConstructor());
-    eqs.push_back(n[i].eqNode(null));
-    Node sel = dt[1][0].getSelector();
-    Node applySel = nm->mkNode(Kind::APPLY_SELECTOR, sel, n[i]);
-    someArgs.push_back(applySel);
-  }
-  Node condition = nm->mkOr(eqs);
-  const DType& dt = type.getDType();
-  Node thenNode = nm->mkNode(Kind::APPLY_CONSTRUCTOR, dt[0].getConstructor());
-  Node elseNode = nm->mkNode(Kind::APPLY_CONSTRUCTOR,
-                             dt[1].getConstructor(),
-                             nm->mkNode(Kind::APPLY_UF, someArgs));
-  Node ret = nm->mkNode(Kind::ITE, condition, thenNode, elseNode);
-  return ret;
-}
-
-Node DatatypesRewriter::sygusToBuiltinEval(Node n,
-                                           const std::vector<Node>& args)
-{
-  Assert(d_sygusEval != nullptr);
-  Assert(n.getType().isDatatype());
-  Assert(n.getType().getDType().isSygus());
-  Assert(n.getType().getDType().getSygusVarList().getNumChildren()
-         == args.size());
-  NodeManager* nm = nodeManager();
-  // constant arguments?
-  bool constArgs = true;
-  for (const Node& a : args)
-  {
-    if (!a.isConst())
-    {
-      constArgs = false;
-      break;
-    }
-  }
-  std::vector<Node> eargs;
-  bool svarsInit = false;
-  std::vector<Node> svars;
-  std::unordered_map<TNode, Node> visited;
-  std::unordered_map<TNode, Node>::iterator it;
-  std::vector<TNode> visit;
-  TNode cur;
-  unsigned index;
-  visit.push_back(n);
-  do
-  {
-    cur = visit.back();
-    visit.pop_back();
-    it = visited.find(cur);
-    if (it == visited.end())
-    {
-      TypeNode tn = cur.getType();
-      if (!tn.isDatatype() || !tn.getDType().isSygus())
-      {
-        visited[cur] = cur;
-      }
-      else if (cur.isConst())
-      {
-        // convert to builtin term
-        Node bt = utils::sygusToBuiltin(cur);
-        // run the evaluator if possible
-        if (!svarsInit)
-        {
-          svarsInit = true;
-          TypeNode type = cur.getType();
-          Node varList = type.getDType().getSygusVarList();
-          for (const Node& v : varList)
-          {
-            svars.push_back(v);
-          }
-        }
-        Assert(args.size() == svars.size());
-        // try evaluation if we have constant arguments
-        Node ret =
-            constArgs ? d_sygusEval->eval(bt, svars, args) : Node::null();
-        if (ret.isNull())
-        {
-          // if evaluation was not available, use a substitution
-          ret = bt.substitute(
-              svars.begin(), svars.end(), args.begin(), args.end());
-        }
-        visited[cur] = ret;
-      }
-      else
-      {
-        if (cur.getKind() == Kind::APPLY_CONSTRUCTOR)
-        {
-          visited[cur] = Node::null();
-          visit.push_back(cur);
-          for (const Node& cn : cur)
-          {
-            visit.push_back(cn);
-          }
-        }
-        else
-        {
-          // it is the evaluation of this term on the arguments
-          if (eargs.empty())
-          {
-            eargs.push_back(cur);
-            eargs.insert(eargs.end(), args.begin(), args.end());
-          }
-          else
-          {
-            eargs[0] = cur;
-          }
-          visited[cur] = nm->mkNode(Kind::DT_SYGUS_EVAL, eargs);
-        }
-      }
-    }
-    else if (it->second.isNull())
-    {
-      Node ret = cur;
-      Assert(cur.getKind() == Kind::APPLY_CONSTRUCTOR);
-      const DType& dt = cur.getType().getDType();
-      // non sygus-datatype terms are also themselves
-      if (dt.isSygus())
-      {
-        std::vector<Node> children;
-        for (const Node& cn : cur)
-        {
-          it = visited.find(cn);
-          Assert(it != visited.end());
-          Assert(!it->second.isNull());
-          children.push_back(it->second);
-        }
-        index = utils::indexOf(cur.getOperator());
-        // apply to children, which constructs the builtin term
-        ret = utils::mkSygusTerm(dt, index, children);
-        // now apply it to arguments in args
-        ret = utils::applySygusArgs(dt, dt[index].getSygusOp(), ret, args);
-      }
-      visited[cur] = ret;
-    }
-  } while (!visit.empty());
-  Assert(visited.find(n) != visited.end());
-  Assert(!visited.find(n)->second.isNull());
-  return visited[n];
-}
-
 }  // namespace datatypes
 }  // namespace theory
 }  // namespace ava6::internal

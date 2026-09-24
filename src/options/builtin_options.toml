@@ -2,4 +2,3 @@ id     = "BUILTIN"
 name   = "Builtin Theory"
 
 
-# Internal core policies; never accepted as command-line or SMT-LIB options.

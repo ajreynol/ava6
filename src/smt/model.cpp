@@ -47,17 +47,6 @@ Node Model::getValue(TNode n) const
   return it->second;
 }
 
-bool Model::getHeapModel(Node& h, Node& nilEq) const
-{
-  if (d_sepHeap.isNull() || d_sepNilEq.isNull())
-  {
-    return false;
-  }
-  h = d_sepHeap;
-  nilEq = d_sepNilEq;
-  return true;
-}
-
 void Model::addDeclarationSort(TypeNode tn, const std::vector<Node>& elements)
 {
   d_declareSorts.push_back(tn);
@@ -68,12 +57,6 @@ void Model::addDeclarationTerm(Node n, Node value)
 {
   d_declareTerms.push_back(n);
   d_declareTermValues[n] = value;
-}
-
-void Model::setHeapModel(Node h, Node nilEq)
-{
-  d_sepHeap = h;
-  d_sepNilEq = nilEq;
 }
 
 const std::vector<TypeNode>& Model::getDeclaredSorts() const

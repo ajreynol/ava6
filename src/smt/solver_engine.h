@@ -192,29 +192,6 @@ class AVA6_EXPORT SolverEngine
   bool isInternalSubsolver() const;
 
   /**
-   * Declare heap. For smt2 inputs, this is called when the command
-   * (declare-heap (locT datat)) is invoked by the user. This sets locT as the
-   * location type and dataT is the data type for the heap. This command should
-   * be executed only once, and must be invoked before solving separation logic
-   * inputs.
-   */
-  void declareSepHeap(TypeNode locT, TypeNode dataT);
-
-  /**
-   * Get the separation heap types, which extracts which types were passed to
-   * the method above.
-   *
-   * @return true if the separation logic heap types have been declared.
-   */
-  bool getSepHeapTypes(TypeNode& locT, TypeNode& dataT);
-
-  /** When using separation logic, obtain the expression for the heap.  */
-  Node getSepHeapExpr();
-
-  /** When using separation logic, obtain the expression for nil.  */
-  Node getSepNilExpr();
-
-  /**
    * Get an aspect of the current SMT execution environment.
    * @throw OptionException
    */
@@ -369,7 +346,7 @@ class AVA6_EXPORT SolverEngine
    *
    * @param declaredSorts The sorts to print in the model
    * @param declaredFuns The free constants to print in the model. A subset
-   * of these may be printed based on isModelCoreSymbol.
+   * of these are printed.
    * @return the string corresponding to the model. If the output language is
    * smt2, then this corresponds to a response to the get-model command.
    */
@@ -716,12 +693,6 @@ class AVA6_EXPORT SolverEngine
   void debugCheckFunctionBody(Node formula,
                               const std::vector<Node>& formals,
                               Node func);
-  /**
-   * Helper method to obtain both the heap and nil from the solver. Returns a
-   * std::pair where the first element is the heap expression and the second
-   * element is the nil expression.
-   */
-  std::pair<Node, Node> getSepHeapAndNilExpr();
   /**
    * Get assertions internal, which is only called after initialization. This
    * should be used internally to get the assertions instead of getAssertions

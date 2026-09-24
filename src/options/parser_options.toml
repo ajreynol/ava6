@@ -35,4 +35,3 @@ name   = "Parser"
   help       = "set the logic, and override all further user attempts to change it"
 
 
-# Internal core policies; never accepted as command-line or SMT-LIB options.

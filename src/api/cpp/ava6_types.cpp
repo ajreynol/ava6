@@ -20,34 +20,6 @@
 #include "base/check.h"
 
 namespace ava6 {
-std::ostream& operator<<(std::ostream& out, RoundingMode rm)
-{
-  switch (rm)
-  {
-    case RoundingMode::ROUND_NEAREST_TIES_TO_EVEN: out << "RNE"; break;
-    case RoundingMode::ROUND_TOWARD_POSITIVE: out << "RTP"; break;
-    case RoundingMode::ROUND_TOWARD_NEGATIVE: out << "RTN"; break;
-    case RoundingMode::ROUND_TOWARD_ZERO: out << "RTZ"; break;
-    case RoundingMode::ROUND_NEAREST_TIES_TO_AWAY: out << "RNA"; break;
-    default:
-      throw Ava6ApiException("unhandled enum value '"
-                             + std::to_string(static_cast<int32_t>(rm))
-                             + "' encountered");
-  }
-  return out;
-}
-}  // namespace ava6
-
-namespace std {
-std::string to_string(ava6::RoundingMode rm)
-{
-  std::stringstream ss;
-  ss << rm;
-  return ss.str();
-}
-}  // namespace std
-
-namespace ava6 {
 std::ostream& operator<<(std::ostream& out, UnknownExplanation e)
 {
   switch (e)
@@ -131,7 +103,6 @@ std::ostream& operator<<(std::ostream& out, OptionCategory cat)
   switch (cat)
   {
     case OptionCategory::REGULAR: out << "regular"; break;
-    case OptionCategory::EXPERT: out << "expert"; break;
     case OptionCategory::COMMON: out << "common"; break;
     case OptionCategory::UNDOCUMENTED: out << "undocumented"; break;
     default: out << "?";
