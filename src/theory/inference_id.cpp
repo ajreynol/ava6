@@ -42,18 +42,11 @@ const char* toString(InferenceId i)
     case InferenceId::ARITH_CONF_SIMPLEX: return "ARITH_CONF_SIMPLEX";
     case InferenceId::ARITH_CONF_SOI_SIMPLEX: return "ARITH_CONF_SOI_SIMPLEX";
     case InferenceId::ARITH_CONF_FACT_QUEUE: return "ARITH_CONF_FACT_QUEUE";
-    case InferenceId::ARITH_CONF_BRANCH_CUT: return "ARITH_CONF_BRANCH_CUT";
-    case InferenceId::ARITH_CONF_REPLAY_ASSERT:
-      return "ARITH_CONF_REPLAY_ASSERT";
-    case InferenceId::ARITH_CONF_REPLAY_LOG: return "ARITH_CONF_REPLAY_LOG";
-    case InferenceId::ARITH_CONF_REPLAY_LOG_REC:
-      return "ARITH_CONF_REPLAY_LOG_REC";
     case InferenceId::ARITH_CONF_UNATE_PROP: return "ARITH_CONF_UNATE_PROP";
     case InferenceId::ARITH_SPLIT_DEQ: return "ARITH_SPLIT_DEQ";
     case InferenceId::ARITH_EQUIV_ATOM: return "ARITH_EQUIV_ATOM";
     case InferenceId::ARITH_TIGHTEN_CEIL: return "ARITH_TIGHTEN_CEIL";
     case InferenceId::ARITH_TIGHTEN_FLOOR: return "ARITH_TIGHTEN_FLOOR";
-    case InferenceId::ARITH_APPROX_CUT: return "ARITH_APPROX_CUT";
     case InferenceId::ARITH_BB_LEMMA: return "ARITH_BB_LEMMA";
     case InferenceId::ARITH_DIO_CUT: return "ARITH_DIO_CUT";
     case InferenceId::ARITH_DIO_DECOMPOSITION: return "ARITH_DIO_DECOMPOSITION";

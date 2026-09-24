@@ -46,11 +46,6 @@ set(CMAKE_INSTALL_DEFAULT_COMPONENT_NAME ava6)
 #-----------------------------------------------------------------------------#
 # Policies
 
-# Required for FindGLPK since it sets CMAKE_REQUIRED_LIBRARIES
-if(POLICY CMP0075)
-  cmake_policy(SET CMP0075 NEW)
-endif()
-
 if(POLICY CMP0135)
   # For `ExternalProject_Add()`, set the timestamp of the files extracted from
   # the downloaded archive to the time of the extraction. This behavior was
@@ -68,10 +63,6 @@ endif()
 
 #-----------------------------------------------------------------------------#
 # Tell CMake where to find our dependencies
-
-if(GLPK_DIR)
-  list(APPEND CMAKE_PREFIX_PATH "${GLPK_DIR}")
-endif()
 
 # By default the contrib/get-* scripts install dependencies to deps/install.
 list(APPEND CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/deps/install")
@@ -130,7 +121,6 @@ option(TREAT_WARNING_AS_ERROR  "Treat warnings on building as errors")
 # installed via the corresponding contrib/get-* script and if not found, we
 # check the intalled system version. If the user provides a directory we
 # immediately fail if the dependency was not found at the specified location.
-set(GLPK_DIR          "" CACHE STRING "Set GLPK install directory")
 
 # Prepend binaries with prefix on make install
 set(PROGRAM_PREFIX    "" CACHE STRING "Program prefix on make install")
@@ -758,8 +748,6 @@ message("")
 
 message("")
 message("")
-if(GLPK_DIR)
-endif()
 if(PYTHONIC_PATH)
   print_config("Pythonic API path         " ${PYTHONIC_PATH})
 endif()

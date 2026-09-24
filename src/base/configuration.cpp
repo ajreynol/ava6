@@ -128,7 +128,7 @@ std::string Configuration::copyright()
     }
   }
 
-  if (isBuiltWithCln() || isBuiltWithGlpk() || isBuiltWithCoCoA()
+  if (isBuiltWithCln() || isBuiltWithCoCoA()
       || isBuiltWithNormaliz())
   {
     ss << "This version of ava6 is linked against the following third party\n"
@@ -139,13 +139,7 @@ std::string Configuration::copyright()
       ss << "  CLN - Class Library for Numbers\n"
          << "  See http://www.ginac.de/CLN for copyright information.\n\n";
     }
-    if (isBuiltWithGlpk())
-    {
-      ss << "  glpk-cut-log - a modified version of GPLK, "
-         << "the GNU Linear Programming Kit\n"
-         << "  See http://github.com/timothy-king/glpk-cut-log for copyright"
-         << " information\n\n";
-    }
+
     if (isBuiltWithCoCoA())
     {
       ss << "  CoCoALib - a computer algebra library\n"
@@ -198,8 +192,6 @@ bool Configuration::licenseIsGpl() { return IS_GPL_BUILD; }
 bool Configuration::isBuiltWithGmp() { return IS_GMP_BUILD; }
 
 bool Configuration::isBuiltWithCln() { return IS_CLN_BUILD; }
-
-bool Configuration::isBuiltWithGlpk() { return IS_GLPK_BUILD; }
 
 bool Configuration::isBuiltWithCryptominisat()
 {

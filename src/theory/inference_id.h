@@ -72,14 +72,6 @@ enum class InferenceId
   ARITH_CONF_SOI_SIMPLEX,
   // conflict when getting constraint from fact queue
   ARITH_CONF_FACT_QUEUE,
-  // conflict in tryBranchCut
-  ARITH_CONF_BRANCH_CUT,
-  // conflict in replayAssert
-  ARITH_CONF_REPLAY_ASSERT,
-  // conflict in replayLog
-  ARITH_CONF_REPLAY_LOG,
-  // conflict in replayLogRec
-  ARITH_CONF_REPLAY_LOG_REC,
   // conflict from handleUnateProp
   ARITH_CONF_UNATE_PROP,
   // introduces split on a disequality
@@ -91,7 +83,6 @@ enum class InferenceId
   ARITH_TIGHTEN_CEIL,
   // tighten integer inequalities to floor
   ARITH_TIGHTEN_FLOOR,
-  ARITH_APPROX_CUT,
   ARITH_BB_LEMMA,
   ARITH_DIO_CUT,
   ARITH_DIO_DECOMPOSITION,

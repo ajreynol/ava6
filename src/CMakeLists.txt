@@ -280,22 +280,16 @@ libava6_add_sources(
   theory/arith/equality_solver.h
   theory/arith/inference_manager.cpp
   theory/arith/inference_manager.h
-  theory/arith/linear/approx_simplex.cpp
-  theory/arith/linear/approx_simplex.h
   theory/arith/linear/arith_static_learner.cpp
   theory/arith/linear/arith_static_learner.h
   theory/arith/linear/arithvar.cpp
   theory/arith/linear/arithvar.h
-  theory/arith/linear/attempt_solution_simplex.cpp
-  theory/arith/linear/attempt_solution_simplex.h
   theory/arith/linear/bound_counts.h
   theory/arith/linear/callbacks.cpp
   theory/arith/linear/callbacks.h
   theory/arith/linear/constraint.cpp
   theory/arith/linear/constraint.h
   theory/arith/linear/constraint_forward.h
-  theory/arith/linear/cut_log.cpp
-  theory/arith/linear/cut_log.h
   theory/arith/linear/dio_solver.cpp
   theory/arith/linear/dio_solver.h
   theory/arith/linear/dual_simplex.cpp

@@ -78,8 +78,7 @@ LinearEqualityModule::Statistics::Statistics(StatisticsRegistry& sr)
       d_weakeningAttempts(sr.registerInt("theory::arith::weakening::attempts")),
       d_weakeningSuccesses(sr.registerInt("theory::arith::weakening::success")),
       d_weakenings(sr.registerInt("theory::arith::weakening::total")),
-      d_weakenTime(sr.registerTimer("theory::arith::weakening::time")),
-      d_forceTime(sr.registerTimer("theory::arith::forcing::time"))
+      d_weakenTime(sr.registerTimer("theory::arith::weakening::time"))
 {
 }
 
@@ -104,91 +103,6 @@ void LinearEqualityModule::includeBoundUpdate(ArithVar v,
         << d_tableau.rowIndexToBasic(ridx) << " " << counts << " to ";
     counts.addInChange(a_ijSgn, prev, curr);
     Trace("includeBoundUpdate") << counts << " " << a_ijSgn << std::endl;
-  }
-}
-
-void LinearEqualityModule::updateMany(const DenseMap<DeltaRational>& many)
-{
-  for (DenseMap<DeltaRational>::const_iterator i = many.begin(),
-                                               i_end = many.end();
-       i != i_end;
-       ++i)
-  {
-    ArithVar nb = *i;
-    if (!d_tableau.isBasic(nb))
-    {
-      Assert(!d_tableau.isBasic(nb));
-      const DeltaRational& newValue = many[nb];
-      if (newValue != d_variables.getAssignment(nb))
-      {
-        Trace("arith::updateMany")
-            << "updateMany:" << nb << " " << d_variables.getAssignment(nb)
-            << " to " << newValue << endl;
-        update(nb, newValue);
-      }
-    }
-  }
-}
-
-void LinearEqualityModule::applySolution(
-    const DenseSet& newBasis, const DenseMap<DeltaRational>& newValues)
-{
-  forceNewBasis(newBasis);
-  updateMany(newValues);
-}
-
-void LinearEqualityModule::forceNewBasis(const DenseSet& newBasis)
-{
-  TimerStat::CodeTimer codeTimer(d_statistics.d_forceTime);
-  DenseSet needsToBeAdded;
-  for (DenseSet::const_iterator i = newBasis.begin(), i_end = newBasis.end();
-       i != i_end;
-       ++i)
-  {
-    ArithVar b = *i;
-    if (!d_tableau.isBasic(b))
-    {
-      needsToBeAdded.add(b);
-    }
-  }
-
-  while (!needsToBeAdded.empty())
-  {
-    ArithVar toRemove = ARITHVAR_SENTINEL;
-    ArithVar toAdd = ARITHVAR_SENTINEL;
-    DenseSet::const_iterator i = needsToBeAdded.begin(),
-                             i_end = needsToBeAdded.end();
-    for (; toAdd == ARITHVAR_SENTINEL && i != i_end; ++i)
-    {
-      ArithVar v = *i;
-
-      Tableau::ColIterator colIter = d_tableau.colIterator(v);
-      for (; !colIter.atEnd(); ++colIter)
-      {
-        const Tableau::Entry& entry = *colIter;
-        Assert(entry.getColVar() == v);
-        ArithVar b = d_tableau.rowIndexToBasic(entry.getRowIndex());
-        if (!newBasis.isMember(b))
-        {
-          toAdd = v;
-          if (toRemove == ARITHVAR_SENTINEL
-              || d_tableau.basicRowLength(toRemove)
-                     > d_tableau.basicRowLength(b))
-          {
-            toRemove = b;
-          }
-        }
-      }
-    }
-    Assert(toRemove != ARITHVAR_SENTINEL);
-    Assert(toAdd != ARITHVAR_SENTINEL);
-
-    Trace("arith::forceNewBasis") << toRemove << " " << toAdd << endl;
-    d_tableau.pivot(toRemove, toAdd, d_trackCallback);
-    d_basicVariableUpdates(toAdd);
-
-    Trace("arith::forceNewBasis") << needsToBeAdded.size() << "to go" << endl;
-    needsToBeAdded.remove(toAdd);
   }
 }
 

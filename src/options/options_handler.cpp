@@ -327,7 +327,6 @@ void OptionsHandler::showConfiguration(AVA6_UNUSED const std::string& flag,
   o << std::endl;
 
   print_config_cond(o, "cln", Configuration::isBuiltWithCln());
-  print_config_cond(o, "glpk", Configuration::isBuiltWithGlpk());
   print_config_cond(
       o, "cryptominisat", Configuration::isBuiltWithCryptominisat());
   print_config_cond(o, "gmp", Configuration::isBuiltWithGmp());

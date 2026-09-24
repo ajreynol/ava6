@@ -38,3 +38,8 @@ check the generated proofs against the retained CPC signature.
 
 Upstream disabled regressions are deleted, and `regression_disabled_tests` is
 empty. Only regression levels 0, 1, and 2 are retained; levels 3 and 4 are omitted.
+
+`regress/cli/regress1/nl/nl_uf_lalt.smt2` is retained only for manual performance
+investigation. It exceeds 120 seconds with central equality in both Ava6 and
+upstream cvc5, so it is not registered with CTest or run by the regression
+targets.

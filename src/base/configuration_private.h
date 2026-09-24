@@ -77,11 +77,6 @@ namespace ava6::internal {
 #define IS_CLN_BUILD false
 #endif /* AVA6_CLN_IMP */
 
-#if AVA6_USE_GLPK
-#define IS_GLPK_BUILD true
-#else /* AVA6_USE_GLPK */
-#define IS_GLPK_BUILD false
-#endif /* AVA6_USE_GLPK */
 
 #if AVA6_USE_CRYPTOMINISAT
 #define IS_CRYPTOMINISAT_BUILD true

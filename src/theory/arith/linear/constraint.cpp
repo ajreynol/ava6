@@ -1199,15 +1199,6 @@ ConstraintDatabase::Statistics::Statistics(StatisticsRegistry& sr)
 {
 }
 
-void ConstraintDatabase::deleteConstraintAndNegation(ConstraintP c)
-{
-  Assert(c->safeToGarbageCollect());
-  ConstraintP neg = c->getNegation();
-  Assert(neg->safeToGarbageCollect());
-  delete c;
-  delete neg;
-}
-
 void ConstraintDatabase::addVariable(ArithVar v)
 {
   if (d_reclaimable.isMember(v))

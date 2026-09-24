@@ -31,7 +31,6 @@
 #include "theory/arith/delta_rational.h"
 #include "theory/arith/linear/arith_static_learner.h"
 #include "theory/arith/linear/arithvar.h"
-#include "theory/arith/linear/attempt_solution_simplex.h"
 #include "theory/arith/linear/constraint.h"
 #include "theory/arith/linear/dio_solver.h"
 #include "theory/arith/linear/dual_simplex.h"
@@ -63,9 +62,6 @@ class TheoryModel;
 namespace arith::linear {
 
 class LinearSolver;
-class BranchCutInfo;
-class TreeLog;
-class ApproximateStatistics;
 
 class ArithEntailmentCheckParameters;
 class ArithEntailmentCheckSideEffects;
@@ -125,7 +121,6 @@ class TheoryArithPrivate : protected EnvObj
   //                     emptied
   int d_unknownsInARow;
 
-  bool d_replayedLemmas;
 
   /**
    * This counter is false if nothing has been done since the last cut.
@@ -401,27 +396,10 @@ class TheoryArithPrivate : protected EnvObj
   DualSimplexDecisionProcedure d_dualSimplex;
   FCSimplexDecisionProcedure d_fcSimplex;
   SumOfInfeasibilitiesSPD d_soiSimplex;
-  AttemptSolutionSDP d_attemptSolSimplex;
 
   bool solveRealRelaxation(Theory::Effort effortLevel);
 
-  /* Returns true if this is heuristically a good time to try
-   * to solve the integers.
-   */
-  bool attemptSolveInteger(Theory::Effort effortLevel,
-                           bool emmmittedLemmaOrSplit);
-  bool replayLemmas(ApproximateSimplex* approx);
-  void solveInteger(Theory::Effort effortLevel);
-  bool safeToCallApprox() const;
-  SimplexDecisionProcedure& selectSimplex(bool pass1);
-  SimplexDecisionProcedure* d_pass1SDP;
-  SimplexDecisionProcedure* d_otherSDP;
-  /* Sets d_qflraStatus */
-  void importSolution(const ApproximateSimplex::Solution& solution);
   bool solveRelaxationOrPanic(Theory::Effort effortLevel);
-  context::CDO<int> d_lastContextIntegerAttempted;
-  bool replayLog(ApproximateSimplex* approx);
-
   class ModelException : public Exception
   {
    public:
@@ -656,14 +634,6 @@ class TheoryArithPrivate : protected EnvObj
                                   bool rowUp,
                                   ConstraintP bestImplied);
   // void enqueueConstraints(std::vector<ConstraintCP>& out, Node n) const;
-  // ConstraintCPVec resolveOutPropagated(const ConstraintCPVec& v, const
-  // std::set<ConstraintCP>& propagated) const;
-  void resolveOutPropagated(std::vector<ConstraintCPVec>& confs) const;
-  void subsumption(std::vector<ConstraintCPVec>& confs) const;
-
-  Node cutToLiteral(const CutInfo& cut) const;
-  Node branchToNode(ApproximateSimplex* approx, const NodeLog& cut) const;
-
   void propagateCandidates();
   void propagateCandidate(ArithVar basic);
   bool propagateCandidateBound(ArithVar basic, bool upperBound);
@@ -730,11 +700,8 @@ class TheoryArithPrivate : protected EnvObj
   void outputRestart();
   bool isSatLiteral(TNode l) const;
   Node getSatValue(TNode n) const;
-  /** Used for replaying approximate simplex */
-  context::CDQueue<TrustNode> d_approxCuts;
-  /** Also used for replaying approximate simplex. "approximate cuts temporary
-   * storage" */
-  std::vector<TrustNode> d_acTmp;
+  /** Pending integer branches generated while solving the real relaxation. */
+  context::CDQueue<TrustNode> d_pendingBranches;
 
   /** Counts the number of fullCheck calls to arithmetic. */
   uint32_t d_fullCheckCounter;
@@ -744,42 +711,8 @@ class TheoryArithPrivate : protected EnvObj
   context::CDO<unsigned> d_cutCount;
   context::CDHashSet<ArithVar, std::hash<ArithVar>> d_cutInContext;
 
-  context::CDO<bool> d_likelyIntegerInfeasible;
 
-  context::CDO<bool> d_guessedCoeffSet;
-  ArithRatPairVec d_guessedCoeffs;
 
-  TreeLog* d_treeLog;
-  TreeLog& getTreeLog();
-
-  ArithVarVec d_replayVariables;
-  std::vector<ConstraintP> d_replayConstraints;
-  DenseMap<Rational> d_lhsTmp;
-
-  /* Approximate simpplex solvers are given a copy of their stats */
-  ApproximateStatistics* d_approxStats;
-  ApproximateStatistics& getApproxStats();
-  context::CDO<int32_t> d_attemptSolveIntTurnedOff;
-  void turnOffApproxFor(int32_t rounds);
-  bool getSolveIntegerResource();
-
-  void tryBranchCut(ApproximateSimplex* approx, int nid, BranchCutInfo& bl);
-  std::vector<ConstraintCPVec> replayLogRec(ApproximateSimplex* approx,
-                                            int nid,
-                                            ConstraintP bc,
-                                            int depth);
-
-  std::pair<ConstraintP, ArithVar> replayGetConstraint(const CutInfo& info);
-  std::pair<ConstraintP, ArithVar> replayGetConstraint(
-      ApproximateSimplex* approx, const NodeLog& nl);
-  std::pair<ConstraintP, ArithVar> replayGetConstraint(
-      const DenseMap<Rational>& lhs, Kind k, const Rational& rhs, bool branch);
-
-  void replayAssert(ConstraintP c);
-
-  static ConstraintCP vectorToIntHoleConflict(const ConstraintCPVec& conflict);
-  static void intHoleConflictToVector(ConstraintCP conflicting,
-                                      ConstraintCPVec& conflict);
 
   // Returns true if the node contains a literal
   // that is an arithmetic literal and is not a sat literal
@@ -790,7 +723,6 @@ class TheoryArithPrivate : protected EnvObj
   int32_t d_dioSolveResources;
   bool getDioCuttingResource();
 
-  uint32_t d_solveIntMaybeHelp, d_solveIntAttempts;
 
   RationalVector d_farkasBuffer;
 
@@ -835,44 +767,12 @@ class TheoryArithPrivate : protected EnvObj
     IntStat d_commitsOnConflicts;
     IntStat d_nontrivialSatChecks;
 
-    IntStat d_replayLogRecCount, d_replayLogRecConflictEscalation,
-        d_replayLogRecEarlyExit, d_replayBranchCloseFailures,
-        d_replayLeafCloseFailures, d_replayBranchSkips, d_mirCutsAttempted,
-        d_gmiCutsAttempted, d_branchCutsAttempted, d_cutsReconstructed,
-        d_cutsReconstructionFailed, d_cutsProven, d_cutsProofFailed,
-        d_mipReplayLemmaCalls, d_mipExternalCuts, d_mipExternalBranch;
-
-    IntStat d_inSolveInteger, d_branchesExhausted, d_execExhausted,
-        d_pivotsExhausted, d_panicBranches, d_relaxCalls, d_relaxLinFeas,
-        d_relaxLinFeasFailures, d_relaxLinInfeas, d_relaxLinInfeasFailures,
-        d_relaxLinExhausted, d_relaxOthers;
-
-    IntStat d_applyRowsDeleted;
-    TimerStat d_replaySimplexTimer;
-
-    TimerStat d_replayLogTimer, d_solveIntTimer, d_solveRealRelaxTimer;
-
-    IntStat d_solveIntCalls, d_solveStandardEffort;
-
-    IntStat d_approxDisabled;
-    IntStat d_replayAttemptFailed;
-
-    IntStat d_cutsRejectedDuringReplay;
-    IntStat d_cutsRejectedDuringLemmas;
+    IntStat d_panicBranches;
+    TimerStat d_solveRealRelaxTimer;
 
     HistogramStat<uint32_t> d_satPivots;
     HistogramStat<uint32_t> d_unsatPivots;
     HistogramStat<uint32_t> d_unknownPivots;
-
-    IntStat d_solveIntModelsAttempts;
-    IntStat d_solveIntModelsSuccessful;
-    TimerStat d_mipTimer;
-    TimerStat d_lpTimer;
-
-    IntStat d_mipProofsAttempted;
-    IntStat d_mipProofsSuccessful;
-
-    IntStat d_numBranchesFailed;
 
     Statistics(StatisticsRegistry& reg, const std::string& name);
   };

@@ -297,15 +297,6 @@ class LinearEqualityModule
   Tableau& getTableau() const { return d_tableau; }
 
   /**
-   * Updates every non-basic to reflect the assignment in many.
-   * For use with ApproximateSimplex.
-   */
-  void updateMany(const DenseMap<DeltaRational>& many);
-  void forceNewBasis(const DenseSet& newBasis);
-  void applySolution(const DenseSet& newBasis,
-                     const DenseMap<DeltaRational>& newValues);
-
-  /**
    * Returns a pointer to the first Tableau entry on the row ridx that does not
    * have an either a lower bound/upper bound for proving a bound on skip.
    * The variable skip is always excluded. Returns NULL if there is no such
@@ -818,7 +809,6 @@ class LinearEqualityModule
 
     IntStat d_weakeningAttempts, d_weakeningSuccesses, d_weakenings;
     TimerStat d_weakenTime;
-    TimerStat d_forceTime;
 
     Statistics(StatisticsRegistry& sr);
   };

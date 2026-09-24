@@ -25,7 +25,7 @@ if(NOT WIN32)
   set(ResetColor "${Esc}[m")
 endif()
 
-# Build triplet used when compiling GMP, CLN, and GLPK to ensure that
+# Build triplet used when compiling GMP to ensure that
 # optimizations using very specific CPU instructions are not enabled.
 # This makes the binary more portable.
 set(BUILD_TRIPLET "${CMAKE_HOST_SYSTEM_PROCESSOR}")

@@ -98,8 +98,6 @@ class AVA6_EXPORT Configuration final
 
   static bool isBuiltWithCln();
 
-  static bool isBuiltWithGlpk();
-
   static bool isBuiltWithCryptominisat();
 
   static bool isBuiltWithKissat();

@@ -1204,8 +1204,6 @@ class ConstraintDatabase : protected EnvObj
    */
   ConstraintP ensureConstraint(ValueCollection& vc, ConstraintType t);
 
-  void deleteConstraintAndNegation(ConstraintP c);
-
   /** Given constraints `a` and `b` such that `a OR b` by unate reasoning,
    *  adds a TrustNode to `out` which proves `a OR b` as a lemma.
    *
