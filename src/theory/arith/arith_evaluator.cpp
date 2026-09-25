@@ -12,8 +12,8 @@
 #include "theory/arith/arith_evaluator.h"
 
 #include "theory/rewriter.h"
+#include "util/rational.h"
 #include "theory/theory.h"
-#include "util/real_algebraic_number.h"
 
 namespace ava6::internal {
 namespace theory {
@@ -37,10 +37,6 @@ std::optional<bool> isExpressionZero(Env& env,
   if (expr.isConst())
   {
     return expr.getConst<Rational>().isZero();
-  }
-  if (expr.getKind() == Kind::REAL_ALGEBRAIC_NUMBER)
-  {
-    return expr.getOperator().getConst<RealAlgebraicNumber>().isZero();
   }
   return std::nullopt;
 }

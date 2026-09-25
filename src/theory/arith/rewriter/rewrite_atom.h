@@ -27,7 +27,7 @@ namespace rewriter {
 
 /**
  * Tries to evaluate the given relation. Returns std::nullopt if either left
- * or right is not a value (constant or a real algebraic number).
+ * or right is not a rational constant.
  * Assumes rel to be a relational operator, i.e. one of <,<=,=,!=,>=,>.
  */
 std::optional<bool> tryEvaluateRelation(Kind rel, TNode left, TNode right);

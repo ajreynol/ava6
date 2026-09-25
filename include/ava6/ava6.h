@@ -1475,7 +1475,6 @@ class AVA6_EXPORT Term
   std::pair<int64_t, uint64_t> getReal64Value() const;
   /**
    * Determine if this term is a rational value.
-   * @note A term of kind PI is not considered to be a real value.
    * @return True if the term is a rational value.
    */
   bool isRealValue() const;
@@ -1627,32 +1626,6 @@ class AVA6_EXPORT Term
    * @return The representation of a sequence value as a vector of terms.
    */
   std::vector<Term> getSequenceValue() const;
-
-  /**
-   * Determine if this term is a real algebraic number.
-   * @return True if the term is a real algebraic number.
-   */
-  bool isRealAlgebraicNumber() const;
-  /**
-   * Get the defining polynomial for a real algebraic number term, expressed in
-   * terms of the given variable.
-   * @note Asserts isRealAlgebraicNumber().
-   * @param v The variable over which to express the polynomial.
-   * @return The defining polynomial.
-   */
-  Term getRealAlgebraicNumberDefiningPolynomial(const Term& v) const;
-  /**
-   * Get the lower bound for a real algebraic number value.
-   * @note Asserts isRealAlgebraicNumber().
-   * @return The lower bound.
-   */
-  Term getRealAlgebraicNumberLowerBound() const;
-  /**
-   * Get the upper bound for a real algebraic number value.
-   * @note Asserts isRealAlgebraicNumber().
-   * @return The upper bound.
-   */
-  Term getRealAlgebraicNumberUpperBound() const;
 
   /**
    * Is this term a skolem?
@@ -3604,11 +3577,6 @@ class AVA6_EXPORT TermManager
    * @param val The value of the constant.
    */
   Term mkBoolean(bool val);
-  /**
-   * Create a constant representing the number Pi.
-   * @return A constant representing Pi.
-   */
-  Term mkPi();
   /**
    * Create an integer constant from a string.
    * @param s The string representation of the constant, may represent an

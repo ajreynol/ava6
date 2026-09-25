@@ -21,7 +21,6 @@
 #include "theory/evaluator.h"
 #include "util/bitvector.h"
 #include "util/divisible.h"
-#include "util/iand.h"
 #include "util/rational.h"
 #include "util/regexp.h"
 
@@ -57,7 +56,7 @@ bool GenericOp::isNumeralIndexedOperatorKind(Kind k)
          || k == Kind::BITVECTOR_REPEAT || k == Kind::BITVECTOR_ZERO_EXTEND
          || k == Kind::BITVECTOR_SIGN_EXTEND || k == Kind::BITVECTOR_ROTATE_LEFT
          || k == Kind::BITVECTOR_ROTATE_RIGHT || k == Kind::INT_TO_BITVECTOR
-         || k == Kind::BITVECTOR_BIT || k == Kind::IAND;
+         || k == Kind::BITVECTOR_BIT;
 }
 
 bool GenericOp::isIndexedOperatorKind(Kind k)
@@ -126,11 +125,6 @@ std::vector<Node> GenericOp::getIndicesForOperator(Kind k, Node n)
       indices.push_back(
           nm->mkConstInt(Rational(n.getConst<IntToBitVector>().d_size)));
       break;
-    case Kind::IAND:
-      indices.push_back(nm->mkConstInt(Rational(n.getConst<IntAnd>().d_size)));
-      break;
-
-
     case Kind::APPLY_TESTER:
     {
       unsigned index = DType::indexOf(n);
@@ -234,9 +228,6 @@ Node GenericOp::getOperatorForIndices(NodeManager* nm,
       case Kind::INT_TO_BITVECTOR:
         Assert(numerals.size() == 1);
         return nm->mkConst(IntToBitVector(numerals[0]));
-      case Kind::IAND:
-        Assert(numerals.size() == 1);
-        return nm->mkConst(IntAnd(numerals[0]));
       default:
         Unhandled() << "GenericOp::getOperatorForIndices: unhandled kind " << k;
         break;

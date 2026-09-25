@@ -145,41 +145,6 @@ enum ENUM(SkolemId)
    */
   EVALUE(MOD_BY_ZERO),
   /**
-   * A function introduced to eliminate extended transcendental functions.
-   * Transcendental functions like sqrt, arccos, arcsin, etc. are replaced
-   * during processing with uninterpreted functions that are unique to
-   * each function.
-   *
-   * - Number of skolem indices: ``1``
-   *   - ``1:`` A lambda corresponding to the function, e.g.,
-   *   `(lambda ((x Real)) (sqrt x))`.
-   * - Sort: ``(-> Real Real)``
-   * 
-   * The term `(@transcendental_purify f)` is equivalent to `f`.
-   */
-  EVALUE(TRANSCENDENTAL_PURIFY),
-  /**
-   * Argument used to purify transcendental function app ``(f x)``.
-   * For ``(sin x)``, this is a variable that is assumed to be in phase with
-   * ``x`` that is between ``-pi`` and ``pi``.
-   *
-   * - Number of skolem indices: ``1``
-   *   - ``1:`` The application of a transcendental function.
-   * - Sort: ``Real``
-   */
-  EVALUE(TRANSCENDENTAL_PURIFY_ARG),
-  /**
-   * Argument used to reason about the phase shift of arguments to sine.
-   * In particular, this is an integral rational indicating the number of times
-   * :math:`2\pi` is added to a real value between :math:`-\pi` and :math:`\pi`
-   * to obtain the value of argument to sine.
-   *
-   * - Number of skolem indices: ``1``
-   *   - ``1:`` The argument to sine.
-   * - Sort: ``Real``
-   */
-  EVALUE(TRANSCENDENTAL_SINE_PHASE_SHIFT),
-  /**
    * Used to reason about virtual term substitution. This term represents
    * an infinitesimal. This skolem is expected to appear in instantiations
    * and immediately be rewritten via virtual term substitution.
@@ -418,7 +383,6 @@ enum ENUM(SkolemId)
    * - Sort: ``E``
    */
   EVALUE(SETS_DEQ_DIFF),
-
 
   //================================================= Unknown rule
   /** Indicates this is not a skolem. */

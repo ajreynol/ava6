@@ -37,34 +37,6 @@ class ArithConstantTypeRule
 };
 
 /**
- * Type rule for real algebraic numbers.
- * Returns `realType`.
- */
-class ArithRealAlgebraicNumberOpTypeRule
-{
- public:
-  static TypeNode preComputeType(NodeManager* nm, TNode n);
-  static TypeNode computeType(NodeManager* nodeManager,
-                              TNode n,
-                              bool check,
-                              std::ostream* errOut);
-};
-
-/**
- * Type rule for real algebraic numbers.
- * Returns `realType`.
- */
-class ArithRealAlgebraicNumberTypeRule
-{
- public:
-  static TypeNode preComputeType(NodeManager* nm, TNode n);
-  static TypeNode computeType(NodeManager* nodeManager,
-                              TNode n,
-                              bool check,
-                              std::ostream* errOut);
-};
-
-/**
  * Type rule for arithmetic relations. Returns Boolean. Throws a type error
  * if the types of the children are not arithmetic or not comparable.
  */
@@ -92,50 +64,10 @@ class ArithOperatorTypeRule
                               std::ostream* errOut);
 };
 
-/** Type rule for nullary real operators. */
-class RealNullaryOperatorTypeRule
-{
- public:
-  static TypeNode preComputeType(NodeManager* nm, TNode n);
-  static TypeNode computeType(NodeManager* nodeManager,
-                              TNode n,
-                              bool check,
-                              std::ostream* errOut);
-};
-
-/**
- * Type rule for the IAND kind.
- * Always returns integerType.
- */
-class IAndTypeRule
-{
- public:
-  static TypeNode preComputeType(NodeManager* nm, TNode n);
-  static TypeNode computeType(NodeManager* nodeManager,
-                              TNode n,
-                              bool check,
-                              std::ostream* errOut);
-};
-
 /**
  * Type rule for the POW operator.
  */
 class PowTypeRule
-{
- public:
-  static TypeNode preComputeType(NodeManager* nm, TNode n);
-  static TypeNode computeType(NodeManager* nodeManager,
-                              TNode n,
-                              bool check,
-                              std::ostream* errOut);
-};
-
-/**
- * Type rule for the IndexedRootPredicate operator.
- * Checks that the two arguments are booleanType and realType, always returns
- * booleanType.
- */
-class IndexedRootPredicateTypeRule
 {
  public:
   static TypeNode preComputeType(NodeManager* nm, TNode n);

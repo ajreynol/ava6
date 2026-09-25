@@ -32,7 +32,6 @@ namespace ava6::internal {
  *
  * Other types may conditionally use model values that are also illegal in
  * inputs e.g.:
- * - Real algebraic numbers (RAN) for the reals,
  * - Witness terms for strings (for strings of excessive length).
  */
 class NonClosedNodeConverter : protected EnvObj, public NodeConverter

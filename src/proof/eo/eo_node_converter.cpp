@@ -31,8 +31,6 @@
 #include "theory/uf/function_const.h"
 #include "theory/uf/theory_uf_rewriter.h"
 #include "util/bitvector.h"
-#include "util/iand.h"
-#include "util/indexed_root_predicate.h"
 #include "util/rational.h"
 #include "util/regexp.h"
 #include "util/string.h"
@@ -231,16 +229,6 @@ Node EoNodeConverter::postConvert(Node n)
     newArgs.push_back(opc);
     newArgs.insert(newArgs.end(), n.begin(), n.end());
     return d_nm->mkNode(Kind::APPLY_UF, newArgs);
-  }
-  else if (k == Kind::INDEXED_ROOT_PREDICATE)
-  {
-    TypeNode tn = n.getType();
-    const IndexedRootPredicate& irp =
-        n.getOperator().getConst<IndexedRootPredicate>();
-    std::vector<Node> newArgs;
-    newArgs.push_back(d_nm->mkConstInt(irp.d_index));
-    newArgs.insert(newArgs.end(), n.begin(), n.end());
-    return mkInternalApp("@indexed_root_predicate", newArgs, tn);
   }
   else if (k == Kind::SEXPR || k == Kind::BOUND_VAR_LIST)
   {
@@ -622,8 +610,7 @@ bool EoNodeConverter::isHandledSkolemId(SkolemId id)
     case SkolemId::DIV_BY_ZERO:
     case SkolemId::INT_DIV_BY_ZERO:
     case SkolemId::MOD_BY_ZERO:
-    case SkolemId::TRANSCENDENTAL_PURIFY:
-    case SkolemId::TRANSCENDENTAL_PURIFY_ARG:
+
     case SkolemId::ARITH_VTS_DELTA:
     case SkolemId::ARITH_VTS_DELTA_FREE:
     case SkolemId::QUANTIFIERS_SKOLEMIZE:
@@ -639,12 +626,6 @@ bool EoNodeConverter::isHandledSkolemId(SkolemId id)
     case SkolemId::STRINGS_STOI_RESULT:
     case SkolemId::STRINGS_STOI_NON_DIGIT:
     case SkolemId::RE_UNFOLD_POS_COMPONENT:
-
-
-
-
-
-
 
     case SkolemId::WITNESS_STRING_LENGTH: return true;
     default: break;

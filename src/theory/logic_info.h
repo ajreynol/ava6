@@ -50,8 +50,6 @@ class AVA6_EXPORT LogicInfo
   bool d_integers;
   /** are reals used in this logic? */
   bool d_reals;
-  /** transcendentals in this logic? */
-  bool d_transcendentals;
   /** linear-only arithmetic in this logic? */
   bool d_linear;
   /** difference-only arithmetic in this logic? */
@@ -141,9 +139,6 @@ class AVA6_EXPORT LogicInfo
   /** Are reals in this logic? */
   bool areRealsUsed() const;
 
-  /** Are transcendentals in this logic? */
-  bool areTranscendentalsUsed() const;
-
   /** Does this logic only linear arithmetic? */
   bool isLinear() const;
 
@@ -216,8 +211,6 @@ class AVA6_EXPORT LogicInfo
   void enableReals();
   /** Disable the use of reals in this logic. */
   void disableReals();
-  /** Enable the use of transcendentals in this logic. */
-  void arithTranscendentals();
   /** Only permit difference arithmetic in this logic. */
   void arithOnlyDifference();
   /** Only permit linear arithmetic in this logic. */

@@ -32,7 +32,6 @@ LogicInfo::LogicInfo()
       d_sharingTheories(0),
       d_integers(true),
       d_reals(true),
-      d_transcendentals(true),
       d_linear(false),
       d_differenceLogic(false),
       d_locked(false)
@@ -49,7 +48,6 @@ LogicInfo::LogicInfo(std::string logicString)
       d_sharingTheories(0),
       d_integers(false),
       d_reals(false),
-      d_transcendentals(false),
       d_linear(false),
       d_differenceLogic(false),
       d_locked(false)
@@ -64,7 +62,6 @@ LogicInfo::LogicInfo(const char* logicString)
       d_sharingTheories(0),
       d_integers(false),
       d_reals(false),
-      d_transcendentals(false),
       d_linear(false),
       d_differenceLogic(false),
       d_locked(false)
@@ -159,18 +156,6 @@ bool LogicInfo::areRealsUsed() const
   return d_reals;
 }
 
-bool LogicInfo::areTranscendentalsUsed() const
-{
-  PrettyCheckArgument(d_locked,
-                      *this,
-                      "This LogicInfo isn't locked yet, and cannot be queried");
-  PrettyCheckArgument(isTheoryEnabled(theory::THEORY_ARITH),
-                      *this,
-                      "Arithmetic not used in this LogicInfo; cannot ask "
-                      "whether transcendentals are used");
-  return d_transcendentals;
-}
-
 bool LogicInfo::isLinear() const
 {
   PrettyCheckArgument(d_locked,
@@ -216,7 +201,6 @@ bool LogicInfo::operator==(const LogicInfo& other) const
   if (isTheoryEnabled(theory::THEORY_ARITH))
   {
     return d_integers == other.d_integers && d_reals == other.d_reals
-           && d_transcendentals == other.d_transcendentals
            && d_linear == other.d_linear
            && d_differenceLogic == other.d_differenceLogic;
   }
@@ -244,7 +228,6 @@ bool LogicInfo::operator<=(const LogicInfo& other) const
       && other.isTheoryEnabled(theory::THEORY_ARITH))
   {
     return (!d_integers || other.d_integers) && (!d_reals || other.d_reals)
-           && (!d_transcendentals || other.d_transcendentals)
            && (d_linear || !other.d_linear)
            && (d_differenceLogic || !other.d_differenceLogic) && res;
   }
@@ -275,7 +258,6 @@ bool LogicInfo::operator>=(const LogicInfo& other) const
       && other.isTheoryEnabled(theory::THEORY_ARITH))
   {
     return (d_integers || !other.d_integers) && (d_reals || !other.d_reals)
-           && (d_transcendentals || !other.d_transcendentals)
            && (!d_linear || other.d_linear)
            && (!d_differenceLogic || other.d_differenceLogic) && res;
   }
@@ -326,7 +308,6 @@ std::string LogicInfo::getLogicString() const
         ++seen;
       }
 
-
       if (d_theories[THEORY_DATATYPES])
       {
         ss << "DT";
@@ -351,7 +332,6 @@ std::string LogicInfo::getLogicString() const
           ss << (areIntegersUsed() ? "I" : "");
           ss << (areRealsUsed() ? "R" : "");
           ss << "A";
-          ss << (areTranscendentalsUsed() ? "T" : "");
         }
         ++seen;
       }
@@ -612,11 +592,6 @@ void LogicInfo::setLogicString(std::string logicString)
           arithNonLinear();
           arithmeticTheory = "NRA";
           p += 3;
-          if (*p == 'T')
-          {
-            arithTranscendentals();
-            p += 1;
-          }
         }
         else if (!strncmp(p, "NIRA", 4))
         {
@@ -626,11 +601,6 @@ void LogicInfo::setLogicString(std::string logicString)
           arithNonLinear();
           arithmeticTheory = "NIRA";
           p += 4;
-          if (*p == 'T')
-          {
-            arithTranscendentals();
-            p += 1;
-          }
         }
         else if (!strncmp(p, "FS", 2))
         {
@@ -645,7 +615,6 @@ void LogicInfo::setLogicString(std::string logicString)
       }
     }
   }
-
 
   if (*p != '\0')
   {
@@ -775,22 +744,6 @@ void LogicInfo::disableReals()
   }
 }
 
-void LogicInfo::arithTranscendentals()
-{
-  PrettyCheckArgument(
-      !d_locked, *this, "This LogicInfo is locked, and cannot be modified");
-  d_logicString = "";
-  d_transcendentals = true;
-  if (!d_reals)
-  {
-    enableReals();
-  }
-  if (d_linear)
-  {
-    arithNonLinear();
-  }
-}
-
 void LogicInfo::arithOnlyDifference()
 {
   PrettyCheckArgument(
@@ -798,7 +751,6 @@ void LogicInfo::arithOnlyDifference()
   d_logicString = "";
   d_linear = true;
   d_differenceLogic = true;
-  d_transcendentals = false;
 }
 
 void LogicInfo::arithOnlyLinear()
@@ -808,7 +760,6 @@ void LogicInfo::arithOnlyLinear()
   d_logicString = "";
   d_linear = true;
   d_differenceLogic = false;
-  d_transcendentals = false;
 }
 
 void LogicInfo::arithNonLinear()

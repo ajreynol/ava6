@@ -102,7 +102,8 @@ def main():
                    '--sat-random-seed=1', '--nl-ext-tf-tplanes']:
         result = run(args.binary, '(check-sat)', option)
         assert result.returncode != 0, (option, result.stdout)
-    for text in ['(set-logic HO_ALL)',
+    for text in ['(set-logic QF_NRAT)', '(set-logic QF_NIRAT)',
+                 '(set-logic HO_ALL)',
                  '(set-logic ALL) (declare-fun f (Int) Int) (assert (= (@ f 0) 0))',
                  '(set-logic ALL) (define-fun f () (-> Int Int) (lambda ((x Int)) x))',
                  '(set-logic ALL) (declare-fun f (Int) Int) (assert (= (set.map f (set.singleton 0)) (set.singleton 0)))',
@@ -142,6 +143,21 @@ def main():
         assert 'command' in (result.stdout + result.stderr).lower(), (
             command, result.stdout, result.stderr)
     print('PASS removed commands are rejected by the parser')
+    removed_terms = [(f'({symbol} x)', 'Real') for symbol in
+                     ['exp', 'sin', 'cos', 'tan', 'csc', 'sec', 'cot',
+                      'arcsin', 'arccos', 'arctan', 'arccsc', 'arcsec', 'arccot',
+                      'sqrt']]
+    removed_terms += [('real.pi', 'Real'), ('(^ x 2)', 'Real'),
+                      ('(int.pow2 x)', 'Int'), ('(int.log2 x)', 'Int'),
+                      ('((_ iand 4) x x)', 'Int'), ('(piand 4 x x)', 'Int')]
+    for term, sort in removed_terms:
+        result = run(args.binary,
+            f'(set-logic ALL) (declare-const x {sort}) (assert (= {term} 0))')
+        assert result.returncode != 0, (term, result.stdout, result.stderr)
+        error = result.stdout + result.stderr
+        assert 'not declared' in error or 'Unknown indexed function' in error, (
+            term, error)
+    print('PASS removed arithmetic kinds are rejected by the parser')
     assert not any((ROOT / 'src/theory' / t).exists() for t in ('fp', 'ff', 'bags', 'sep'))
     assert not any((ROOT / 'test/regress/cli' / d).exists() for d in ('regress3', 'regress4'))
     manifest = (ROOT / 'test/regress/cli/CMakeLists.txt').read_text()

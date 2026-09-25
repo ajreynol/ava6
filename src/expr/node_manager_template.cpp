@@ -1376,30 +1376,4 @@ Node NodeManager::mkConstRealOrInt(const TypeNode& tn, const Rational& r)
   return nm->mkConstReal(r);
 }
 
-Node NodeManager::mkRealAlgebraicNumber(const RealAlgebraicNumber& ran)
-{
-  if (ran.isRational())
-  {
-    // may generate an integer it is it integral
-    return mkConstRealOrInt(ran.toRational());
-  }
-  // Creating this node may refine the ran to the point where isRational returns
-  // true
-  Node inner = mkConst(Kind::REAL_ALGEBRAIC_NUMBER_OP, ran);
-
-  // Keep doing this until it either is rational or we have a fixed point.
-  while (true)
-  {
-    const RealAlgebraicNumber& cur = inner.getConst<RealAlgebraicNumber>();
-    if (cur.isRational())
-    {
-      // may generate an integer it is it integral
-      return mkConstRealOrInt(cur.toRational());
-    }
-    if (cur == ran) break;
-    inner = mkConst(Kind::REAL_ALGEBRAIC_NUMBER_OP, cur);
-  }
-  return mkNode(Kind::REAL_ALGEBRAIC_NUMBER, inner);
-}
-
 }  // namespace ava6::internal

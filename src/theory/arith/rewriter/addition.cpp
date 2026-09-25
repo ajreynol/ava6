@@ -18,7 +18,6 @@
 #include "expr/node.h"
 #include "theory/arith/rewriter/node_utils.h"
 #include "theory/arith/rewriter/ordering.h"
-#include "util/real_algebraic_number.h"
 
 namespace ava6::internal {
 namespace theory {
@@ -46,14 +45,14 @@ namespace {
 /**
  * Adds a factor n to a product, consisting of the numerical multiplicity and
  * the remaining (non-numerical) factors. If n is a product itself, its children
- * are merged into the product. If n is a constant or a real algebraic number,
+ * are merged into the product. If n is a rational constant,
  * it is multiplied to the multiplicity. Otherwise, n is added to product.
  *
  * Invariant:
  *   multiplicity' * multiply(product') = n * multiplicity * multiply(product)
  */
 void addToProduct(std::vector<Node>& product,
-                  RealAlgebraicNumber& multiplicity,
+                  Rational& multiplicity,
                   TNode n)
 {
   switch (n.getKind())
@@ -67,7 +66,6 @@ void addToProduct(std::vector<Node>& product,
         addToProduct(product, multiplicity, child);
       }
       break;
-    case Kind::REAL_ALGEBRAIC_NUMBER: multiplicity *= getRAN(n); break;
     default:
       if (n.isConst())
       {
@@ -90,7 +88,7 @@ void addToProduct(std::vector<Node>& product,
  *   add(s.n * s.ran for s in sum')
  *   = add(s.n * s.ran for s in sum) + multiplicity * product
  */
-void addToSum(Sum& sum, TNode product, const RealAlgebraicNumber& multiplicity)
+void addToSum(Sum& sum, TNode product, const Rational& multiplicity)
 {
   if (multiplicity.isZero()) return;
   auto it = sum.find(product);
@@ -114,7 +112,7 @@ void addToSum(Sum& sum, TNode product, const RealAlgebraicNumber& multiplicity)
  */
 Node collectSumWithBase(NodeManager* nm,
                         const Sum& sum,
-                        const RealAlgebraicNumber& basemultiplicity,
+                        const Rational& basemultiplicity,
                         const std::vector<Node>& baseproduct)
 {
   if (sum.empty()) return mkConst(nm, Rational(0));
@@ -123,7 +121,7 @@ Node collectSumWithBase(NodeManager* nm,
   for (const auto& summand : sum)
   {
     Assert(!summand.second.isZero());
-    RealAlgebraicNumber mult = summand.second * basemultiplicity;
+    Rational mult = summand.second * basemultiplicity;
     std::vector<Node> product = baseproduct;
     rewriter::addToProduct(product, mult, summand.first);
     nb << mkMultTerm(nm, mult, std::move(product));
@@ -142,7 +140,6 @@ bool isIntegral(const Sum& sum)
   for (const auto& s : sum)
   {
     queue.emplace_back(s.first);
-    if (!s.second.isRational()) return false;
   }
   while (!queue.empty())
   {
@@ -177,7 +174,7 @@ void addToSum(Sum& sum, TNode n, bool negate)
     return;
   }
   std::vector<Node> monomial;
-  RealAlgebraicNumber multiplicity(Integer(1));
+  Rational multiplicity(Integer(1));
   if (negate)
   {
     multiplicity = Integer(-1);
@@ -208,7 +205,7 @@ void addToSumNoMixed(Sum& sum, TNode n, bool negate)
 
 void addMonomialToSum(Sum& sum,
                       TNode product,
-                      RealAlgebraicNumber& multiplicity)
+                      Rational& multiplicity)
 {
   Assert(product.getKind() != Kind::ADD);
   std::vector<Node> monomial;
@@ -246,14 +243,14 @@ Node distributeMultiplication(NodeManager* nm,
     }
   }
   // factors that are not sums, separated into numerical and non-numerical
-  RealAlgebraicNumber basemultiplicity(Integer(1));
+  Rational basemultiplicity(Integer(1));
   std::vector<Node> base;
-  // maps products to their (possibly real algebraic) multiplicities.
+  // maps products to their rational coefficients.
   // The current (intermediate) value is the sum of these (multiplied by the
   // base factors).
   Sum sum;
   // Add a base summand
-  sum.emplace(mkConst(nm, Rational(1)), RealAlgebraicNumber(Integer(1)));
+  sum.emplace(mkConst(nm, Rational(1)), Rational(Integer(1)));
 
   // multiply factors one by one to basmultiplicity * base * sum
   for (const auto& factor : factors)
@@ -261,7 +258,7 @@ Node distributeMultiplication(NodeManager* nm,
     // Subtractions are rewritten already, we only need to care about additions
     Assert(factor.getKind() != Kind::SUB);
     Assert(factor.getKind() != Kind::NEG
-           || (factor[0].isConst() || isRAN(factor[0])));
+           || (factor[0].isConst()));
     if (factor.getKind() != Kind::ADD)
     {
       Assert(!(factor.isConst() && factor.getConst<Rational>().isZero()));
@@ -276,16 +273,10 @@ Node distributeMultiplication(NodeManager* nm,
       for (const auto& child : factor)
       {
         // add summand * child to newsum
-        RealAlgebraicNumber multiplicity = summand.second;
+        Rational multiplicity = summand.second;
         if (child.isConst())
         {
           multiplicity *= child.getConst<Rational>();
-          addToSum(newsum, summand.first, multiplicity);
-          continue;
-        }
-        if (isRAN(child))
-        {
-          multiplicity *= getRAN(child);
           addToSum(newsum, summand.first, multiplicity);
           continue;
         }

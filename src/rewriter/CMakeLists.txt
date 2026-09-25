@@ -72,6 +72,10 @@ add_custom_command(
       --rewrites_files ${REWRITES_FILES}
     DEPENDS
       ${mkrewrites_script}
+      ${CMAKE_CURRENT_LIST_DIR}/node.py
+      ${CMAKE_CURRENT_LIST_DIR}/rule.py
+      ${CMAKE_CURRENT_LIST_DIR}/rw_parser.py
+      ${CMAKE_CURRENT_LIST_DIR}/util.py
       ${REWRITES_FILES}
       ${CMAKE_CURRENT_LIST_DIR}/theory_rewrites_template.cpp
       ${CMAKE_CURRENT_LIST_DIR}/rewrites_template.cpp

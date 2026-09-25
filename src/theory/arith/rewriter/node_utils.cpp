@@ -34,52 +34,16 @@ Node mkMultTerm(const Rational& multiplicity, TNode monomial)
   return NodeManager::mkNode(Kind::MULT, mkConst(nm, multiplicity), monomial);
 }
 
-Node mkMultTerm(const RealAlgebraicNumber& multiplicity, TNode monomial)
-{
-  NodeManager* nm = monomial.getNodeManager();
-  Node mterm = mkConst(nm, multiplicity);
-  if (mterm.isConst())
-  {
-    return mkMultTerm(mterm.getConst<Rational>(), monomial);
-  }
-  if (monomial.isConst())
-  {
-    return mkConst(nm, multiplicity * monomial.getConst<Rational>());
-  }
-  std::vector<Node> prod;
-  prod.emplace_back(mterm);
-  if (monomial.getKind() == Kind::MULT
-      || monomial.getKind() == Kind::NONLINEAR_MULT)
-  {
-    prod.insert(prod.end(), monomial.begin(), monomial.end());
-  }
-  else
-  {
-    prod.emplace_back(monomial);
-  }
-  Assert(prod.size() >= 2);
-  return nm->mkNode(Kind::NONLINEAR_MULT, prod);
-}
-
 Node mkMultTerm(NodeManager* nm,
-                const RealAlgebraicNumber& multiplicity,
+                const Rational& multiplicity,
                 std::vector<Node>&& monomial)
 {
   if (monomial.empty())
   {
     return mkConst(nm, multiplicity);
   }
-  Node mterm = mkConst(nm, multiplicity);
-  if (mterm.isConst())
-  {
-    std::sort(monomial.begin(), monomial.end(), rewriter::LeafNodeComparator());
-    return mkMultTerm(mterm.getConst<Rational>(),
-                      mkNonlinearMult(nm, monomial));
-  }
-  monomial.emplace_back(mterm);
   std::sort(monomial.begin(), monomial.end(), rewriter::LeafNodeComparator());
-  Assert(monomial.size() >= 2);
-  return nm->mkNode(Kind::NONLINEAR_MULT, monomial);
+  return mkMultTerm(multiplicity, mkNonlinearMult(nm, monomial));
 }
 
 TNode removeToReal(TNode t) { return t.getKind() == Kind::TO_REAL ? t[0] : t; }

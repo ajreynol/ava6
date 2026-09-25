@@ -811,7 +811,7 @@ void MonomialCheck::assignOrderIds(std::vector<Node>& vars,
     {
       Trace("nl-ext-mvo") << "..do not assign order to " << x << " : " << v
                           << std::endl;
-      // don't assign for non-constant values (transcendental function apps)
+      // don't assign for non-constant values
       continue;
     }
     Trace("nl-ext-mvo") << "  order " << x << " : " << v << std::endl;

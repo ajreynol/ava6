@@ -17,17 +17,16 @@
 
 #include "base/check.h"
 #include "expr/node.h"
+#include "util/rational.h"
 
 namespace ava6::internal::theory::arith::rewriter {
 
 /**
  * Implements an ordering on arithmetic leaf nodes. We expect that values have
- * already been combined, i.e., there shall only be a single rational and a
- * single real algebraic number. It broadly categorizes leaf nodes into
- * rationals, real algebraic numbers, integers, variables, and the rest.
+ * already been combined into a single rational. It categorizes leaf nodes
+ * into rationals, integers, variables, and the rest.
  * The ordering is built as follows:
  * - rationals come first
- * - real algebraic numbers come second
  * - real terms come before integer terms
  * - variables come before non-variable terms
  * - finally, fall back to node ordering
@@ -43,11 +42,6 @@ struct LeafNodeComparator
     bool bIsConst = b.isConst();
     if (aIsConst != bIsConst) return aIsConst;
     Assert(!aIsConst && !bIsConst) << "Rationals should be combined";
-
-    bool aIsRAN = a.getKind() == Kind::REAL_ALGEBRAIC_NUMBER;
-    bool bIsRAN = b.getKind() == Kind::REAL_ALGEBRAIC_NUMBER;
-    if (aIsRAN != bIsRAN) return aIsRAN;
-    Assert(!aIsRAN && !bIsRAN) << "real algebraic numbers should be combined";
 
     bool aIsInt = a.getType().isInteger();
     bool bIsInt = b.getType().isInteger();

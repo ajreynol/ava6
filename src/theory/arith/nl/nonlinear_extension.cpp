@@ -105,8 +105,6 @@ void NonlinearExtension::presolve()
 void NonlinearExtension::getAssertions(std::vector<Node>& assertions)
 {
   Trace("nl-ext-assert-debug") << "Getting assertions..." << std::endl;
-  
-  
 
   BoundInference bounds(d_env);
 
@@ -190,29 +188,8 @@ bool NonlinearExtension::checkModel(const std::vector<Node>& assertions)
 {
   Trace("nl-ext-cm") << "--- check-model ---" << std::endl;
 
-  // get the presubstitution
-  Trace("nl-ext-cm-debug") << "  apply pre-substitution..." << std::endl;
-  // Notice that we do not consider relevance here, since assertions were
-  // already filtered based on relevance. It is incorrect to filter based on
-  // relevance here, since we may have discarded literals that are relevant
-  // that are entailed based on the techniques in getAssertions.
-  std::vector<Node> passertions = assertions;
-  if (options().arith.nlExt == options::NlExtMode::FULL)
-  {
-    // preprocess the assertions with the trancendental solver
-    
-  }
-  
-
-  Trace("nl-ext-cm") << "-----" << std::endl;
-  unsigned tdegree = 0;
-  std::vector<NlLemma> lemmas;
-  bool ret = d_model.checkModel(passertions, tdegree, lemmas);
-  for (const auto& al : lemmas)
-  {
-    d_im.addPendingLemma(al);
-  }
-  return ret;
+  // Assertions have already been filtered for relevance.
+  return d_model.checkModel(assertions);
 }
 
 void NonlinearExtension::checkFullEffort(std::map<Node, Node>& arithModel,
@@ -293,9 +270,6 @@ void NonlinearExtension::checkFullEffort(std::map<Node, Node>& arithModel,
     // modify the model values
     d_model.getModelValueRepair(arithModel);
   }
-  // must post-process model with transcendental solver, to ensure we don't
-  // assign values for equivalence classes with transcendental function
-  // applications
   if (TraceIsOn("nl-model-final"))
   {
     Trace("nl-model-final") << "MODEL OUTPUT:" << std::endl;
@@ -452,10 +426,9 @@ Result::Status NonlinearExtension::modelBasedRefinement(
     if (completeStatus == CheckCompletion::NEEDS_MODEL_CHECK)
     {
       Trace("nl-ext")
-          << "Check model based on bounds for irrational-valued functions..."
+          << "Check model using exact rational substitutions..."
           << std::endl;
-      // check the model based on simple solving of equalities and using
-      // error bounds on the Taylor approximation of transcendental functions.
+      // Check the model after solving equalities by exact substitution.
       if (checkModel(assertions))
       {
         completeStatus = CheckCompletion::COMPLETE;

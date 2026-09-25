@@ -37,8 +37,8 @@ class OperatorElim : protected EnvObj, public ProofGenerator
   /** Eliminate operators in this term.
    *
    * Eliminate operators in term n. If n has top symbol that is not a core
-   * one (including division, int division, mod, to_int, is_int, syntactic sugar
-   * transcendental functions), then we replace it by a form that eliminates
+   * one (including division, int division, mod, to_int, is_int), then we
+   * replace it by a form that eliminates
    * that operator. This may involve the introduction of witness terms.
    *
    * @param n The node to eliminate
@@ -89,8 +89,8 @@ class OperatorElim : protected EnvObj, public ProofGenerator
   context::CDHashMap<Node, Node> d_lemmaMap;
   /**
    * Eliminate operators in term n. If n has top symbol that is not a core
-   * one (including division, int division, mod, to_int, is_int, syntactic sugar
-   * transcendental functions), then we replace it by a form that eliminates
+   * one (including division, int division, mod, to_int, is_int), then we
+   * replace it by a form that eliminates
    * that operator. This may involve the introduction of witness terms.
    *
    * One exception to the above rule is that we may leave certain applications

@@ -39,8 +39,6 @@ class ArithProofRuleChecker : public ProofRuleChecker
                      const std::vector<Node>& args) override;
   /** The proof checker for proofs of the nlext. */
   nl::ExtProofRuleChecker d_extChecker;
-  /** The proof checker for proofs of the pow2 solver. */
-  /** The proof checker for transcendental proofs */
 };
 
 }  // namespace arith

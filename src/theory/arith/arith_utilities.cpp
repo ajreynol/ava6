@@ -112,35 +112,11 @@ Node mkOne(const TypeNode& tn, bool isNeg)
   return NodeManager::mkConstRealOrInt(tn, isNeg ? -1 : 1);
 }
 
-bool isTranscendentalKind(Kind k)
-{
-  switch (k)
-  {
-    case Kind::PI:
-    case Kind::EXPONENTIAL:
-    case Kind::SINE:
-    case Kind::COSINE:
-    case Kind::TANGENT:
-    case Kind::COSECANT:
-    case Kind::SECANT:
-    case Kind::COTANGENT:
-    case Kind::ARCSINE:
-    case Kind::ARCCOSINE:
-    case Kind::ARCTANGENT:
-    case Kind::ARCCOSECANT:
-    case Kind::ARCSECANT:
-    case Kind::ARCCOTANGENT:
-    case Kind::SQRT: return true;
-    default: break;
-  }
-  return false;
-}
-
 bool isExtendedNonLinearKind(Kind k)
 {
   switch (k)
   {
-    case Kind::IAND:
+
     case Kind::POW2:
     case Kind::POW: return true;
     default: break;

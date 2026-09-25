@@ -68,7 +68,6 @@
 #include "theory/theory_model.h"
 #include "util/bitvector.h"
 #include "util/divisible.h"
-#include "util/iand.h"
 #include "util/random.h"
 #include "util/regexp.h"
 #include "util/result.h"
@@ -215,9 +214,7 @@ const static std::unordered_map<Kind, std::pair<internal::Kind, std::string>>
         KIND_ENUM(Kind::BITVECTOR_BIT, internal::Kind::BITVECTOR_BIT),
         /* Finite Fields --------------------------------------------------- */
 
-
         /* FP --------------------------------------------------------------- */
-
 
         /* Arrays ----------------------------------------------------------- */
         KIND_ENUM(Kind::SELECT, internal::Kind::SELECT),
@@ -230,7 +227,6 @@ const static std::unordered_map<Kind, std::pair<internal::Kind, std::string>>
         KIND_ENUM(Kind::APPLY_UPDATER, internal::Kind::APPLY_UPDATER),
         KIND_ENUM(Kind::TUPLE_PROJECT, internal::Kind::TUPLE_PROJECT),
         /* Separation Logic ------------------------------------------------- */
-
 
         /* Sets ------------------------------------------------------------- */
         KIND_ENUM(Kind::SET_EMPTY, internal::Kind::SET_EMPTY),
@@ -247,7 +243,6 @@ const static std::unordered_map<Kind, std::pair<internal::Kind, std::string>>
         KIND_ENUM(Kind::SET_IS_SINGLETON, internal::Kind::SET_IS_SINGLETON),
         /* Relations -------------------------------------------------------- */
         /* Bags ------------------------------------------------------------- */
-
 
         /* Strings ---------------------------------------------------------- */
         KIND_ENUM(Kind::STRING_CONCAT, internal::Kind::STRING_CONCAT),
@@ -348,7 +343,6 @@ const static std::unordered_map<SortKind,
         SORT_KIND_ENUM(SortKind::BOOLEAN_SORT, internal::Kind::TYPE_CONSTANT),
         SORT_KIND_ENUM(SortKind::DATATYPE_SORT, internal::Kind::DATATYPE_TYPE),
 
-
         SORT_KIND_ENUM(SortKind::FUNCTION_SORT, internal::Kind::FUNCTION_TYPE),
         SORT_KIND_ENUM(SortKind::INTEGER_SORT, internal::Kind::TYPE_CONSTANT),
         SORT_KIND_ENUM(SortKind::REAL_SORT, internal::Kind::TYPE_CONSTANT),
@@ -393,10 +387,6 @@ const static std::unordered_map<internal::Kind,
         {internal::Kind::ADD, Kind::ADD},
         {internal::Kind::MULT, Kind::MULT},
         {internal::Kind::NONLINEAR_MULT, Kind::MULT},
-        {internal::Kind::IAND, Kind::IAND},
-        {internal::Kind::PIAND, Kind::PIAND},
-        {internal::Kind::POW2, Kind::POW2},
-        {internal::Kind::INTS_LOG2, Kind::LOG2},
         {internal::Kind::SUB, Kind::SUB},
         {internal::Kind::NEG, Kind::NEG},
         {internal::Kind::DIVISION, Kind::DIVISION},
@@ -407,21 +397,6 @@ const static std::unordered_map<internal::Kind,
         {internal::Kind::INTS_MODULUS_TOTAL, Kind::INTS_MODULUS_TOTAL},
         {internal::Kind::ABS, Kind::ABS},
         {internal::Kind::DIVISIBLE, Kind::DIVISIBLE},
-        {internal::Kind::POW, Kind::POW},
-        {internal::Kind::EXPONENTIAL, Kind::EXPONENTIAL},
-        {internal::Kind::SINE, Kind::SINE},
-        {internal::Kind::COSINE, Kind::COSINE},
-        {internal::Kind::TANGENT, Kind::TANGENT},
-        {internal::Kind::COSECANT, Kind::COSECANT},
-        {internal::Kind::SECANT, Kind::SECANT},
-        {internal::Kind::COTANGENT, Kind::COTANGENT},
-        {internal::Kind::ARCSINE, Kind::ARCSINE},
-        {internal::Kind::ARCCOSINE, Kind::ARCCOSINE},
-        {internal::Kind::ARCTANGENT, Kind::ARCTANGENT},
-        {internal::Kind::ARCCOSECANT, Kind::ARCCOSECANT},
-        {internal::Kind::ARCSECANT, Kind::ARCSECANT},
-        {internal::Kind::ARCCOTANGENT, Kind::ARCCOTANGENT},
-        {internal::Kind::SQRT, Kind::SQRT},
         {internal::Kind::DIVISIBLE_OP, Kind::DIVISIBLE},
         {internal::Kind::CONST_RATIONAL, Kind::CONST_RATIONAL},
         {internal::Kind::CONST_INTEGER, Kind::CONST_INTEGER},
@@ -432,8 +407,6 @@ const static std::unordered_map<internal::Kind,
         {internal::Kind::IS_INTEGER, Kind::IS_INTEGER},
         {internal::Kind::TO_INTEGER, Kind::TO_INTEGER},
         {internal::Kind::TO_REAL, Kind::TO_REAL},
-        {internal::Kind::PI, Kind::PI},
-        {internal::Kind::IAND_OP, Kind::IAND},
         /* BV -------------------------------------------------------------- */
         {internal::Kind::CONST_BITVECTOR, Kind::CONST_BITVECTOR},
         {internal::Kind::BITVECTOR_CONCAT, Kind::BITVECTOR_CONCAT},
@@ -503,9 +476,7 @@ const static std::unordered_map<internal::Kind,
         {internal::Kind::BITVECTOR_BIT, Kind::BITVECTOR_BIT},
         /* Finite Fields --------------------------------------------------- */
 
-
         /* FP -------------------------------------------------------------- */
-
 
         /* Arrays ---------------------------------------------------------- */
         {internal::Kind::SELECT, Kind::SELECT},
@@ -523,7 +494,6 @@ const static std::unordered_map<internal::Kind,
         {internal::Kind::TUPLE_PROJECT_OP, Kind::TUPLE_PROJECT},
         /* Separation Logic ------------------------------------------------ */
 
-
         /* Sets ------------------------------------------------------------ */
         {internal::Kind::SET_EMPTY, Kind::SET_EMPTY},
         {internal::Kind::SET_UNION, Kind::SET_UNION},
@@ -539,7 +509,6 @@ const static std::unordered_map<internal::Kind,
         {internal::Kind::SET_IS_SINGLETON, Kind::SET_IS_SINGLETON},
         /* Relations ------------------------------------------------------- */
         /* Bags ------------------------------------------------------------ */
-
 
         /* Strings --------------------------------------------------------- */
         {internal::Kind::STRING_CONCAT, Kind::STRING_CONCAT},
@@ -612,7 +581,6 @@ const static std::
             {internal::Kind::BITVECTOR_TYPE, SortKind::BITVECTOR_SORT},
             {internal::Kind::DATATYPE_TYPE, SortKind::DATATYPE_SORT},
 
-
             {internal::Kind::FUNCTION_TYPE, SortKind::FUNCTION_SORT},
             {internal::Kind::SEQUENCE_TYPE, SortKind::SEQUENCE_SORT},
             {internal::Kind::SET_TYPE, SortKind::SET_SORT},
@@ -623,7 +591,6 @@ const static std::
 /* Set of kinds for indexed operators */
 const static std::unordered_set<Kind> s_indexed_kinds(
     {Kind::DIVISIBLE,
-     Kind::IAND,
      Kind::BITVECTOR_REPEAT,
      Kind::BITVECTOR_ZERO_EXTEND,
      Kind::BITVECTOR_SIGN_EXTEND,
@@ -645,21 +612,16 @@ const static std::unordered_map<Kind, internal::Kind> s_op_kinds{
     {Kind::BITVECTOR_SIGN_EXTEND, internal::Kind::BITVECTOR_SIGN_EXTEND_OP},
     {Kind::BITVECTOR_ZERO_EXTEND, internal::Kind::BITVECTOR_ZERO_EXTEND_OP},
     {Kind::DIVISIBLE, internal::Kind::DIVISIBLE_OP},
-
-
-    {Kind::IAND, internal::Kind::IAND_OP},
     {Kind::INT_TO_BITVECTOR, internal::Kind::INT_TO_BITVECTOR_OP},
     {Kind::REGEXP_REPEAT, internal::Kind::REGEXP_REPEAT_OP},
     {Kind::REGEXP_LOOP, internal::Kind::REGEXP_LOOP_OP},
     {Kind::TUPLE_PROJECT, internal::Kind::TUPLE_PROJECT_OP},
-
 
 };
 
 /* -------------------------------------------------------------------------- */
 /* Rounding Mode for Floating Points                                          */
 /* -------------------------------------------------------------------------- */
-
 
 /* -------------------------------------------------------------------------- */
 /* Helpers                                                                    */
@@ -1696,7 +1658,6 @@ size_t Op::getNumIndicesHelper() const
     case Kind::BITVECTOR_ROTATE_RIGHT: size = 1; break;
     case Kind::BITVECTOR_BIT: size = 1; break;
     case Kind::INT_TO_BITVECTOR: size = 1; break;
-    case Kind::IAND: size = 1; break;
     case Kind::REGEXP_REPEAT: size = 1; break;
     case Kind::BITVECTOR_EXTRACT: size = 2; break;
     case Kind::REGEXP_LOOP: size = 2; break;
@@ -1780,12 +1741,6 @@ Term Op::getIndexHelper(size_t index)
     {
       t = TermManager::mkRationalValHelper(
           d_nm, d_node->getConst<internal::BitVectorBit>().d_bitIndex, true);
-      break;
-    }
-    case Kind::IAND:
-    {
-      t = TermManager::mkRationalValHelper(
-          d_nm, d_node->getConst<internal::IntAnd>().d_size, true);
       break;
     }
     case Kind::REGEXP_REPEAT:
@@ -2828,70 +2783,6 @@ std::vector<Term> Term::getSequenceValue() const
     res.emplace_back(Term(d_nm, node));
   }
   return res;
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-bool Term::isRealAlgebraicNumber() const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_CHECK_NOT_NULL;
-  //////// all checks before this line
-  return d_node->getKind() == internal::Kind::REAL_ALGEBRAIC_NUMBER;
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-Term Term::getRealAlgebraicNumberDefiningPolynomial(const Term& v) const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_CHECK_NOT_NULL;
-  AVA6_API_ARG_CHECK_EXPECTED(
-      d_node->getKind() == internal::Kind::REAL_ALGEBRAIC_NUMBER, *d_node)
-      << "Term to be a real algebraic number when calling "
-         "getRealAlgebraicNumberDefiningPolynomial()";
-  AVA6_API_ARG_CHECK_EXPECTED(v.getKind() == Kind::VARIABLE, v)
-      << "expected a variable as argument when calling "
-         "getRealAlgebraicNumberDefiningPolynomial()";
-  throw Ava6ApiException(
-      "expected libpoly enabled build when calling "
-      "getRealAlgebraicNumberDefiningPolynomial");
-  //////// all checks before this line
-  return Term();
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-Term Term::getRealAlgebraicNumberLowerBound() const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_CHECK_NOT_NULL;
-  AVA6_API_ARG_CHECK_EXPECTED(
-      d_node->getKind() == internal::Kind::REAL_ALGEBRAIC_NUMBER, *d_node)
-      << "Term to be a real algebraic number when calling "
-         "getRealAlgebraicNumberDefiningPolynomial()";
-  throw Ava6ApiException(
-      "expected libpoly enabled build when calling "
-      "getRealAlgebraicNumberLowerBound");
-  //////// all checks before this line
-  return Term();
-  ////////
-  AVA6_API_TRY_CATCH_END;
-}
-
-Term Term::getRealAlgebraicNumberUpperBound() const
-{
-  AVA6_API_TRY_CATCH_BEGIN;
-  AVA6_API_CHECK_NOT_NULL;
-  AVA6_API_ARG_CHECK_EXPECTED(
-      d_node->getKind() == internal::Kind::REAL_ALGEBRAIC_NUMBER, *d_node)
-      << "Term to be a real algebraic number when calling "
-         "getRealAlgebraicNumberDefiningPolynomial()";
-  throw Ava6ApiException(
-      "expected libpoly enabled build when calling "
-      "getRealAlgebraicNumberUpperBound");
-  //////// all checks before this line
-  return Term();
   ////////
   AVA6_API_TRY_CATCH_END;
 }
@@ -4535,24 +4426,14 @@ Sort TermManager::mkTupleSortHelper(const std::vector<Sort>& sorts)
 Term TermManager::mkTermFromKind(Kind kind)
 {
   AVA6_API_KIND_CHECK_EXPECTED(
-      kind == Kind::PI || kind == Kind::REGEXP_NONE || kind == Kind::REGEXP_ALL
+      kind == Kind::REGEXP_NONE || kind == Kind::REGEXP_ALL
           || kind == Kind::REGEXP_ALLCHAR,
       kind)
-      << "PI, REGEXP_NONE, REGEXP_ALL, REGEXP_ALLCHAR";
+      << "REGEXP_NONE, REGEXP_ALL, REGEXP_ALLCHAR";
   //////// all checks before this line
-  internal::Node res;
   internal::Kind k = extToIntKind(kind);
-  if (kind == Kind::REGEXP_NONE || kind == Kind::REGEXP_ALL
-      || kind == Kind::REGEXP_ALLCHAR)
-  {
-    Assert(isDefinedIntKind(k));
-    res = d_nm->mkNode(k, std::vector<internal::Node>());
-  }
-  else
-  {
-    Assert(kind == Kind::PI);
-    res = d_nm->mkNullaryOperator(d_nm->realType(), k);
-  }
+  Assert(isDefinedIntKind(k));
+  internal::Node res = d_nm->mkNode(k, std::vector<internal::Node>());
   (void)res.getType(true); /* kick off type checking */
   return Term(d_nm, res);
 }
@@ -4990,10 +4871,6 @@ Op TermManager::mkOp(Kind kind, const std::vector<uint32_t>& args)
       AVA6_API_CHECK_OP_INDEX(args[0] != 0, args, 0) << "a value != 0";
       res = mkOpHelper(kind, internal::Divisible(args[0]));
       break;
-    case Kind::IAND:
-      AVA6_API_OP_CHECK_ARITY(nargs, 1, kind);
-      res = mkOpHelper(kind, internal::IntAnd(args[0]));
-      break;
     case Kind::INT_TO_BITVECTOR:
       AVA6_API_OP_CHECK_ARITY(nargs, 1, kind);
       res = mkOpHelper(kind, internal::IntToBitVector(args[0]));
@@ -5078,11 +4955,6 @@ Term TermManager::mkBoolean(bool val)
   return Term(d_nm, d_nm->mkConst<bool>(val));
   ////////
   AVA6_API_TRY_CATCH_END;
-}
-
-Term TermManager::mkPi()
-{
-  throw Ava6ApiException("This constructor is not part of the core SMT language");
 }
 
 Term TermManager::mkInteger(const std::string& s)
@@ -5965,7 +5837,6 @@ OptionInfo Solver::getOptionInfo(const std::string& option) const
 
                               info.setByUser,
 
-
                               convertOptionCategory(info.category),
                               OptionInfo::VoidInfo{}};
           },
@@ -5976,7 +5847,6 @@ OptionInfo Solver::getOptionInfo(const std::string& option) const
 
                 info.setByUser,
 
-
                 convertOptionCategory(info.category),
                 OptionInfo::ValueInfo<bool>{vi.defaultValue, vi.currentValue}};
           },
@@ -5986,7 +5856,6 @@ OptionInfo Solver::getOptionInfo(const std::string& option) const
                               info.aliases,
 
                               info.setByUser,
-
 
                               convertOptionCategory(info.category),
                               OptionInfo::ValueInfo<std::string>{
@@ -6000,7 +5869,6 @@ OptionInfo Solver::getOptionInfo(const std::string& option) const
 
                 info.setByUser,
 
-
                 convertOptionCategory(info.category),
                 OptionInfo::NumberInfo<int64_t>{
                     vi.defaultValue, vi.currentValue, vi.minimum, vi.maximum}};
@@ -6013,7 +5881,6 @@ OptionInfo Solver::getOptionInfo(const std::string& option) const
 
                 info.setByUser,
 
-
                 convertOptionCategory(info.category),
                 OptionInfo::NumberInfo<uint64_t>{
                     vi.defaultValue, vi.currentValue, vi.minimum, vi.maximum}};
@@ -6025,7 +5892,6 @@ OptionInfo Solver::getOptionInfo(const std::string& option) const
 
                 info.setByUser,
 
-
                 convertOptionCategory(info.category),
                 OptionInfo::NumberInfo<double>{
                     vi.defaultValue, vi.currentValue, vi.minimum, vi.maximum}};
@@ -6035,7 +5901,6 @@ OptionInfo Solver::getOptionInfo(const std::string& option) const
                               info.aliases,
 
                               info.setByUser,
-
 
                               convertOptionCategory(info.category),
                               OptionInfo::ModeInfo{
@@ -6524,10 +6389,6 @@ std::string to_string(ava6::Kind k)
     case ava6::Kind::APPLY_UF: return "APPLY_UF";
     case ava6::Kind::ADD: return "ADD";
     case ava6::Kind::MULT: return "MULT";
-    case ava6::Kind::IAND: return "IAND";
-    case ava6::Kind::PIAND: return "PIAND";
-    case ava6::Kind::POW2: return "POW2";
-    case ava6::Kind::LOG2: return "LOG2";
     case ava6::Kind::SUB: return "SUB";
     case ava6::Kind::NEG: return "NEG";
     case ava6::Kind::DIVISION: return "DIVISION";
@@ -6537,21 +6398,6 @@ std::string to_string(ava6::Kind k)
     case ava6::Kind::INTS_MODULUS: return "INTS_MODULUS";
     case ava6::Kind::INTS_MODULUS_TOTAL: return "INTS_MODULUS_TOTAL";
     case ava6::Kind::ABS: return "ABS";
-    case ava6::Kind::POW: return "POW";
-    case ava6::Kind::EXPONENTIAL: return "EXPONENTIAL";
-    case ava6::Kind::SINE: return "SINE";
-    case ava6::Kind::COSINE: return "COSINE";
-    case ava6::Kind::TANGENT: return "TANGENT";
-    case ava6::Kind::COSECANT: return "COSECANT";
-    case ava6::Kind::SECANT: return "SECANT";
-    case ava6::Kind::COTANGENT: return "COTANGENT";
-    case ava6::Kind::ARCSINE: return "ARCSINE";
-    case ava6::Kind::ARCCOSINE: return "ARCCOSINE";
-    case ava6::Kind::ARCTANGENT: return "ARCTANGENT";
-    case ava6::Kind::ARCCOSECANT: return "ARCCOSECANT";
-    case ava6::Kind::ARCSECANT: return "ARCSECANT";
-    case ava6::Kind::ARCCOTANGENT: return "ARCCOTANGENT";
-    case ava6::Kind::SQRT: return "SQRT";
     case ava6::Kind::DIVISIBLE: return "DIVISIBLE";
     case ava6::Kind::CONST_RATIONAL: return "CONST_RATIONAL";
     case ava6::Kind::CONST_INTEGER: return "CONST_INTEGER";
@@ -6562,7 +6408,6 @@ std::string to_string(ava6::Kind k)
     case ava6::Kind::IS_INTEGER: return "IS_INTEGER";
     case ava6::Kind::TO_INTEGER: return "TO_INTEGER";
     case ava6::Kind::TO_REAL: return "TO_REAL";
-    case ava6::Kind::PI: return "PI";
     case ava6::Kind::CONST_BITVECTOR: return "CONST_BITVECTOR";
     case ava6::Kind::BITVECTOR_CONCAT: return "BITVECTOR_CONCAT";
     case ava6::Kind::BITVECTOR_AND: return "BITVECTOR_AND";

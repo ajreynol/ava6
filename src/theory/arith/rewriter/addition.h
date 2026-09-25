@@ -19,8 +19,8 @@
 #include <map>
 
 #include "expr/node.h"
+#include "util/rational.h"
 #include "theory/arith/rewriter/ordering.h"
-#include "util/real_algebraic_number.h"
 
 namespace ava6::internal {
 namespace theory {
@@ -42,7 +42,7 @@ namespace rewriter {
  * done in-place instead of copying the result out of the std::unordered_map
  * into a sortable container.
  */
-using Sum = std::map<Node, RealAlgebraicNumber, LeafNodeComparator>;
+using Sum = std::map<Node, Rational, LeafNodeComparator>;
 
 /**
  * Print a sum. Does not use a particularly useful syntax and is thus only meant
@@ -87,7 +87,7 @@ void addToSumNoMixed(Sum& sum, TNode n, bool negate = false);
  */
 void addMonomialToSum(Sum& sum,
                       TNode product,
-                      RealAlgebraicNumber& multiplicity);
+                      Rational& multiplicity);
 
 /**
  * Evaluates the sum object (mapping monomials to their multiplicities) into a
@@ -102,9 +102,9 @@ Node collectSum(NodeManager* nm, const Sum& sum);
  * in this case. The result is the resulting sum after expanding the product
  * and pushing the multiplication inside the addition.
  *
- * The method maintains a `sum` as a mapping from Node to RealAlgebraicNumber.
+ * The method maintains a `sum` as a mapping from Node to Rational.
  * The nodes can be understood as monomials, or generally non-value parts of
- * the product, while the real algebraic numbers are the multiplicities of these
+ * the product, while the rational coefficients are the multiplicities of these
  * monomials or products. This allows to combine summands with identical
  * monomials immediately and avoid a potential blow-up.
  */

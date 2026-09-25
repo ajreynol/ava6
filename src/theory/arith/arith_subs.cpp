@@ -59,8 +59,7 @@ Node ArithSubs::applyArith(const Node& n, bool traverseNlMult) const
         if (!shouldTraverse(cur, traverseNlMult))
         {
           // Do not traverse beneath applications that belong to another theory
-          // besides (core) arithmetic. Notice that transcendental function
-          // applications are also not traversed here.
+          // besides core arithmetic.
           visited[cur] = cur;
         }
         else
@@ -106,10 +105,9 @@ bool ArithSubs::shouldTraverse(const Node& n, bool traverseNlMult)
 {
   Kind k = n.getKind();
   TheoryId ctid = theory::kindToTheoryId(k);
-  // We always treat transcendental kinds and extended nonlinear kinds
-  // as black boxes.
+  // Treat internal extended arithmetic operators as black boxes.
   if ((ctid != THEORY_ARITH && ctid != THEORY_BOOL && ctid != THEORY_BUILTIN)
-      || isTranscendentalKind(k) || isExtendedNonLinearKind(k)
+      || isExtendedNonLinearKind(k)
       || (!traverseNlMult && k == Kind::NONLINEAR_MULT))
   {
     return false;

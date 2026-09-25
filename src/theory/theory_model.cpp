@@ -705,11 +705,8 @@ void TheoryModel::assignFunctionDefinition(Node f, Node f_def) const
                          << ")" << endl;
   Assert(d_uf_models.find(f) == d_uf_models.end());
 
-  
-
   d_uf_models[f] = f_def;
 
-  
 }
 
 bool TheoryModel::hasAssignedFunctionDefinition(Node f) const
@@ -750,7 +747,7 @@ bool TheoryModel::isBaseModelValue(TNode n) const
     return true;
   }
   Kind k = n.getKind();
-  if (k == Kind::REAL_ALGEBRAIC_NUMBER || k == Kind::LAMBDA
+  if (k == Kind::LAMBDA
       || k == Kind::WITNESS)
   {
     // we are a value if we are one of the above kinds
@@ -856,11 +853,9 @@ bool TheoryModel::isValue(TNode n) const
       }
       else if (cur.getNumChildren() == 0)
       {
-        // PI is a (non-base) value. We require it as a special case here
-        // since nullary operators are represented internal as variables.
-        // All other non-constant terms with zero children are not values.
+        // Non-constant nullary terms are not values.
         finishedComputing = true;
-        currentReturn = (cur.getKind() == Kind::PI);
+        currentReturn = false;
       }
       else if (rewrite(cur) != cur)
       {

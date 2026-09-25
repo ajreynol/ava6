@@ -380,20 +380,6 @@ typerule = "::ava6::internal::theory::bv::BitVectorITETypeRule"
 ## internal kinds
 [[kinds]]
 type     = "operator"
-name     = "BITVECTOR_ACKERMANNIZE_UDIV"
-children = 1
-comment  = "term to be treated as a variable; used for eager bit-blasting Ackermann expansion of bvudiv (internal-only symbol)"
-typerule = "::ava6::internal::theory::bv::BitVectorAckermanizationUdivTypeRule"
-
-[[kinds]]
-type     = "operator"
-name     = "BITVECTOR_ACKERMANNIZE_UREM"
-children = 1
-comment  = "term to be treated as a variable; used for eager bit-blasting Ackermann expansion of bvurem (internal-only symbol)"
-typerule = "::ava6::internal::theory::bv::BitVectorAckermanizationUremTypeRule"
-
-[[kinds]]
-type     = "operator"
 name     = "BITVECTOR_EAGER_ATOM"
 children = 1
 comment  = "formula to be treated as a bv atom via eager bit-blasting (internal-only symbol)"

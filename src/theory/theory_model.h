@@ -144,16 +144,16 @@ class TheoryModel : protected EnvObj
    * return the (constant) result of rewriting <k>( c1...cn ).
    *
    * [2] "Unevaluated"
-   * This includes interpreted symbols like FORALL, EXISTS,
-   * CARDINALITY_CONSTRAINT, that are not evaluatable. When getting a model
+   * This includes interpreted symbols like FORALL and EXISTS that are not
+   * evaluatable. When getting a model
    * value for a term <k>( t1...tn ) where k is a kind of this category, we
    * check whether <k>( t1...tn ) exists in the equality engine of this model.
    * If it does, we return its representative, otherwise we return the term
    * itself.
    *
    * [3] "Semi-evaluated"
-   * This includes kinds like BITVECTOR_ACKERMANNIZE_UDIV, APPLY_SELECTOR and.
-   * SEQ_NTH. Like unevaluated kinds, these kinds do not have an evaluator for
+   * This includes kinds like APPLY_SELECTOR and SEQ_NTH. Like unevaluated
+   * kinds, these kinds do not have an evaluator for
    * (some) inputs. In contrast to unevaluated kinds, we interpret a term
    * <k>( t1...tn ) not appearing in the equality engine as an arbitrary value
    * instead of the term itself.
@@ -253,9 +253,8 @@ class TheoryModel : protected EnvObj
 
   /**
    * Is the node n a "value"? This is true if n is a "base value", where
-   * a base value is one where isConst() returns true, a constant-like
-   * value (e.g. a real algebraic number) or if n is a lambda or witness
-   * term.
+   * a base value is one where isConst() returns true, or n is a lambda
+   * or witness term.
    *
    * We also return true for rewritten nodes whose leafs are base values.
    * For example, (str.++ (witness ((x String)) (= (str.len x) 1000)) "A") is

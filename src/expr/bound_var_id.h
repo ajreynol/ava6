@@ -27,15 +27,6 @@ enum class BoundVarId
 {
   NONE,
   /**
-   * A bound variable for the witness term used to eliminate real algebraic
-   * numbers.
-   */
-  REAL_ALGEBRAIC_NUMBER_WITNESS,
-  /**
-   * A bound variable used for transcendental function purification.
-   */
-  ARITH_TR_PURIFY,
-  /**
    * A bound variable corresponding to the index used in the eqrange expansion.
    */
   ARRAYS_EQ_RANGE,

@@ -110,7 +110,6 @@ void NonClosedNodeConverter::getNonClosedKinds(
   ncks.insert(Kind::UNINTERPRETED_SORT_VALUE);
   // may appear in certain models e.g. strings of excessive length
   ncks.insert(Kind::WITNESS);
-  ncks.insert(Kind::REAL_ALGEBRAIC_NUMBER);
 }
 
 const std::vector<Node>& NonClosedNodeConverter::getSkolems() const

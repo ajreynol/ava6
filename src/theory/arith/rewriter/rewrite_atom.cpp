@@ -71,7 +71,7 @@ void normalizeLCoeffAbsOne(Sum& sum)
     return;
   }
   // LCoeff is first coefficient of non-constant monomial
-  RealAlgebraicNumber lcoeff = getLTerm(sum).second;
+  Rational lcoeff = getLTerm(sum).second;
   ;
   if (lcoeff.sgn() < 0)
   {
@@ -99,7 +99,7 @@ bool normalizeGCDLCM(Sum& sum, bool followLCoeffSign = false)
   auto it = sum.begin();
   if (!it->first.isConst())
   {
-    Rational r = it->second.toRational();
+    Rational r = it->second;
     denLCM = r.getDenominator();
     numGCD = r.getNumerator().abs();
   }
@@ -107,8 +107,8 @@ bool normalizeGCDLCM(Sum& sum, bool followLCoeffSign = false)
   for (; it != sum.end(); ++it)
   {
     if (it->first.isConst()) continue;
-    Assert(it->second.isRational());
-    Rational r = it->second.toRational();
+
+    Rational r = it->second;
     denLCM = denLCM.lcm(r.getDenominator());
     if (numGCD.isZero())
       numGCD = r.getNumerator().abs();
@@ -135,14 +135,14 @@ bool normalizeGCDLCM(Sum& sum, bool followLCoeffSign = false)
   return negate;
 }
 
-std::pair<Node, RealAlgebraicNumber> removeMinAbsCoeff(NodeManager* nm,
+std::pair<Node, Rational> removeMinAbsCoeff(NodeManager* nm,
                                                        Sum& sum)
 {
   auto minit = getLTermIt(sum);
   for (auto it = minit; it != sum.end(); ++it)
   {
     if (it->first.isConst()) continue;
-    if (it->second.toRational().absCmp(minit->second.toRational()) < 0)
+    if (it->second.absCmp(minit->second) < 0)
     {
       minit = it;
     }
@@ -157,9 +157,9 @@ std::pair<Node, RealAlgebraicNumber> removeMinAbsCoeff(NodeManager* nm,
   return res;
 }
 
-RealAlgebraicNumber removeConstant(Sum& sum)
+Rational removeConstant(Sum& sum)
 {
-  RealAlgebraicNumber res;
+  Rational res;
   if (!sum.empty())
   {
     auto constantit = sum.begin();
@@ -173,7 +173,7 @@ RealAlgebraicNumber removeConstant(Sum& sum)
   return res;
 }
 
-std::pair<Node, RealAlgebraicNumber> removeLTerm(NodeManager* nm, Sum& sum)
+std::pair<Node, Rational> removeLTerm(NodeManager* nm, Sum& sum)
 {
   auto it = getLTermIt(sum);
   if (it == sum.end())
@@ -190,36 +190,10 @@ std::pair<Node, RealAlgebraicNumber> removeLTerm(NodeManager* nm, Sum& sum)
 
 std::optional<bool> tryEvaluateRelation(Kind rel, TNode left, TNode right)
 {
-  if (left.isConst())
+  if (left.isConst() && right.isConst())
   {
-    const Rational& l = left.getConst<Rational>();
-    if (right.isConst())
-    {
-      const Rational& r = right.getConst<Rational>();
-      return evaluateRelation(rel, l, r);
-    }
-    else if (right.getKind() == Kind::REAL_ALGEBRAIC_NUMBER)
-    {
-      const RealAlgebraicNumber& r =
-          right.getOperator().getConst<RealAlgebraicNumber>();
-      return evaluateRelation(rel, RealAlgebraicNumber(l), r);
-    }
-  }
-  else if (left.getKind() == Kind::REAL_ALGEBRAIC_NUMBER)
-  {
-    const RealAlgebraicNumber& l =
-        left.getOperator().getConst<RealAlgebraicNumber>();
-    if (right.isConst())
-    {
-      const Rational& r = right.getConst<Rational>();
-      return evaluateRelation(rel, l, RealAlgebraicNumber(r));
-    }
-    else if (right.getKind() == Kind::REAL_ALGEBRAIC_NUMBER)
-    {
-      const RealAlgebraicNumber& r =
-          right.getOperator().getConst<RealAlgebraicNumber>();
-      return evaluateRelation(rel, l, r);
-    }
+    return evaluateRelation(
+        rel, left.getConst<Rational>(), right.getConst<Rational>());
   }
   return {};
 }
@@ -297,8 +271,8 @@ Node buildIntegerEquality(NodeManager* nm,
   const auto& constant = *sum.begin();
   if (constant.first.isConst())
   {
-    Assert(constant.second.isRational());
-    if (!constant.second.toRational().isIntegral())
+
+    if (!constant.second.isIntegral())
     {
       Trace("arith-rewriter::debug")
           << "\thas non-integer constant, thus false" << std::endl;
@@ -380,7 +354,7 @@ Node buildRealEquality(NodeManager* nm, Sum&& sum, bool* negated)
     Node zero = mkConst(nm, Integer(0));
     return buildRelation(Kind::EQUAL, zero, collectSum(nm, sum));
   }
-  RealAlgebraicNumber lcoeff = -lterm.second;
+  Rational lcoeff = -lterm.second;
   for (auto& s : sum)
   {
     s.second = s.second / lcoeff;
@@ -411,9 +385,9 @@ Node buildIntegerInequality(NodeManager* nm, Sum&& sum, Kind k)
     k = (k == Kind::GEQ) ? Kind::GT : Kind::GEQ;
   }
 
-  RealAlgebraicNumber constant = removeConstant(sum);
-  Assert(constant.isRational());
-  Rational rhs = -constant.toRational();
+  Rational constant = removeConstant(sum);
+
+  Rational rhs = -constant;
 
   if (rhs.isIntegral() && k == Kind::GT)
   {
@@ -443,9 +417,9 @@ std::pair<Node, Node> decomposeSum(NodeManager* nm,
                                    bool followLCoeffSign)
 {
   negated = normalizeGCDLCM(sum, followLCoeffSign);
-  RealAlgebraicNumber constant = removeConstant(sum);
-  Assert(constant.isRational());
-  Node c = nm->mkConstReal(constant.toRational());
+  Rational constant = removeConstant(sum);
+
+  Node c = nm->mkConstReal(constant);
   Node t = collectSum(nm, sum);
   return std::pair<Node, Node>(t, c);
 }
@@ -501,10 +475,10 @@ std::pair<Node, Node> decomposeRelation(NodeManager* nm,
   rewriter::addToSum(sum, br, true);
   // decompose the sum into a non-constant and constant part
   normalizeGCDLCM(sum);
-  RealAlgebraicNumber constant = removeConstant(sum);
-  Assert(constant.isRational());
+  Rational constant = removeConstant(sum);
+
   // negate the constant
-  Node c = nm->mkConstReal(-constant.toRational());
+  Node c = nm->mkConstReal(-constant);
   Node t = collectSum(nm, sum);
   return std::pair<Node, Node>(t, c);
 }

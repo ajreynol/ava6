@@ -217,40 +217,6 @@ bool ArrayStoreTypeRule::computeIsConst(AVA6_UNUSED NodeManager* nodeManager,
   return true;
 }
 
-TypeNode ArrayLambdaTypeRule::preComputeType(AVA6_UNUSED NodeManager* nm,
-                                             AVA6_UNUSED TNode n)
-{
-  return TypeNode::null();
-}
-TypeNode ArrayLambdaTypeRule::computeType(NodeManager* nodeManager,
-                                          TNode n,
-                                          bool check,
-                                          std::ostream* errOut)
-{
-  Assert(n.getKind() == Kind::ARRAY_LAMBDA);
-  TypeNode lamType = n[0].getTypeOrNull();
-  if (check)
-  {
-    if (n[0].getKind() != Kind::LAMBDA)
-    {
-      if (errOut)
-      {
-        (*errOut) << "array lambda arg is non-lambda";
-      }
-      return TypeNode::null();
-    }
-  }
-  if (lamType.getNumChildren() != 2)
-  {
-    if (errOut)
-    {
-      (*errOut) << "array lambda arg is not unary lambda";
-    }
-    return TypeNode::null();
-  }
-  return nodeManager->mkArrayType(lamType[0], lamType[1]);
-}
-
 Cardinality ArraysProperties::computeCardinality(TypeNode type)
 {
   Assert(type.getKind() == Kind::ARRAY_TYPE);

@@ -171,36 +171,6 @@ const char* toString(ProofRule rule)
     case ProofRule::ARITH_REDUCTION: return "ARITH_REDUCTION";
     case ProofRule::ARITH_POLY_NORM: return "ARITH_POLY_NORM";
     case ProofRule::ARITH_POLY_NORM_REL: return "ARITH_POLY_NORM_REL";
-    case ProofRule::ARITH_TRANS_PI: return "ARITH_TRANS_PI";
-    case ProofRule::ARITH_TRANS_EXP_NEG: return "ARITH_TRANS_EXP_NEG";
-    case ProofRule::ARITH_TRANS_EXP_POSITIVITY:
-      return "ARITH_TRANS_EXP_POSITIVITY";
-    case ProofRule::ARITH_TRANS_EXP_SUPER_LIN:
-      return "ARITH_TRANS_EXP_SUPER_LIN";
-    case ProofRule::ARITH_TRANS_EXP_ZERO: return "ARITH_TRANS_EXP_ZERO";
-    case ProofRule::ARITH_TRANS_EXP_APPROX_ABOVE_NEG:
-      return "ARITH_TRANS_EXP_APPROX_ABOVE_NEG";
-    case ProofRule::ARITH_TRANS_EXP_APPROX_ABOVE_POS:
-      return "ARITH_TRANS_EXP_APPROX_ABOVE_POS";
-    case ProofRule::ARITH_TRANS_EXP_APPROX_BELOW:
-      return "ARITH_TRANS_EXP_APPROX_BELOW";
-    case ProofRule::ARITH_TRANS_SINE_BOUNDS: return "ARITH_TRANS_SINE_BOUNDS";
-    case ProofRule::ARITH_TRANS_SINE_SHIFT: return "ARITH_TRANS_SINE_SHIFT";
-    case ProofRule::ARITH_TRANS_SINE_SYMMETRY:
-      return "ARITH_TRANS_SINE_SYMMETRY";
-    case ProofRule::ARITH_TRANS_SINE_TANGENT_ZERO:
-      return "ARITH_TRANS_SINE_TANGENT_ZERO";
-    case ProofRule::ARITH_TRANS_SINE_TANGENT_PI:
-      return "ARITH_TRANS_SINE_TANGENT_PI";
-    case ProofRule::ARITH_TRANS_SINE_APPROX_ABOVE_NEG:
-      return "ARITH_TRANS_SINE_APPROX_ABOVE_NEG";
-    case ProofRule::ARITH_TRANS_SINE_APPROX_ABOVE_POS:
-      return "ARITH_TRANS_SINE_APPROX_ABOVE_POS";
-    case ProofRule::ARITH_TRANS_SINE_APPROX_BELOW_NEG:
-      return "ARITH_TRANS_SINE_APPROX_BELOW_NEG";
-    case ProofRule::ARITH_TRANS_SINE_APPROX_BELOW_POS:
-      return "ARITH_TRANS_SINE_APPROX_BELOW_POS";
-    //================================================= Finite fields
     case ProofRule::ALETHE_RULE: return "ALETHE_RULE";
     //================================================= Unknown rule
     case ProofRule::UNKNOWN: return "UNKNOWN";

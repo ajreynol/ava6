@@ -284,10 +284,6 @@ inline Node mkOnZeroIte(Node n, Node q, Node if_zero, Node not_zero)
   return n.eqNode(zero).iteNode({q.eqNode(if_zero), q.eqNode(not_zero)});
 }
 
-inline Node mkPi(NodeManager* nm)
-{
-  return nm->mkNullaryOperator(nm->realType(), Kind::PI);
-}
 /** Join kinds, where k1 and k2 are arithmetic relations returns an
  * arithmetic relation ret such that
  * if (a <k1> b) and (a <k2> b), then (a <ret> b).
@@ -300,17 +296,7 @@ Kind joinKinds(Kind k1, Kind k2);
  */
 Kind transKinds(Kind k1, Kind k2);
 
-/** Is k a transcendental function kind? */
-bool isTranscendentalKind(Kind k);
-
-/**
- * Is k an extended non-linear function kind? These kinds are treated by the
- * non-linear solver. We distinguish these kinds by the fact that they do not
- * generate irrational outputs given rational inputs. Examples of extended
- * non-linear kinds include IAND and POW2. All kinds that are non-linear
- * and arithmetic should return true for either isTranscendentalKind or
- * isExtendedNonLinearKind.
- */
+/** Is k an internal arithmetic operator restricted to proof rewriting? */
 bool isExtendedNonLinearKind(Kind k);
 
 /**

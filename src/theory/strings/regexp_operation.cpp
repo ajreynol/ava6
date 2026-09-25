@@ -628,13 +628,6 @@ std::string RegExpOpr::mkString(Node r)
         retStr += ss.str();
         break;
       }
-      case Kind::REGEXP_RV:
-      {
-        retStr += "<";
-        retStr += r[0].getConst<Rational>().getNumerator().toString();
-        retStr += ">";
-        break;
-      }
       case Kind::REGEXP_COMPLEMENT:
       {
         retStr += "^(";

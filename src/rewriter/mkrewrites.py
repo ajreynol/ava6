@@ -102,8 +102,6 @@ def gen_mk_node(defns, expr):
                        Op.REGEXP_LOOP, Op.REGEXP_REPEAT, Op.DIVISIBLE}:
           args = f'nm->mkConst(GenericOp(Kind::{gen_kind(expr.op)})),' + args
           return f'nm->mkNode(Kind::APPLY_INDEXED_SYMBOLIC, {{ {args} }})'
-        elif expr.op in {Op.REAL_PI}:
-          return f'nm->mkNullaryOperator(nm->realType(), Kind::PI)'
         if args:
           return f'nm->mkNode(Kind::{gen_kind(expr.op)}, {{ {args} }})'
         else:

@@ -113,8 +113,12 @@ combination lives in `CombinationEngine` without a strategy subclass. The
 central equality engine is assigned directly to participating theories, and
 the model manager owns its separate, independently resettable equality engine.
 Nonlinear arithmetic uses the retained extension solver and is still incomplete
-on some inputs. The rational implementation of real algebraic number storage is
-retained without libpoly.
+on some inputs. Arithmetic coefficients use `Rational` directly; the former
+libpoly algebraic-number wrapper, root predicates, and interval model machinery
+are deleted. Transcendental and integer-AND kinds and their API entries are
+removed. Internal `POW`, `POW2`, `INTS_LOG2`, and `INTS_ISPOW2` remain for
+polynomial and bit-vector proof rewriting, without a public parser/API surface.
+See [KIND_AUDIT.md](KIND_AUDIT.md) for the complete kind audit.
 
 ## Changes for later experiments
 

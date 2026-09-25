@@ -30,13 +30,10 @@ libava6_add_sources(
   divisible.h
   gmp_util.h
   hash.h
-  iand.h
   index.cpp
   index.h
   ostream_util.cpp
   ostream_util.h
-  real_algebraic_number.cpp
-  real_algebraic_number.h
   random.cpp
   random.h
   resource_manager.cpp

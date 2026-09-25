@@ -146,27 +146,15 @@ class NonlinearExtension : EnvObj
   /** check model
    *
    * Returns the subset of assertions whose concrete values we cannot show are
-   * true in the current model. Notice that we typically cannot compute concrete
-   * values for assertions involving transcendental functions. Any assertion
-   * whose model value cannot be computed is included in the return value of
+   * true in the current model. Any assertion whose model value cannot be
+   * computed is included in the return value of
    * this function.
    */
   std::vector<Node> getUnsatisfiedAssertions(
       const std::vector<Node>& assertions);
 
   //---------------------------check model
-  /** Check model
-   *
-   * Checks the current model based on solving for equalities, and using error
-   * bounds on the Taylor approximation.
-   *
-   * If this function returns true, then all assertions in the input argument
-   * "assertions" are satisfied for all interpretations of variables within
-   * their computed bounds (as stored in d_check_model_bounds).
-   *
-   * For details, see Section 3 of Cimatti et al CADE 2017 under the heading
-   * "Detecting Satisfiable Formulas".
-   */
+  /** Check that all assertions hold after solving equalities by substitution. */
   bool checkModel(const std::vector<Node>& assertions);
   //---------------------------end check model
   /** run check strategy

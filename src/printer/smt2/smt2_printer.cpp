@@ -45,9 +45,6 @@
 #include "theory/uf/theory_uf_rewriter.h"
 #include "util/bitvector.h"
 #include "util/divisible.h"
-#include "util/iand.h"
-#include "util/indexed_root_predicate.h"
-#include "util/real_algebraic_number.h"
 #include "util/regexp.h"
 #include "util/smt2_quote_string.h"
 #include "util/string.h"
@@ -389,7 +386,6 @@ bool Smt2Printer::toStreamBase(std::ostream& out,
         break;
       case Kind::TUPLE_PROJECT_OP:
 
-
       {
         ProjectOp op = n.getConst<ProjectOp>();
         const std::vector<uint32_t>& indices = op.getIndices();
@@ -692,21 +688,6 @@ bool Smt2Printer::toStreamBase(std::ostream& out,
   }
   switch (k)
   {
-    case Kind::REAL_ALGEBRAIC_NUMBER:
-    {
-      const RealAlgebraicNumber& ran =
-          n.getOperator().getConst<RealAlgebraicNumber>();
-      out << "(_ real_algebraic_number " << ran << ")";
-      stillNeedToPrintParams = false;
-      break;
-    }
-    case Kind::INDEXED_ROOT_PREDICATE_OP:
-    {
-      const IndexedRootPredicate& irp = n.getConst<IndexedRootPredicate>();
-      out << "(_ root_predicate " << irp.d_index << ")";
-      stillNeedToPrintParams = false;
-      break;
-    }
     case Kind::BITVECTOR_BIT:
       out << "(_ @bit " << n.getOperator().getConst<BitVectorBit>().d_bitIndex
           << ")";
@@ -940,24 +921,7 @@ std::string Smt2Printer::smtKindString(Kind k)
     case Kind::ADD: return "+";
     case Kind::MULT:
     case Kind::NONLINEAR_MULT: return "*";
-    case Kind::IAND: return "iand";
-    case Kind::PIAND: return "piand";
     case Kind::POW2: return "int.pow2";
-    case Kind::EXPONENTIAL: return "exp";
-    case Kind::SINE: return "sin";
-    case Kind::COSINE: return "cos";
-    case Kind::TANGENT: return "tan";
-    case Kind::COSECANT: return "csc";
-    case Kind::SECANT: return "sec";
-    case Kind::COTANGENT: return "cot";
-    case Kind::ARCSINE: return "arcsin";
-    case Kind::ARCCOSINE: return "arccos";
-    case Kind::ARCTANGENT: return "arctan";
-    case Kind::ARCCOSECANT: return "arccsc";
-    case Kind::ARCSECANT: return "arcsec";
-    case Kind::ARCCOTANGENT: return "arccot";
-    case Kind::PI: return "real.pi";
-    case Kind::SQRT: return "sqrt";
     case Kind::SUB: return "-";
     case Kind::NEG: return "-";
     case Kind::LT: return "<";

@@ -73,15 +73,6 @@ bool TheoryArith::needsEqualityEngine(EeSetupInfo& esi)
 void TheoryArith::finishInit()
 {
   const LogicInfo& logic = logicInfo();
-  if (logic.isTheoryEnabled(THEORY_ARITH) && logic.areTranscendentalsUsed())
-  {
-    // witness is used to eliminate square root
-    d_valuation.setUnevaluatedKind(Kind::WITNESS);
-    // we only need to add the operators that are not syntax sugar
-    d_valuation.setUnevaluatedKind(Kind::EXPONENTIAL);
-    d_valuation.setUnevaluatedKind(Kind::SINE);
-    d_valuation.setUnevaluatedKind(Kind::PI);
-  }
   // only need to create nonlinear extension if non-linear logic
   if (logic.isTheoryEnabled(THEORY_ARITH) && !logic.isLinear())
   {
@@ -99,48 +90,12 @@ void TheoryArith::preRegisterTerm(TNode n)
 {
   // handle logic exceptions
   Kind k = n.getKind();
-  bool isTransKind = isTranscendentalKind(k);
-  // note that we don't throw an exception for non-linear multiplication in
-  // linear logics, since this is caught in the linear solver with a more
-  // informative error message
-  if (isTransKind || isExtendedNonLinearKind(k))
-  {
-    {
-      std::stringstream ss;
-      ss << "Support for arithmetic extensions (required for " << k
-         << ") not available in this core solver.";
-      throw LogicException(ss.str());
-    }
-    if (d_nonlinearExtension == nullptr)
-    {
-      std::stringstream ss;
-      ss << "Term of kind " << k
-         << " requires the logic to include non-linear arithmetic";
-      throw LogicException(ss.str());
-    }
-    // logic exceptions based on the configuration of nl-ext: if we are a
-    // transcendental function, we require nl-ext=full.
-    if (isTransKind)
-    {
-      if (options().arith.nlExt != options::NlExtMode::FULL)
-      {
-        std::stringstream ss;
-        ss << "Term of kind " << k
-           << " requires nl-ext mode to be set to value 'full'";
-        throw LogicException(ss.str());
-      }
-    }
-    
-  }
-  // if POW is allowed but was not rewritten
-  if (k == Kind::POW || (k == Kind::POW2 && n[0].isConst()))
+  // These internal operators support proof rewriting, not solving arithmetic
+  // extensions that survive preprocessing.
+  if (isExtendedNonLinearKind(k))
   {
     std::stringstream ss;
-    ss << "The exponent of the POW(^) operator can only be a positive "
-          "integral constant below "
-       << (expr::NodeValue::MAX_CHILDREN + 1) << ". ";
-    ss << "Exception occurred in:" << std::endl;
-    ss << "  " << n;
+    ss << "Unsupported arithmetic extension in solver input: " << k;
     throw LogicException(ss.str());
   }
   if (d_nonlinearExtension != nullptr)
@@ -369,8 +324,7 @@ bool TheoryArith::collectModelValues(TheoryModel* m,
     {
       continue;
     }
-    // do not assert non-leafs e.g. non-linear multiplication terms,
-    // transcendental functions, etc.
+    // Do not assert non-leaf terms, such as non-linear multiplications.
     if (!Theory::isLeafOf(p.first, TheoryId::THEORY_ARITH))
     {
       continue;

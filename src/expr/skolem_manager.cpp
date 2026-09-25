@@ -368,7 +368,7 @@ TypeNode SkolemManager::getTypeFor(SkolemId id,
   {
     // Type(cacheVals[0]), i.e skolems that return same type as first argument
     case SkolemId::PURIFY:
-    case SkolemId::TRANSCENDENTAL_PURIFY:
+
       Assert(cacheVals.size() > 0);
       return cacheVals[0].getType();
       break;
@@ -386,8 +386,7 @@ TypeNode SkolemManager::getTypeFor(SkolemId id,
       return d_nm->mkFunctionType(rtype, rtype);
     }
     // real skolems
-    case SkolemId::TRANSCENDENTAL_PURIFY_ARG:
-    case SkolemId::TRANSCENDENTAL_SINE_PHASE_SHIFT:
+
     case SkolemId::ARITH_VTS_DELTA:
     case SkolemId::ARITH_VTS_DELTA_FREE: return d_nm->realType();
     // int -> int function
@@ -397,7 +396,6 @@ TypeNode SkolemManager::getTypeFor(SkolemId id,
     case SkolemId::STRINGS_OCCUR_INDEX_RE:
     case SkolemId::STRINGS_STOI_RESULT:
     case SkolemId::STRINGS_ITOS_RESULT:
-
 
     {
       TypeNode itype = d_nm->integerType();
@@ -420,8 +418,6 @@ TypeNode SkolemManager::getTypeFor(SkolemId id,
     case SkolemId::STRINGS_NUM_OCCUR_RE:
     case SkolemId::STRINGS_DEQ_DIFF:
     case SkolemId::STRINGS_STOI_NON_DIGIT:
-
-
 
  return d_nm->integerType();
     // string skolems
@@ -501,9 +497,7 @@ size_t SkolemManager::getNumIndicesForSkolemId(SkolemId id) const
     // Number of skolem indices: 1
     case SkolemId::PURIFY:
     case SkolemId::GROUND_TERM:
-    case SkolemId::TRANSCENDENTAL_PURIFY:
-    case SkolemId::TRANSCENDENTAL_PURIFY_ARG:
-    case SkolemId::TRANSCENDENTAL_SINE_PHASE_SHIFT:
+
     case SkolemId::ARITH_VTS_INFINITY:
     case SkolemId::ARITH_VTS_INFINITY_FREE:
     case SkolemId::WITNESS_INV_CONDITION:
@@ -511,21 +505,7 @@ size_t SkolemManager::getNumIndicesForSkolemId(SkolemId id) const
     case SkolemId::STRINGS_STOI_RESULT:
     case SkolemId::STRINGS_STOI_NON_DIGIT:
 
-
-
-
-
-
-
-
-
-
     case SkolemId::SETS_CHOOSE:
-
-
-
-
-
 
  return 1;
 
@@ -538,22 +518,16 @@ size_t SkolemManager::getNumIndicesForSkolemId(SkolemId id) const
     case SkolemId::STRINGS_OCCUR_INDEX_RE:
     case SkolemId::STRINGS_DEQ_DIFF:
 
-
-
     case SkolemId::SETS_DEQ_DIFF:
-
 
  return 2;
 
     // Number of skolem indices: 3
 
-
     case SkolemId::WITNESS_STRING_LENGTH:
     case SkolemId::STRINGS_REPLACE_ALL_RESULT:
     case SkolemId::STRINGS_REPLACE_RE_ALL_RESULT:
     case SkolemId::RE_UNFOLD_POS_COMPONENT:
-
-
 
  return 3;
 

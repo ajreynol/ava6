@@ -281,7 +281,7 @@ void MonomialBoundsCheck::checkBounds(const std::vector<Node>& asserts,
           {
             Trace("nl-ext-bound-debug")
                 << "     ...coefficient " << mult
-                << " is non-constant (probably transcendental)." << std::endl;
+                << " is non-constant." << std::endl;
             continue;
           }
           int mmv_sign = mmv.getConst<Rational>().sgn();

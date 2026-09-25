@@ -67,15 +67,3 @@ hasher    = "::ava6::internal::ArrayStoreAllHashFunction"
 header    = "expr/array_store_all.h"
 comment   = "array store-all; payload is an instance of the ava6::internal::ArrayStoreAll class (this is not supported by arrays decision procedure yet, but it is used for returned array models)"
 typerule  = "::ava6::internal::theory::arrays::ArrayStoreTypeRule"
-
-# used internally for substitutions in models (e.g. the Boolean terms converter)
-# The (single) argument is a lambda(x:T):U.  Type of the array lambda is
-# Array T of U.  Thus ARRAY_LAMBDA LAMBDA(x:INT) . (read a x) is the same array
-# as a.  ARRAY_LAMBDA LAMBDA(x:INT) . (read a (- x 1)) is the same array as
-# as a shifted over one.
-[[kinds]]
-type     = "operator"
-name     = "ARRAY_LAMBDA"
-children = 1
-comment  = "array lambda (internal-only symbol)"
-typerule = "::ava6::internal::theory::arrays::ArrayLambdaTypeRule"

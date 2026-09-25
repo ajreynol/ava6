@@ -238,26 +238,11 @@ class Variable : public NodeWrapper
       case Kind::INTS_DIVISION_TOTAL:
       case Kind::INTS_MODULUS_TOTAL:
       case Kind::DIVISION_TOTAL: return isDivMember(n);
-      case Kind::IAND:
-      case Kind::PIAND:
+
       case Kind::POW2:
       case Kind::INTS_LOG2:
       case Kind::POW:
-      case Kind::EXPONENTIAL:
-      case Kind::SINE:
-      case Kind::COSINE:
-      case Kind::TANGENT:
-      case Kind::COSECANT:
-      case Kind::SECANT:
-      case Kind::COTANGENT:
-      case Kind::ARCSINE:
-      case Kind::ARCCOSINE:
-      case Kind::ARCTANGENT:
-      case Kind::ARCCOSECANT:
-      case Kind::ARCSECANT:
-      case Kind::ARCCOTANGENT:
-      case Kind::SQRT:
-      case Kind::PI:
+
       case Kind::ABS:
       case Kind::TO_INTEGER:
       case Kind::NONLINEAR_MULT:
@@ -296,16 +281,6 @@ class Variable : public NodeWrapper
       if (n == m)
       {
         return 0;
-      }
-
-      // RAN < real var < int var < non-variable
-
-      bool nIsRAN = n.getKind() == Kind::REAL_ALGEBRAIC_NUMBER;
-      bool mIsRAN = m.getKind() == Kind::REAL_ALGEBRAIC_NUMBER;
-
-      if (mIsRAN != nIsRAN)
-      {
-        return nIsRAN ? -1 : 1;
       }
 
       bool nIsInteger = n.getType().isInteger();

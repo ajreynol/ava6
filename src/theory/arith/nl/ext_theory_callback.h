@@ -47,9 +47,8 @@ class NlExtTheoryCallback : public ExtTheoryCallback
    * (= (* x y) 0), then (* x y) may be considered reduced. The motivation is
    * to minimize the number of terms that the non-linear solver must consider.
    *
-   * This method returns true if
-   * (1) the extended term on is not a transcendental function,
-   * (2) the top symobl of n does not belong to non-linear arithmetic.
+   * This method returns true if the top symbol of n does not belong to
+   * non-linear arithmetic.
    *
    * For example,
    * if on, n = (* x y), (* 5 y), we return true

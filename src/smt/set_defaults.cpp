@@ -439,13 +439,6 @@ void SetDefaults::setDefaultsPost(const LogicInfo& logic, Options& opts) const
         "any theory other than UF. ");
   }
 
-  if (logic.isTheoryEnabled(theory::THEORY_ARITH) && logic.areTranscendentalsUsed())
-  {
-    SET_AND_NOTIFY_IF_NOT_USER_VAL_SYM(
-        arith, nlExt, options::NlExtMode::FULL, "logic with transcendentals");
-  }
-  
-
 }
 
 bool SetDefaults::incompatibleWithIncremental(const LogicInfo& logic,

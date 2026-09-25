@@ -12,7 +12,6 @@
 
 #include "ava6_private.h"
 
-
 /* circular dependency; force node.h first */
 #include "expr/node.h"
 #include "expr/type_node.h"
@@ -706,23 +705,6 @@ class NodeManager
    */
   static Node mkConstRealOrInt(const TypeNode& tn, const Rational& r);
 
-  /**
-   * Make a real algebraic number node from a RealAlgebraicNumber.
-   * If the real algebraic number is found to be rational, this method returns a
-   * node of kind CONST_RATIONAL. Otherwise, it returns a node of kind
-   * REAL_ALGEBRIAC_NUMBER.
-   *
-   * It is, unfortunately, not entirely possible to provide the usual uniqueness
-   * guarantees for real algebraic number nodes. As a REAL_ALGEBRIAC_NUMBER node
-   * may turn out to be rational later on, it may be semantically equal to a
-   * CONST_RATIONAL node, although the comparison operator would always return
-   * false. For this reason, comparisons should be performed by evaluating (i.e.
-   * rewriting) the EQUAL predicate, or by inspecting the values manually. Note
-   * that the comparison operators for RealAlgebraicNumber properly support
-   * Rational as well.
-   */
-  Node mkRealAlgebraicNumber(const RealAlgebraicNumber& ran);
-
   /** Create a node with children. */
   TypeNode mkTypeNode(Kind kind, TypeNode child1);
   TypeNode mkTypeNode(Kind kind, TypeNode child1, TypeNode child2);
@@ -1041,7 +1023,6 @@ class NodeManager
 
   /** A list of datatypes owned by this node manager */
   std::vector<std::unique_ptr<DType>> d_dtypes;
-
 
   /** A mapping for sorts allocated by mkSortConstructor where fresh is false */
   std::map<std::pair<std::string, size_t>, TypeNode> d_nfreshSorts;

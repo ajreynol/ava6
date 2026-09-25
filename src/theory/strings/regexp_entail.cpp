@@ -391,10 +391,6 @@ bool RegExpEntail::isConstRegExp(TNode t)
           return false;
         }
       }
-      else if (ck == Kind::REGEXP_RV)
-      {
-        return false;
-      }
       else if (ck == Kind::REGEXP_RANGE)
       {
         if (!utils::isCharacterRange(cur))

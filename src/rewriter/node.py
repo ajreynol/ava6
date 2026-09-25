@@ -130,13 +130,6 @@ class Op(Enum):
     IS_INT = ('is_int', 'IS_INTEGER')
     DIVISIBLE = ('divisible', 'DIVISIBLE')
     
-    SINE = ('sin', 'SINE')
-    COSINE = ('cos', 'COSINE')
-    TANGENT = ('tan', 'TANGENT')
-    SECANT = ('sec', 'SECANT')
-    COSECANT = ('csc', 'COSECANT')
-    COTANGENT = ('cot', 'COTANGENT')
-    REAL_PI = (None, 'PI')  # Handled as constant
 
     INT_ISPOW2 = ('int.ispow2', 'INTS_ISPOW2')  # Backdoor for some bv rewrites
     INT_LENGTH = ('int.log2', 'INTS_LOG2')  # Backdoor for some bv rewrites

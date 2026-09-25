@@ -301,8 +301,6 @@ bool TheoryArithPrivate::AssertLower(ConstraintP constraint)
     }
     ConstraintP ub = d_partialModel.getUpperBoundConstraint(x_i);
 
-    
-
     const ValueCollection& vc = constraint->getValueCollection();
     if (vc.hasEquality())
     {
@@ -369,8 +367,6 @@ bool TheoryArithPrivate::AssertLower(ConstraintP constraint)
       d_partialModel.getLowerBoundConstraint(x_i));
 
   d_partialModel.setLowerBoundConstraint(constraint);
-
-  
 
   d_updatedBounds.softAdd(x_i);
 
@@ -448,7 +444,6 @@ bool TheoryArithPrivate::AssertUpper(ConstraintP constraint)
 
     const ValueCollection& vc = constraint->getValueCollection();
     ConstraintP lb = d_partialModel.getLowerBoundConstraint(x_i);
-    
 
     if (vc.hasDisequality())
     {
@@ -515,8 +510,6 @@ bool TheoryArithPrivate::AssertUpper(ConstraintP constraint)
   // It is fine if this is NullConstraint
 
   d_partialModel.setUpperBoundConstraint(constraint);
-
-  
 
   d_updatedBounds.softAdd(x_i);
 
@@ -608,8 +601,6 @@ bool TheoryArithPrivate::AssertEquality(ConstraintP constraint)
   d_partialModel.setUpperBoundConstraint(constraint);
   d_partialModel.setLowerBoundConstraint(constraint);
 
-  
-
   d_updatedBounds.softAdd(x_i);
 
   if (TraceIsOn("model"))
@@ -656,8 +647,6 @@ bool TheoryArithPrivate::AssertDisequality(ConstraintP constraint)
 
   // Should be fine in integers
   Assert(!isInteger(x_i) || c_i.isIntegral());
-
-  
 
   const ValueCollection& vc = constraint->getValueCollection();
   if (vc.hasLowerBound() && vc.hasUpperBound())
@@ -1010,12 +999,6 @@ void TheoryArithPrivate::setupVariableList(const VarList& vl)
 
     markSetup(vlNode);
   }
-  else if (vlNode.getKind() == Kind::EXPONENTIAL
-           || vlNode.getKind() == Kind::SINE || vlNode.getKind() == Kind::COSINE
-           || vlNode.getKind() == Kind::TANGENT)
-  {
-    d_foundNl = true;
-  }
 
   /* Note:
    * Only call markSetup if the VarList is not a singleton.
@@ -1212,11 +1195,10 @@ ArithVar TheoryArithPrivate::requestArithVar(TNode x,
                                              AVA6_UNUSED bool internal)
 {
   // TODO : The VarList trick is good enough?
-  Kind xk = x.getKind();
-  Assert(isLeaf(x) || VarList::isMember(x) || xk == Kind::ADD || internal);
+  Assert(isLeaf(x) || VarList::isMember(x) || x.getKind() == Kind::ADD
+         || internal);
   if (logicInfo().isLinear()
-      && (Variable::isDivMember(x) || xk == Kind::IAND
-          || isTranscendentalKind(xk)))
+      && Variable::isDivMember(x))
   {
     stringstream ss;
     ss << "A non-linear fact was asserted to "
@@ -1876,7 +1858,6 @@ Node TheoryArithPrivate::getSatValue(TNode n) const
   return d_valuation.getSatValue(n);
 }
 
-
 bool TheoryArithPrivate::solveRelaxationOrPanic(Theory::Effort effortLevel)
 {
   // if at this point the linear relaxation is still unknown,
@@ -2086,7 +2067,6 @@ bool TheoryArithPrivate::postCheck(Theory::Effort effortLevel)
       d_partialModel.commitAssignmentChanges();
       d_statistics.d_maxUnknownsInARow.maxAssign(d_unknownsInARow);
 
-
       break;
     case Result::UNSAT:
       d_unknownsInARow = 0;
@@ -2106,7 +2086,6 @@ bool TheoryArithPrivate::postCheck(Theory::Effort effortLevel)
       outputConflicts();
       emmittedConflictOrSplit = true;
       Trace("arith::conflict") << "simplex conflict" << endl;
-
 
       break;
     default: Unimplemented();
@@ -2628,7 +2607,6 @@ void TheoryArithPrivate::propagate()
                            << c->getLiteral() << endl;
     }
   }
-
 
 }
 

@@ -19,7 +19,6 @@
 #include "expr/node.h"
 #include "util/integer.h"
 #include "util/rational.h"
-#include "util/real_algebraic_number.h"
 
 namespace ava6::internal {
 namespace theory {
@@ -48,18 +47,6 @@ inline bool isAtom(TNode n)
   }
 }
 
-/** Check whether the node wraps a real algebraic number. */
-inline bool isRAN(TNode n)
-{
-  return n.getKind() == Kind::REAL_ALGEBRAIC_NUMBER;
-}
-/** Retrieve the wrapped a real algebraic number. Asserts isRAN(n) */
-AVA6_NO_DANGLING inline const RealAlgebraicNumber& getRAN(TNode n)
-{
-  Assert(isRAN(n));
-  return n.getOperator().getConst<RealAlgebraicNumber>();
-}
-
 /**
  * Check whether the parent has a child that is a constant zero. If so, return
  * this child. Otherwise, return std::nullopt. Works on any kind of iterable,
@@ -86,10 +73,10 @@ inline Node mkConst(NodeManager* nm, const Integer& value)
   return nm->mkConstInt(value);
 }
 
-/** Create a real algebraic number node */
-inline Node mkConst(NodeManager* nm, const RealAlgebraicNumber& value)
+/** Create a rational constant, using integer type when integral. */
+inline Node mkConst(NodeManager* nm, const Rational& value)
 {
-  return nm->mkRealAlgebraicNumber(value);
+  return nm->mkConstRealOrInt(value);
 }
 
 /** Make a nonlinear multiplication from the given factors */
@@ -105,7 +92,7 @@ inline Node mkNonlinearMult(NodeManager* nm, const std::vector<Node>& factors)
 
 /**
  * Create the product of `multiplicity * monomial`. Assumes that the monomial is
- * either a product of non-values (neither rational nor real algebraic numbers)
+ * either a product of non-values (not rational constants)
  * or a rational constant.
  * If the monomial is a constant, return the product of the two numbers. If the
  * multiplicity is one, return the monomial. Otherwise return `(MULT
@@ -113,29 +100,11 @@ inline Node mkNonlinearMult(NodeManager* nm, const std::vector<Node>& factors)
  */
 Node mkMultTerm(const Rational& multiplicity, TNode monomial);
 
-/**
- * Create the product of `multiplicity * monomial`. Assumes that the monomial is
- * either a product of non-values (neither rational nor real algebraic numbers)
- * or a rational constant.
- * If multiplicity is rational, defer to the appropriate overload. If the
- * monomial is one, return the product of the two numbers. Otherwise return the
- * nonlinear product of the two, i.e. `(NONLINEAR_MULT multiplicity *monomial)`.
- */
-Node mkMultTerm(const RealAlgebraicNumber& multiplicity, TNode monomial);
-
-/**
- * Create the product of `multiplicity * monomial`, where the monomial is given
- * as the (implicitly multiplied, possibly unsorted) list of children. Assumes
- * that monomial is either empty (implicitly one) or  a list of non-values
- * (neither rational nor real algebraic numbers). If multiplicity is rational,
- * sort the monomial, create a nonlinear mult term and defer to the appropriate
- * overload. Otherwise return the nonlinear product of the two, i.e.
- * `(NONLINEAR_MULT multiplicity *monomial)`. The monomial is taken as rvalue as
- * it may be modified in the process.
- *
+/** Multiply a rational coefficient by the given non-constant factors.
+ * Sorts the factors and combines them into a nonlinear multiplication.
  */
 Node mkMultTerm(NodeManager* nm,
-                const RealAlgebraicNumber& multiplicity,
+                const Rational& multiplicity,
                 std::vector<Node>&& monomial);
 
 /**

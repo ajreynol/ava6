@@ -12,7 +12,6 @@
 
 #include "theory/arith/theory_arith_type_rules.h"
 
-#include "util/iand.h"
 #include "util/rational.h"
 
 namespace ava6::internal {
@@ -57,33 +56,6 @@ TypeNode ArithConstantTypeRule::computeType(NodeManager* nodeManager,
     }
   }
   return nodeManager->integerType();
-}
-
-TypeNode ArithRealAlgebraicNumberOpTypeRule::preComputeType(NodeManager* nm,
-                                                            AVA6_UNUSED TNode n)
-{
-  return nm->realType();
-}
-TypeNode ArithRealAlgebraicNumberOpTypeRule::computeType(
-    NodeManager* nodeManager,
-    AVA6_UNUSED TNode n,
-    AVA6_UNUSED bool check,
-    AVA6_UNUSED std::ostream* errOut)
-{
-  return nodeManager->realType();
-}
-TypeNode ArithRealAlgebraicNumberTypeRule::preComputeType(NodeManager* nm,
-                                                          AVA6_UNUSED TNode n)
-{
-  return nm->realType();
-}
-TypeNode ArithRealAlgebraicNumberTypeRule::computeType(
-    NodeManager* nodeManager,
-    AVA6_UNUSED TNode n,
-    AVA6_UNUSED bool check,
-    AVA6_UNUSED std::ostream* errOut)
-{
-  return nodeManager->realType();
 }
 
 TypeNode ArithOperatorTypeRule::preComputeType(AVA6_UNUSED NodeManager* nm,
@@ -183,68 +155,6 @@ TypeNode ArithRelationTypeRule::computeType(NodeManager* nodeManager,
   return nodeManager->booleanType();
 }
 
-TypeNode RealNullaryOperatorTypeRule::preComputeType(
-    AVA6_UNUSED NodeManager* nm, AVA6_UNUSED TNode n)
-{
-  return TypeNode::null();
-}
-TypeNode RealNullaryOperatorTypeRule::computeType(NodeManager* nodeManager,
-                                                  TNode n,
-                                                  AVA6_UNUSED bool check,
-                                                  std::ostream* errOut)
-{
-  // for nullary operators, we only computeType for check=true, since they are
-  // given TypeAttr() on creation
-  Assert(check);
-  if (!n.getTypeOrNull().isReal())
-  {
-    if (errOut)
-    {
-      (*errOut) << "expecting real type";
-    }
-    return TypeNode::null();
-  }
-  return nodeManager->realType();
-}
-
-TypeNode IAndTypeRule::preComputeType(NodeManager* nm, AVA6_UNUSED TNode n)
-{
-  return nm->integerType();
-}
-TypeNode IAndTypeRule::computeType(NodeManager* nodeManager,
-                                   TNode n,
-                                   bool check,
-                                   std::ostream* errOut)
-{
-  Assert(n.getKind() == Kind::IAND)
-      << "IAND typerule invoked for " << n << " instead of IAND kind";
-  if (check)
-  {
-    TypeNode arg1 = n[0].getTypeOrNull();
-    TypeNode arg2 = n[1].getTypeOrNull();
-    Node op = n.getOperator();
-    uint32_t bsize = op.getConst<IntAnd>().d_size;
-    if (bsize <= 0)
-    {
-      if (errOut)
-      {
-        (*errOut) << "iand must be indexed by a positive integer. Index is: "
-                  << bsize;
-      }
-      return TypeNode::null();
-    }
-    if (!isMaybeInteger(arg1) || !isMaybeInteger(arg2))
-    {
-      if (errOut)
-      {
-        (*errOut) << "expecting integer terms";
-      }
-      return TypeNode::null();
-    }
-  }
-  return nodeManager->integerType();
-}
-
 TypeNode PowTypeRule::preComputeType(AVA6_UNUSED NodeManager* nm,
                                      AVA6_UNUSED TNode n)
 {
@@ -269,41 +179,6 @@ TypeNode PowTypeRule::computeType(AVA6_UNUSED NodeManager* nodeManager,
     return TypeNode::null();
   }
   return t;
-}
-
-TypeNode IndexedRootPredicateTypeRule::preComputeType(NodeManager* nm,
-                                                      AVA6_UNUSED TNode n)
-{
-  return nm->booleanType();
-}
-TypeNode IndexedRootPredicateTypeRule::computeType(NodeManager* nodeManager,
-                                                   TNode n,
-                                                   bool check,
-                                                   std::ostream* errOut)
-{
-  // used internally, does not accept arguments of abstract type
-  if (check)
-  {
-    TypeNode t1 = n[0].getTypeOrNull();
-    if (!t1.isBoolean())
-    {
-      if (errOut)
-      {
-        (*errOut) << "expecting boolean term as first argument";
-      }
-      return TypeNode::null();
-    }
-    TypeNode t2 = n[1].getTypeOrNull();
-    if (!t2.isRealOrInt())
-    {
-      if (errOut)
-      {
-        (*errOut) << "expecting polynomial as second argument";
-      }
-      return TypeNode::null();
-    }
-  }
-  return nodeManager->booleanType();
 }
 
 }  // namespace arith

@@ -44,10 +44,6 @@ void EqualitySolver::finishInit()
   d_ee = d_astate.getEqualityEngine();
   // add the function kinds
   d_ee->addFunctionKind(Kind::NONLINEAR_MULT);
-  d_ee->addFunctionKind(Kind::EXPONENTIAL);
-  d_ee->addFunctionKind(Kind::SINE);
-  d_ee->addFunctionKind(Kind::IAND);
-  d_ee->addFunctionKind(Kind::PIAND);
   d_ee->addFunctionKind(Kind::POW2);
 }
 

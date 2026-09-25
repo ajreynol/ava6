@@ -26,11 +26,6 @@ const char* toString(ava6::SkolemId id)
     case ava6::SkolemId::DIV_BY_ZERO: return "div_by_zero";
     case ava6::SkolemId::INT_DIV_BY_ZERO: return "int_div_by_zero";
     case ava6::SkolemId::MOD_BY_ZERO: return "mod_by_zero";
-    case ava6::SkolemId::TRANSCENDENTAL_PURIFY: return "transcendental_purify";
-    case ava6::SkolemId::TRANSCENDENTAL_PURIFY_ARG:
-      return "transcendental_purify_arg";
-    case ava6::SkolemId::TRANSCENDENTAL_SINE_PHASE_SHIFT:
-      return "transcendental_sine_phase_shift";
     case ava6::SkolemId::ARITH_VTS_DELTA: return "arith_vts_delta";
     case ava6::SkolemId::ARITH_VTS_DELTA_FREE: return "arith_vts_delta_free";
     case ava6::SkolemId::ARITH_VTS_INFINITY: return "arith_vts_infinity";

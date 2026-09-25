@@ -65,16 +65,10 @@ bool NlExtTheoryCallback::isExtfReduced(AVA6_UNUSED int effort,
                                         std::vector<Node>& exp,
                                         ExtReducedId& id)
 {
-  if (isTranscendentalKind(on.getKind()))
-  {
-    // we do not handle reductions of transcendental functions here
-    return false;
-  }
   if (!isZero(n))
   {
     Kind k = n.getKind();
-    if (k != Kind::NONLINEAR_MULT && !isTranscendentalKind(k) && k != Kind::IAND
-        && k != Kind::PIAND && k != Kind::POW2)
+    if (k != Kind::NONLINEAR_MULT && k != Kind::POW2)
     {
       // we consider an extended function to be reduced if it simplifies to
       // something that is not a non-linear term. For example, if we know

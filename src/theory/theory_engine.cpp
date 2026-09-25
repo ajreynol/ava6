@@ -792,7 +792,7 @@ bool TheoryEngine::isLegalElimination(TNode x, TNode val)
     return true;
   }
   // If models are enabled, then it depends on whether the term contains any
-  // unevaluable operators like FORALL, SINE, etc. Having such operators makes
+  // unevaluable operators like FORALL. Having such operators makes
   // model construction contain non-constant values for variables, which is
   // not ideal from a user perspective.
   // We also insist on this check since the term to eliminate should never

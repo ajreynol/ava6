@@ -403,13 +403,6 @@ typerule = "SimpleTypeRule<RRegExp, ARegExp>"
 
 #internal
 [[kinds]]
-type     = "operator"
-name     = "REGEXP_RV"
-children = 1
-comment  = "regexp rv (internal use only)"
-typerule = "SimpleTypeRule<RRegExp, AInteger>"
-
-[[kinds]]
 type = "operator"
 name     = "SEQ_EMPTY_OF_TYPE"
 children = 1

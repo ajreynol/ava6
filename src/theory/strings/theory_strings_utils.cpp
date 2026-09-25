@@ -428,7 +428,7 @@ bool isRegExpKind(Kind k)
          || k == Kind::REGEXP_INTER || k == Kind::REGEXP_STAR
          || k == Kind::REGEXP_PLUS || k == Kind::REGEXP_OPT
          || k == Kind::REGEXP_RANGE || k == Kind::REGEXP_LOOP
-         || k == Kind::REGEXP_RV || k == Kind::REGEXP_COMPLEMENT;
+         || k == Kind::REGEXP_COMPLEMENT;
 }
 
 TypeNode getOwnerStringType(Node n)

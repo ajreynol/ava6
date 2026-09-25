@@ -273,20 +273,6 @@ bool EoPrinter::isHandled(AVA6_UNUSED const Options& opts, const ProofNode* pfn)
       }
     }
     break;
-    case ProofRule::ARITH_TRANS_EXP_NEG:
-    case ProofRule::ARITH_TRANS_EXP_POSITIVITY:
-    case ProofRule::ARITH_TRANS_EXP_SUPER_LIN:
-    case ProofRule::ARITH_TRANS_EXP_ZERO:
-    case ProofRule::ARITH_TRANS_SINE_BOUNDS:
-    case ProofRule::ARITH_TRANS_SINE_SYMMETRY:
-    case ProofRule::ARITH_TRANS_SINE_TANGENT_ZERO:
-    case ProofRule::ARITH_TRANS_SINE_TANGENT_PI:
-
-
-    {
-          }
-    break;
-    // otherwise not handled
     default: break;
   }
   return false;

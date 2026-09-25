@@ -20,9 +20,6 @@ const char* toString(BoundVarId id)
 {
   switch (id)
   {
-    case BoundVarId::REAL_ALGEBRAIC_NUMBER_WITNESS:
-      return "REAL_ALGEBRAIC_NUMBER_WITNESS";
-    case BoundVarId::ARITH_TR_PURIFY: return "ARITH_TR_PURIFY";
     case BoundVarId::ARRAYS_EQ_RANGE: return "ARRAYS_EQ_RANGE";
     case BoundVarId::BAGS_FIRST_INDEX: return "BAGS_FIRST_INDEX";
     case BoundVarId::BAGS_SECOND_INDEX: return "BAGS_SECOND_INDEX";

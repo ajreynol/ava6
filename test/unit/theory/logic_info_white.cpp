@@ -11,6 +11,7 @@
  */
 
 #include "base/configuration.h"
+#include "base/exception.h"
 #include "expr/kind.h"
 #include "test.h"
 #include "theory/logic_info.h"
@@ -113,6 +114,11 @@ class TestTheoryWhiteLogicInfo : public TestInternal
 
 TEST_F(TestTheoryWhiteLogicInfo, smtlib_logics)
 {
+  for (const char* logic : {"QF_NRAT", "QF_NIRAT", "QF_AUFNIRAT", "AUFNIRAT"})
+  {
+    EXPECT_THROW(LogicInfo{logic}, Exception);
+  }
+
   LogicInfo info("QF_SAT");
   ASSERT_TRUE(info.isLocked());
   ASSERT_FALSE(info.isSharingEnabled());
@@ -404,7 +410,6 @@ TEST_F(TestTheoryWhiteLogicInfo, smtlib_logics)
   ASSERT_TRUE(info.isDifferenceLogic());
   ASSERT_TRUE(info.areIntegersUsed());
   ASSERT_FALSE(info.areRealsUsed());
-  ASSERT_FALSE(info.areTranscendentalsUsed());
   ASSERT_FALSE(info.hasEverything());
   ASSERT_FALSE(info.hasNothing());
 
@@ -422,7 +427,6 @@ TEST_F(TestTheoryWhiteLogicInfo, smtlib_logics)
   ASSERT_FALSE(info.isDifferenceLogic());
   ASSERT_TRUE(info.areIntegersUsed());
   ASSERT_FALSE(info.areRealsUsed());
-  ASSERT_FALSE(info.areTranscendentalsUsed());
   ASSERT_FALSE(info.hasEverything());
   ASSERT_FALSE(info.hasNothing());
 
@@ -439,7 +443,6 @@ TEST_F(TestTheoryWhiteLogicInfo, smtlib_logics)
   ASSERT_FALSE(info.isDifferenceLogic());
   ASSERT_FALSE(info.areIntegersUsed());
   ASSERT_TRUE(info.areRealsUsed());
-  ASSERT_FALSE(info.areTranscendentalsUsed());
   ASSERT_FALSE(info.hasEverything());
   ASSERT_FALSE(info.hasNothing());
 
@@ -457,7 +460,6 @@ TEST_F(TestTheoryWhiteLogicInfo, smtlib_logics)
   ASSERT_FALSE(info.isDifferenceLogic());
   ASSERT_FALSE(info.areIntegersUsed());
   ASSERT_TRUE(info.areRealsUsed());
-  ASSERT_FALSE(info.areTranscendentalsUsed());
   ASSERT_FALSE(info.hasEverything());
   ASSERT_FALSE(info.hasNothing());
 
@@ -475,7 +477,6 @@ TEST_F(TestTheoryWhiteLogicInfo, smtlib_logics)
   ASSERT_FALSE(info.isDifferenceLogic());
   ASSERT_FALSE(info.areIntegersUsed());
   ASSERT_TRUE(info.areRealsUsed());
-  ASSERT_FALSE(info.areTranscendentalsUsed());
   ASSERT_FALSE(info.hasEverything());
   ASSERT_FALSE(info.hasNothing());
 
@@ -493,7 +494,6 @@ TEST_F(TestTheoryWhiteLogicInfo, smtlib_logics)
   ASSERT_FALSE(info.isDifferenceLogic());
   ASSERT_TRUE(info.areIntegersUsed());
   ASSERT_FALSE(info.areRealsUsed());
-  ASSERT_FALSE(info.areTranscendentalsUsed());
   ASSERT_FALSE(info.hasEverything());
   ASSERT_FALSE(info.hasNothing());
 
@@ -512,7 +512,6 @@ TEST_F(TestTheoryWhiteLogicInfo, smtlib_logics)
   ASSERT_TRUE(info.areIntegersUsed());
   ASSERT_FALSE(info.isDifferenceLogic());
   ASSERT_TRUE(info.areRealsUsed());
-  ASSERT_TRUE(info.areTranscendentalsUsed());
   ASSERT_FALSE(info.hasEverything());
   ASSERT_FALSE(info.hasNothing());
 
@@ -534,8 +533,6 @@ TEST_F(TestTheoryWhiteLogicInfo, smtlib_logics)
   ASSERT_TRUE(info.hasEverything());
   ASSERT_FALSE(info.hasNothing());
 }
-
-
 
 TEST_F(TestTheoryWhiteLogicInfo, comparison)
 {
@@ -805,7 +802,6 @@ TEST_F(TestTheoryWhiteLogicInfo, comparison)
   lt("QF_IDL", "QF_UFIDL");
   lt("QF_IDL", "QF_NIA");
   nc("QF_IDL", "QF_NRA");
-  nc("QF_IDL", "QF_NRAT");
   lt("QF_IDL", "QF_AUFNIRA");
   nc("QF_IDL", "LRA");
   nc("QF_IDL", "NRA");
@@ -915,7 +911,6 @@ TEST_F(TestTheoryWhiteLogicInfo, comparison)
   nc("QF_NRA", "AUFLIA");
   nc("QF_NRA", "AUFLIRA");
   lt("QF_NRA", "AUFNIRA");
-  lt("QF_NRA", "QF_NRAT");
 
   gt("QF_AUFNIRA", "QF_UF");
   gt("QF_AUFNIRA", "QF_LRA");
@@ -941,7 +936,6 @@ TEST_F(TestTheoryWhiteLogicInfo, comparison)
   nc("QF_AUFNIRA", "AUFLIA");
   nc("QF_AUFNIRA", "AUFLIRA");
   lt("QF_AUFNIRA", "AUFNIRA");
-  lt("QF_AUFNIRA", "QF_AUFNIRAT");
 
   nc("LRA", "QF_UF");
   gt("LRA", "QF_LRA");
@@ -1142,8 +1136,6 @@ TEST_F(TestTheoryWhiteLogicInfo, comparison)
   gt("AUFNIRA", "AUFLIA");
   gt("AUFNIRA", "AUFLIRA");
   eq("AUFNIRA", "AUFNIRA");
-  lt("AUFNIRA", "AUFNIRAT");
-
 
 }
 }  // namespace test

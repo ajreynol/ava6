@@ -77,8 +77,6 @@ class ArithRewriter : public TheoryRewriter
   /** postRewrite for terms */
   RewriteResponse postRewriteTerm(TNode t);
 
-  /** rewrite real algebraic numbers */
-  RewriteResponse rewriteRAN(TNode t);
   /** rewrite variables */
   RewriteResponse rewriteVariable(TNode t);
 
@@ -108,8 +106,6 @@ class ArithRewriter : public TheoryRewriter
   /** rewrite to_int and is_int */
   RewriteResponse rewriteExtIntegerOp(TNode t);
 
-  /** postRewrite PIAND */
-  RewriteResponse postRewritePIAnd(TNode t);
   /** postRewrite POW2 */
   RewriteResponse postRewritePow2(TNode t);
   /** postRewrite INTS_IS_POW2 */
