@@ -30,7 +30,7 @@ class OperatorElim;
 class ArithRewriter : public TheoryRewriter
 {
  public:
-  ArithRewriter(NodeManager* nm, OperatorElim& oe, bool expertEnabled = true);
+  ArithRewriter(NodeManager* nm, OperatorElim& oe);
   RewriteResponse preRewrite(TNode n) override;
   RewriteResponse postRewrite(TNode n) override;
   /**
@@ -77,9 +77,6 @@ class ArithRewriter : public TheoryRewriter
   /** postRewrite for terms */
   RewriteResponse postRewriteTerm(TNode t);
 
-  /** Post-rewrites that are only available in expert mode */
-  RewriteResponse postRewriteExpert(TNode t);
-
   /** rewrite real algebraic numbers */
   RewriteResponse rewriteRAN(TNode t);
   /** rewrite variables */
@@ -111,8 +108,6 @@ class ArithRewriter : public TheoryRewriter
   /** rewrite to_int and is_int */
   RewriteResponse rewriteExtIntegerOp(TNode t);
 
-  /** postRewrite IAND */
-  RewriteResponse postRewriteIAnd(TNode t);
   /** postRewrite PIAND */
   RewriteResponse postRewritePIAnd(TNode t);
   /** postRewrite POW2 */
@@ -121,9 +116,6 @@ class ArithRewriter : public TheoryRewriter
   RewriteResponse postRewriteIntsIsPow2(TNode t);
   /** postRewrite INTS_LOG2 */
   RewriteResponse postRewriteIntsLog2(TNode t);
-
-  /** postRewrite transcendental functions */
-  RewriteResponse postRewriteTranscendental(TNode t);
 
   /** return rewrite */
   RewriteResponse returnRewrite(TNode t, Node ret, Rewrite r);
@@ -139,8 +131,6 @@ class ArithRewriter : public TheoryRewriter
   Node rewriteIneqToBv(Kind k, const rewriter::Sum& sum, const Node& ineq);
   /** The operator elimination utility */
   OperatorElim& d_opElim;
-  /** Whether we permit reasoning about expert extensions of arithmetic */
-  bool d_expertEnabled;
 }; /* class ArithRewriter */
 
 }  // namespace arith

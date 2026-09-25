@@ -245,16 +245,6 @@ void Printer::toStreamCmdDeclareFunction(std::ostream& out, const Node& v) const
   toStreamCmdDeclareFunction(out, ss.str(), argTypes, vt);
 }
 
-void Printer::toStreamCmdDeclareOracleFun(
-    std::ostream& out,
-    AVA6_UNUSED const std::string& id,
-    AVA6_UNUSED const std::vector<TypeNode>& argTypes,
-    AVA6_UNUSED TypeNode type,
-    AVA6_UNUSED const std::string& binName) const
-{
-  printUnknownCommand(out, "declare-oracle-fun");
-}
-
 void Printer::toStreamCmdDeclareType(std::ostream& out,
                                      AVA6_UNUSED const std::string& id,
                                      AVA6_UNUSED size_t arity) const

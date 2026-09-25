@@ -35,44 +35,18 @@ enum class IncompleteId
   ARITH_NL_DISABLED,
   // the non-linear arithmetic solver was incomplete
   ARITH_NL,
-  // the floating-point solver could not refine a conversion abstraction,
-  // e.g. because model values for its arguments were unavailable
   // incomplete due to lack of a complete quantifiers strategy
   QUANTIFIERS,
-  // (refutation unsound) we failed to verify the correctness of a candidate
-  // solution in SyGuS and blocked it to make progress
-  // (refutation unsound) we are generalizing any-constants when blocking with
-  // smart enumeration
   // incomplete due to counterexample-guided instantiation not being complete
   QUANTIFIERS_CEGQI,
   // incomplete due to bounded-quantifier model checking
   QUANTIFIERS_FMF,
-  // incomplete due to explicitly recorded instantiations
-  QUANTIFIERS_RECORDED_INST,
   // incomplete due to limited number of allowed instantiation rounds
   QUANTIFIERS_MAX_INST_ROUNDS,
-  // we solved a negated synthesis conjecture and will terminate as a subsolver
-  // with unknown
-  // we failed to construct a grammar for a function-to-synthesize
-  QUANTIFIERS_SYGUS_NO_WF_GRAMMAR,
-  // incomplete due to separation logic
-  // Higher order operators like sets.map were used in combination with set
-  // cardinality constraints
-  // relations were used in combination with set cardinality constraints
-  SETS_RELS_CARD,
-  // finite model finding used in combination with set cardinality constraints
   // we skipped processing a looping word equation
   STRINGS_LOOP_SKIP,
   // we could not simplify a regular expression membership
   STRINGS_REGEXP_NO_SIMPLIFY,
-  // incomplete due to sequence of a dynamic finite type (e.g. a type that
-  // we know is finite, but its exact cardinality is not fixed. For example,
-  // when finite model finding is enabled, uninterpreted sorts have a
-  // cardinality that depends on their interpretation in the current model).
-  // HO extensionality axiom was disabled
-  // UF+cardinality solver was disabled
-  // UF+cardinality solver used in an incomplete mode
-
   //------------------- other causes external to theories
   // unprocessed theory conflict
   UNPROCESSED_THEORY_CONFLICT,

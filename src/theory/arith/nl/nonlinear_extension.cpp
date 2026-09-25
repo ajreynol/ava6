@@ -50,7 +50,6 @@ NonlinearExtension::NonlinearExtension(Env& env, TheoryArith& containing)
       d_monomialBoundsSlv(d_env, &d_extState),
       d_monomialSlv(d_env, &d_extState),
       d_fmSlv(d_env, d_astate, d_im),
-      d_splitZeroSlv(d_env, &d_extState),
       d_tangentPlaneSlv(d_env, &d_extState)
 {
   d_extTheory.addFunctionKind(Kind::NONLINEAR_MULT);
@@ -552,10 +551,6 @@ void NonlinearExtension::runStrategy(const std::vector<Node>& assertions,
         d_monomialSlv.checkMagnitude(MagnitudeCompareMode::MONOMIAL);
         break;
       case InferStep::NL_MONOMIAL_SIGN: d_monomialSlv.checkSign(); break;
-      case InferStep::NL_RESOLUTION_BOUNDS:
-        d_monomialBoundsSlv.checkResBounds();
-        break;
-      case InferStep::NL_SPLIT_ZERO: d_splitZeroSlv.check(); break;
       case InferStep::NL_TANGENT_PLANES: d_tangentPlaneSlv.check(false); break;
       case InferStep::NL_TANGENT_PLANES_WAITING:
         d_tangentPlaneSlv.check(true);

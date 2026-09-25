@@ -22,7 +22,6 @@ std::ostream& operator<<(std::ostream& o, Token t)
   switch (t)
   {
     case Token::EOF_TOK: o << "EOF_TOK"; break;
-    case Token::ALPHA: o << "ALPHA"; break;
     case Token::ASSERT_TOK: o << "ASSERT_TOK"; break;
     case Token::AS_TOK: o << "AS_TOK"; break;
     case Token::ATTRIBUTE_TOK: o << "ATTRIBUTE_TOK"; break;
@@ -34,8 +33,6 @@ std::ostream& operator<<(std::ostream& o, Token t)
     case Token::DECLARE_DATATYPES_TOK: o << "DECLARE_DATATYPES_TOK"; break;
     case Token::DECLARE_DATATYPE_TOK: o << "DECLARE_DATATYPE_TOK"; break;
     case Token::DECLARE_FUN_TOK: o << "DECLARE_FUN_TOK"; break;
-    case Token::DECLARE_HEAP_TOK: o << "DECLARE_HEAP_TOK"; break;
-    case Token::DECLARE_ORACLE_FUN_TOK: o << "DECLARE_ORACLE_FUN_TOK"; break;
     case Token::DECLARE_SORT_TOK: o << "DECLARE_SORT_TOK"; break;
     case Token::DECLARE_SORT_PARAMETER_TOK:
       o << "DECLARE_SORT_PARAMETER_TOK";
@@ -69,7 +66,6 @@ std::ostream& operator<<(std::ostream& o, Token t)
     case Token::LET_TOK: o << "LET_TOK"; break;
     case Token::LPAREN_TOK: o << "LPAREN_TOK"; break;
     case Token::MATCH_TOK: o << "MATCH_TOK"; break;
-    case Token::NUMERAL: o << "NUMERAL"; break;
     case Token::PAR_TOK: o << "PAR_TOK"; break;
     case Token::POP_TOK: o << "POP_TOK"; break;
     case Token::PUSH_TOK: o << "PUSH_TOK"; break;
@@ -78,7 +74,6 @@ std::ostream& operator<<(std::ostream& o, Token t)
     case Token::RESET_ASSERTIONS_TOK: o << "RESET_ASSERTIONS_TOK"; break;
     case Token::RESET_TOK: o << "RESET_TOK"; break;
     case Token::RPAREN_TOK: o << "RPAREN_TOK"; break;
-    case Token::SET_FEATURE_TOK: o << "SET_FEATURE_TOK"; break;
     case Token::SET_INFO_TOK: o << "SET_INFO_TOK"; break;
     case Token::SET_LOGIC_TOK: o << "SET_LOGIC_TOK"; break;
     case Token::SET_OPTION_TOK: o << "SET_OPTION_TOK"; break;

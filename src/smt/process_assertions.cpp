@@ -14,7 +14,6 @@
 
 #include <utility>
 
-#include "expr/beta_reduce_converter.h"
 #include "options/arith_options.h"
 #include "options/base_options.h"
 #include "options/bv_options.h"

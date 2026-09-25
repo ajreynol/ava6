@@ -24,7 +24,6 @@
 #include "theory/arith/nl/ext/flatten_monomial_check.h"
 #include "theory/arith/nl/ext/monomial_bounds_check.h"
 #include "theory/arith/nl/ext/monomial_check.h"
-#include "theory/arith/nl/ext/split_zero_check.h"
 #include "theory/arith/nl/ext/tangent_plane_check.h"
 #include "theory/arith/nl/ext_theory_callback.h"
 #include "theory/arith/nl/nl_model.h"
@@ -210,11 +209,6 @@ class NonlinearExtension : EnvObj
    */
   NlModel d_model;
 
-  /** The transcendental extension object
-   *
-   * This is the subsolver responsible for running the procedure for
-   * transcendental functions.
-   */
   /**
    * Holds common lookup data for the checks implemented in the "nl-ext"
    * solvers (from Cimatti et al., TACAS 2017).
@@ -228,30 +222,8 @@ class NonlinearExtension : EnvObj
   MonomialCheck d_monomialSlv;
   /** Solver for flattening monomials */
   FlattenMonomialCheck d_fmSlv;
-  /** Solver for lemmas that split multiplication at zero. */
-  SplitZeroCheck d_splitZeroSlv;
   /** Solver for tangent plane lemmas. */
   TangentPlaneCheck d_tangentPlaneSlv;
-  /** The coverings-based solver */
-  /** The ICP-based solver */
-  /** The integer and solver
-   *
-   * This is the subsolver responsible for running the procedure for
-   * constraints involving integer and.
-   */
-
-  /** The parametric integer and solver
-   *
-   * This is the subsolver responsible for running the procedure for
-   * constraints involving parametric integer and.
-   */
-
-  /** The pow2 solver
-   *
-   * This is the subsolver responsible for running the procedure for
-   * constraints involving powers of 2.
-   */
-
   /** The strategy for the nonlinear extension. */
   Strategy d_strategy;
 }; /* class NonlinearExtension */

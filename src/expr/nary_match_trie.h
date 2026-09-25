@@ -18,7 +18,7 @@
 #include <map>
 #include <vector>
 
-#include "expr/match_trie.h"
+#include "expr/notify_match.h"
 #include "expr/node.h"
 
 namespace ava6::internal {

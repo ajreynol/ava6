@@ -21,7 +21,6 @@
 #include "theory/quantifiers/ematching/inst_match_generator_simple.h"
 #include "theory/quantifiers/ematching/pattern_term_selector.h"
 #include "theory/quantifiers/ematching/relational_match_generator.h"
-#include "theory/quantifiers/ematching/var_match_generator.h"
 #include "theory/quantifiers/instantiate.h"
 #include "theory/quantifiers/quantifiers_state.h"
 #include "theory/quantifiers/term_database.h"
@@ -709,24 +708,6 @@ InstMatchGenerator* InstMatchGenerator::getInstMatchGenerator(Env& env,
                                                               AVA6_UNUSED Node q,
                                                               Node n)
 {
-  // maybe variable match generator
-  if (n.getKind() != Kind::INST_CONSTANT)
-  {
-    Trace("var-trigger-debug")
-        << "Is " << n << " a variable trigger?" << std::endl;
-    Node x;
-    
-    if (!x.isNull())
-    {
-      Node s = PatternTermSelector::getInversion(n, x);
-      s = env.getRewriter()->rewrite(s);
-      VarMatchGeneratorTermSubs* vmg =
-          new VarMatchGeneratorTermSubs(env, tparent, x, s);
-      Trace("var-trigger") << "Term substitution trigger : " << n
-                           << ", var = " << x << ", subs = " << s << std::endl;
-      return vmg;
-    }
-  }
   Trace("relational-trigger")
       << "Is " << n << " a relational trigger?" << std::endl;
   // relational triggers

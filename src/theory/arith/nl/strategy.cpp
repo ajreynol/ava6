@@ -26,23 +26,10 @@ std::ostream& operator<<(std::ostream& os, InferStep step)
 {
   switch (step)
   {
-    case InferStep::NONE: return os << "NONE";
     case InferStep::BREAK: return os << "BREAK";
     case InferStep::FLUSH_WAITING_LEMMAS: return os << "FLUSH_WAITING_LEMMAS";
-    case InferStep::COVERINGS_INIT: return os << "COVERINGS_INIT";
-    case InferStep::COVERINGS_FULL: return os << "COVERINGS_FULL";
     case InferStep::NL_FACTORING: return os << "NL_FACTORING";
     case InferStep::NL_FLATTEN_MON: return os << "NL_FLATTEN_MON";
-    case InferStep::IAND_INIT: return os << "IAND_INIT";
-    case InferStep::IAND_FULL: return os << "IAND_FULL";
-    case InferStep::IAND_INITIAL: return os << "IAND_INITIAL";
-    case InferStep::PIAND_INIT: return os << "PIAND_INIT";
-    case InferStep::PIAND_FULL: return os << "PIAND_FULL";
-    case InferStep::PIAND_INITIAL: return os << "PIAND_INITIAL";
-    case InferStep::POW2_INIT: return os << "POW2_INIT";
-    case InferStep::POW2_FULL: return os << "POW2_FULL";
-    case InferStep::POW2_INITIAL: return os << "POW2_INITIAL";
-    case InferStep::ICP: return os << "ICP";
     case InferStep::NL_INIT: return os << "NL_INIT";
     case InferStep::NL_MONOMIAL_INFER_BOUNDS:
       return os << "NL_MONOMIAL_INFER_BOUNDS";
@@ -53,16 +40,9 @@ std::ostream& operator<<(std::ostream& os, InferStep step)
     case InferStep::NL_MONOMIAL_MAGNITUDE2:
       return os << "NL_MONOMIAL_MAGNITUDE2";
     case InferStep::NL_MONOMIAL_SIGN: return os << "NL_MONOMIAL_SIGN";
-    case InferStep::NL_RESOLUTION_BOUNDS: return os << "NL_RESOLUTION_BOUNDS";
-    case InferStep::NL_SPLIT_ZERO: return os << "NL_SPLIT_ZERO";
     case InferStep::NL_TANGENT_PLANES: return os << "NL_TANGENT_PLANES";
     case InferStep::NL_TANGENT_PLANES_WAITING:
       return os << "NL_TANGENT_PLANES_WAITING";
-    case InferStep::TRANS_INIT: return os << "TRANS_INIT";
-    case InferStep::TRANS_INITIAL: return os << "TRANS_INITIAL";
-    case InferStep::TRANS_MONOTONIC: return os << "TRANS_MONOTONIC";
-    case InferStep::TRANS_TANGENT_PLANES: return os << "TRANS_TANGENT_PLANES";
-    case InferStep::UNKNOWN: return os << "?";
     default: Unreachable(); return os << "UNKNOWN_STEP";
   }
 }
@@ -76,50 +56,19 @@ inline StepSequence& operator<<(StepSequence& steps, InferStep s)
 }
 }  // namespace
 
-void Interleaving::add(const StepSequence& ss, std::size_t constant)
-{
-  d_branches.emplace_back(Branch{ss, constant});
-  d_size += constant;
-}
-void Interleaving::resetCounter() { d_counter = 0; }
-
-const StepSequence& Interleaving::get()
-{
-  Assert(!d_branches.empty())
-      << "Can not get next sequence from an empty interleaving.";
-  std::size_t cnt = d_counter;
-  // Increase the counter
-  d_counter = (d_counter + 1) % d_size;
-  for (const auto& branch : d_branches)
-  {
-    if (cnt < branch.d_interleavingConstant)
-    {
-      // This is the current branch
-      return branch.d_steps;
-    }
-    cnt -= branch.d_interleavingConstant;
-  }
-  DebugUnhandled() << "Something went wrong.";
-  return d_branches[0].d_steps;
-}
-bool Interleaving::empty() const { return d_branches.empty(); }
-
 bool StepGenerator::hasNext() const { return d_next < d_steps.size(); }
 InferStep StepGenerator::next() { return d_steps[d_next++]; }
 
-bool Strategy::isStrategyInit() const { return !d_interleaving.empty(); }
+bool Strategy::isStrategyInit() const { return d_initialized; }
 void Strategy::initializeStrategy(const Options& options)
 {
-  StepSequence one;
+  Assert(!d_initialized);
+  StepSequence& one = d_steps;
   
   if (options.arith.nlExt == options::NlExtMode::FULL
       || options.arith.nlExt == options::NlExtMode::LIGHT)
   {
     one << InferStep::NL_INIT << InferStep::BREAK;
-  }
-  if (options.arith.nlExt == options::NlExtMode::FULL)
-  {
-    
   }
   if (options.arith.nlExt == options::NlExtMode::FULL
       || options.arith.nlExt == options::NlExtMode::LIGHT)
@@ -144,11 +93,9 @@ void Strategy::initializeStrategy(const Options& options)
     one << InferStep::BREAK;
   }
   
-  if (options.arith.nlExt == options::NlExtMode::FULL
-      )
+  if (options.arith.nlExt == options::NlExtMode::FULL)
   {
-    // if nl-cov is not enabled or we forced it to be enabled, then we use
-    // heuristic non-terminating techniques as a last resort
+    // Use heuristic non-terminating techniques as a last resort.
     one << InferStep::FLUSH_WAITING_LEMMAS << InferStep::BREAK;
     if (options.arith.nlExtFactor)
     {
@@ -160,17 +107,14 @@ void Strategy::initializeStrategy(const Options& options)
     {
       one << InferStep::NL_TANGENT_PLANES_WAITING;
     }
-    if (options.arith.nlExtTfTangentPlanes)
-    {
-    }
     one << InferStep::BREAK;
   }
 
-  d_interleaving.add(one);
+  d_initialized = true;
 }
 StepGenerator Strategy::getStrategy()
 {
-  return StepGenerator(d_interleaving.get());
+  return StepGenerator(d_steps);
 }
 
 }  // namespace nl

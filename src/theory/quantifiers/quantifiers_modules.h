@@ -76,20 +76,14 @@ class QuantifiersModules
   std::unique_ptr<BoundedIntegers> d_bint;
   /** Conflict find mechanism for quantifiers */
   std::unique_ptr<QuantConflictFind> d_qcf;
-  /** Sub-conflict strategy */
-  /** subgoal generator */
-  /** ceg instantiation */
   /** full saturation */
   std::unique_ptr<InstStrategyEnum> d_fs;
-  /** pool-based instantiation */
   /** counterexample-based quantifier instantiation */
   std::unique_ptr<InstStrategyCegqi> d_i_cbqi;
   /** quantifiers splitting */
   std::unique_ptr<QuantDSplit> d_qsplit;
-  /** SyGuS instantiation engine */
   /** model-based quantifier instantiation */
   std::unique_ptr<InstStrategyMbqi> d_mbqi;
-  /** Oracle engine */
 };
 
 }  // namespace quantifiers

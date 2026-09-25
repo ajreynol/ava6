@@ -137,14 +137,8 @@ class QuantifiersEngine : protected EnvObj
    * answer "unknown" instead of "sat".
    */
   void checkInternal(Theory::Effort e, IncompleteId& setModelUnsoundId);
-  /**
-   * Return true if we should recheck
-   * @param e the effort level
-   * @param setModelUnsoundId the incomplete id indicating why we are currently
-   * answering "unknown".
-   */
-  bool shouldRecheck(AVA6_UNUSED Theory::Effort e,
-                     IncompleteId setModelUnsoundId);
+  /** Mark delayed terms relevant and return true if we should recheck. */
+  bool shouldRecheck();
   //---------------------- private initialization
   /**
    * Finish initialize, which passes pointers to the objects that quantifiers

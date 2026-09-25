@@ -35,11 +35,6 @@ name    = "INST_CONSTANT"
 comment = "instantiation constant"
 
 [[kinds]]
-type    = "variable"
-name    = "ORACLE"
-comment = "oracle"
-
-[[kinds]]
 type         = "sort"
 name         = "BOUND_VAR_LIST_TYPE"
 cardinality  = "Cardinality::INTEGERS"
@@ -83,13 +78,6 @@ name     = "INST_ATTRIBUTE"
 children = "1:"
 comment  = "instantiation attribute"
 typerule = "::ava6::internal::theory::quantifiers::QuantifierAnnotationTypeRule"
-
-[[kinds]]
-type     = "operator"
-name     = "ORACLE_FORMULA_GEN"
-children = 2
-comment  = "oracle interface"
-typerule = "::ava6::internal::theory::quantifiers::QuantifierOracleFormulaGenTypeRule"
 
 [[kinds]]
 type         = "sort"

@@ -57,71 +57,17 @@ const char* toString(InferenceId i)
     case InferenceId::ARITH_PP_ELIM_OPERATORS: return "ARITH_PP_ELIM_OPERATORS";
     case InferenceId::ARITH_PP_ELIM_OPERATORS_LEMMA:
       return "ARITH_PP_ELIM_OPERATORS_LEMMA";
-    case InferenceId::ARITH_NL_CONGRUENCE: return "ARITH_NL_CONGRUENCE";
     case InferenceId::ARITH_NL_SHARED_TERM_SPLIT:
       return "ARITH_NL_SHARED_TERM_SPLIT";
     case InferenceId::ARITH_NL_SHARED_TERM_FACTOR_SPLIT:
       return "ARITH_NL_SHARED_TERM_FACTOR_SPLIT";
-    case InferenceId::ARITH_NL_SPLIT_ZERO: return "ARITH_NL_SPLIT_ZERO";
     case InferenceId::ARITH_NL_SIGN: return "ARITH_NL_SIGN";
     case InferenceId::ARITH_NL_COMPARISON: return "ARITH_NL_COMPARISON";
     case InferenceId::ARITH_NL_INFER_BOUNDS_NT:
       return "ARITH_NL_INFER_BOUNDS_NT";
     case InferenceId::ARITH_NL_FACTOR: return "ARITH_NL_FACTOR";
-    case InferenceId::ARITH_NL_RES_INFER_BOUNDS:
-      return "ARITH_NL_RES_INFER_BOUNDS";
     case InferenceId::ARITH_NL_TANGENT_PLANE: return "ARITH_NL_TANGENT_PLANE";
     case InferenceId::ARITH_NL_FLATTEN_MON: return "ARITH_NL_FLATTEN_MON";
-    case InferenceId::ARITH_NL_T_SINE_SYMM: return "ARITH_NL_T_SINE_SYMM";
-    case InferenceId::ARITH_NL_T_SINE_BOUNDARY_REDUCE:
-      return "ARITH_NL_T_SINE_BOUNDARY_REDUCE";
-    case InferenceId::ARITH_NL_T_PURIFY_ARG: return "ARITH_NL_T_PURIFY_ARG";
-    case InferenceId::ARITH_NL_T_PURIFY_ARG_PHASE_SHIFT:
-      return "ARITH_NL_T_PURIFY_ARG_PHASE_SHIFT";
-    case InferenceId::ARITH_NL_T_INIT_REFINE: return "ARITH_NL_T_INIT_REFINE";
-    case InferenceId::ARITH_NL_T_PI_BOUND: return "ARITH_NL_T_PI_BOUND";
-    case InferenceId::ARITH_NL_T_MONOTONICITY: return "ARITH_NL_T_MONOTONICITY";
-    case InferenceId::ARITH_NL_T_SECANT: return "ARITH_NL_T_SECANT";
-    case InferenceId::ARITH_NL_T_TANGENT: return "ARITH_NL_T_TANGENT";
-    case InferenceId::ARITH_NL_IAND_INIT_REFINE:
-      return "ARITH_NL_IAND_INIT_REFINE";
-    case InferenceId::ARITH_NL_IAND_VALUE_REFINE:
-      return "ARITH_NL_IAND_VALUE_REFINE";
-    case InferenceId::ARITH_NL_IAND_SUM_REFINE:
-      return "ARITH_NL_IAND_SUM_REFINE";
-    case InferenceId::ARITH_NL_IAND_BITWISE_REFINE:
-      return "ARITH_NL_IAND_BITWISE_REFINE";
-    case InferenceId::ARITH_NL_PIAND_INIT_REFINE:
-      return "ARITH_NL_PIAND_INIT_REFINE";
-    case InferenceId::ARITH_NL_PIAND_SUM_REFINE:
-      return "ARITH_NL_PIAND_SUM_REFINE";
-    case InferenceId::ARITH_NL_PIAND_BASE_CASE_REFINE:
-      return "ARITH_NL_PIAND_BASE_CASE_REFINE";
-    case InferenceId::ARITH_NL_PIAND_DIFFERENCE_REFINE:
-      return "ARITH_NL_PIAND_DIFFERENCE_REFINE";
-    case InferenceId::ARITH_NL_PIAND_SYMETRY_REFINE:
-      return "ARITH_NL_PIAND_SYMETRY_REFINE";
-    case InferenceId::ARITH_NL_PIAND_CONTRADITION_REFINE:
-      return "ARITH_NL_PIAND_CONTRADITION_REFINE";
-    case InferenceId::ARITH_NL_PIAND_ONE_REFINE:
-      return "ARITH_NL_PIAND_ONE_REFINE";
-    case InferenceId::ARITH_NL_POW2_INIT_REFINE:
-      return "ARITH_NL_POW2_INIT_REFINE";
-    case InferenceId::ARITH_NL_POW2_VALUE_REFINE:
-      return "ARITH_NL_POW2_VALUE_REFINE";
-    case InferenceId::ARITH_NL_POW2_MONOTONE_REFINE:
-      return "ARITH_NL_POW2_MONOTONE_REFINE";
-    case InferenceId::ARITH_NL_POW2_DIV0_CASE_REFINE:
-      return "ARITH_NL_POW2_DIV0_CASE_REFINE";
-    case InferenceId::ARITH_NL_POW2_LOWER_BOUND_CASE_REFINE:
-      return "ARITH_NL_POW2_LOWER_BOUND_CASE_REFINE";
-    case InferenceId::ARITH_NL_COVERING_CONFLICT:
-      return "ARITH_NL_COVERING_CONFLICT";
-    case InferenceId::ARITH_NL_COVERING_EXCLUDED_INTERVAL:
-      return "ARITH_NL_COVERING_EXCLUDED_INTERVAL";
-    case InferenceId::ARITH_NL_ICP_CONFLICT: return "ARITH_NL_ICP_CONFLICT";
-    case InferenceId::ARITH_NL_ICP_PROPAGATION:
-      return "ARITH_NL_ICP_PROPAGATION";
     case InferenceId::ARRAYS_EXT: return "ARRAYS_EXT";
     case InferenceId::ARRAYS_READ_OVER_WRITE: return "ARRAYS_READ_OVER_WRITE";
     case InferenceId::ARRAYS_READ_OVER_WRITE_1:
@@ -132,7 +78,6 @@ const char* toString(InferenceId i)
       return "ARRAYS_CONST_ARRAY_DEFAULT";
     case InferenceId::ARRAYS_EQ_TAUTOLOGY: return "ARRAYS_EQ_TAUTOLOGY";
 
-    case InferenceId::BV_BITBLAST_CONFLICT: return "BV_BITBLAST_CONFLICT";
     case InferenceId::BV_BITBLAST_INTERNAL_EAGER_LEMMA:
       return "BV_BITBLAST_EAGER_LEMMA";
     case InferenceId::BV_BITBLAST_INTERNAL_BITBLAST_LEMMA:
@@ -142,7 +87,6 @@ const char* toString(InferenceId i)
     case InferenceId::DATATYPES_UNIF: return "DATATYPES_UNIF";
     case InferenceId::DATATYPES_INST: return "DATATYPES_INST";
     case InferenceId::DATATYPES_SPLIT: return "DATATYPES_SPLIT";
-    case InferenceId::DATATYPES_BINARY_SPLIT: return "DATATYPES_BINARY_SPLIT";
     case InferenceId::DATATYPES_LABEL_EXH: return "DATATYPES_LABEL_EXH";
     case InferenceId::DATATYPES_COLLAPSE_SEL: return "DATATYPES_COLLAPSE_SEL";
     case InferenceId::DATATYPES_CLASH_CONFLICT:
@@ -152,7 +96,6 @@ const char* toString(InferenceId i)
     case InferenceId::DATATYPES_TESTER_MERGE_CONFLICT:
       return "DATATYPES_TESTER_MERGE_CONFLICT";
     case InferenceId::DATATYPES_CYCLE: return "DATATYPES_CYCLE";
-    case InferenceId::DATATYPES_HEIGHT_ZERO: return "DATATYPES_HEIGHT_ZERO";
     case InferenceId::QUANTIFIERS_INST_E_MATCHING:
       return "QUANTIFIERS_INST_E_MATCHING";
     case InferenceId::QUANTIFIERS_INST_E_MATCHING_SIMPLE:
@@ -161,19 +104,12 @@ const char* toString(InferenceId i)
       return "QUANTIFIERS_INST_E_MATCHING_MT";
     case InferenceId::QUANTIFIERS_INST_E_MATCHING_MTL:
       return "QUANTIFIERS_INST_E_MATCHING_MTL";
-    case InferenceId::QUANTIFIERS_INST_E_MATCHING_HO:
-      return "QUANTIFIERS_INST_E_MATCHING_HO";
-    case InferenceId::QUANTIFIERS_INST_E_MATCHING_VAR_GEN:
-      return "QUANTIFIERS_INST_E_MATCHING_VAR_GEN";
     case InferenceId::QUANTIFIERS_INST_E_MATCHING_RELATIONAL:
       return "QUANTIFIERS_INST_E_MATCHING_RELATIONAL";
     case InferenceId::QUANTIFIERS_INST_CBQI_CONFLICT:
       return "QUANTIFIERS_INST_CBQI_CONFLICT";
     case InferenceId::QUANTIFIERS_INST_CBQI_PROP:
       return "QUANTIFIERS_INST_CBQI_PROP";
-    case InferenceId::QUANTIFIERS_INST_SUB_CONFLICT:
-      return "QUANTIFIERS_INST_SUB_CONFLICT";
-    case InferenceId::QUANTIFIERS_SUB_UC: return "QUANTIFIERS_SUB_UC";
     case InferenceId::QUANTIFIERS_INST_FMF_EXH:
       return "QUANTIFIERS_INST_FMF_EXH";
     case InferenceId::QUANTIFIERS_INST_FMF_FMC:
@@ -181,18 +117,13 @@ const char* toString(InferenceId i)
     case InferenceId::QUANTIFIERS_INST_FMF_FMC_EXH:
       return "QUANTIFIERS_INST_FMF_FMC_EXH";
     case InferenceId::QUANTIFIERS_INST_CEGQI: return "QUANTIFIERS_INST_CEGQI";
-    case InferenceId::QUANTIFIERS_INST_SYQI: return "QUANTIFIERS_INST_SYQI";
     case InferenceId::QUANTIFIERS_INST_MBQI: return "QUANTIFIERS_INST_MBQI";
-    case InferenceId::QUANTIFIERS_INST_MBQI_ENUM:
-      return "QUANTIFIERS_INST_MBQI_ENUM";
     case InferenceId::QUANTIFIERS_INST_ENUM: return "QUANTIFIERS_INST_ENUM";
     case InferenceId::QUANTIFIERS_BINT_PROXY: return "QUANTIFIERS_BINT_PROXY";
     case InferenceId::QUANTIFIERS_BINT_MIN_NG: return "QUANTIFIERS_BINT_MIN_NG";
     case InferenceId::QUANTIFIERS_CEGQI_CEX: return "QUANTIFIERS_CEGQI_CEX";
     case InferenceId::QUANTIFIERS_CEGQI_CEX_AUX:
       return "QUANTIFIERS_CEGQI_CEX_AUX";
-    case InferenceId::QUANTIFIERS_CEGQI_NESTED_QE:
-      return "QUANTIFIERS_CEGQI_NESTED_QE";
     case InferenceId::QUANTIFIERS_CEGQI_CEX_DEP:
       return "QUANTIFIERS_CEGQI_CEX_DEP";
     case InferenceId::QUANTIFIERS_CEGQI_VTS_LB_DELTA:
@@ -201,22 +132,7 @@ const char* toString(InferenceId i)
       return "QUANTIFIERS_CEGQI_VTS_UB_DELTA";
     case InferenceId::QUANTIFIERS_CEGQI_VTS_LB_INF:
       return "QUANTIFIERS_CEGQI_VTS_LB_INF";
-    case InferenceId::QUANTIFIERS_MBQI_ENUM_CHOICE:
-      return "QUANTIFIERS_MBQI_ENUM_CHOICE";
-    case InferenceId::QUANTIFIERS_ORACLE_INTERFACE:
-      return "QUANTIFIERS_ORACLE_INTERFACE";
-    case InferenceId::QUANTIFIERS_ORACLE_PURIFY_SUBS:
-      return "QUANTIFIERS_ORACLE_PURIFY_SUBS";
-    case InferenceId::QUANTIFIERS_SYQI_CEX: return "QUANTIFIERS_SYQI_CEX";
-    case InferenceId::QUANTIFIERS_SYQI_EVAL_UNFOLD:
-      return "QUANTIFIERS_SYQI_EVAL_UNFOLD";
-    case InferenceId::QUANTIFIERS_SYGUS_NO_WF_GRAMMAR:
-      return "QUANTIFIERS_SYGUS_NO_WF_GRAMMAR";
     case InferenceId::QUANTIFIERS_DSPLIT: return "QUANTIFIERS_DSPLIT";
-    case InferenceId::QUANTIFIERS_CONJ_GEN_SPLIT:
-      return "QUANTIFIERS_CONJ_GEN_SPLIT";
-    case InferenceId::QUANTIFIERS_CONJ_GEN_GT_ENUM:
-      return "QUANTIFIERS_CONJ_GEN_GT_ENUM";
     case InferenceId::QUANTIFIERS_SKOLEMIZE: return "QUANTIFIERS_SKOLEMIZE";
     case InferenceId::QUANTIFIERS_REDUCE_ALPHA_EQ:
       return "QUANTIFIERS_REDUCE_ALPHA_EQ";
@@ -236,11 +152,6 @@ const char* toString(InferenceId i)
     case InferenceId::SETS_EQ_CONFLICT: return "SETS_EQ_CONFLICT";
     case InferenceId::SETS_EQ_MEM: return "SETS_EQ_MEM";
     case InferenceId::SETS_EQ_MEM_CONFLICT: return "SETS_EQ_MEM_CONFLICT";
-    case InferenceId::SETS_FILTER_DOWN: return "SETS_FILTER_DOWN";
-    case InferenceId::SETS_FILTER_UP: return "SETS_FILTER_UP";
-    case InferenceId::SETS_FOLD: return "SETS_FOLD";
-    case InferenceId::SETS_MAP_DOWN_POSITIVE: return "SETS_MAP_DOWN_POSITIVE";
-    case InferenceId::SETS_MAP_UP: return "SETS_MAP_UP";
     case InferenceId::SETS_MEM_EQ: return "SETS_MEM_EQ";
     case InferenceId::SETS_MEM_EQ_CONFLICT: return "SETS_MEM_EQ_CONFLICT";
     case InferenceId::SETS_PROXY: return "SETS_PROXY";
@@ -248,58 +159,6 @@ const char* toString(InferenceId i)
     case InferenceId::SETS_SINGLETON_EQ: return "SETS_SINGLETON_EQ";
     case InferenceId::SETS_UP_CLOSURE: return "SETS_UP_CLOSURE";
     case InferenceId::SETS_UP_CLOSURE_2: return "SETS_UP_CLOSURE_2";
-    case InferenceId::SETS_UP_UNIV: return "SETS_UP_UNIV";
-    case InferenceId::SETS_CARD_SPLIT_EMPTY: return "SETS_CARD_SPLIT_EMPTY";
-    case InferenceId::SETS_CARD_SPLIT_EQ: return "SETS_CARD_SPLIT_EQ";
-    case InferenceId::SETS_CARD_CYCLE: return "SETS_CARD_CYCLE";
-    case InferenceId::SETS_CARD_EQUAL: return "SETS_CARD_EQUAL";
-    case InferenceId::SETS_CARD_GRAPH_EMP: return "SETS_CARD_GRAPH_EMP";
-    case InferenceId::SETS_CARD_GRAPH_EMP_PARENT:
-      return "SETS_CARD_GRAPH_EMP_PARENT";
-    case InferenceId::SETS_CARD_GRAPH_EQ_PARENT:
-      return "SETS_CARD_GRAPH_EQ_PARENT";
-    case InferenceId::SETS_CARD_GRAPH_EQ_PARENT_2:
-      return "SETS_CARD_GRAPH_EQ_PARENT_2";
-    case InferenceId::SETS_CARD_GRAPH_PARENT_SINGLETON:
-      return "SETS_CARD_GRAPH_PARENT_SINGLETON";
-    case InferenceId::SETS_CARD_MINIMAL: return "SETS_CARD_MINIMAL";
-    case InferenceId::SETS_CARD_NEGATIVE_MEMBER:
-      return "SETS_CARD_NEGATIVE_MEMBER";
-    case InferenceId::SETS_CARD_POSITIVE: return "SETS_CARD_POSITIVE";
-    case InferenceId::SETS_CARD_UNIV_SUPERSET: return "SETS_CARD_UNIV_SUPERSET";
-    case InferenceId::SETS_CARD_UNIV_TYPE: return "SETS_CARD_UNIV_TYPE";
-    case InferenceId::SETS_RELS_IDENTITY_DOWN: return "SETS_RELS_IDENTITY_DOWN";
-    case InferenceId::SETS_RELS_IDENTITY_UP: return "SETS_RELS_IDENTITY_UP";
-    case InferenceId::SETS_RELS_JOIN_COMPOSE: return "SETS_RELS_JOIN_COMPOSE";
-    case InferenceId::SETS_RELS_JOIN_IMAGE_DOWN:
-      return "SETS_RELS_JOIN_IMAGE_DOWN";
-    case InferenceId::SETS_RELS_JOIN_IMAGE_UP: return "SETS_RELS_JOIN_IMAGE_UP";
-    case InferenceId::SETS_RELS_JOIN_SPLIT_1: return "SETS_RELS_JOIN_SPLIT_1";
-    case InferenceId::SETS_RELS_JOIN_SPLIT_2: return "SETS_RELS_JOIN_SPLIT_2";
-    case InferenceId::SETS_RELS_TABLE_JOIN_UP: return "SETS_RELS_TABLE_JOIN_UP";
-    case InferenceId::SETS_RELS_TABLE_JOIN_DOWN:
-      return "SETS_RELS_TABLE_JOIN_DOWN";
-    case InferenceId::SETS_RELS_PRODUCE_COMPOSE:
-      return "SETS_RELS_PRODUCE_COMPOSE";
-    case InferenceId::SETS_RELS_PRODUCT_SPLIT: return "SETS_RELS_PRODUCT_SPLIT";
-    case InferenceId::SETS_RELS_TCLOSURE_UP: return "SETS_RELS_TCLOSURE_UP";
-    case InferenceId::SETS_RELS_TCLOSURE_DOWN: return "SETS_RELS_TCLOSURE_DOWN";
-    case InferenceId::SETS_RELS_TRANSPOSE_EQ: return "SETS_RELS_TRANSPOSE_EQ";
-    case InferenceId::SETS_RELS_TRANSPOSE_REV: return "SETS_RELS_TRANSPOSE_REV";
-    case InferenceId::SETS_RELS_TUPLE_REDUCTION:
-      return "SETS_RELS_TUPLE_REDUCTION";
-    case InferenceId::SETS_RELS_GROUP_NOT_EMPTY:
-      return "SETS_RELS_GROUP_NOT_EMPTY";
-    case InferenceId::SETS_RELS_GROUP_UP1: return "SETS_RELS_GROUP_UP1";
-    case InferenceId::SETS_RELS_GROUP_UP2: return "SETS_RELS_GROUP_UP2";
-    case InferenceId::SETS_RELS_GROUP_DOWN: return "SETS_RELS_GROUP_DOWN";
-    case InferenceId::SETS_RELS_GROUP_PART_MEMBER:
-      return "SETS_RELS_GROUP_PART_MEMBER";
-    case InferenceId::SETS_RELS_GROUP_SAME_PROJECTION:
-      return "SETS_RELS_GROUP_SAME_PROJECTION";
-    case InferenceId::SETS_RELS_GROUP_SAME_PART:
-      return "SETS_RELS_GROUP_SAME_PART";
-
     case InferenceId::STRINGS_I_NORM_S: return "STRINGS_I_NORM_S";
     case InferenceId::STRINGS_I_CONST_MERGE: return "STRINGS_I_CONST_MERGE";
     case InferenceId::STRINGS_I_CONST_CONFLICT:
@@ -354,25 +213,6 @@ const char* toString(InferenceId i)
     case InferenceId::STRINGS_DEQ_EXTENSIONALITY:
       return "STRINGS_DEQ_EXTENSIONALITY";
     case InferenceId::STRINGS_CODE_INJ: return "STRINGS_CODE_INJ";
-    case InferenceId::STRINGS_ARRAY_UPDATE_UNIT:
-      return "STRINGS_ARRAY_UPDATE_UNIT";
-    case InferenceId::STRINGS_ARRAY_UPDATE_CONCAT:
-      return "STRINGS_ARRAY_UPDATE_CONCAT";
-    case InferenceId::STRINGS_ARRAY_UPDATE_CONCAT_INVERSE:
-      return "STRINGS_ARRAY_UPDATE_CONCAT_INVERSE";
-    case InferenceId::STRINGS_ARRAY_NTH_UNIT: return "STRINGS_ARRAY_NTH_UNIT";
-    case InferenceId::STRINGS_ARRAY_NTH_CONCAT:
-      return "STRINGS_ARRAY_NTH_CONCAT";
-    case InferenceId::STRINGS_ARRAY_NTH_EXTRACT:
-      return "STRINGS_ARRAY_NTH_EXTRACT";
-    case InferenceId::STRINGS_ARRAY_NTH_UPDATE:
-      return "STRINGS_ARRAY_NTH_UPDATE";
-    case InferenceId::STRINGS_ARRAY_NTH_TERM_FROM_UPDATE:
-      return "STRINGS_ARRAY_NTH_TERM_FROM_UPDATE";
-    case InferenceId::STRINGS_ARRAY_UPDATE_BOUND:
-      return "STRINGS_ARRAY_UPDATE_BOUND";
-    case InferenceId::STRINGS_ARRAY_EQ_SPLIT: return "STRINGS_ARRAY_EQ_SPLIT";
-    case InferenceId::STRINGS_ARRAY_NTH_REV: return "STRINGS_ARRAY_NTH_REV";
     case InferenceId::STRINGS_RE_NF_CONFLICT: return "STRINGS_RE_NF_CONFLICT";
     case InferenceId::STRINGS_RE_UNFOLD_POS: return "STRINGS_RE_UNFOLD_POS";
     case InferenceId::STRINGS_RE_UNFOLD_NEG: return "STRINGS_RE_UNFOLD_NEG";
@@ -413,8 +253,6 @@ const char* toString(InferenceId i)
     case InferenceId::UF_DISTINCT_DEQ_MODEL: return "UF_DISTINCT_DEQ_MODEL";
     case InferenceId::UF_ARITH_BV_CONV_REDUCTION:
       return "UF_ARITH_BV_CONV_REDUCTION";
-    case InferenceId::UF_ARITH_BV_CONV_VALUE_REFINE:
-      return "UF_ARITH_BV_CONV_VALUE_REFINE";
     case InferenceId::UNKNOWN: return "?";
 
     default:

@@ -184,37 +184,6 @@ TypeNode QuantifierInstPatternListTypeRule::computeType(
   return nodeManager->instPatternListType();
 }
 
-TypeNode QuantifierOracleFormulaGenTypeRule::preComputeType(NodeManager* nm,
-                                                            AVA6_UNUSED TNode n)
-{
-  return nm->booleanType();
-}
-TypeNode QuantifierOracleFormulaGenTypeRule::computeType(
-    NodeManager* nodeManager, TNode n, bool check, std::ostream* errOut)
-{
-  Assert(n.getKind() == Kind::ORACLE_FORMULA_GEN);
-  if (check)
-  {
-    if (!n[0].getTypeOrNull().isBoolean())
-    {
-      if (errOut)
-      {
-        (*errOut) << "expected Boolean for oracle interface assumption";
-      }
-      return TypeNode::null();
-    }
-    if (!n[1].getTypeOrNull().isBoolean())
-    {
-      if (errOut)
-      {
-        (*errOut) << "expected Boolean for oracle interface constraint";
-      }
-      return TypeNode::null();
-    }
-  }
-  return nodeManager->booleanType();
-}
-
 }  // namespace quantifiers
 }  // namespace theory
 }  // namespace ava6::internal

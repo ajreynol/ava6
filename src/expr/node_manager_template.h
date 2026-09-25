@@ -44,7 +44,6 @@ class SkolemManager;
 class BoundVarManager;
 
 class DType;
-class Oracle;
 class Integer;
 class Rational;
 
@@ -753,18 +752,6 @@ class NodeManager
   /** Make an unresolved datatype sort */
   TypeNode mkUnresolvedDatatypeSort(const std::string& name, size_t arity = 0);
 
-  /**
-   * Make an oracle node. This returns a constant of kind ORACLE that stores
-   * the given method in an Oracle object. This Oracle can later be obtained by
-   * getOracleFor below.
-   */
-  Node mkOracle(Oracle& o);
-
-  /**
-   * Get the oracle for an oracle node n, which should have kind ORACLE.
-   */
-  const Oracle& getOracleFor(const Node& n) const;
-
  private:
   /**
    * Make a set of types representing the given datatypes, which may
@@ -1055,8 +1042,6 @@ class NodeManager
   /** A list of datatypes owned by this node manager */
   std::vector<std::unique_ptr<DType>> d_dtypes;
 
-  /** A list of oracles owned by this node manager */
-  std::vector<std::unique_ptr<Oracle>> d_oracles;
 
   /** A mapping for sorts allocated by mkSortConstructor where fresh is false */
   std::map<std::pair<std::string, size_t>, TypeNode> d_nfreshSorts;

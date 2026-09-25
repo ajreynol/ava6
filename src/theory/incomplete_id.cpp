@@ -29,13 +29,8 @@ const char* toString(IncompleteId i)
     case IncompleteId::QUANTIFIERS: return "QUANTIFIERS";
     case IncompleteId::QUANTIFIERS_FMF: return "QUANTIFIERS_FMF";
     case IncompleteId::QUANTIFIERS_CEGQI: return "QUANTIFIERS_CEGQI";
-    case IncompleteId::QUANTIFIERS_RECORDED_INST:
-      return "QUANTIFIERS_RECORDED_INST";
     case IncompleteId::QUANTIFIERS_MAX_INST_ROUNDS:
       return "QUANTIFIERS_MAX_INST_ROUNDS";
-    case IncompleteId::QUANTIFIERS_SYGUS_NO_WF_GRAMMAR:
-      return "QUANTIFIERS_SYGUS_NO_WF_GRAMMAR";
-    case IncompleteId::SETS_RELS_CARD: return "SETS_RELS_CARD";
     case IncompleteId::STRINGS_LOOP_SKIP: return "STRINGS_LOOP_SKIP";
     case IncompleteId::STRINGS_REGEXP_NO_SIMPLIFY:
       return "STRINGS_REGEXP_NO_SIMPLIFY";

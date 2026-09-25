@@ -99,15 +99,12 @@ class CegInstantiator : protected EnvObj
    * Instantiate::addInstantiation(...)
    * was successfully made in a recursive call.
    *
-   * The solved form sf is reverted to its original state if
-   *   this function returns false, or
-   *   revertOnSuccess is true and this function returns true.
+   * The solved form sf is reverted if this function returns false.
    */
   bool constructInstantiationInc(Node pv,
                                  Node n,
                                  TermProperties& pv_prop,
-                                 SolvedForm& sf,
-                                 bool revertOnSuccess = false);
+                                 SolvedForm& sf);
   /** get the current model value of term n */
   Node getModelValue(Node n);
   /** get bound variable for type

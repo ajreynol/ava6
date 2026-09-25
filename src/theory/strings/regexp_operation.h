@@ -16,7 +16,6 @@
 #define AVA6__THEORY__STRINGS__REGEXP__OPERATION_H
 
 #include <map>
-#include <set>
 #include <unordered_map>
 #include <vector>
 
@@ -53,56 +52,23 @@ enum RegExpConstType
 
 class RegExpOpr : protected EnvObj
 {
-  typedef std::pair<Node, ava6::internal::String> PairNodeStr;
-  typedef std::set<Node> SetNodes;
   typedef std::pair<Node, Node> PairNodes;
 
  private:
-  /** the code point of the last character in the alphabet we are using */
-  uint32_t d_lastchar;
   Node d_emptyString;
-  Node d_true;
-  Node d_false;
-  Node d_emptySingleton;
-  Node d_emptyRegexp;
-  Node d_zero;
-  Node d_one;
 
-  Node d_sigma;
-  Node d_sigma_star;
 
   /** A cache for simplify */
   std::map<Node, Node> d_simpCache;
   std::map<Node, std::pair<int, Node> > d_delta_cache;
-  std::map<PairNodeStr, Node> d_dv_cache;
-  std::map<PairNodeStr, std::pair<Node, int> > d_deriv_cache;
   /** cache mapping regular expressions to whether they contain constants */
   std::unordered_map<Node, RegExpConstType> d_constCache;
-  std::map<Node, std::pair<std::set<unsigned>, std::set<Node> > > d_fset_cache;
-  std::map<PairNodes, Node> d_inter_cache;
-  std::map<Node, std::vector<PairNodes> > d_split_cache;
   std::map<PairNodes, bool> d_inclusionCache;
   /**
    * Helper function for mkString, pretty prints constant or variable regular
    * expression r.
    */
   static std::string niceChar(Node r);
-  Node mkAllExceptOne(unsigned c);
-  bool isPairNodesInSet(std::set<PairNodes>& s, Node n1, Node n2);
-
-  bool containC2(unsigned cnt, Node n);
-  Node convert1(unsigned cnt, Node n);
-  void convert2(unsigned cnt, Node n, Node& r1, Node& r2);
-  Node intersectInternal(Node r1,
-                         Node r2,
-                         std::map<PairNodes, Node> cache,
-                         unsigned cnt);
-  /**
-   * Given a regular expression r, this returns an equivalent regular expression
-   * that contains no applications of intersection.
-   */
-  Node removeIntersection(Node r);
-  void firstChars(Node r, std::set<unsigned>& pcset, SetNodes& pvset);
 
  public:
   RegExpOpr(Env& env, SkolemCache* sc);
@@ -173,13 +139,6 @@ class RegExpOpr : protected EnvObj
    * - delta( (re.union (re.* "A") R) ) returns 1.
    */
   int delta(Node r, Node& exp);
-  int derivativeS(Node r, ava6::internal::String c, Node& retNode);
-  Node derivativeSingle(Node r, ava6::internal::String c);
-  /**
-   * Returns the regular expression intersection of r1 and r2. If r1 or r2 is
-   * not constant, then this method returns null.
-   */
-  Node intersect(Node r1, Node r2);
   /** Get the pretty printed version of the regular expression r */
   static std::string mkString(Node r);
 

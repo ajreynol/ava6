@@ -23,7 +23,6 @@
 #include "expr/metakind.h"
 #include "expr/node_manager.h"
 #include "expr/node_manager_attributes.h"
-#include "expr/oracle.h"
 #include "expr/skolem_manager.h"
 #include "expr/type_checker.h"
 #include "expr/type_properties.h"
@@ -220,9 +219,8 @@ NodeManager::~NodeManager()
   d_rt_cache.d_children.clear();
   d_rt_cache.d_data = dummy;
 
-  // clear the datatypes, oracles and declared sorts
+  // clear the datatypes and declared sorts
   d_dtypes.clear();
-  d_oracles.clear();
   d_nfreshSorts.clear();
   d_nfreshVars.clear();
 
@@ -1002,25 +1000,6 @@ TypeNode NodeManager::mkUnresolvedDatatypeSort(const std::string& name,
   // mark that it is an unresolved sort
   setAttribute(usort, expr::UnresolvedDatatypeAttr(), true);
   return usort;
-}
-
-Node NodeManager::mkOracle(Oracle& o)
-{
-  Node n = NodeBuilder(this, Kind::ORACLE);
-  n.setAttribute(TypeAttr(), builtinOperatorType());
-  n.setAttribute(TypeCheckedAttr(), true);
-  n.setAttribute(OracleIndexAttr(), d_oracles.size());
-  // we allocate a new oracle, to take ownership
-  d_oracles.push_back(std::unique_ptr<Oracle>(new Oracle(o.getFunction())));
-  return n;
-}
-
-const Oracle& NodeManager::getOracleFor(const Node& n) const
-{
-  Assert(n.getKind() == Kind::ORACLE);
-  size_t index = n.getAttribute(OracleIndexAttr());
-  Assert(index < d_oracles.size());
-  return *d_oracles[index];
 }
 
 Node NodeManager::mkVar(const std::string& name,

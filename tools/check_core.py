@@ -96,7 +96,10 @@ def main():
                    '--sat-solver=minisat', '--sat-solver=cadical',
                    '--ee-mode=distributed', '--ee-mode=central',
                    '--dt-shared-sel', '--check-synth-sol', '--model-cores=simple',
-                   '--interactive', '--help-option-categories', '--output=normalize']:
+                   '--interactive', '--help-option-categories', '--output=normalize',
+                   '--nl-cov-linear-model=none', '--cegis-sample=none',
+                   '--sub-cbqi-timeout=1', '--elim-taut-quant',
+                   '--sat-random-seed=1', '--nl-ext-tf-tplanes']:
         result = run(args.binary, '(check-sat)', option)
         assert result.returncode != 0, (option, result.stdout)
     for text in ['(set-logic HO_ALL)',

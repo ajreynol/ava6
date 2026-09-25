@@ -1415,18 +1415,6 @@ void Smt2Printer::toStreamCmdDeclareFunction(
   out << ')';
 }
 
-void Smt2Printer::toStreamCmdDeclareOracleFun(
-    std::ostream& out,
-    const std::string& id,
-    const std::vector<TypeNode>& argTypes,
-    TypeNode type,
-    const std::string& binName) const
-{
-  out << "(declare-oracle-fun " << ava6::internal::quoteSymbol(id) << " ";
-  toStreamDeclareType(out, argTypes, type);
-  out << " " << binName << ")";
-}
-
 void Smt2Printer::toStreamCmdDefineFunction(std::ostream& out,
                                             const std::string& id,
                                             const std::vector<Node>& formals,

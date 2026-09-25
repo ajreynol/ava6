@@ -103,21 +103,6 @@ struct QuantifierInstPatternListTypeRule
                               std::ostream* errOut);
 };
 
-/**
- * Type rule for oracle formula generators, which are used as the bodies
- * of quantified formulas that specify oracle interfaces. The type rule
- * ensures its two children are of type Boolean, and returns the Boolean type.
- */
-struct QuantifierOracleFormulaGenTypeRule
-{
-  static TypeNode preComputeType(NodeManager* nm, TNode n);
-
-  static TypeNode computeType(NodeManager* nodeManager,
-                              TNode n,
-                              bool check,
-                              std::ostream* errOut);
-};
-
 }  // namespace quantifiers
 }  // namespace theory
 }  // namespace ava6::internal

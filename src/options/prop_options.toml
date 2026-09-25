@@ -2,14 +2,6 @@ id     = "PROP"
 name   = "SAT Layer"
 
 [[option]]
-  name       = "satRandomSeed"
-  category   = "regular"
-  long       = "sat-random-seed=N"
-  type       = "uint64_t"
-  default    = "0"
-  help       = "sets the random seed for the sat solver"
-
-[[option]]
   name       = "preRegisterMode"
   category   = "regular"
   long       = "preregister-mode=MODE"

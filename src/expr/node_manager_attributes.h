@@ -43,9 +43,6 @@ struct TupleDatatypeTag
 struct DatatypeIndexTag
 {
 };
-struct OracleIndexTag
-{
-};
 }  // namespace attr
 
 typedef Attribute<attr::VarNameTag, std::string> VarNameAttr;
@@ -64,10 +61,6 @@ using TupleDatatypeAttr =
 
 /** Mapping datatype types to the index of their datatype in node manager */
 using DatatypeIndexAttr = Attribute<attr::DatatypeIndexTag, uint64_t>;
-
-/** Mapping oracle constant nodes to the index of their oracle in the node
- * manager */
-using OracleIndexAttr = expr::Attribute<expr::attr::OracleIndexTag, uint64_t>;
 
 }  // namespace expr
 }  // namespace ava6::internal

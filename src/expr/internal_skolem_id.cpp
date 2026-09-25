@@ -24,12 +24,8 @@ const char* toString(InternalSkolemId id)
       return "SEQ_MODEL_BASE_ELEMENT";
     case InternalSkolemId::IEVAL_NONE: return "IEVAL_NONE";
     case InternalSkolemId::IEVAL_SOME: return "IEVAL_SOME";
-    case InternalSkolemId::QUANTIFIERS_SYNTH_FUN_EMBED:
-      return "QUANTIFIERS_SYNTH_FUN_EMBED";
     case InternalSkolemId::MBQI_INPUT: return "MBQI_INPUT";
-    case InternalSkolemId::MBQI_CHOICE_FUN: return "MBQI_CHOICE_FUN";
     case InternalSkolemId::ABSTRACT_VALUE: return "ABSTRACT_VALUE";
-    case InternalSkolemId::QE_CLOSED_INPUT: return "QE_CLOSED_INPUT";
     case InternalSkolemId::QUANTIFIERS_ATTRIBUTE_INTERNAL:
       return "QUANTIFIERS_ATTRIBUTE_INTERNAL";
     case InternalSkolemId::GET_VALUE_PURIFY: return "GET_VALUE_PURIFY";

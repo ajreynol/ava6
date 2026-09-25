@@ -53,7 +53,6 @@ InstStrategyCegqi::InstStrategyCegqi(Env& env,
                                      TermRegistry& tr)
     : QuantifiersModule(env, qs, qim, qr, tr),
       d_irew(new InstRewriterCegqi(this)),
-      d_cbqi_set_quant_inactive(false),
       d_incomplete_check(false),
       d_added_cbqi_lemma(userContext()),
       d_small_const_multiplier(
@@ -188,7 +187,6 @@ bool InstStrategyCegqi::registerCbqiLemma(Node q)
 
 void InstStrategyCegqi::reset_round(AVA6_UNUSED Theory::Effort effort)
 {
-  d_cbqi_set_quant_inactive = false;
   d_incomplete_check = false;
   d_active_quant.clear();
   // check if any cbqi lemma has not been added yet
@@ -223,7 +221,6 @@ void InstStrategyCegqi::reset_round(AVA6_UNUSED Theory::Effort effort)
             {
               Trace("cegqi") << "Inactive : " << q << std::endl;
               fm->setQuantifierActive(q, false);
-              d_cbqi_set_quant_inactive = true;
               d_active_quant.erase(q);
             }
           }
@@ -304,11 +301,6 @@ void InstStrategyCegqi::check(AVA6_UNUSED Theory::Effort e, QEffort quant_e)
         Node q = it->first;
         Trace("cegqi") << "CEGQI : Process quantifier " << q[0] << " at effort "
                        << ee << std::endl;
-        if (d_qreg.getQuantAttributes().isQuantElimPartial(q))
-        {
-          d_cbqi_set_quant_inactive = true;
-          d_incomplete_check = true;
-        }
         process(q, ee);
         if (d_qstate.isInConflict())
         {

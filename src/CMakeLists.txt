@@ -335,14 +335,10 @@ libava6_add_sources(
   theory/arith/nl/ext/ext_state.h
   theory/arith/nl/ext/proof_checker.cpp
   theory/arith/nl/ext/proof_checker.h
-  theory/arith/nl/ext/split_zero_check.cpp
-  theory/arith/nl/ext/split_zero_check.h
   theory/arith/nl/ext/tangent_plane_check.cpp
   theory/arith/nl/ext/tangent_plane_check.h
   theory/arith/nl/ext_theory_callback.cpp
   theory/arith/nl/ext_theory_callback.h
-  theory/arith/nl/iand_utils.cpp
-  theory/arith/nl/iand_utils.h
   theory/arith/nl/nl_lemma_utils.cpp
   theory/arith/nl/nl_lemma_utils.h
   theory/arith/nl/nl_model.cpp
@@ -515,8 +511,6 @@ libava6_add_sources(
   theory/quantifiers/cegqi/ceg_arith_instantiator.h
   theory/quantifiers/cegqi/ceg_bv_instantiator.cpp
   theory/quantifiers/cegqi/ceg_bv_instantiator.h
-  theory/quantifiers/cegqi/ceg_bv_instantiator_utils.cpp
-  theory/quantifiers/cegqi/ceg_bv_instantiator_utils.h
   theory/quantifiers/cegqi/ceg_dt_instantiator.cpp
   theory/quantifiers/cegqi/ceg_dt_instantiator.h
   theory/quantifiers/cegqi/ceg_instantiator.cpp
@@ -561,8 +555,6 @@ libava6_add_sources(
   theory/quantifiers/ematching/trigger_term_info.h
   theory/quantifiers/ematching/trigger_trie.cpp
   theory/quantifiers/ematching/trigger_trie.h
-  theory/quantifiers/ematching/var_match_generator.cpp
-  theory/quantifiers/ematching/var_match_generator.h
   theory/quantifiers/entailment_check.cpp
   theory/quantifiers/entailment_check.h
   theory/quantifiers/equality_query.cpp
@@ -776,8 +768,6 @@ libava6_add_sources(
   theory/strings/type_enumerator.h
   theory/strings/word.cpp
   theory/strings/word.h
-  theory/subs_minimize.cpp
-  theory/subs_minimize.h
   theory/substitutions.cpp
   theory/substitutions.h
   theory/term_registration_visitor.cpp

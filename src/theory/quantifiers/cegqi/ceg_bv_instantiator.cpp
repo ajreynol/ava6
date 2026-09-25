@@ -52,7 +52,7 @@ class CegInstantiatorBvInverterQuery : public BvInverterQuery
 };
 
 BvInstantiator::BvInstantiator(Env& env, TypeNode tn, BvInverter* inv)
-    : Instantiator(env, tn), d_inverter(inv), d_util(env), d_inst_id_counter(0)
+    : Instantiator(env, tn), d_inverter(inv), d_inst_id_counter(0)
 {
   // The inverter utility d_inverter is global to all BvInstantiator classes.
   // This must be global since we need to:
@@ -71,8 +71,6 @@ void BvInstantiator::reset(AVA6_UNUSED CegInstantiator* ci,
   d_var_to_inst_id.clear();
   d_inst_id_to_term.clear();
   d_inst_id_to_alit.clear();
-  d_var_to_curr_inst_id.clear();
-  d_alit_to_model_slack.clear();
 }
 
 void BvInstantiator::processLiteral(CegInstantiator* ci,
@@ -233,8 +231,6 @@ bool BvInstantiator::processAssertions(CegInstantiator* ci,
   }
   Trace("cegqi-bv") << "BvInstantiator::processAssertions for " << pv
                     << std::endl;
-  // if interleaving, do not do inversion half the time
-  
   bool firstVar = sf.empty();
   // get inst id list
   if (TraceIsOn("cegqi-bv"))
@@ -265,299 +261,31 @@ bool BvInstantiator::processAssertions(CegInstantiator* ci,
       Assert(d_inst_id_to_alit.find(inst_id) != d_inst_id_to_alit.end());
       Node alit = d_inst_id_to_alit[inst_id];
 
-      // get the slack value introduced for the asserted literal
-      Node curr_slack_val;
-      std::unordered_map<Node, Node>::iterator itms =
-          d_alit_to_model_slack.find(alit);
-      if (itms != d_alit_to_model_slack.end())
-      {
-        curr_slack_val = itms->second;
-      }
-
       // debug printing
       Trace("cegqi-bv") << "   [" << j << "] : ";
       Trace("cegqi-bv") << inst_term << std::endl;
-      if (!curr_slack_val.isNull())
-      {
-        Trace("cegqi-bv") << "   ...with slack value : " << curr_slack_val
-                          << std::endl;
-      }
       Trace("cegqi-bv-debug") << "   ...from : " << alit << std::endl;
       Trace("cegqi-bv") << std::endl;
     }
   }
 
-  // Now, try all instantiation ids we want to try
-  // Typically we try only one, otherwise worst-case performance
-  // for constructing instantiations is exponential on the number of
-  // variables in this quantifier prefix.
-  bool ret = false;
-  bool tryMultipleInst = firstVar && false;
-  bool revertOnSuccess = tryMultipleInst;
-  for (unsigned j = 0, size = iti->second.size(); j < size; j++)
+  // Try the first candidate in the shuffled list. Trying every candidate can
+  // make instantiation construction exponential in the quantifier prefix.
+  Assert(!iti->second.empty());
+  unsigned inst_id = iti->second.front();
+  Assert(d_inst_id_to_term.find(inst_id) != d_inst_id_to_term.end());
+  Node inst_term = d_inst_id_to_term[inst_id];
+  Node alit = d_inst_id_to_alit[inst_id];
+  TermProperties pv_prop_bv;
+  Trace("cegqi-bv") << "*** try " << pv << " -> " << inst_term << std::endl;
+  ci->markSolved(alit);
+  bool ret = ci->constructInstantiationInc(pv, inst_term, pv_prop_bv, sf);
+  ci->markSolved(alit, false);
+  if (!ret)
   {
-    unsigned inst_id = iti->second[j];
-    Assert(d_inst_id_to_term.find(inst_id) != d_inst_id_to_term.end());
-    Node inst_term = d_inst_id_to_term[inst_id];
-    Node alit = d_inst_id_to_alit[inst_id];
-    // try instantiation pv -> inst_term
-    TermProperties pv_prop_bv;
-    Trace("cegqi-bv") << "*** try " << pv << " -> " << inst_term << std::endl;
-    d_var_to_curr_inst_id[pv] = inst_id;
-    ci->markSolved(alit);
-    if (ci->constructInstantiationInc(
-            pv, inst_term, pv_prop_bv, sf, revertOnSuccess))
-    {
-      ret = true;
-    }
-    ci->markSolved(alit, false);
-    // we are done unless we try multiple instances
-    if (!tryMultipleInst)
-    {
-      break;
-    }
+    Trace("cegqi-bv") << "...failed to add instantiation for " << pv << std::endl;
   }
-  if (ret)
-  {
-    return true;
-  }
-  Trace("cegqi-bv") << "...failed to add instantiation for " << pv << std::endl;
-  d_var_to_curr_inst_id.erase(pv);
-
-  return false;
-}
-
-Node BvInstantiator::rewriteAssertionForSolvePv(CegInstantiator* ci,
-                                                Node pv,
-                                                Node lit)
-{
-  // result of rewriting the visited term
-  std::stack<std::unordered_map<TNode, Node>> visited;
-  visited.push(std::unordered_map<TNode, Node>());
-  // whether the visited term contains pv
-  std::unordered_map<Node, bool> visited_contains_pv;
-  std::unordered_map<TNode, Node>::iterator it;
-  std::unordered_map<TNode, Node> curr_subs;
-  std::stack<std::stack<TNode>> visit;
-  TNode cur;
-  visit.push(std::stack<TNode>());
-  visit.top().push(lit);
-  do
-  {
-    cur = visit.top().top();
-    visit.top().pop();
-    it = visited.top().find(cur);
-
-    if (it == visited.top().end())
-    {
-      std::unordered_map<TNode, Node>::iterator itc = curr_subs.find(cur);
-      if (itc != curr_subs.end())
-      {
-        visited.top()[cur] = itc->second;
-      }
-      else
-      {
-        if (cur.getKind() == Kind::WITNESS)
-        {
-          // must replace variables of choice functions
-          // with new variables to avoid variable
-          // capture when considering substitutions
-          // with multiple literals.
-          Node bv = ci->getBoundVariable(cur[0][0].getType());
-          // should not have captured variables
-          Assert(curr_subs.find(cur[0][0]) == curr_subs.end());
-          curr_subs[cur[0][0]] = bv;
-          // we cannot cache the results of subterms
-          // of this witness expression since we are
-          // now in the context { cur[0][0] -> bv },
-          // hence we push a context here
-          visited.push(std::unordered_map<TNode, Node>());
-          visit.push(std::stack<TNode>());
-        }
-        visited.top()[cur] = Node::null();
-        visit.top().push(cur);
-        for (unsigned i = 0; i < cur.getNumChildren(); i++)
-        {
-          visit.top().push(cur[i]);
-        }
-      }
-    }
-    else if (it->second.isNull())
-    {
-      Node ret;
-      bool childChanged = false;
-      std::vector<Node> children;
-      if (cur.getMetaKind() == kind::metakind::PARAMETERIZED)
-      {
-        children.push_back(cur.getOperator());
-      }
-      bool contains_pv = (cur == pv);
-      for (unsigned i = 0; i < cur.getNumChildren(); i++)
-      {
-        it = visited.top().find(cur[i]);
-        Assert(it != visited.top().end());
-        Assert(!it->second.isNull());
-        childChanged = childChanged || cur[i] != it->second;
-        children.push_back(it->second);
-        contains_pv = contains_pv || visited_contains_pv[cur[i]];
-      }
-      // careful that rewrites above do not affect whether this term contains pv
-      visited_contains_pv[cur] = contains_pv;
-
-      // rewrite the term
-      ret = rewriteTermForSolvePv(pv, cur, children, visited_contains_pv);
-
-      // return original if the above function does not produce a result
-      if (ret.isNull())
-      {
-        if (childChanged)
-        {
-          ret = nodeManager()->mkNode(cur.getKind(), children);
-        }
-        else
-        {
-          ret = cur;
-        }
-      }
-
-      /* We need to update contains_pv also for rewritten nodes, since
-       * the normalizePv* functions rely on the information if pv occurs in a
-       * rewritten node or not. */
-      if (ret != cur)
-      {
-        contains_pv = (ret == pv);
-        for (unsigned i = 0, size = ret.getNumChildren(); i < size; ++i)
-        {
-          contains_pv = contains_pv || visited_contains_pv[ret[i]];
-        }
-        visited_contains_pv[ret] = contains_pv;
-      }
-
-      // if was witness, pop context
-      if (cur.getKind() == Kind::WITNESS)
-      {
-        Assert(curr_subs.find(cur[0][0]) != curr_subs.end());
-        curr_subs.erase(cur[0][0]);
-        visited.pop();
-        visit.pop();
-        Assert(visited.size() == visit.size());
-        Assert(!visit.empty());
-      }
-
-      visited.top()[cur] = ret;
-    }
-  } while (!visit.top().empty());
-  Assert(visited.size() == 1);
-  Assert(visited.top().find(lit) != visited.top().end());
-  Assert(!visited.top().find(lit)->second.isNull());
-
-  Node result = visited.top()[lit];
-
-  if (TraceIsOn("cegqi-bv-nl"))
-  {
-    std::vector<TNode> trace_visit;
-    std::unordered_set<TNode> trace_visited;
-
-    trace_visit.push_back(result);
-    do
-    {
-      cur = trace_visit.back();
-      trace_visit.pop_back();
-
-      if (trace_visited.find(cur) == trace_visited.end())
-      {
-        trace_visited.insert(cur);
-        trace_visit.insert(trace_visit.end(), cur.begin(), cur.end());
-      }
-      else if (cur == pv)
-      {
-        Trace("cegqi-bv-nl")
-            << "NONLINEAR LITERAL for " << pv << " : " << lit << std::endl;
-      }
-    } while (!trace_visit.empty());
-  }
-  // process again, to ensure the policy for cegqiBvIneqMode is handled after
-  // rewriting above.
-  result = processAssertionInternal(ci, result);
-
-  return result;
-}
-
-Node BvInstantiator::rewriteTermForSolvePv(
-    Node pv,
-    Node n,
-    std::vector<Node>& children,
-    std::unordered_map<Node, bool>& contains_pv)
-{
-  // [1] rewrite cases of non-invertible operators
-
-  if (n.getKind() == Kind::EQUAL)
-  {
-    TNode lhs = children[0];
-    TNode rhs = children[1];
-
-    /* rewrite: x * x = x -> x < 2 */
-    if ((lhs == pv && rhs.getKind() == Kind::BITVECTOR_MULT && rhs[0] == pv
-         && rhs[1] == pv)
-        || (rhs == pv && lhs.getKind() == Kind::BITVECTOR_MULT && lhs[0] == pv
-            && lhs[1] == pv))
-    {
-      NodeManager* nm = nodeManager();
-      return NodeManager::mkNode(
-          Kind::BITVECTOR_ULT,
-          pv,
-          bv::utils::mkConst(nm,
-                             BitVector(bv::utils::getSize(pv), Integer(2))));
-    }
-
-    if (true && contains_pv[lhs]
-        && contains_pv[rhs])
-    {
-      Node result = d_util.normalizePvEqual(pv, children, contains_pv);
-      if (!result.isNull())
-      {
-        Trace("cegqi-bv-nl")
-            << "Normalize " << n << " to " << result << std::endl;
-      }
-      else
-      {
-        Trace("cegqi-bv-nl")
-            << "Nonlinear " << n.getKind() << " " << n << std::endl;
-      }
-      return result;
-    }
-  }
-  else if (n.getKind() == Kind::BITVECTOR_MULT
-           || n.getKind() == Kind::BITVECTOR_ADD)
-  {
-    if (true && contains_pv[n])
-    {
-      Node result;
-      if (n.getKind() == Kind::BITVECTOR_MULT)
-      {
-        result = d_util.normalizePvMult(pv, children, contains_pv);
-      }
-      else
-      {
-        result = d_util.normalizePvPlus(pv, children, contains_pv);
-      }
-      if (!result.isNull())
-      {
-        Trace("cegqi-bv-nl")
-            << "Normalize " << n << " to " << result << std::endl;
-        return result;
-      }
-      else
-      {
-        Trace("cegqi-bv-nl")
-            << "Nonlinear " << n.getKind() << " " << n << std::endl;
-      }
-    }
-  }
-
-  // [2] try to rewrite non-linear literals -> linear literals
-
-  return Node::null();
+  return ret;
 }
 
 /** sort bv extract interval

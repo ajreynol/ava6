@@ -60,14 +60,6 @@ name   = "Arithmetic Theory"
   help       = "interleave tangent plane strategy for non-linear incremental linearization solver"
 
 [[option]]
-  name       = "nlExtTfTangentPlanes"
-  category   = "regular"
-  long       = "nl-ext-tf-tplanes"
-  type       = "bool"
-  default    = "true"
-  help       = "use non-terminating tangent plane strategy for transcendental functions for non-linear incremental linearization solver"
-
-[[option]]
   name       = "nlExtRewrites"
   category   = "regular"
   long       = "nl-ext-rewrite"
@@ -82,24 +74,6 @@ name   = "Arithmetic Theory"
   type       = "bool"
   default    = "true"
   help       = "whether to use simple rounding, similar to a unit-cube test, for integers"
-
-[[option]]
-  name       = "nlCovLinearModel"
-  category   = "regular"
-  long       = "nl-cov-linear-model=MODE"
-  type       = "nlCovLinearModelMode"
-  default    = "NONE"
-  help       = "whether to use the linear model as initial guess for the cylindrical algebraic coverings solver"
-  help_mode  = "Modes for the usage of the linear model in non-linear arithmetic."
-[[option.mode.NONE]]
-  name       = "none"
-  help       = "Do not use linear model to seed nonlinear model"
-[[option.mode.INITIAL]]
-  name       = "initial"
-  help       = "Use linear model to seed nonlinear model initially, discard it when it does not work"
-[[option.mode.PERSISTENT]]
-  name       = "persistent"
-  help       = "Use linear model to seed nonlinear model whenever possible"
 
 [[option]]
   name       = "arithStaticLearning"

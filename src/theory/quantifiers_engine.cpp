@@ -180,7 +180,7 @@ void QuantifiersEngine::check(Theory::Effort e)
     // if we are about to say "unknown", see if anything can be done as a last
     // resort to avoid this
     if (setModelUnsoundId != IncompleteId::NONE
-        && shouldRecheck(e, setModelUnsoundId))
+        && shouldRecheck())
     {
       Trace("quant-engine-debug") << "*** Run recheck" << std::endl;
       // We simply mark the output channel is used, which will ensure we are
@@ -203,17 +203,8 @@ void QuantifiersEngine::check(Theory::Effort e)
   d_qim.clearPending();
 }
 
-bool QuantifiersEngine::shouldRecheck(AVA6_UNUSED Theory::Effort e,
-                                      IncompleteId setModelUnsoundId)
+bool QuantifiersEngine::shouldRecheck()
 {
-  // special case: IncompleteId::QUANTIFIERS_RECORDED_INST indicates we wish
-  // to intentionally answer unknown for partial quantifier elimination
-  if (setModelUnsoundId == IncompleteId::QUANTIFIERS_RECORDED_INST)
-  {
-    return false;
-  }
-  // do not recheck with sygus
-  
   // If the term database mode is relevant, we instead now mark all terms
   // as relevant.
   if (options().quantifiers.termDbMode

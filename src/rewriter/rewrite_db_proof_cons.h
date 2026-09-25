@@ -17,7 +17,7 @@
 
 #include <map>
 
-#include "expr/match_trie.h"
+#include "expr/notify_match.h"
 #include "expr/node.h"
 #include "proof/proof.h"
 #include "proof/proof_generator.h"

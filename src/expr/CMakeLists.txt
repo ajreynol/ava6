@@ -24,8 +24,6 @@ libava6_add_sources(
   attribute_unique_id.h
   bound_var_id.cpp
   bound_var_id.h
-  beta_reduce_converter.cpp
-  beta_reduce_converter.h
   bound_var_manager.cpp
   bound_var_manager.h
   elim_shadow_converter.cpp
@@ -39,8 +37,7 @@ libava6_add_sources(
   internal_skolem_id.cpp
   internal_skolem_id.h
   kind_map.h
-  match_trie.cpp
-  match_trie.h
+  notify_match.h
   nary_match_trie.cpp
   nary_match_trie.h
   nary_term_util.cpp
@@ -61,7 +58,6 @@ libava6_add_sources(
   node_trie_algorithm.h
   node_value.cpp
   node_value.h
-  oracle.h
   sequence.cpp
   sequence.h
   node_visitor.h

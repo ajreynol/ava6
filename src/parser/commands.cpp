@@ -596,7 +596,6 @@ void DeclareFunctionCommand::toStream(std::ostream& out) const
 }
 
 /* -------------------------------------------------------------------------- */
-/* class DeclareOracleFunCommand */
 /* -------------------------------------------------------------------------- */
 
 

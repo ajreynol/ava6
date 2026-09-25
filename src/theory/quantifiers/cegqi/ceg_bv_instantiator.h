@@ -18,7 +18,6 @@
 #include <unordered_map>
 
 #include "theory/quantifiers/bv_inverter.h"
-#include "theory/quantifiers/cegqi/ceg_bv_instantiator_utils.h"
 #include "theory/quantifiers/cegqi/instantiator.h"
 
 namespace ava6::internal {
@@ -70,8 +69,6 @@ class BvInstantiator : public Instantiator
    * This is called after processAssertion has been called on all currently
    * asserted literals that involve pv. This chooses the best solved form for pv
    * based on heuristics. Currently, by default, we choose a random solved form.
-   * We may try multiple or zero bounds based on the options
-   * --cbqi-multi-inst and --cbqi-bv-interleave-value.
    */
   bool processAssertions(CegInstantiator* ci,
                          SolvedForm& sf,
@@ -92,8 +89,6 @@ class BvInstantiator : public Instantiator
  private:
   /** pointer to the bv inverter class */
   BvInverter* d_inverter;
-  /** Utility class */
-  BvInstantiatorUtil d_util;
   //--------------------------------solved forms
   /** identifier counter, used to allocate ids to each solve form */
   unsigned d_inst_id_counter;
@@ -103,33 +98,7 @@ class BvInstantiator : public Instantiator
   std::unordered_map<unsigned, Node> d_inst_id_to_term;
   /** for each solved form id, the corresponding asserted literal */
   std::unordered_map<unsigned, Node> d_inst_id_to_alit;
-  /** map from variable to current id we are processing */
-  std::unordered_map<Node, unsigned> d_var_to_curr_inst_id;
-  /** the amount of slack we added for asserted literals */
-  std::unordered_map<Node, Node> d_alit_to_model_slack;
   //--------------------------------end solved forms
-  /** rewrite assertion for solve pv
-   *
-   * Returns a literal that is equivalent to lit that leads to best solved form
-   * for pv.
-   */
-  Node rewriteAssertionForSolvePv(CegInstantiator* ci, Node pv, Node lit);
-  /** rewrite term for solve pv
-   *
-   * This is a helper function for rewriteAssertionForSolvePv.
-   * If this returns non-null value ret, then this indicates
-   * that n should be rewritten to ret. It is called as
-   * a "post-rewrite", that is, after the children of n
-   * have been rewritten and stored in the vector children.
-   *
-   * contains_pv stores whether certain nodes contain pv.
-   * where we guarantee that all subterms of terms in children
-   * appear in the domain of contains_pv.
-   */
-  Node rewriteTermForSolvePv(Node pv,
-                             Node n,
-                             std::vector<Node>& children,
-                             std::unordered_map<Node, bool>& contains_pv);
   /** process literal, called from processAssertion
    *
    * lit is the literal to solve for pv that has been rewritten according to

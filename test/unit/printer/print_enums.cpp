@@ -59,8 +59,8 @@ TEST_F(TestPrintEnums, print_enums)
   TEST_ENUM_RANGE(
       arith::Rewrite, arith::Rewrite::NONE, arith::Rewrite::UNKNOWN);
   TEST_ENUM_RANGE(arith::nl::InferStep,
-                  arith::nl::InferStep::NONE,
-                  arith::nl::InferStep::UNKNOWN);
+                  arith::nl::InferStep::BREAK,
+                  arith::nl::InferStep::NL_TANGENT_PLANES_WAITING);
 }
 
 }  // namespace test

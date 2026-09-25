@@ -65,25 +65,11 @@ Instantiate::~Instantiate() {}
 bool Instantiate::reset(Theory::Effort e)
 {
   Trace("inst-debug") << "Reset, effort " << e << std::endl;
-  // clear explicitly recorded instantiations
-  d_recordedInst.clear();
   d_instDebugTemp.clear();
   return true;
 }
 
 void Instantiate::registerQuantifier(AVA6_UNUSED Node q) {}
-bool Instantiate::checkComplete(IncompleteId& incId)
-{
-  if (!d_recordedInst.empty())
-  {
-    Trace("quant-engine-debug")
-        << "Set incomplete due to recorded instantiations." << std::endl;
-    incId = IncompleteId::QUANTIFIERS_RECORDED_INST;
-    return false;
-  }
-  return true;
-}
-
 void Instantiate::addRewriter(InstantiationRewriter* ir)
 {
   d_instRewrite.push_back(ir);
@@ -376,8 +362,8 @@ bool Instantiate::isLocalInstId(InferenceId id)
     case InferenceId::QUANTIFIERS_INST_E_MATCHING_SIMPLE:
     case InferenceId::QUANTIFIERS_INST_E_MATCHING_MT:
     case InferenceId::QUANTIFIERS_INST_E_MATCHING_MTL:
-    case InferenceId::QUANTIFIERS_INST_E_MATCHING_HO:
-    case InferenceId::QUANTIFIERS_INST_E_MATCHING_VAR_GEN:
+
+
     case InferenceId::QUANTIFIERS_INST_E_MATCHING_RELATIONAL:
     case InferenceId::QUANTIFIERS_INST_CBQI_CONFLICT:
     case InferenceId::QUANTIFIERS_INST_CBQI_PROP: return true;
@@ -493,18 +479,6 @@ bool Instantiate::addInstantiationExpFail(Node q,
     Trace("inst-exp-fail") << std::endl;
   }
   return false;
-}
-
-void Instantiate::recordInstantiation(Node q,
-                                      const std::vector<Node>& terms,
-                                      bool doVts)
-{
-  Trace("inst-debug") << "Record instantiation for " << q << std::endl;
-  // get the instantiation list, which ensures that q is marked as a quantified
-  // formula we instantiated, despite only recording an instantiation here
-  getOrMkInstLemmaList(q);
-  Node inst = getInstantiation(q, terms, doVts);
-  d_recordedInst[q].push_back(inst);
 }
 
 bool Instantiate::existsInstantiation(Node q, const std::vector<Node>& terms)
@@ -710,13 +684,7 @@ void Instantiate::getInstantiations(Node q, std::vector<Node>& insts)
   Trace("inst-debug") << "get instantiations for " << q << std::endl;
   InstLemmaList* ill = getOrMkInstLemmaList(q);
   insts.insert(insts.end(), ill->d_list.begin(), ill->d_list.end());
-  // also include recorded instantations (for qe-partial)
-  std::map<Node, std::vector<Node> >::const_iterator it =
-      d_recordedInst.find(q);
-  if (it != d_recordedInst.end())
-  {
-    insts.insert(insts.end(), it->second.begin(), it->second.end());
-  }
+
 }
 
 bool Instantiate::isProofEnabled() const

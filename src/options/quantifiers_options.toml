@@ -109,14 +109,6 @@ name   = "Quantifiers"
 # For example, forall x. ( P( x ) => (exists y. f( y ) = x) ) will be rewritten to
 #   forall x. P( x ) => f( S( x ) ) = x
 [[option]]
-  name       = "elimTautQuant"
-  category   = "regular"
-  long       = "elim-taut-quant"
-  type       = "bool"
-  default    = "true"
-  help       = "eliminate tautological disjuncts of quantified formulas"
-
-[[option]]
   name       = "mbqi"
   category   = "regular"
   long       = "mbqi"
@@ -426,34 +418,6 @@ name   = "Quantifiers"
 [[option.mode.USE_LEARN]]
   name = "use-learn"
   help = "Use instantiation evaluation, and generalize learning."
-
-[[option]]
-  name       = "quantSubCbqiTimeout"
-  category   = "common"
-  long       = "sub-cbqi-timeout=N"
-  type       = "uint64_t"
-  default    = "0"
-  help       = "Timeout (in milliseconds) for subsolver calls for sub-cbqi"
-
-### Induction options
-
-[[option]]
-  name       = "cegisSample"
-  category   = "regular"
-  long       = "cegis-sample=MODE"
-  type       = "CegisSampleMode"
-  default    = "NONE"
-  help       = "mode for using samples in the counterexample-guided inductive synthesis loop"
-  help_mode  = "Modes for sampling with counterexample-guided inductive synthesis (CEGIS)."
-[[option.mode.NONE]]
-  name = "none"
-  help = "Do not use sampling with CEGIS."
-[[option.mode.USE]]
-  name = "use"
-  help = "Use sampling to accelerate CEGIS. This will rule out solutions for a conjecture when they are not satisfied by a sample point."
-[[option.mode.TRUST]]
-  name = "trust"
-  help = "Trust that when a solution for a conjecture is always true under sampling, then it is indeed a solution. Note this option may print out spurious solutions for synthesis conjectures."
 
 [[option]]
   name       = "cegqi"

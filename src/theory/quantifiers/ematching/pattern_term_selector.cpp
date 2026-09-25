@@ -685,64 +685,6 @@ Node PatternTermSelector::getInversionVariable(Node n)
   return Node::null();
 }
 
-Node PatternTermSelector::getInversion(Node n, Node x)
-{
-  Kind nk = n.getKind();
-  if (nk == Kind::INST_CONSTANT)
-  {
-    return x;
-  }
-  else if (nk == Kind::ADD || nk == Kind::MULT)
-  {
-    NodeManager* nm = n.getNodeManager();
-    int cindex = -1;
-    bool cindexSet = false;
-    for (size_t i = 0, nchild = n.getNumChildren(); i < nchild; i++)
-    {
-      Node nc = n[i];
-      if (!quantifiers::TermUtil::hasInstConstAttr(nc))
-      {
-        if (nk == Kind::ADD)
-        {
-          x = nm->mkNode(Kind::SUB, x, nc);
-        }
-        else if (nk == Kind::MULT)
-        {
-          Assert(nc.isConst());
-          if (x.getType().isInteger())
-          {
-            Node coeff = nm->mkConstInt(nc.getConst<Rational>().abs());
-            if (!nc.getConst<Rational>().abs().isOne())
-            {
-              x = nm->mkNode(Kind::INTS_DIVISION_TOTAL, x, coeff);
-            }
-            if (nc.getConst<Rational>().sgn() < 0)
-            {
-              x = nm->mkNode(Kind::NEG, x);
-            }
-          }
-          else
-          {
-            Node coeff = nm->mkConstReal(Rational(1) / nc.getConst<Rational>());
-            x = nm->mkNode(Kind::MULT, x, coeff);
-          }
-        }
-      }
-      else
-      {
-        Assert(!cindexSet);
-        cindex = i;
-        cindexSet = true;
-      }
-    }
-    if (cindexSet)
-    {
-      return getInversion(n[cindex], x);
-    }
-  }
-  return Node::null();
-}
-
 void PatternTermSelector::getTriggerVariables(AVA6_UNUSED const Options& opts,
                                               Node n,
                                               Node q,

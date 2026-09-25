@@ -90,11 +90,6 @@ class PatternTermSelector
    * We call f the inversion function for n.
    */
   static Node getInversionVariable(Node n);
-  /** Get the body of the inversion function for n whose argument is y.
-   * e.g. getInversion( x+1, y ) returns y-1
-   */
-  static Node getInversion(Node n, Node y);
-
   /**
    * get all variables that E-matching can instantiate from a subterm n in
    * quantified formula q.

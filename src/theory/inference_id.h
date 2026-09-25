@@ -99,17 +99,11 @@ enum class InferenceId
   ARITH_PP_ELIM_OPERATORS,
   // a lemma from arithmetic preprocessing
   ARITH_PP_ELIM_OPERATORS_LEMMA,
-  //-------------------- nonlinear core
-  // simple congruence x=y => f(x)=f(y)
-  ARITH_NL_CONGRUENCE,
   // for theory combination when NL model construction identifies shared terms
   ARITH_NL_SHARED_TERM_SPLIT,
   // for theory combination when NL has a multiplication term with factors that
   // are not preregistered.
   ARITH_NL_SHARED_TERM_FACTOR_SPLIT,
-  //-------------------- nonlinear incremental linearization solver
-  // splitting on zero (NlSolver::checkSplitZero)
-  ARITH_NL_SPLIT_ZERO,
   // based on sign (NlSolver::checkMonomialSign)
   ARITH_NL_SIGN,
   // based on comparing (abs) model values (NlSolver::checkMonomialMagnitude)
@@ -119,76 +113,10 @@ enum class InferenceId
   ARITH_NL_INFER_BOUNDS_NT,
   // factoring (NlSolver::checkFactoring)
   ARITH_NL_FACTOR,
-  // resolution bound inferences (NlSolver::checkMonomialInferResBounds)
-  ARITH_NL_RES_INFER_BOUNDS,
   // tangent planes (NlSolver::checkTangentPlanes)
   ARITH_NL_TANGENT_PLANE,
   // flatten monomials (NonlinearExtension::checkFlattenMonomials).
   ARITH_NL_FLATTEN_MON,
-  //-------------------- nonlinear transcendental solver
-  // sine symmetry
-  ARITH_NL_T_SINE_SYMM,
-  // boundary reduction
-  ARITH_NL_T_SINE_BOUNDARY_REDUCE,
-  // purification of arguments to transcendental functions
-  ARITH_NL_T_PURIFY_ARG,
-  // purification of arguments to transcendental functions with phase shifting
-  ARITH_NL_T_PURIFY_ARG_PHASE_SHIFT,
-  // initial refinement (TranscendentalSolver::checkTranscendentalInitialRefine)
-  ARITH_NL_T_INIT_REFINE,
-  // pi bounds
-  ARITH_NL_T_PI_BOUND,
-  // monotonicity (TranscendentalSolver::checkTranscendentalMonotonic)
-  ARITH_NL_T_MONOTONICITY,
-  // tangent refinement (TranscendentalSolver::checkTranscendentalTangentPlanes)
-  ARITH_NL_T_TANGENT,
-  // secant refinement, the dual of the above inference
-  ARITH_NL_T_SECANT,
-  //-------------------- nonlinear iand solver
-  // initial refinements (IAndSolver::checkInitialRefine)
-  ARITH_NL_IAND_INIT_REFINE,
-  // value refinements (IAndSolver::checkFullRefine)
-  ARITH_NL_IAND_VALUE_REFINE,
-  // sum refinements (IAndSolver::checkFullRefine)
-  ARITH_NL_IAND_SUM_REFINE,
-  // bitwise refinements (IAndSolver::checkFullRefine)
-  ARITH_NL_IAND_BITWISE_REFINE,
-  //-------------------- nonlinear piand solver
-  // initial refinements (PIAndSolver::checkInitialRefine)
-  ARITH_NL_PIAND_INIT_REFINE,
-  // sum refinements (PIAndSolver::checkFullRefine)
-  ARITH_NL_PIAND_SUM_REFINE,
-  // base case refinements (PIAndSolver::checkFullRefine)
-  ARITH_NL_PIAND_BASE_CASE_REFINE,
-  // difference refinements (PIAndSolver::checkFullRefine)
-  ARITH_NL_PIAND_DIFFERENCE_REFINE,
-  // symetry refinements (PIAndSolver::checkFullRefine)
-  ARITH_NL_PIAND_SYMETRY_REFINE,
-  // contradition refinements (PIAndSolver::checkFullRefine)
-  ARITH_NL_PIAND_CONTRADITION_REFINE,
-  // one refinements (PIAndSolver::checkFullRefine)
-  ARITH_NL_PIAND_ONE_REFINE,
-  //-------------------- nonlinear pow2 solver
-  // initial refinements (Pow2Solver::checkInitialRefine)
-  ARITH_NL_POW2_INIT_REFINE,
-  // value refinements (Pow2Solver::checkFullRefine)
-  ARITH_NL_POW2_VALUE_REFINE,
-  // monotonicity refinements (Pow2Solver::checkFullRefine)
-  ARITH_NL_POW2_MONOTONE_REFINE,
-  // div0 refinements (Pow2Solver::checkFullRefine)
-  ARITH_NL_POW2_DIV0_CASE_REFINE,
-  // lower bound refinements (Pow2Solver::checkFullRefine)
-  ARITH_NL_POW2_LOWER_BOUND_CASE_REFINE,
-  //-------------------- nonlinear coverings solver
-  // conflict / infeasible subset obtained from coverings
-  ARITH_NL_COVERING_CONFLICT,
-  // excludes an interval for a single variable
-  ARITH_NL_COVERING_EXCLUDED_INTERVAL,
-  //-------------------- nonlinear icp solver
-  // conflict obtained from icp
-  ARITH_NL_ICP_CONFLICT,
-  // propagation / contraction of variable bounds from icp
-  ARITH_NL_ICP_PROPAGATION,
   //-------------------- ff inference
   // ---------------------------------- end arith theory
 
@@ -207,11 +135,7 @@ enum class InferenceId
   ARRAYS_EQ_TAUTOLOGY,
   // ---------------------------------- end arrays theory
 
-  // ---------------------------------- bags theory
-  // ---------------------------------- end bags theory
-
   // ---------------------------------- bitvector theory
-  BV_BITBLAST_CONFLICT,
   BV_BITBLAST_INTERNAL_EAGER_LEMMA,
   BV_BITBLAST_INTERNAL_BITBLAST_LEMMA,
   // ---------------------------------- end bitvector theory
@@ -225,8 +149,6 @@ enum class InferenceId
   DATATYPES_INST,
   // (or ((_ is C1) t) V ... V ((_ is Cn) t))
   DATATYPES_SPLIT,
-  // (or ((_ is Ci) t) V (not ((_ is Ci) t)))
-  DATATYPES_BINARY_SPLIT,
   // (not ((_ is C1) t)) ^ ... [j] ... ^ (not ((_ is Cn) t)) => ((_ is Cj) t)
   DATATYPES_LABEL_EXH,
   // (= t (Ci t1 ... tn)) => (= (sel_j t) rewrite((sel_j (Ci t1 ... tn))))
@@ -242,35 +164,7 @@ enum class InferenceId
   // corecursive singleton equality (not (= k1 k2)) for fresh k1, k2
   // cycle conflict for datatypes
   DATATYPES_CYCLE,
-  //-------------------- datatypes height
-  // (=> (= (dt.height t) 0) => (and (= (dt.height (sel_1 t)) 0) .... ))
-  DATATYPES_HEIGHT_ZERO,
-  //-------------------- sygus extension
-  // a sygus symmetry breaking lemma (or ~is-C1( t1 ) V ... V ~is-Cn( tn ) )
-  // where t1 ... tn are unique shared selector chains. For details see
-  // Reynolds et al CAV 2019
-  // a conjecture-dependent symmetry breaking lemma, which may be used to
-  // exclude constructors for variables that irrelevant for a synthesis
-  // conjecture
-  // an enumerator-specific symmetry breaking lemma, which are used e.g. for
-  // excluding certain kinds of constructors
-  // a simple static symmetry breaking lemma (see Reynolds et al CAV 2019)
-  // (dt.size t) <= N, to implement fair enumeration when sygus-fair=dt-size
-  // (dt.size t) <= N => (or ~is-C1( t1 ) V ... V ~is-Cn( tn ) ) if using
-  // sygus-fair=direct
-  // used for implementing variable agnostic enumeration
-  // handles case the model value for a sygus term does not exist
-  // s <= (dt.size t), where s is a term that must be less than the current
-  // size bound based on our fairness strategy. For instance, s may be
-  // (dt.size e) for (each) enumerator e when multiple enumerators are present.
-  // (dt.size t) >= 0
   // ---------------------------------- end datatypes theory
-
-  //-------------------------------------- floating point theory
-  // a lemma sent during TheoryFp::ppRewrite
-  // a lemma sent during TheoryFp::convertAndEquateTerm
-  // a lemma sent during TheoryFp::registerTerm
-  //-------------------------------------- end floating point theory
 
   //-------------------------------------- quantifiers theory
   //-------------------- types of instantiations.
@@ -285,20 +179,12 @@ enum class InferenceId
   QUANTIFIERS_INST_E_MATCHING_MT,
   // E-matching using linear implementation of multi-triggers
   QUANTIFIERS_INST_E_MATCHING_MTL,
-  // instantiation due to higher-order matching on top of e-matching
-  QUANTIFIERS_INST_E_MATCHING_HO,
-  // E-matching based on variable triggers
-  QUANTIFIERS_INST_E_MATCHING_VAR_GEN,
   // E-matching based on relational triggers
   QUANTIFIERS_INST_E_MATCHING_RELATIONAL,
   // conflicting instantiation from conflict-based instantiation
   QUANTIFIERS_INST_CBQI_CONFLICT,
   // propagating instantiation from conflict-based instantiation
   QUANTIFIERS_INST_CBQI_PROP,
-  // conflicting instantiation from sub conflict-based instantiation
-  QUANTIFIERS_INST_SUB_CONFLICT,
-  // unsat core from sub conflict-based instantiation
-  QUANTIFIERS_SUB_UC,
   // instantiation from naive exhaustive instantiation in finite model finding
   // instantiation from finite model finding based on its model-based algorithm
   // instantiation from running exhaustive instantiation on a subdomain of
@@ -309,16 +195,10 @@ enum class InferenceId
   QUANTIFIERS_INST_FMF_FMC,
   QUANTIFIERS_INST_FMF_FMC_EXH,
   QUANTIFIERS_INST_CEGQI,
-  // instantiations from syntax-guided instantiation
-  QUANTIFIERS_INST_SYQI,
   // instantiations from model-based instantiation
   QUANTIFIERS_INST_MBQI,
-  // instantiations from model-based instantiation (mbqi-enum)
-  QUANTIFIERS_INST_MBQI_ENUM,
   // instantiations from enumerative instantiation
   QUANTIFIERS_INST_ENUM,
-  // instantiations from pool instantiation
-  // instantiations from pool instantiation (tuple semantics)
   //-------------------- bounded integers
   // a proxy lemma from bounded integers, used to control bounds on ground terms
   QUANTIFIERS_BINT_PROXY,
@@ -329,8 +209,6 @@ enum class InferenceId
   QUANTIFIERS_CEGQI_CEX,
   // an auxiliary lemma from counterexample lemma
   QUANTIFIERS_CEGQI_CEX_AUX,
-  // a reduction lemma for nested quantifier elimination
-  QUANTIFIERS_CEGQI_NESTED_QE,
   // G2 => G1 where G2 is a counterexample literal for a nested quantifier whose
   // counterexample literal is G1.
   QUANTIFIERS_CEGQI_CEX_DEP,
@@ -340,61 +218,9 @@ enum class InferenceId
   QUANTIFIERS_CEGQI_VTS_UB_DELTA,
   // infinity > c
   QUANTIFIERS_CEGQI_VTS_LB_INF,
-  //-------------------- mbqi
-  // a choice axiom when enuemrating a choice in mbqi-enum
-  QUANTIFIERS_MBQI_ENUM_CHOICE,
-  //-------------------- oracles
-  // A lemma generated by an oracle interface quantified formula.
-  // For example, (= (f c) d) where (c, d) is an I/O pair obtained from calling
-  // the oracle associated with oracle function f.
-  QUANTIFIERS_ORACLE_INTERFACE,
-  // purification lemma to ensure oracle functions in substitutions are taken
-  // into account
-  QUANTIFIERS_ORACLE_PURIFY_SUBS,
-  //-------------------- syntax-guided instantiation
-  // a counterexample lemma
-  QUANTIFIERS_SYQI_CEX,
-  // evaluation unfolding for syntax-guided instantiation
-  QUANTIFIERS_SYQI_EVAL_UNFOLD,
-  //-------------------- sygus solver
-  // G or ~G where G is the active guard for a sygus enumerator
-  // manual exclusion of a current solution for an actively generated enumerator
-  // manual exclusion of a current solution for sygus-stream
-  // manual exclusion of a current solution for incremental sygus
-  // manual exclusion of a current solution for a failed side condition
-  // manual exclusion of a current solution for a failed verification
-  // manual exclusion of a current solution for a repeated counterexample
-  // ~Q where Q is a PBE conjecture with conflicting examples
-  // infeasible determined by single-invocation solver
-  // unif+pi symmetry breaking between multiple enumerators
-  // unif+pi separation lemma
-  // unif+pi lemma for fairness of size of enumerators
-  // unif+pi lemma for removing redundant operators
-  // symmetry breaking for enumerators
-  // constraining terms to be in the domain of output
-  // condition exclusion from sygus unif
-  // refinement lemma from sygus unif
-  // symmetry breaking lemma from unsat core learning algorithm initialization
-  // candidate exclusion lemma from unsat core learning algorithm
-  // candidate exclusion lemma from repair constants algorithm
-  // a counterexample-guided inductive synthesis refinement lemma
-  // a cegis refinement lemma found by sampling
-  // a lemma based on refinement lemma evaluation
-  // an evaluation unfolding lemma
-  // candidate exclusion lemma from programming-by-examples
-  // a lemma generated while constructing a candidate solution for PBE
-  // complete enumeration lemma
-  // infeasible due to side condition (e.g. for abduction)
-  // infeasible due to non-well-founded grammar
-  QUANTIFIERS_SYGUS_NO_WF_GRAMMAR,
   //-------------------- dynamic splitting
   // a dynamic split from quantifiers
   QUANTIFIERS_DSPLIT,
-  //-------------------- induction / conjecture generation
-  // a split on a conjecture for inductive theorem proving
-  QUANTIFIERS_CONJ_GEN_SPLIT,
-  // enumeration of ground terms for inductive theorem proving
-  QUANTIFIERS_CONJ_GEN_GT_ENUM,
   //-------------------- miscellaneous
   // skolemization
   QUANTIFIERS_SKOLEMIZE,
@@ -444,11 +270,6 @@ enum class InferenceId
   SETS_EQ_CONFLICT,
   SETS_EQ_MEM,
   SETS_EQ_MEM_CONFLICT,
-  SETS_FILTER_DOWN,
-  SETS_FILTER_UP,
-  SETS_FOLD,
-  SETS_MAP_DOWN_POSITIVE,
-  SETS_MAP_UP,
   SETS_MEM_EQ,
   SETS_MEM_EQ_CONFLICT,
   SETS_PROXY,
@@ -456,55 +277,6 @@ enum class InferenceId
   SETS_SINGLETON_EQ,
   SETS_UP_CLOSURE,
   SETS_UP_CLOSURE_2,
-  SETS_UP_UNIV,
-  //-------------------- sets cardinality solver
-  // split on emptyset
-  SETS_CARD_SPLIT_EMPTY,
-  // split on equality between two distinct Venn regions
-  SETS_CARD_SPLIT_EQ,
-  // cycle of cardinalities, hence all sets have the same
-  SETS_CARD_CYCLE,
-  // two sets have the same cardinality
-  SETS_CARD_EQUAL,
-  SETS_CARD_GRAPH_EMP,
-  SETS_CARD_GRAPH_EMP_PARENT,
-  SETS_CARD_GRAPH_EQ_PARENT,
-  SETS_CARD_GRAPH_EQ_PARENT_2,
-  SETS_CARD_GRAPH_PARENT_SINGLETON,
-  // cardinality is at least the number of elements we already know
-  SETS_CARD_MINIMAL,
-  // negative members are part of the universe
-  SETS_CARD_NEGATIVE_MEMBER,
-  // all sets have non-negative cardinality
-  SETS_CARD_POSITIVE,
-  // the universe is a superset of every set
-  SETS_CARD_UNIV_SUPERSET,
-  // cardinality of the universe is at most cardinality of the type
-  SETS_CARD_UNIV_TYPE,
-  //-------------------- sets relations solver
-  SETS_RELS_IDENTITY_DOWN,
-  SETS_RELS_IDENTITY_UP,
-  SETS_RELS_JOIN_COMPOSE,
-  SETS_RELS_JOIN_IMAGE_DOWN,
-  SETS_RELS_JOIN_IMAGE_UP,
-  SETS_RELS_JOIN_SPLIT_1,
-  SETS_RELS_JOIN_SPLIT_2,
-  SETS_RELS_TABLE_JOIN_UP,
-  SETS_RELS_TABLE_JOIN_DOWN,
-  SETS_RELS_PRODUCE_COMPOSE,
-  SETS_RELS_PRODUCT_SPLIT,
-  SETS_RELS_TCLOSURE_UP,
-  SETS_RELS_TCLOSURE_DOWN,
-  SETS_RELS_TRANSPOSE_EQ,
-  SETS_RELS_TRANSPOSE_REV,
-  SETS_RELS_TUPLE_REDUCTION,
-  SETS_RELS_GROUP_NOT_EMPTY,
-  SETS_RELS_GROUP_UP1,
-  SETS_RELS_GROUP_UP2,
-  SETS_RELS_GROUP_DOWN,
-  SETS_RELS_GROUP_PART_MEMBER,
-  SETS_RELS_GROUP_SAME_PROJECTION,
-  SETS_RELS_GROUP_SAME_PART,
   //-------------------------------------- end sets theory
 
   //-------------------------------------- strings theory
@@ -696,29 +468,6 @@ enum class InferenceId
   //-------------------- codes solver
   // str.code(x) = -1 V str.code(x) != str.code(y) V x = y
   STRINGS_CODE_INJ,
-  //-------------------- sequence update solver
-  // update over unit
-  STRINGS_ARRAY_UPDATE_UNIT,
-  // update over conatenation
-  STRINGS_ARRAY_UPDATE_CONCAT,
-  // update over conatenation, inverse
-  STRINGS_ARRAY_UPDATE_CONCAT_INVERSE,
-  // nth over unit
-  STRINGS_ARRAY_NTH_UNIT,
-  // nth over conatenation
-  STRINGS_ARRAY_NTH_CONCAT,
-  // nth over extract
-  STRINGS_ARRAY_NTH_EXTRACT,
-  // nth over update
-  STRINGS_ARRAY_NTH_UPDATE,
-  // reasoning about the nth term from update term
-  STRINGS_ARRAY_NTH_TERM_FROM_UPDATE,
-  // reasoning about whether an update changes a term or not
-  STRINGS_ARRAY_UPDATE_BOUND,
-  // splitting about equality of sequences
-  STRINGS_ARRAY_EQ_SPLIT,
-  // nth over reverse
-  STRINGS_ARRAY_NTH_REV,
   //-------------------- regexp solver
   // regular expression normal form conflict
   //   ( x in R ^ x = y ^ rewrite((str.in_re y R)) = false ) => false
@@ -835,8 +584,6 @@ enum class InferenceId
   //-------------------- UF arith/bv conversions solver
   // reductions of an arithmetic/bit-vector conversion term
   UF_ARITH_BV_CONV_REDUCTION,
-  // value-based refinement of an arithmetic/bit-vector conversion term
-  UF_ARITH_BV_CONV_VALUE_REFINE,
   //-------------------------------------- end uf theory
 
   //-------------------------------------- unknown

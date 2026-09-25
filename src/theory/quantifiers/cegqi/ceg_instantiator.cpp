@@ -281,15 +281,6 @@ CegHandledStatus CegInstantiator::isCbqiQuantPrefix(Node q)
 CegHandledStatus CegInstantiator::isCbqiQuant(Node q, bool cegqiAll)
 {
   Assert(q.getKind() == Kind::FORALL);
-  // compute attributes
-  QAttributes qa;
-  QuantAttributes::computeQuantAttributes(q, qa);
-  if (qa.d_quant_elim)
-  {
-    return CEG_HANDLED;
-  }
-
-  Assert(!qa.d_quant_elim_partial);
   // if has an instantiation pattern, don't do it
   if (q.getNumChildren() == 3)
   {
@@ -527,21 +518,16 @@ bool CegInstantiator::constructInstantiation(SolvedForm& sf, unsigned i)
         return true;
       }
     }
-    // If the above call fails, resort to using value in model. We do so if:
-    // (A) we are doing quantifier elimination for this quantified formula, or
-    // (B) all of the following hold:
-    // - we have yet to try an instantiation this round (or we are trying
-    //   multiple instantiations, indicated by options::cegqiMultiInst),
+    // If the above call fails, use a model value when all of these hold:
+    // - we have yet to try an instantiation this round,
     // - the instantiator uses model values at this effort or
     //   if we are solving for a subfield of a datatype (is_sv), and
     // - the instantiator allows model values.
     // Furthermore, we only permit the value if it is constant, since the model
     // may contain internal-only expressions, e.g. RANs.
-    bool isQElim = d_qreg.getQuantAttributes().isQuantElim(d_quant);
-    if (isQElim
-        || ((false || !hasTriedInstantiation(pv))
-            && (vinst->useModelValue(this, sf, pv, d_effort) || is_sv)
-            && vinst->allowModelValue(this, sf, pv, d_effort)))
+    if (!hasTriedInstantiation(pv)
+        && (vinst->useModelValue(this, sf, pv, d_effort) || is_sv)
+        && vinst->allowModelValue(this, sf, pv, d_effort))
     {
       Node mv = getModelValue(pv);
       if (mv.isConst())
@@ -836,8 +822,7 @@ void CegInstantiator::popStackVariable()
 bool CegInstantiator::constructInstantiationInc(Node pv,
                                                 Node n,
                                                 TermProperties& pv_prop,
-                                                SolvedForm& sf,
-                                                bool revertOnSuccess)
+                                                SolvedForm& sf)
 {
   AssertEqual(n.getType(), pv.getType());
   Node cnode = pv_prop.getCacheNode();
@@ -964,13 +949,13 @@ bool CegInstantiator::constructInstantiationInc(Node pv,
       Trace("cegqi-inst-debug2") << "Recurse..." << std::endl;
       unsigned i = d_curr_index[pv];
       success = constructInstantiation(sf, d_stack_vars.empty() ? i + 1 : i);
-      if (!success || revertOnSuccess)
+      if (!success)
       {
         Trace("cegqi-inst-debug2") << "Removing from vectors..." << std::endl;
         sf.pop_back(pv_prop);
       }
     }
-    if (success && !revertOnSuccess)
+    if (success)
     {
       return true;
     }
@@ -1070,19 +1055,12 @@ bool CegInstantiator::doAddInstantiation(std::vector<Node>& vars,
   Trace("cegqi-inst-debug") << "Do the instantiation...." << std::endl;
 
   // construct the final instantiation by eliminating witness terms
-  bool isQElim = d_qreg.getQuantAttributes().isQuantElim(d_quant);
   std::vector<Node> svec;
   std::vector<Node> exists;
   for (const Node& s : subs)
   {
     if (expr::hasSubtermKind(Kind::WITNESS, s))
     {
-      if (isQElim)
-      {
-        Trace("cegqi-inst-debug") << "...no witness if QE" << std::endl;
-        // not allowed to use witness if doing quantifier elimination
-        return false;
-      }
       PreprocessElimWitnessNodeConverter ewc(d_env, d_qstate.getValuation());
       Node sc = ewc.convert(s);
       const std::vector<Node>& wexists = ewc.getAxioms();
@@ -1100,14 +1078,7 @@ bool CegInstantiator::doAddInstantiation(std::vector<Node>& vars,
   VtsTermCache* vtc = d_treg.getVtsTermCache();
   bool usedVts = vtc->containsVtsTerm(svec, false);
   Instantiate* inst = d_qim.getInstantiate();
-  // if doing partial quantifier elimination, record the instantiation and set
-  // the incomplete flag instead of sending instantiation lemma
-  if (d_qreg.getQuantAttributes().isQuantElimPartial(d_quant))
-  {
-    inst->recordInstantiation(d_quant, svec, usedVts);
-    return true;
-  }
-  else if (inst->addInstantiation(d_quant,
+  if (inst->addInstantiation(d_quant,
                                   svec,
                                   InferenceId::QUANTIFIERS_INST_CEGQI,
                                   Node::null(),

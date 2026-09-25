@@ -51,22 +51,6 @@ class MonomialBoundsCheck : protected EnvObj
   void checkBounds(const std::vector<Node>& asserts,
                    const std::vector<Node>& false_asserts);
 
-  /** check monomial infer resolution bounds
-   *
-   * Returns a set of valid theory lemmas, based on a
-   * lemma schema which "resolves" upper bounds
-   * of one inequality with lower bounds for another.
-   * This schema is not enabled by default, and can
-   * be enabled by --nl-ext-rbound.
-   *
-   * Examples:
-   *
-   *  ( y>=0 ^ s <= x*z ^ x*y <= t ) => y*s <= z*t
-   *  ...where s <= x*z and x*y <= t are constraints
-   *     that occur in the current context.
-   */
-  void checkResBounds();
-
  private:
   /** Basic data that is shared with other checks */
   ExtState* d_data;

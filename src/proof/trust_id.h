@@ -25,8 +25,6 @@ namespace ava6::internal {
 enum class TrustId : uint32_t
 {
   NONE,
-  /** Assertions of the preprocessed input clauses */
-  PREPROCESSED_INPUT,
   /** A lemma sent by a theory without a proof */
   THEORY_LEMMA,
   /**
@@ -41,7 +39,6 @@ enum class TrustId : uint32_t
   THEORY_INFERENCE_ARITH,
   THEORY_INFERENCE_ARRAYS,
   THEORY_INFERENCE_DATATYPES,
-  THEORY_INFERENCE_SEP,
   THEORY_INFERENCE_SETS,
   THEORY_INFERENCE_STRINGS,
   /** A ppStaticRewrite step */
@@ -51,10 +48,6 @@ enum class TrustId : uint32_t
   THEORY_PREPROCESS,
   /** A lemma added during theory-preprocessing without a proof */
   THEORY_PREPROCESS_LEMMA,
-  /** Specific preprocessing passes */
-  /** BvGauss */
-  PREPROCESS_BV_GUASS,
-  PREPROCESS_BV_GUASS_LEMMA,
   /** BvToBool preprocessing pass */
   PREPROCESS_BV_TO_BOOL,
   /** BoolToBv preprocessing pass */
@@ -64,91 +57,12 @@ enum class TrustId : uint32_t
   PREPROCESS_ACKERMANN_LEMMA,
   /** StaticLearning preprocessing pass */
   PREPROCESS_STATIC_LEARNING_LEMMA,
-  /** HoElim preprocessing pass */
-  PREPROCESS_HO_ELIM,
-  PREPROCESS_HO_ELIM_LEMMA,
-  /** FfBitsum preprocessing pass */
-  PREPROCESS_FF_BITSUM,
-  /** FfDisjunctiveBit preprocessing pass */
-  PREPROCESS_FF_DISJUNCTIVE_BIT,
-  /** FunDefFmf preprocessing pass */
-  /** ITESimp preprocessing pass */
-  PREPROCESS_ITE_SIMP,
-  /** LearnedRewrite preprocessing pass */
-  PREPROCESS_LEARNED_REWRITE,
-  PREPROCESS_LEARNED_REWRITE_LEMMA,
-  /** MipLibTrick preprocessing pass */
-  PREPROCESS_MIPLIB_TRICK,
-  PREPROCESS_MIPLIB_TRICK_LEMMA,
-  /** NlExtPurify preprocessing pass */
-  PREPROCESS_NL_EXT_PURIFY,
-  PREPROCESS_NL_EXT_PURIFY_LEMMA,
-  /** BvIntroPow2 preprocessing pass */
-  PREPROCESS_BV_INTRO_POW2,
-  /** ForeignTheoryRewrite preprocessing pass */
-  PREPROCESS_FOREIGN_THEORY_REWRITE,
-  /** UnconstrainedSimp preprocessing pass */
-  PREPROCESS_UNCONSTRAINED_SIMP,
   /** QuantifiersPreprocess preprocessing pass */
   PREPROCESS_QUANTIFIERS_PP,
   /** RealToInt preprocessing pass */
   PREPROCESS_REAL_TO_INT,
-  /** SortInferencePass preprocessing pass */
-  PREPROCESS_SORT_INFER,
-  PREPROCESS_SORT_INFER_LEMMA,
-  /** StringsEagerPp preprocessing pass */
-  PREPROCESS_STRINGS_EAGER_PP,
   /** A step from the distinct extension */
   UF_DISTINCT,
-  /**
-   * We use :math:`\texttt{IRP}_k(poly)` for an IndexedRootPredicate that is
-   * defined as the :math:`k`'th root of the polynomial :math:`poly`. Note that
-   * :math:`poly` may not be univariate; in this case, the value of
-   * :math:`\texttt{IRP}_k(poly)` can only be calculated with respect to a
-   * (partial) model for all but one variable of :math:`poly`.
-   *
-   * A formula :math:`\texttt{Interval}(x_i)` describes that a variable
-   * :math:`x_i` is within a particular interval whose bounds are given as IRPs.
-   * It is either an open interval or a point interval:
-   *
-   * .. math::
-   *   \texttt{IRP}_k(poly) < x_i < \texttt{IRP}_k(poly)
-   *
-   *   x_i = \texttt{IRP}_k(poly)
-   *
-   * A formula :math:`\texttt{Cell}(x_1 \dots x_i)` describes a portion
-   * of the real space in the following form:
-   *
-   * .. math::
-   *   \texttt{Interval}(x_1) \land \dots \land \texttt{Interval}(x_i)
-   *
-   * A cell can also be empty (for :math:`i = 0`).
-   *
-   * A formula :math:`\texttt{Covering}(x_i)` is a set of intervals, implying
-   * that :math:`x_i` can be in neither of these intervals. To be a covering (of
-   * the real line), the union of these intervals should be the real numbers.
-   *
-   * .. math::
-   *   \inferrule{\texttt{Cell}, A \mid -}{\bot}
-   *
-   * A direct interval is generated from an assumption :math:`A` (in variables
-   * :math:`x_1 \dots x_i`) over a :math:`\texttt{Cell}(x_1 \dots x_i)`. It
-   * derives that :math:`A` evaluates to false over the cell. In the actual
-   * algorithm, it means that :math:`x_i` can not be in the topmost interval of
-   * the cell.
-   */
-  ARITH_NL_COVERING_DIRECT,
-  /**
-   * See ARITH_NL_COVERING_DIRECT for the necessary definitions.
-   *
-   * .. math::
-   *   \inferrule{\texttt{Cell}, \texttt{Covering} \mid -}{\bot}
-   *
-   * A recursive interval is generated from :math:`\texttt{Covering}(x_i)` over
-   * :math:`\texttt{Cell}(x_1 \dots x_{i-1})`. It generates the conclusion that
-   * no :math:`x_i` exists that extends the cell and satisfies all assumptions.
-   */
-  ARITH_NL_COVERING_RECURSIVE,
   /**
    * A conversion between a literal used in the inference id lemma
    * InferenceId::ARITH_NL_COMPARISON and a relation between absolute
@@ -164,7 +78,6 @@ enum class TrustId : uint32_t
   /** A nonlinear flatten monomial lemma that failed proof reconstruction */
   ARITH_NL_FLATTEN_MON_LEMMA,
   /** A conflict coming from the bitblast solver */
-  BV_BITBLAST_CONFLICT,
   /** A step from BvPpAssert utility */
   BV_PP_ASSERT,
   /** Diamonds preprocessing in TheoryUf::ppStaticLearn */
@@ -184,27 +97,11 @@ enum class TrustId : uint32_t
   SUBS_EQ,
   /** A step of the form (~ s t) = (~ (to_real s) (to_real t)) */
   ARITH_PRED_CAST_TYPE,
-  /**
-   * Strings -- Regular expression elimination
-   *
-   * Proves :math:`F = F'` where :math:`F'` is the result of eliminating regular
-   * expressions from :math:`F` using the routine
-   * :math:`\texttt{strings::RegExpElimination::eliminate}(F, b)` for some
-   * :math:`b`.
-   *
-   * Here, :math:`b` is a Boolean indicating whether we are using aggressive
-   * eliminations.
-   */
-  RE_ELIM,
   /** A quantifiers preprocessing step that was given without a proof */
   QUANTIFIERS_PREPROCESS,
   /** A quantifiers rewriting step for instantiations, e.g. virtual term
      substitution */
   QUANTIFIERS_INST_REWRITE,
-  /** A quantifiers from the --sub-cbqi module */
-  QUANTIFIERS_SUB_CBQI_LEMMA,
-  /** A quantifiers from the nested quantifier elimination module */
-  QUANTIFIERS_NESTED_QE_LEMMA,
   /** A rewrite performed at TheoryStrings::ppStaticRewrite */
   STRINGS_PP_STATIC_REWRITE,
   /**
@@ -221,8 +118,6 @@ enum class TrustId : uint32_t
    * require the use of theory rewrites to prove.
    */
   MACRO_THEORY_REWRITE_RCONS_SIMPLE,
-  /** An unproven step from the int-blaster */
-  INT_BLASTER,
   /** Untracked sources of trust, which are discouraged */
   /** A rewrite of the input formula by a preprocessing pass without a proof */
   UNKNOWN_PREPROCESS,

@@ -86,13 +86,6 @@ class Smt2Printer : public ava6::internal::Printer
                                   const std::vector<TypeNode>& argTypes,
                                   TypeNode type) const override;
 
-  /** Print declare-oracle-fun command */
-  void toStreamCmdDeclareOracleFun(std::ostream& out,
-                                   const std::string& id,
-                                   const std::vector<TypeNode>& argTypes,
-                                   TypeNode type,
-                                   const std::string& binName) const override;
-
   /** Print declare-sort command */
   void toStreamCmdDeclareType(std::ostream& out,
                               const std::string& id,

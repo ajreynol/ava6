@@ -115,9 +115,6 @@ class Instantiate : public QuantifiersUtil
   void registerQuantifier(Node q) override;
   /** identify */
   std::string identify() const override { return "Instantiate"; }
-  /** check incomplete */
-  bool checkComplete(IncompleteId& incId) override;
-
   //--------------------------------------rewrite objects
   /** add instantiation rewriter */
   void addRewriter(InstantiationRewriter* ir);
@@ -195,19 +192,9 @@ class Instantiate : public QuantifiersUtil
    * corresponding variable in q.
    */
   void processInstantiationRep(Node q, std::vector<Node>& terms);
-  /** record instantiation
-   *
-   * Explicitly record that q has been instantiated with terms, with virtual
-   * term substitution if doVts is true. This is the same as addInstantiation,
-   * but does not enqueue an instantiation lemma.
-   */
-  void recordInstantiation(Node q,
-                           const std::vector<Node>& terms,
-                           bool doVts = false);
   /** exists instantiation
    *
-   * Returns true if and only if the instantiation already was added or
-   * recorded by this class.
+   * Returns true if and only if the instantiation was already added.
    */
   bool existsInstantiation(Node q, const std::vector<Node>& terms);
   //--------------------------------------general utilities
@@ -325,17 +312,9 @@ class Instantiate : public QuantifiersUtil
 
   /**
    * The list of all instantiation lemma bodies per quantifier. This is used
-   * for debugging and for quantifier elimination.
+   * for debugging and reporting instantiations.
    */
   NodeInstListMap d_insts;
-  /** explicitly recorded instantiations
-   *
-   * Sometimes an instantiation is recorded internally but not sent out as a
-   * lemma, for instance, for partial quantifier elimination. This is a map
-   * of these instantiations, for each quantified formula. This map is cleared
-   * on presolve, e.g. it is local to a check-sat call.
-   */
-  std::map<Node, std::vector<Node>> d_recordedInst;
   /** statistics for debugging total instantiations per quantifier per round */
   std::map<Node, uint32_t> d_instDebugTemp;
   /** list of all instantiations produced for each quantifier

@@ -23,24 +23,6 @@
 
 namespace ava6::context {
 
-class CDRaised
-{
- private:
-  context::CDO<bool> d_flag;
-
- public:
-  CDRaised(context::Context* c) : d_flag(c, false) {}
-
-  bool isRaised() const { return d_flag.get(); }
-
-  void raise()
-  {
-    Assert(!isRaised());
-    d_flag.set(true);
-  }
-
-}; /* class CDRaised */
-
 template <class T>
 class CDMaybe
 {

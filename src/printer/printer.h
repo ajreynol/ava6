@@ -129,14 +129,6 @@ class AVA6_EXPORT Printer
                                           TypeNode type) const;
   /** Variant of above for a pre-existing variable */
   void toStreamCmdDeclareFunction(std::ostream& out, const Node& v) const;
-  /** Print declare-oracle-fun command */
-  virtual void toStreamCmdDeclareOracleFun(
-      std::ostream& out,
-      const std::string& id,
-      const std::vector<TypeNode>& argTypes,
-      TypeNode type,
-      const std::string& binName) const;
-
   /** Print declare-sort command */
   virtual void toStreamCmdDeclareType(std::ostream& out,
                                       const std::string& id,

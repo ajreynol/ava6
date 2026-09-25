@@ -38,14 +38,7 @@ struct InstLevelAttributeId
 };
 using InstLevelAttribute = expr::Attribute<InstLevelAttributeId, uint64_t>;
 
-/** Attribute true for quantifiers we are doing quantifier elimination on */
-struct QuantElimAttributeId
-{
-};
-using QuantElimAttribute = expr::Attribute<QuantElimAttributeId, bool>;
-
-/** Attribute true for quantifiers we which to preserve structure for, including
- * those that we are doing quantifier elimination on */
+/** Attribute true for quantifiers whose structure must be preserved. */
 struct PreserveStructureAttributeId
 {
 };
@@ -54,7 +47,7 @@ using PreserveStructureAttribute =
 
 bool QAttributes::isStandard() const
 {
-  return !d_preserveStructure && !isFunDef() && !isOracleInterface()
+  return !d_preserveStructure && !isFunDef()
          && !d_isQuantBounded;
 }
 
@@ -89,20 +82,6 @@ void QuantAttributes::setUserAttribute(const std::string& attr,
         << "Set instantiation level " << n << " to " << lvl << std::endl;
     QuantInstLevelAttribute qila;
     n.setAttribute(qila, lvl);
-  }
-  else if (attr == "quant-elim")
-  {
-    Trace("quant-attr-debug")
-        << "Set quantifier elimination " << n << std::endl;
-    QuantElimAttribute qea;
-    n.setAttribute(qea, true);
-  }
-  else if (attr == "quant-elim-partial")
-  {
-    Trace("quant-attr-debug")
-        << "Set partial quantifier elimination " << n << std::endl;
-    QuantElimPartialAttribute qepa;
-    n.setAttribute(qepa, true);
   }
 }
 
@@ -249,13 +228,6 @@ void QuantAttributes::computeQuantAttributes(Node q, QAttributes& qa)
           qa.d_fundef_f = q[2][i][0].getOperator();
         }
 
-        // oracles are specified by a distinguished variable kind
-        if (avar.getKind() == Kind::ORACLE)
-        {
-          qa.d_oracle = avar;
-          Trace("quant-attr")
-              << "Attribute : oracle interface : " << q << std::endl;
-        }
 
         if (avar.getAttribute(QuantNameAttribute()))
         {
@@ -290,24 +262,6 @@ void QuantAttributes::computeQuantAttributes(Node q, QAttributes& qa)
               << "Attribute : preserve structure : " << q << std::endl;
           qa.d_preserveStructure = true;
         }
-        if (avar.getAttribute(QuantElimAttribute()))
-        {
-          Trace("quant-attr")
-              << "Attribute : quantifier elimination : " << q << std::endl;
-          qa.d_preserveStructure = true;
-          qa.d_quant_elim = true;
-          // don't set owner, should happen naturally
-        }
-        if (avar.getAttribute(QuantElimPartialAttribute()))
-        {
-          Trace("quant-attr")
-              << "Attribute : quantifier elimination partial : " << q
-              << std::endl;
-          qa.d_preserveStructure = true;
-          qa.d_quant_elim = true;
-          qa.d_quant_elim_partial = true;
-          // don't set owner, should happen naturally
-        }
         if (BoundedIntegers::isBoundedForallAttribute(avar))
         {
           Trace("quant-attr")
@@ -337,16 +291,6 @@ bool QuantAttributes::isFunDef(Node q)
   return it->second.isFunDef();
 }
 
-bool QuantAttributes::isOracleInterface(Node q)
-{
-  std::map<Node, QAttributes>::iterator it = d_qattr.find(q);
-  if (it == d_qattr.end())
-  {
-    return false;
-  }
-  return it->second.isOracleInterface();
-}
-
 int64_t QuantAttributes::getQuantInstLevel(Node q)
 {
   std::map<Node, QAttributes>::iterator it = d_qattr.find(q);
@@ -358,25 +302,6 @@ int64_t QuantAttributes::getQuantInstLevel(Node q)
   {
     return it->second.d_qinstLevel;
   }
-}
-
-bool QuantAttributes::isQuantElim(Node q) const
-{
-  std::map<Node, QAttributes>::const_iterator it = d_qattr.find(q);
-  if (it == d_qattr.end())
-  {
-    return false;
-  }
-  return it->second.d_quant_elim;
-}
-bool QuantAttributes::isQuantElimPartial(Node q) const
-{
-  std::map<Node, QAttributes>::const_iterator it = d_qattr.find(q);
-  if (it == d_qattr.end())
-  {
-    return false;
-  }
-  return it->second.d_quant_elim_partial;
 }
 
 bool QuantAttributes::isQuantBounded(Node q) const
@@ -440,13 +365,6 @@ Node QuantAttributes::mkAttrPreserveStructure(NodeManager* nm)
   return nattr;
 }
 
-Node QuantAttributes::mkAttrQuantifierElimination(NodeManager* nm)
-{
-  Node nattr = mkAttrInternal(nm, AttrType::ATTR_QUANT_ELIM);
-  QuantElimAttribute qea;
-  nattr[0].setAttribute(qea, true);
-  return nattr;
-}
 Node QuantAttributes::mkAttrInternal(NodeManager* nm, AttrType at)
 {
   SkolemManager* sm = nm->getSkolemManager();

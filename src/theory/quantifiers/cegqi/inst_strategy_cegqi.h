@@ -114,13 +114,6 @@ class InstStrategyCegqi : public QuantifiersModule
  protected:
   /** The instantiation rewriter object */
   std::unique_ptr<InstRewriterCegqi> d_irew;
-  /** set quantified formula inactive
-   *
-   * This flag is set to true during a full effort check if at least one
-   * quantified formula is set "inactive", that is, its negation is
-   * unsatisfiable in the current context.
-   */
-  bool d_cbqi_set_quant_inactive;
   /** incomplete check
    *
    * This is set to true during a full effort check if this strategy could
