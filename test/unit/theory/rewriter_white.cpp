@@ -10,6 +10,7 @@
  * White box testing of the core rewriter.
  */
 
+#include "proof/proof_node.h"
 #include "test_smt.h"
 #include "util/rational.h"
 
@@ -21,6 +22,46 @@ using namespace theory;
 class TestTheoryWhiteRewriter : public TestSmt
 {
 };
+
+class TestTheoryWhiteRewriterProof : public TestSmtNoFinishInit
+{
+ protected:
+  void SetUp() override
+  {
+    TestSmtNoFinishInit::SetUp();
+    d_slvEngine->setOption("produce-proofs", "true");
+    d_slvEngine->setOption("proof-check", "eager");
+    d_slvEngine->finishInit();
+  }
+};
+
+TEST_F(TestTheoryWhiteRewriterProof, sharedChildProofCache)
+{
+  Rewriter* rr = d_slvEngine->getEnv().getRewriter();
+  TypeNode intType = d_nodeManager->integerType();
+  TypeNode funType = d_nodeManager->mkFunctionType(intType, intType);
+  Node x = d_skolemManager->mkDummySkolem("x", intType);
+  Node f = d_skolemManager->mkDummySkolem("f", funType);
+  Node g = d_skolemManager->mkDummySkolem("g", funType);
+  Node zero = d_nodeManager->mkConstInt(Rational(0));
+  Node child = d_nodeManager->mkNode(Kind::ADD, x, zero);
+
+  // A shared child's ordinary rewrite cache must not suppress its proof.
+  // The second parent can then reuse the child's completed proof.
+  ASSERT_EQ(rr->rewrite(child), x);
+  for (const Node& fun : {f, g})
+  {
+    Node input = d_nodeManager->mkNode(Kind::APPLY_UF, fun, child);
+    Node expected = d_nodeManager->mkNode(Kind::APPLY_UF, fun, x);
+    ASSERT_EQ(rr->rewrite(input), expected);
+    TrustNode rewritten = rr->rewriteWithProof(input);
+    ASSERT_EQ(rewritten.getNode(), expected);
+    std::shared_ptr<ProofNode> proof = rewritten.toProofNode();
+    ASSERT_NE(proof, nullptr);
+    ASSERT_EQ(proof->getResult(), input.eqNode(expected));
+    ASSERT_TRUE(proof->isClosed());
+  }
+}
 
 TEST_F(TestTheoryWhiteRewriter, deepFullRewrite)
 {

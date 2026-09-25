@@ -91,12 +91,8 @@ void addToProduct(std::vector<Node>& product,
 void addToSum(Sum& sum, TNode product, const Rational& multiplicity)
 {
   if (multiplicity.isZero()) return;
-  auto it = sum.find(product);
-  if (it == sum.end())
-  {
-    sum.emplace(product, multiplicity);
-  }
-  else
+  auto [it, inserted] = sum.try_emplace(product, multiplicity);
+  if (!inserted)
   {
     it->second += multiplicity;
     if (it->second.isZero())

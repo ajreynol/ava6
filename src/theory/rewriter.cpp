@@ -237,7 +237,7 @@ Node Rewriter::rewriteTo(theory::TheoryId theoryId,
   // Use deque since RewriteStackElement contains a live NodeBuilder; unlike a
   // vector, pushing deep stacks will not relocate existing frames.
   deque<RewriteStackElement> rewriteStack;
-  rewriteStack.push_back(RewriteStackElement(node, theoryId));
+  rewriteStack.emplace_back(node, theoryId);
 
   // Rewrite until the stack is empty
   for (;;)
@@ -350,8 +350,19 @@ Node Rewriter::rewriteTo(theory::TheoryId theoryId,
       if (rewriteStackTop.d_nextChild < numChildren)
       {
         Node childNode = rewriteStackTop.d_node[rewriteStackTop.d_nextChild++];
-        rewriteStack.push_back(
-            RewriteStackElement(childNode, theoryOf(childNode)));
+        TheoryId childTheory = theoryOf(childNode);
+        Node childCached = getPostRewriteCache(childTheory, childNode);
+        if (!childCached.isNull()
+            && (tcpg == nullptr || hasRewrittenWithProofs(childNode)))
+        {
+          // Use the same cache condition as rewriteTo: a result computed
+          // without proofs cannot bypass proof construction for this child.
+          rewriteStackTop.d_builder << childCached;
+        }
+        else
+        {
+          rewriteStack.emplace_back(childNode, childTheory);
+        }
         continue;
       }
       if (numChildren > 0)
@@ -394,8 +405,7 @@ Node Rewriter::rewriteTo(theory::TheoryId theoryId,
 #endif
           rewriteStackTop.d_fullRewriteNode = response.d_node;
           rewriteStackTop.setState(RewriteStackElement::WAIT_FOR_FULL_REWRITE);
-          rewriteStack.push_back(
-              RewriteStackElement(response.d_node, newTheoryId));
+          rewriteStack.emplace_back(response.d_node, newTheoryId);
           break;
         }
         else if ((response.d_status == REWRITE_DONE
