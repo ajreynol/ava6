@@ -23,4 +23,5 @@ for arg in "$@"; do
     *) echo "Unsupported core build argument: $arg" >&2; exit 1 ;;
   esac
 done
-exec cmake -S "$(dirname "$0")" -B "$build_dir" -DCMAKE_BUILD_TYPE="$build_type" "${cmake_args[@]}"
+# Older Bash versions treat empty arrays as unset under `set -u`.
+exec cmake -S "$(dirname "$0")" -B "$build_dir" -DCMAKE_BUILD_TYPE="$build_type" ${cmake_args[@]+"${cmake_args[@]}"}

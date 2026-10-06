@@ -71,7 +71,7 @@ configure_args=(
   "$build_type" "--name=$build_dir" "--prefix=$install_dir" --auto-download
   -DBUILD_SHARED_LIBS=OFF -DSTATIC_BINARY=OFF -DENABLE_TRACING=ON
   "-DENABLE_UNIT_TESTING=$unit_testing"
-  "${extra_args[@]}"
+  ${extra_args[@]+"${extra_args[@]}"}
 )
 printf 'Configuring %s in %s\n' "$build_type" "$build_dir"
 "$source_dir/configure.sh" "${configure_args[@]}"
